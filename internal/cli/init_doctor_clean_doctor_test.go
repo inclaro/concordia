@@ -247,6 +247,26 @@ func TestDoctorReportsAvailableCapabilitiesAndExits0(t *testing.T) {
 	}
 }
 
+func TestDoctorMissingGitIsOptional(t *testing.T) {
+	t.Parallel()
+
+	noGit := func(ctx context.Context, cmd string, args []string) *cli.ProbeResult {
+		if cmd == "git" {
+			return nil
+		}
+
+		return okProbe(ctx, cmd, args)
+	}
+
+	deps := clientDeps(fakeCbm("0.12.1", "doctor-repo"), noGit)
+	res := runWith(t, &runConfig{Dir: initialized(t), Deps: deps}, "doctor", "--json")
+	requireExit0(t, &res)
+
+	if git := capabilities(t, res.Stdout)["git"]; !git.hasStatus("missing", "optional:") {
+		t.Errorf("git = %+v", git)
+	}
+}
+
 func TestDoctorPrettyOutput(t *testing.T) {
 	t.Parallel()
 
@@ -317,7 +337,7 @@ func TestDoctorMissingOrIncompatibleCbmExits5(t *testing.T) {
 	}
 }
 
-func TestDoctorMissingGitOrWorkspaceExits5(t *testing.T) {
+func TestDoctorMissingWorkspaceExits5(t *testing.T) {
 	t.Parallel()
 
 	noProbe := func(context.Context, string, []string) *cli.ProbeResult { return nil }

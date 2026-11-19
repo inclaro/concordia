@@ -96,7 +96,22 @@ func (g *CliGit) gitBig(ctx context.Context, args ...string) (procexec.Result, e
 }
 
 func (g *CliGit) run(ctx context.Context, maxBuffer int, args []string) (procexec.Result, error) {
-	res, err := procexec.Run(ctx, "git", args, procexec.Options{Dir: g.root, Timeout: gitTimeout, MaxBuffer: maxBuffer})
+	res, err := g.exec(ctx, maxBuffer, args)
+
+	return checkRun(args, res, err)
+}
+
+// exec runs git in the C locale, so that its messages are not translated: isRepo reads the
+// "not a git repository" message. A later entry of an environment key wins over an earlier one.
+func (g *CliGit) exec(ctx context.Context, maxBuffer int, args []string) (procexec.Result, error) {
+	env := append(os.Environ(), "LC_ALL=C", "LANGUAGE=C")
+
+	//nolint:wrapcheck // checkRun and isRepo read the *procexec.SpawnError.
+	return procexec.Run(ctx, "git", args, procexec.Options{Dir: g.root, Env: env, Timeout: gitTimeout, MaxBuffer: maxBuffer})
+}
+
+// checkRun gives the CO-WRK-012 error of a git run that did not start, failed or timed out.
+func checkRun(args []string, res procexec.Result, err error) (procexec.Result, error) {
 	if err != nil {
 		var spawn *procexec.SpawnError
 		if errors.As(err, &spawn) {
@@ -149,12 +164,20 @@ func (g *CliGit) Revision(ctx context.Context) (string, error) {
 	return "", gitFailed(args, res)
 }
 
-// isRepo says whether the directory is inside a git work tree. Git's "not a git repository"
-// answer means "no"; any other non-zero exit (for example unsafe ownership) is a CO-WRK-012 error.
+// isRepo says whether the directory is inside a git work tree. Without a git executable, or when git
+// answers "not a git repository", it is a plain directory: "no". Any other failure (for example unsafe
+// ownership) is a CO-WRK-012 error.
 func (g *CliGit) isRepo(ctx context.Context) (bool, error) {
 	args := []string{revParse, "--is-inside-work-tree"}
 
-	res, err := g.git(ctx, args...)
+	res, err := g.exec(ctx, 0, args)
+
+	var spawn *procexec.SpawnError
+	if errors.As(err, &spawn) && spawn.NotFound {
+		return false, nil
+	}
+
+	res, err = checkRun(args, res, err)
 	if err != nil {
 		return false, err
 	}
