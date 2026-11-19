@@ -1,0 +1,71 @@
+{
+  "assurance": {
+    "candidates": null,
+    "checkResults": null,
+    "evaluations": null,
+    "lineage": null,
+    "plans": [
+      {
+        "admissible": false,
+        "coverage": "complete",
+        "details": [
+          "not-authenticated"
+        ],
+        "digest": "sha256:87dc823bb134e295cf8f9cec2dc27515b4096caba60f535943064113dfaf0319",
+        "environment": "production",
+        "file": "build/plans/production.json",
+        "formatVersion": "1.2",
+        "gaps": [
+          {
+            "detail": "aws_s3_bucket.logs: arn is unknown until apply",
+            "kind": "unknown-after-apply",
+            "path": "build/plans/production.json"
+          },
+          {
+            "detail": "aws_s3_bucket.logs: cors_rule[0] is unknown until apply",
+            "kind": "unknown-after-apply",
+            "path": "build/plans/production.json"
+          },
+          {
+            "detail": "aws_s3_bucket.logs: id is unknown until apply",
+            "kind": "unknown-after-apply",
+            "path": "build/plans/production.json"
+          },
+          {
+            "detail": "module.net.aws_security_group.web[\"public\"]: id is unknown until apply",
+            "kind": "unknown-after-apply",
+            "path": "build/plans/production.json"
+          }
+        ],
+        "integrity": "content-not-verified",
+        "level": "rendered-or-evaluated",
+        "resourceCount": 3,
+        "tool": "terraform"
+      }
+    ],
+    "quality": null,
+    "qualityAreas": null,
+    "rendered": [
+      {
+        "confinement": "none",
+        "coverage": "complete",
+        "environment": "production",
+        "gaps": [],
+        "inputDigest": "sha256:fcfb2bfef7fab956083b27696672766ee870bbccb547a34983a3d53ea91e9a0b",
+        "level": "rendered-or-evaluated",
+        "outputDigest": "sha256:95d2089f775b1d0a357542f0d10842cd29f6ee72d3d778bfc2eddd7e76647774",
+        "resourceCount": 2,
+        "source": "assurance-render/production",
+        "tool": "plain"
+      }
+    ],
+    "statements": []
+  },
+  "schemaVersion": "1.1",
+  "toolchain": {
+    "claimsRegistryDigest": "sha256:7fa30d8b38567be2084dafe0e1e2e0717c005137f13a400e0bba29b3169c18fb",
+    "evaluators": [],
+    "renderers": [],
+    "trustContractDigest": "sha256:d38f6bef0660414d256368512d220f592dd7c8a05d3cd2ad27e78c54ecbe4a26"
+  }
+}

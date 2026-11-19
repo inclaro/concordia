@@ -1,0 +1,170 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Duplicate unique-id detected. ID: web, path: /relationships/0/unique-id",
+          "path": "/relationships/web/unique-id",
+          "rule": "unique-ids-must-be-unique-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/nodes/node1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/nodes/node2/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/nodes/node1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/nodes/node1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /nodes/1/unique-id",
+          "path": "/nodes/node1/unique-id",
+          "rule": "unique-ids-must-be-unique-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: rel1, path: /relationships/1/unique-id",
+          "path": "/relationships/rel1/unique-id",
+          "rule": "unique-ids-must-be-unique-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/nodes/node1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/nodes/node2/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /nodes/1/interfaces/0/unique-id",
+          "path": "/nodes/node2/interfaces/intf1/unique-id",
+          "rule": "unique-ids-must-be-unique-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/nodes/node1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/nodes/node2/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /relationships/0/unique-id",
+          "path": "/relationships/node1/unique-id",
+          "rule": "unique-ids-must-be-unique-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

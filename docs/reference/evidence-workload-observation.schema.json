@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/evidence/workload-observation/v1.schema.json",
+  "title": "Concordia workload-observation predicate v1",
+  "description": "The predicate of an in-toto Statement v1 with predicateType https://concordia.io/evidence/workload-observation/v1: one container of one workload seen running, with its image digest. The subject names that digest. The schema is open: Concordia ignores fields that it does not list and does not persist them. A missing required field makes the statement inadmissible with the detail `missing-field:<name>`.",
+  "type": "object",
+  "required": [
+    "environment",
+    "workload",
+    "container",
+    "digest",
+    "time"
+  ],
+  "properties": {
+    "environment": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "cluster": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "context": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "workload": {
+      "$ref": "#/$defs/workload"
+    },
+    "container": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "time": {
+      "$ref": "#/$defs/time",
+      "description": "When the container was observed. The maximum age of `assurance.records` counts from it."
+    },
+    "observer": {
+      "type": "string",
+      "description": "The collector, when the producer states it."
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "cluster"
+      ],
+      "properties": {
+        "cluster": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    {
+      "required": [
+        "context"
+      ],
+      "properties": {
+        "context": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "workload": {
+      "type": "object",
+      "required": [
+        "namespace",
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+:[0-9a-fA-F]+$",
+      "description": "`<algorithm>:<hex>`, for example `sha256:...`."
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 time."
+    }
+  }
+}

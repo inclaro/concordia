@@ -1,0 +1,33 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: views
+  version: 1.0.0
+# View currency rules. `check` evaluates them from the `views` of the workspace, not from a predicate: the pack is
+# active whenever the workspace declares a view, and it is not listed in `policies.packs`. The severity of a finding
+# is `views[].comparison.severity` (default error). Set a mode per family with `check.enforcement` (family
+# `view-currency`). Never reuse or renumber a rule ID: baselines and waivers key on it.
+rules:
+  - id: VIEW-PRES-001
+    name: A declared view is committed in the tracked revision
+    severity: error
+    family: view-currency
+    viewCurrency: { check: presence }
+    rationale: A diagram that exists only in the working tree or in the index workspace is not part of what the team reviews and ships, so it cannot stand for the architecture.
+    remediation: Commit the declared source file of an authored view, or run `concordia render --views` and commit the output, the exports and the manifest of a generated view.
+
+  - id: VIEW-FRESH-001
+    name: A generated view is regenerated from its current inputs
+    severity: error
+    family: view-currency
+    viewCurrency: { check: freshness }
+    rationale: A committed artifact is current only when Concordia regenerates the same bytes from the inputs of this run. A recorded digest or a file timestamp is not evidence.
+    remediation: Run `concordia render --views` and commit the artifacts and the manifest. When the Structurizr CLI is not the pinned version, install the pinned version.
+
+  - id: VIEW-CORR-001
+    name: A view corresponds to the architecture and the implementation
+    severity: error
+    family: view-currency
+    viewCurrency: { check: correspondence }
+    rationale: A diagram that shows elements or relationships that differ from the declared or the observed architecture misleads the people who read it.
+    remediation: Correct the diagram or the architecture model. When the result is unknown, supply the mapping or the binding that the comparison needs, or fix the analysis configuration.

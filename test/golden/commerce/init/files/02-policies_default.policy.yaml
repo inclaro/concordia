@@ -1,0 +1,19 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: default
+  version: 1.0.0
+rules:
+  - id: CO-CYC-001
+    name: No dependency cycles between modules
+    severity: error
+    subject:
+      nodeTypes:
+        - service
+        - system
+    require:
+      graphProperty: acyclic
+      edges:
+        - IMPORTS
+        - CALLS
+      collapseBy: architectureBinding

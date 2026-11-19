@@ -1,0 +1,13 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm-timeline.json",
+  "current-moment": "moment1",
+  "moments": [
+    {
+      "unique-id": "moment1",
+      "node-type": "moment",
+      "name": "",
+      "description": "Moment moment1.",
+      "details": {}
+    }
+  ]
+}

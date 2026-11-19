@@ -1,0 +1,5 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# A generator reference that leaves the workspace: the pre-scan must refuse it without reading the host file.
+generators:
+  - ../../../../../../../../../../../../etc/hostname

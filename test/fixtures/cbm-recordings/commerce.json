@@ -1,0 +1,2684 @@
+{
+  "calls": {
+    "022e91f9f55bccb1b1e5a4e7fa21419fbbc9dbe88a52ea2f9d65f787ee675a3e": {
+      "columns": [
+        "id(n)",
+        "properties(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "115",
+          "{\"source\":\"k8s\",\"group\":\"concordia.io\",\"kind\":\"Workspace\",\"version\":\"v1alpha1\",\"obj_key\":\"concordia.io/Workspace/?/commerce-platform\"}"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0d70f1489b29a194bf19de57fdacb1d1a76665b0fd74c952fad116699bcd9353": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0e9420eec0b1c60cb5f6d6c7d35c029a4e4376e1a6632b7e8443561b410b238c": {
+      "cross_repo": {
+        "status": "never_run"
+      },
+      "doc_links": {
+        "mentions": 0,
+        "status": "ok",
+        "unresolved": {}
+      },
+      "edges": 136,
+      "git": {
+        "base_sha": "",
+        "branch": "main",
+        "branch_slug": "main",
+        "canonical_root": "/tmp/concordia-record-commerce",
+        "git_common_dir": ".git",
+        "git_dir": ".git",
+        "head_sha": "d8b19b06a70f1e5b872af0a056345fc0ff99e67c",
+        "is_detached": false,
+        "is_git": true,
+        "is_worktree": false,
+        "root_exists": true,
+        "worktree_root": "/tmp/concordia-record-commerce"
+      },
+      "indexed_at": "2026-10-25T21:06:25Z",
+      "nodes": 115,
+      "not_indexed": {
+        "dirs": [],
+        "dirs_count": 1,
+        "dirs_omitted": 1,
+        "files": [],
+        "files_count": 0,
+        "truncated": true
+      },
+      "parse_partial": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "parse_unusable": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "project": "concordia-fixture-commerce",
+      "root_path": "/tmp/concordia-record-commerce",
+      "skipped": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "status": "ready",
+      "watch": {
+        "hint": "Auto-sync watches only the active MCP session's project; re-run index_repository to refresh this index.",
+        "reason": "not_session_project",
+        "watched": false
+      }
+    },
+    "14e48a6bbdf36e6fb671d7da788371bbcf85eeb3891bbe70b5237af07dea06fc": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "1cdf40ab08546646acfbff84d4d9b82ad7d6d129e4c320783e22f10affad94c2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "20260471f20d81251d0df18b954d0b45d7444072183293a5c7f579d58a3ccafc": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "268579e504a64dd7d458768f467750a3c351eae9de646ebdc1faa7f4bc065098": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "273e62ba800aa749a39291fa040b64a01b58f14853972ba045a21db7bf56bb1d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2da8b499b42fad2013e4d027bc1001735cb02fd08c1b0fe7a946e7fb90db5c19": {
+      "columns": [
+        "f.file_path"
+      ],
+      "has_more": false,
+      "returned": 14,
+      "rows": [
+        [
+          "concordia.yaml"
+        ],
+        [
+          "architecture/url-mapping.json"
+        ],
+        [
+          "architecture/commerce.calm.json"
+        ],
+        [
+          "architecture/resources/requirement.json"
+        ],
+        [
+          "bindings/concordia.bindings.yaml"
+        ],
+        [
+          "exceptions/waivers.yaml"
+        ],
+        [
+          "packages/fulfillment-contract/src/index.ts"
+        ],
+        [
+          "policies/boundaries.policy.yaml"
+        ],
+        [
+          "services/billing/src/InvoiceService.ts"
+        ],
+        [
+          "services/fulfillment/src/notify.ts"
+        ],
+        [
+          "services/fulfillment/src/internal/ShipmentStore.ts"
+        ],
+        [
+          "services/ledger/ledger/store.py"
+        ],
+        [
+          "services/ledger/ledger/api.py"
+        ],
+        [
+          "services/legacy/src/Legacy.kt"
+        ]
+      ],
+      "total": 14,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2dd218aa0eede142ffcfdc13bb338be877a5c680e2e1b02c24ad79c40f92b60d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2ef211e0b80c998983bc7521358a5f7ad48b28e2707fb78e630a0770381092c6": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "30939de4197ac497a3b6decb24124617cdcc49774994f2e6e4ea7a42de14b687": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "33c30cd082cda2f36c5098002416ebc21f93cbd8cddbad5b6549dc08ac376f5f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "348db8dbff840bd161ecaa948e73e425ca3bbffbefa2ca1113ae87164794973d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3b28df47683c2eb6523a0d3ff1c12073bef7370456f07f8e82f91b461a21d430": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3c499976abceb9a640f85bebeb9f069bf11760ca8915b0947b4d560267dc6b5a": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "84",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService",
+          "services/billing/src/InvoiceService.ts",
+          "4",
+          "85",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService.issue",
+          "services/billing/src/InvoiceService.ts",
+          "5"
+        ],
+        [
+          "89",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "1",
+          "90",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "4"
+        ],
+        [
+          "109",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.Legacy",
+          "services/legacy/src/Legacy.kt",
+          "3",
+          "110",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.Legacy.run",
+          "services/legacy/src/Legacy.kt",
+          "4"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3e82f7e3a157e8c9b4d6fe995d8eae76b3772c238154520332e56d4533726f4e": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4e36e8adaca1e215ae4bd5de2b290ff20f660d1ef8ddf3c470e9c5f22d566d58": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "2"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4fd54dbd3f4bb38e1e77b37d519fb88f87e8322af38b156d20dd6a92542e51bb": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "53828682a6e66e3dc47af2e77008337dac7fa262cd19ccd08da5085fce6e8e32": {
+      "cross_repo": {
+        "status": "never_run"
+      },
+      "doc_links": {
+        "mentions": 0,
+        "status": "ok",
+        "unresolved": {}
+      },
+      "edges": 136,
+      "indexed_at": "2026-10-25T21:06:25Z",
+      "nodes": 115,
+      "not_indexed": {
+        "dirs": [],
+        "dirs_count": 1,
+        "dirs_omitted": 1,
+        "files": [],
+        "files_count": 0,
+        "truncated": true
+      },
+      "parse_partial": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "parse_unusable": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "project": "concordia-fixture-commerce",
+      "root_path": "/tmp/concordia-record-commerce",
+      "skipped": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "status": "ready",
+      "watch": {
+        "hint": "Auto-sync watches only the active MCP session's project; re-run index_repository to refresh this index.",
+        "reason": "not_session_project",
+        "watched": false
+      }
+    },
+    "5505fd302f61ce8ba2477762baa48a091d49b85e424acabd6711fe96911bcea5": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "582c50f62e9fcba600339bbe8df4b232c8926d1c550e597c6a71f9f74cd51696": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "59b3ccbaf74e0cfa820d7f52b323dc79a58a327ae9ca9a2a4fa3d887ee083df2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "6ddcc29e8b24bc12c409f3f98a079ed9deac7ef85d79ca7dc6e54aca2eaf9a20": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.base_sha",
+        "r.branch",
+        "r.canonical_root",
+        "r.git_common_dir",
+        "r.head_sha",
+        "r.is_detached",
+        "r.is_git",
+        "r.is_worktree",
+        "r.root_exists",
+        "r.worktree_root"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1",
+          "[\"Project\"]",
+          "concordia-fixture-commerce",
+          "{}",
+          "0",
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-commerce.__branch__.main",
+          "{}",
+          "0",
+          "true",
+          "main",
+          "/tmp/concordia-record-commerce",
+          ".git",
+          "d8b19b06a70f1e5b872af0a056345fc0ff99e67c",
+          "false",
+          "true",
+          "false",
+          "true",
+          "/tmp/concordia-record-commerce"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "6f6f236d3c6ad16300ae027a49062c67945279a9f663d8a3804e215723d78c04": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "70721d661a15c7b4fc27e918362dc520763400c4f171932f3189fa629eaa584f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7789e6da239348b93bd4c8a39008da26d942904f6c62c00736b4852952e62ac3": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "78340336f6ac1a1e34c8e65f92f703044586a185cca3618434687b216f0b3e9f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7b94561f174663e0c2de2ddc829657695d05f334b3b736789af0a6a9cf2a244a": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7cf503018f3d38374ede3eca5278c717c580d09d49ddc7b003ab0469890ded79": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7e063d98df72bcf9237ef6ef55c05f43a9496aff4bcef55c037951fde8a0ef4f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "80239a9e6eb276effb45a77f32afb46abd0bc5a84a55bc24d79fefdd0213b478": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "80a77ea94d58034ec68f323d5d9be7849d7a21ccb1332628511d987f8455234a": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "5"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "82eb268ff386077a2f1ddc778552254994b48f4986413b74719b9692fd619d4f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "84cbcd1959d1d6a79e9b8d867e7bb1d6caa980d9c05a6f12c628659deed02289": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "8b0be736932d4a39090b97d53c72de548e6b45b89ba5a194f3e2dda6af5435c8": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "8f3e97f7b54062d37b35ee1a20a837288fd4985a520c482c473ebe8120d02e90": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "929d19065f2713b10fc265b2178aa054a94dd4d8d5a05d8b96a9adb30509c8bf": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "971ecff1f8fdc39e34535505f754037fa1601dd2d91ae311d8dffe0474a55459": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9aa515588869078e66578fade9894a38b371646a524bc337934b37a755429554": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9f5f34d60fabd4077e786f967f702b75f15c235b2dfdb22e404d836ae260f986": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a0b3082da55f5ce20f57a8cfd393be5e5ab816f02b93e14f3ea7796f13d8237b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a519d424bcad7213ec7ff11d12f7291286daac99e7558aba26817a3005578392": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a8558df23f172359c155077720913252f182cf461902b46bcabd7fa4ba60a8b1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "93"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ae77901ee8214a9893d709d07af40db5501e29474c9846bf7be88da61d7fac61": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b0945792469e3472d7cf940189eeea81de85e0863bf7e8cfb7310cbd6b86aab1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b0adcee47c734eb0d7c5dffc926dbaf05fba161d51e872ab66798c08c82724b0": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b15dd47f9ab5ad47cf601dd70d04253f5901ad58d345d7787ac3d5e0d1b636ad": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.args",
+        "r.callee",
+        "r.candidates",
+        "r.confidence",
+        "r.line",
+        "r.strategy"
+      ],
+      "has_more": false,
+      "returned": 5,
+      "rows": [
+        [
+          "87",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.notifyShipped",
+          "services/fulfillment/src/notify.ts",
+          "3",
+          "84",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService",
+          "services/billing/src/InvoiceService.ts",
+          "4",
+          "",
+          "InvoiceService",
+          "1",
+          "0.95",
+          "4",
+          "import_map"
+        ],
+        [
+          "87",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.notifyShipped",
+          "services/fulfillment/src/notify.ts",
+          "3",
+          "85",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService.issue",
+          "services/billing/src/InvoiceService.ts",
+          "5",
+          "[{\"i\":0,\"e\":\"orderId\"},{\"i\":1,\"e\":\"0\"}]",
+          "invoices.issue",
+          "1",
+          "0.95",
+          "5",
+          "lsp_ts_method"
+        ],
+        [
+          "92",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.append_entry",
+          "services/ledger/ledger/store.py",
+          "4",
+          "103",
+          "[\"Method\"]",
+          "builtins.list.append",
+          "<python-builtins>",
+          "1",
+          "[{\"i\":0,\"e\":\"(account, cents)\"}]",
+          "_entries.append",
+          "1",
+          "0.88",
+          "5",
+          "lsp_generic_method"
+        ],
+        [
+          "92",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.append_entry",
+          "services/ledger/ledger/store.py",
+          "4",
+          "94",
+          "[\"Function\"]",
+          "builtins.len",
+          "<python-builtins>",
+          "1",
+          "[{\"i\":0,\"e\":\"_entries\"}]",
+          "len",
+          "1",
+          "0.92",
+          "6",
+          "lsp_builtin"
+        ],
+        [
+          "107",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.post_entry",
+          "services/ledger/ledger/api.py",
+          "4",
+          "92",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.append_entry",
+          "services/ledger/ledger/store.py",
+          "4",
+          "[{\"i\":0,\"e\":\"account\"},{\"i\":1,\"e\":\"cents\"}]",
+          "store.append_entry",
+          "1",
+          "0.75",
+          "5",
+          "unique_name"
+        ]
+      ],
+      "total": 5,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b18c15c3a6cae68b5fbb75dcd9710ab4fd950dfb0706530e9d9504ffacfa3897": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.local_name"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "19",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.ts.__file__",
+          "services/billing/src/InvoiceService.ts",
+          "0",
+          "88",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "1",
+          "ShipmentStore"
+        ],
+        [
+          "19",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.ts.__file__",
+          "services/billing/src/InvoiceService.ts",
+          "0",
+          "80",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.packages.fulfillment-contract.src.index",
+          "packages/fulfillment-contract/src/index.ts",
+          "1",
+          "ShipmentRequest"
+        ],
+        [
+          "23",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.ts.__file__",
+          "services/fulfillment/src/notify.ts",
+          "0",
+          "83",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService",
+          "services/billing/src/InvoiceService.ts",
+          "1",
+          "InvoiceService"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b2173b4a0f226bfc6e5fbef3ed91aaa0dea6e3b2dcaafec2fdad77d2fdb0829d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b43f8ce3cd83ed59d056fb6a7476d0f802792ca3ce6035e03d27e8af3163ab86": {
+      "adr_hint": "Project indexed. Consider creating an Architecture Decision Record: explore the codebase with get_architecture(aspects=['all']), then use manage_adr(mode='update') to persist architectural insights across sessions.",
+      "adr_present": false,
+      "artifact_present": false,
+      "edges": 136,
+      "excluded": {
+        "count": 1,
+        "dirs": [
+          ".git"
+        ],
+        "truncated": false
+      },
+      "expected_edges": 136,
+      "expected_nodes": 115,
+      "nodes": 115,
+      "not_indexed_files_count": 0,
+      "parse_partial_count": 0,
+      "parse_unusable_count": 0,
+      "project": "concordia-fixture-commerce",
+      "skipped_count": 0,
+      "status": "indexed"
+    },
+    "ba3150938eaba6c990896a3055b1dee6d21a982961dd9a326e5a7b3bdbdbe2aa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c060e9988a3232daaa40b58c9510ab6c5ea19c00414278066dacdb6bddea7f4a": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c24e8ffeaf22b48dd42a1b9f0cba9c462412a58009f45d6deba01cb1d553db14": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c3d6d12b457a1a569fde1d58bbdddebdd9e695bd059f9c836f817ed100d75775": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c5d74b76efe5fc9954e0faf5318c0cf848f19fbbe266e5ee4f6ccfb1ab4e8090": {
+      "columns": [
+        "COUNT(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c6b2af424f408c9e18094da057424efcf1337a114f407218a1acb4b9c902a424": {
+      "adr_hint": "No ADR found. Use manage_adr(mode='update') to persist architectural decisions across sessions. Run get_architecture(aspects=['all']) first.",
+      "adr_present": false,
+      "edge_types": [
+        {
+          "count": 93,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "DEFINES"
+        },
+        {
+          "count": 14,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "CONTAINS_FILE"
+        },
+        {
+          "count": 11,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "CONTAINS_FOLDER"
+        },
+        {
+          "count": 7,
+          "properties": [
+            "source_id",
+            "target_id",
+            "args",
+            "callee",
+            "candidates",
+            "confidence",
+            "line",
+            "strategy"
+          ],
+          "type": "CALLS"
+        },
+        {
+          "count": 3,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "DEFINES_METHOD"
+        },
+        {
+          "count": 3,
+          "properties": [
+            "source_id",
+            "target_id",
+            "local_name"
+          ],
+          "type": "IMPORTS"
+        },
+        {
+          "count": 3,
+          "properties": [
+            "source_id",
+            "target_id",
+            "callee"
+          ],
+          "type": "USAGE"
+        },
+        {
+          "count": 1,
+          "properties": [
+            "source_id",
+            "target_id",
+            "base_sha",
+            "branch",
+            "canonical_root",
+            "git_common_dir",
+            "head_sha",
+            "is_detached",
+            "is_git",
+            "is_worktree",
+            "root_exists",
+            "worktree_root"
+          ],
+          "type": "HAS_BRANCH"
+        },
+        {
+          "count": 1,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "WRITES"
+        }
+      ],
+      "has_more": false,
+      "node_labels": [
+        {
+          "count": 40,
+          "label": "Variable",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 18,
+          "label": "Folder",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line"
+          ]
+        },
+        {
+          "count": 14,
+          "label": "File",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "extension"
+          ]
+        },
+        {
+          "count": 14,
+          "label": "Module",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "docstring",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 11,
+          "label": "Method",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "alloc_in_loop",
+            "cognitive",
+            "complexity",
+            "importance",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "linear_scan_in_loop",
+            "lines",
+            "loop_count",
+            "loop_depth",
+            "max_access_depth",
+            "param_count",
+            "parent_class",
+            "recursion_in_loop",
+            "recursive",
+            "return_type",
+            "self_recursive",
+            "signature",
+            "transitive_loop_depth",
+            "unguarded_recursion"
+          ]
+        },
+        {
+          "count": 9,
+          "label": "Class",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "importance",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 5,
+          "label": "Function",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "alloc_in_loop",
+            "cognitive",
+            "complexity",
+            "importance",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "linear_scan_in_loop",
+            "lines",
+            "loop_count",
+            "loop_depth",
+            "max_access_depth",
+            "param_count",
+            "param_names",
+            "recursion_in_loop",
+            "recursive",
+            "return_type",
+            "self_recursive",
+            "signature",
+            "transitive_loop_depth",
+            "unguarded_recursion"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Branch",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "base_sha",
+            "branch",
+            "canonical_root",
+            "git_common_dir",
+            "head_sha",
+            "is_detached",
+            "is_git",
+            "is_worktree",
+            "root_exists",
+            "worktree_root"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Interface",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Project",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Resource",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "group",
+            "kind",
+            "obj_key",
+            "source",
+            "version"
+          ]
+        }
+      ],
+      "returned": 20,
+      "total": 20
+    },
+    "c9352d80368600f6953345e4a682f75d21b237214659da14ad6107cdc54505ca": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "cdf58a06df27cea230e92e0144f3b0138b479eb2d0dff0b8f90533675bc684c7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d535a084a1b723b632f47de4e4520ec9b9189334f5777b800afc1abe70d7465e": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 93,
+      "rows": [
+        [
+          "3",
+          "[\"File\"]",
+          "concordia-fixture-commerce.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0",
+          "35",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.concordia",
+          "concordia.yaml",
+          "1"
+        ],
+        [
+          "3",
+          "[\"File\"]",
+          "concordia-fixture-commerce.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0",
+          "115",
+          "[\"Resource\"]",
+          "concordia-fixture-commerce.concordia.yaml::concordia.io/Workspace/-/commerce-platform",
+          "concordia.yaml",
+          "1"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.url-mapping.json.__file__",
+          "architecture/url-mapping.json",
+          "0",
+          "36",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.architecture.url-mapping",
+          "architecture/url-mapping.json",
+          "1"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.url-mapping.json.__file__",
+          "architecture/url-mapping.json",
+          "0",
+          "37",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.url-mapping.https://example.org/concordia/controls/dependency-boundary/1.0/requirement.json",
+          "architecture/url-mapping.json",
+          "1"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "38",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm",
+          "architecture/commerce.calm.json",
+          "1"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "39",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.relationships",
+          "architecture/commerce.calm.json",
+          "34"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "40",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.nodes",
+          "architecture/commerce.calm.json",
+          "74"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "41",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.$schema",
+          "architecture/commerce.calm.json",
+          "2"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "42",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.description",
+          "architecture/commerce.calm.json",
+          "72"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "43",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.name",
+          "architecture/commerce.calm.json",
+          "32"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "44",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.node-type",
+          "architecture/commerce.calm.json",
+          "32"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "45",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.unique-id",
+          "architecture/commerce.calm.json",
+          "71"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "46",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.controls",
+          "architecture/commerce.calm.json",
+          "10"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "47",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.concordia",
+          "architecture/commerce.calm.json",
+          "55"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "48",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.tags",
+          "architecture/commerce.calm.json",
+          "9"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "49",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.owner",
+          "architecture/commerce.calm.json",
+          "30"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "50",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.c4-level",
+          "architecture/commerce.calm.json",
+          "9"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "51",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.architecture-001",
+          "architecture/commerce.calm.json",
+          "11"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "52",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.requirements",
+          "architecture/commerce.calm.json",
+          "13"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "53",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.config",
+          "architecture/commerce.calm.json",
+          "16"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "54",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.requirement-url",
+          "architecture/commerce.calm.json",
+          "15"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "55",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.minimum-policy-coverage",
+          "architecture/commerce.calm.json",
+          "22"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "56",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.unknown-disposition",
+          "architecture/commerce.calm.json",
+          "21"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "57",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.rule-ids",
+          "architecture/commerce.calm.json",
+          "20"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "58",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.policy-ref",
+          "architecture/commerce.calm.json",
+          "19"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "59",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.engine",
+          "architecture/commerce.calm.json",
+          "18"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "60",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.control-id",
+          "architecture/commerce.calm.json",
+          "17"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "61",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.relationship-type",
+          "architecture/commerce.calm.json",
+          "73"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "62",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.composed-of",
+          "architecture/commerce.calm.json",
+          "39"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "63",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.container",
+          "architecture/commerce.calm.json",
+          "40"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "64",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.protocol",
+          "architecture/commerce.calm.json",
+          "62"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "65",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.connects",
+          "architecture/commerce.calm.json",
+          "64"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "66",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.destination",
+          "architecture/commerce.calm.json",
+          "66"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "67",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.source",
+          "architecture/commerce.calm.json",
+          "65"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "68",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.node",
+          "architecture/commerce.calm.json",
+          "66"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "69",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.observation",
+          "architecture/commerce.calm.json",
+          "56"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "70",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.required",
+          "architecture/commerce.calm.json",
+          "56"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "71",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.minimum-confidence",
+          "architecture/commerce.calm.json",
+          "56"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "72",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.allowed-edge-kinds",
+          "architecture/commerce.calm.json",
+          "56"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "73",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.interacts",
+          "architecture/commerce.calm.json",
+          "74"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.json.__file__",
+          "architecture/commerce.calm.json",
+          "0",
+          "74",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.commerce.calm.actor",
+          "architecture/commerce.calm.json",
+          "74"
+        ],
+        [
+          "7",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.resources.requirement.json.__file__",
+          "architecture/resources/requirement.json",
+          "0",
+          "75",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.architecture.resources.requirement",
+          "architecture/resources/requirement.json",
+          "1"
+        ],
+        [
+          "7",
+          "[\"File\"]",
+          "concordia-fixture-commerce.architecture.resources.requirement.json.__file__",
+          "architecture/resources/requirement.json",
+          "0",
+          "76",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.architecture.resources.requirement.description",
+          "architecture/resources/requirement.json",
+          "1"
+        ],
+        [
+          "9",
+          "[\"File\"]",
+          "concordia-fixture-commerce.bindings.concordia.bindings.yaml.__file__",
+          "bindings/concordia.bindings.yaml",
+          "0",
+          "77",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.bindings.concordia.bindings",
+          "bindings/concordia.bindings.yaml",
+          "1"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-commerce.exceptions.waivers.yaml.__file__",
+          "exceptions/waivers.yaml",
+          "0",
+          "78",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.exceptions.waivers",
+          "exceptions/waivers.yaml",
+          "1"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-commerce.exceptions.waivers.yaml.__file__",
+          "exceptions/waivers.yaml",
+          "0",
+          "79",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.exceptions.waivers.waivers",
+          "exceptions/waivers.yaml",
+          "1"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-commerce.packages.fulfillment-contract.src.index.ts.__file__",
+          "packages/fulfillment-contract/src/index.ts",
+          "0",
+          "80",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.packages.fulfillment-contract.src.index",
+          "packages/fulfillment-contract/src/index.ts",
+          "1"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-commerce.packages.fulfillment-contract.src.index.ts.__file__",
+          "packages/fulfillment-contract/src/index.ts",
+          "0",
+          "81",
+          "[\"Interface\"]",
+          "concordia-fixture-commerce.packages.fulfillment-contract.src.ShipmentRequest",
+          "packages/fulfillment-contract/src/index.ts",
+          "1"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-commerce.policies.boundaries.policy.yaml.__file__",
+          "policies/boundaries.policy.yaml",
+          "0",
+          "82",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.policies.boundaries.policy",
+          "policies/boundaries.policy.yaml",
+          "1"
+        ],
+        [
+          "19",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.ts.__file__",
+          "services/billing/src/InvoiceService.ts",
+          "0",
+          "83",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService",
+          "services/billing/src/InvoiceService.ts",
+          "1"
+        ],
+        [
+          "19",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.ts.__file__",
+          "services/billing/src/InvoiceService.ts",
+          "0",
+          "84",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService",
+          "services/billing/src/InvoiceService.ts",
+          "4"
+        ],
+        [
+          "19",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.ts.__file__",
+          "services/billing/src/InvoiceService.ts",
+          "0",
+          "85",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService.issue",
+          "services/billing/src/InvoiceService.ts",
+          "5"
+        ],
+        [
+          "23",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.ts.__file__",
+          "services/fulfillment/src/notify.ts",
+          "0",
+          "86",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify",
+          "services/fulfillment/src/notify.ts",
+          "1"
+        ],
+        [
+          "23",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.ts.__file__",
+          "services/fulfillment/src/notify.ts",
+          "0",
+          "87",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.notify.notifyShipped",
+          "services/fulfillment/src/notify.ts",
+          "3"
+        ],
+        [
+          "26",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ts.__file__",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "0",
+          "88",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "1"
+        ],
+        [
+          "26",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ts.__file__",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "0",
+          "89",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "1"
+        ],
+        [
+          "26",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ts.__file__",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "0",
+          "90",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "4"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "91",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store",
+          "services/ledger/ledger/store.py",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "92",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.append_entry",
+          "services/ledger/ledger/store.py",
+          "4"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "93",
+          "[\"Variable\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store._entries",
+          "services/ledger/ledger/store.py",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "94",
+          "[\"Function\"]",
+          "builtins.len",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "95",
+          "[\"Function\"]",
+          "builtins.print",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "96",
+          "[\"Class\"]",
+          "builtins.str",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "97",
+          "[\"Class\"]",
+          "builtins.int",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "98",
+          "[\"Class\"]",
+          "builtins.list",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "99",
+          "[\"Class\"]",
+          "builtins.dict",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "100",
+          "[\"Class\"]",
+          "builtins.range",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "101",
+          "[\"Method\"]",
+          "builtins.str.upper",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "102",
+          "[\"Method\"]",
+          "builtins.str.lower",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "103",
+          "[\"Method\"]",
+          "builtins.list.append",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "104",
+          "[\"Method\"]",
+          "builtins.list.pop",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "28",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.store.py.__file__",
+          "services/ledger/ledger/store.py",
+          "0",
+          "105",
+          "[\"Method\"]",
+          "builtins.dict.get",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "106",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api",
+          "services/ledger/ledger/api.py",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "107",
+          "[\"Function\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.post_entry",
+          "services/ledger/ledger/api.py",
+          "4"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "94",
+          "[\"Function\"]",
+          "builtins.len",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "95",
+          "[\"Function\"]",
+          "builtins.print",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "96",
+          "[\"Class\"]",
+          "builtins.str",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "97",
+          "[\"Class\"]",
+          "builtins.int",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "98",
+          "[\"Class\"]",
+          "builtins.list",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "99",
+          "[\"Class\"]",
+          "builtins.dict",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "100",
+          "[\"Class\"]",
+          "builtins.range",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "101",
+          "[\"Method\"]",
+          "builtins.str.upper",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "102",
+          "[\"Method\"]",
+          "builtins.str.lower",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "103",
+          "[\"Method\"]",
+          "builtins.list.append",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "104",
+          "[\"Method\"]",
+          "builtins.list.pop",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "31",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.ledger.ledger.api.py.__file__",
+          "services/ledger/ledger/api.py",
+          "0",
+          "105",
+          "[\"Method\"]",
+          "builtins.dict.get",
+          "<python-builtins>",
+          "1"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "108",
+          "[\"Module\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy",
+          "services/legacy/src/Legacy.kt",
+          "1"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "109",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.Legacy",
+          "services/legacy/src/Legacy.kt",
+          "3"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "110",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.Legacy.run",
+          "services/legacy/src/Legacy.kt",
+          "4"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "111",
+          "[\"Class\"]",
+          "kotlin.Any",
+          "<kotlin-builtins>",
+          "1"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "112",
+          "[\"Method\"]",
+          "kotlin.Any.toString",
+          "<kotlin-builtins>",
+          "1"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "113",
+          "[\"Method\"]",
+          "kotlin.Any.equals",
+          "<kotlin-builtins>",
+          "1"
+        ],
+        [
+          "32",
+          "[\"File\"]",
+          "concordia-fixture-commerce.services.legacy.src.Legacy.kt.__file__",
+          "services/legacy/src/Legacy.kt",
+          "0",
+          "114",
+          "[\"Method\"]",
+          "kotlin.Any.hashCode",
+          "<kotlin-builtins>",
+          "1"
+        ]
+      ],
+      "total": 93,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e39491aa0b4a1f25998f4f109e2baa1388f0417f7fe81f1d117dbde98720277e": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e93a4fadf1ae89874d68a51244a48bb93f7d926403427a514c683431ab080ebe": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e9dcbc8c0ebab6c270ee8f0dd0deab0f256d7c99e9c72989139c80d762ba13e7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "eb7d2e1c2eb76fb8e47bd0ae4ea14910d80621b6d9316645fbc70f77ae651561": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ec3b95246a9452eb0400de98b734e58750084f7ae679c431a646d5effb452a99": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "edcf2624f5ef44e5954e47b8227765918ad2e96749d41044a8963d8452cf6065": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.args",
+        "r.callee",
+        "r.candidates",
+        "r.confidence",
+        "r.line",
+        "r.strategy"
+      ],
+      "has_more": false,
+      "returned": 2,
+      "rows": [
+        [
+          "85",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService.issue",
+          "services/billing/src/InvoiceService.ts",
+          "5",
+          "89",
+          "[\"Class\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "1",
+          "",
+          "ShipmentStore",
+          "1",
+          "0.95",
+          "6",
+          "import_map"
+        ],
+        [
+          "85",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.billing.src.InvoiceService.InvoiceService.issue",
+          "services/billing/src/InvoiceService.ts",
+          "5",
+          "90",
+          "[\"Method\"]",
+          "concordia-fixture-commerce.services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+          "services/fulfillment/src/internal/ShipmentStore.ts",
+          "4",
+          "[{\"i\":0,\"e\":\"orderId\"}]",
+          "store.reserve",
+          "1",
+          "0.95",
+          "7",
+          "lsp_ts_method"
+        ]
+      ],
+      "total": 2,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f462b5d58f0cd7dbb4fa174e90b94e7d6a6b15a7c0be9cd9c5dd641a5a4e5e3e": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f9681a5c920eef267be2ebdefc6e5fcd9fac75cb40a3bc578a3bf08fca43d31b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    }
+  },
+  "headSha": "d8b19b06a70f1e5b872af0a056345fc0ff99e67c",
+  "version": "0.12.1"
+}

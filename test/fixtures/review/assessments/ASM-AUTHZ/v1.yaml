@@ -1,0 +1,24 @@
+# Authorization of the API service. The code that enforces it is named as evidence; a change to that file needs review
+# while the topology stays the same.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-AUTHZ
+version: 1
+type: security
+title: Authorization in the API service
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: The identity of the API service and the code that authorizes its callers
+  dependencies:
+    - kind: runtime-identity
+      selector:
+        calmNodes: [api-service]
+assumptions: []
+evidence:
+  - id: EV-AUTHZ
+    ref: app/main.go
+    description: The handler that authorizes callers.
+outcome: satisfactory
+state: ready-for-review

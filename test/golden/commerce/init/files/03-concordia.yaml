@@ -1,0 +1,32 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: init
+  preset: custom
+architecture:
+  source: architecture/architecture.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+    - name: init
+      root: .
+      include:
+        - "**"
+      exclude:
+        - node_modules/**
+        - dist/**
+        - build/**
+bindings:
+  files:
+    - bindings/concordia.bindings.yaml
+policies:
+  files:
+    - policies/**/*.policy.yaml
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.95
+  unknown: fail
+  failOn: error

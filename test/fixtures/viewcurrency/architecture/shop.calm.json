@@ -1,0 +1,42 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {"unique-id": "customer", "node-type": "actor", "name": "Customer", "description": "A person who buys goods."},
+    {"unique-id": "shop-system", "node-type": "system", "name": "Shop", "description": "The shop."},
+    {"unique-id": "web-app", "node-type": "webclient", "name": "Web App", "description": "The storefront."},
+    {"unique-id": "orders-service", "node-type": "service", "name": "Orders", "description": "Takes orders."},
+    {"unique-id": "billing-service", "node-type": "service", "name": "Billing", "description": "Charges customers."},
+    {"unique-id": "orders-db", "node-type": "database", "name": "Orders database", "description": "Stores orders."}
+  ],
+  "relationships": [
+    {
+      "unique-id": "shop-composition",
+      "description": "The shop is composed of its containers.",
+      "relationship-type": {
+        "composed-of": {
+          "container": "shop-system",
+          "nodes": ["web-app", "orders-service", "billing-service", "orders-db"]
+        }
+      }
+    },
+    {
+      "unique-id": "customer-uses-web",
+      "relationship-type": {"interacts": {"actor": "customer", "nodes": ["web-app"]}}
+    },
+    {
+      "unique-id": "web-to-orders",
+      "protocol": "HTTPS",
+      "relationship-type": {"connects": {"source": {"node": "web-app"}, "destination": {"node": "orders-service"}}}
+    },
+    {
+      "unique-id": "orders-to-billing",
+      "protocol": "HTTPS",
+      "relationship-type": {"connects": {"source": {"node": "orders-service"}, "destination": {"node": "billing-service"}}}
+    },
+    {
+      "unique-id": "orders-to-db",
+      "protocol": "TCP",
+      "relationship-type": {"connects": {"source": {"node": "orders-service"}, "destination": {"node": "orders-db"}}}
+    }
+  ]
+}

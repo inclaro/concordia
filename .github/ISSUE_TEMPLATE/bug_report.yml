@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a problem with Concordia.
+labels: ["bug"]
+body:
+  - type: input
+    id: concordia-version
+    attributes:
+      label: Concordia version
+      description: Output of `concordia version`.
+    validations:
+      required: true
+  - type: input
+    id: cbm-version
+    attributes:
+      label: CBM version
+      description: Version of codebase-memory-mcp (CBM).
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: For example, Ubuntu 24.04, macOS 15, or Windows 11.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: The command that you ran.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: What happened.
+    validations:
+      required: true
+  - type: textarea
+    id: results-json
+    attributes:
+      label: Part of results.json
+      description: The part of `results.json` that shows the problem. Remove secrets and private data.
+      render: json
+    validations:
+      required: false

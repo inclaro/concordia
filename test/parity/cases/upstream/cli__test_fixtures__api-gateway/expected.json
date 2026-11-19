@@ -1,0 +1,40 @@
+{
+  "runs": {
+    "api-gateway": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "api-gateway-architecture": {
+      "findings": [
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/api-producer/interfaces/producer-ingress/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "api-gateway-timeline": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"api-gateway-v2\" is after current-moment \"api-gateway-v1\" but has a valid-from.",
+          "path": "/current-moment",
+          "rule": "moments-after-current-moment-may-not-have-valid-from",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

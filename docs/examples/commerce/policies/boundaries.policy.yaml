@@ -1,0 +1,67 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: commerce-boundaries
+  version: 1.0.0
+rules:
+  - id: CO-BND-001
+    name: Billing uses Fulfillment contracts only
+    severity: error
+    owner: team-billing
+    rationale: When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.
+    remediation: Import from packages/fulfillment-contract instead.
+    subject:
+      calmNodes: [billing-service]
+    forbid:
+      target:
+        calmNodes: [fulfillment-service]
+      edges: [IMPORTS, CALLS]
+      traversal: direct
+    allow:
+      target:
+        sourceRoots: [packages/fulfillment-contract/**]
+  - id: CO-CYC-001
+    name: Services are acyclic
+    severity: error
+    rationale: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
+    remediation: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
+    subject:
+      nodeTypes: [service]
+    require:
+      graphProperty: acyclic
+      edges: [IMPORTS, CALLS]
+      collapseBy: architectureBinding
+  - id: CO-DECL-001
+    name: Dependencies are declared
+    severity: error
+    rationale: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
+    remediation: Add the relationship to the CALM model if it is intended, or remove the dependency.
+    subject:
+      nodeTypes: [service, database]
+    declaredOnly:
+      edges: [IMPORTS, CALLS]
+  - id: CO-LYR-001
+    name: Billing sits above Fulfillment
+    severity: error
+    rationale: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
+    remediation: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
+    layerOrder:
+      layers:
+        - calmNodes: [billing-service]
+        - calmNodes: [fulfillment-service]
+      edges: [IMPORTS]
+  - id: CO-COV-001
+    name: Legacy must not call Billing
+    severity: error
+    rationale: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
+    remediation: Index the legacy Kotlin code so that Concordia can show that legacy never calls billing.
+    subject:
+      calmNodes: [legacy-service]
+    forbid:
+      target:
+        calmNodes: [billing-service]
+      edges: [CALLS]
+      traversal: direct
+    evidence:
+      minimumConfidence: resolved
+      onUnknown: fail

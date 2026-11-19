@@ -1,0 +1,4 @@
+{
+  "control-id": "api-access",
+  "description": "Only the web client calls the API"
+}

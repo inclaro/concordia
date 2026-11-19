@@ -1,0 +1,20 @@
+[
+  {
+    "class": "secret-data",
+    "file": "plain/config/secret.yaml",
+    "line": 8,
+    "property": "password"
+  },
+  {
+    "class": "secret-data",
+    "file": "plain/config/secret.yaml",
+    "line": 10,
+    "property": "token"
+  },
+  {
+    "class": "env-value",
+    "file": "plain/workloads/deployment.yaml",
+    "line": 24,
+    "property": "DB_PASSWORD"
+  }
+]

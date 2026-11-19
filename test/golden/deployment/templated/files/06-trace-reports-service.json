@@ -1,0 +1,430 @@
+{
+  "architectureId": "reports-service",
+  "levels": [
+    {
+      "level": "declared",
+      "status": "evaluated"
+    },
+    {
+      "level": "rendered-or-evaluated",
+      "status": "not-available"
+    },
+    {
+      "level": "deployment-execution",
+      "status": "not-available"
+    },
+    {
+      "level": "runtime-observation",
+      "status": "not-available"
+    }
+  ],
+  "schemaVersion": "1.1",
+  "traces": [
+    {
+      "architectureId": "reports-service",
+      "cluster": "prod-eu",
+      "environment": "production",
+      "gaps": [
+        {
+          "detail": "container reports uses registry.example.com/payments/reports:2.0.0: the tag can point to other content later, and no immutable digest is known",
+          "reason": "mutable-tag",
+          "step": "container-image"
+        },
+        {
+          "detail": "no build command names the image repository registry.example.com/payments/reports",
+          "lossModes": [
+            "build-link-needs-build-command"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "build-definition"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for reports-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "b407eb0b9ace4cc7",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "b2f679c21cdb3cf8",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "f410988b362dd985",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "0ce2ea5fbe1bf8b4",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "3286452f07e08369",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "b82fd0c27141af16",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "unknown"
+        }
+      ],
+      "status": "partial",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "reports-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Reports service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [
+            {
+              "bindings": [
+                "bind-reports-workload"
+              ],
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/reports",
+              "kind": "workload",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/reports.yaml"
+                }
+              ],
+              "properties": {
+                "apiGroup": "apps",
+                "kind": "Deployment",
+                "name": "reports",
+                "namespace": "payments"
+              },
+              "resolution": "explicitly-bound"
+            },
+            {
+              "identity": "k8s:production/prod-eu/core/Namespace//payments",
+              "kind": "hosting-target",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/namespace.yaml"
+                }
+              ],
+              "properties": {
+                "kind": "Namespace",
+                "name": "payments"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [],
+          "resolution": "explicitly-bound",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [
+            {
+              "consumers": 1,
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/reports#reports",
+              "kind": "container-image",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/reports.yaml"
+                }
+              ],
+              "properties": {
+                "container": "reports",
+                "reference": "registry.example.com/payments/reports:2.0.0",
+                "registry": "registry.example.com",
+                "repository": "registry.example.com/payments/reports",
+                "tag": "2.0.0"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "container reports uses registry.example.com/payments/reports:2.0.0: the tag can point to other content later, and no immutable digest is known",
+              "reason": "mutable-tag"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "exact",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [
+            {
+              "identity": "registry.example.com/payments/reports",
+              "kind": "unlinked-image",
+              "lineage": "unknown",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/reports.yaml"
+                }
+              ],
+              "properties": {
+                "repository": "registry.example.com/payments/reports"
+              },
+              "resolution": "unresolved"
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "no build command names the image repository registry.example.com/payments/reports",
+              "lossModes": [
+                "build-link-needs-build-command"
+              ],
+              "reason": "coverage-incomplete"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [
+            {
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/reports",
+              "kind": "manifest",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/reports.yaml"
+                }
+              ],
+              "properties": {
+                "kind": "Deployment",
+                "name": "reports"
+              }
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for reports-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    },
+    {
+      "architectureId": "reports-service",
+      "environment": "staging",
+      "gaps": [
+        {
+          "detail": "no workload is bound to reports-service in staging, and the workload set of staging is complete",
+          "reason": "absent",
+          "step": "workload"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for reports-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "37c8bb7656b2b594",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "8daefcd33e7fba50",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "6fde5eecae86dbdb",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "e76ad401c6acfabc",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "c7203b617ee0ead1",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "218dcd4c3764376c",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "violation"
+        }
+      ],
+      "status": "unresolved",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "reports-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Reports service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no workload is bound to reports-service in staging, and the workload set of staging is complete",
+              "reason": "absent"
+            }
+          ],
+          "limits": [],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for reports-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "'ghost' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/system-parts/relationship-type/composed-of/nodes/1",
+          "rule": "composition-relationships-reference-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "'node1' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/rel/relationship-type/composed-of/container",
+          "rule": "relationship-references-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "'node2' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/rel/relationship-type/composed-of/nodes/0",
+          "rule": "composition-relationships-reference-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

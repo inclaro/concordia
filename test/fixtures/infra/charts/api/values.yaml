@@ -1,0 +1,4 @@
+replicaCount: 2
+image:
+  repository: registry.example.com/payments/api
+  tag: 1.2.0

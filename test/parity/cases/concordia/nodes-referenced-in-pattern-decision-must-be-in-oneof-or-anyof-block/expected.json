@@ -1,0 +1,283 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "'webapp' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "'cache' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "'webapp' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/1/x/y/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "\"prefixItems\" property must be shorter than 1",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems",
+          "rule": "pattern-option-relationship-must-have-max-one-item",
+          "severity": "error"
+        },
+        {
+          "message": "At least one of \"oneOf\" or \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        },
+        {
+          "message": "At least one of \"oneOf\" or \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/1",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "'cache' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "'redis' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-10": {
+      "findings": [
+        {
+          "message": "Node with ID 'redis' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-11": {
+      "findings": [
+        {
+          "message": "Node with ID 'redis' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-12": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-13": {
+      "findings": [
+        {
+          "message": "'cache' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "'redis' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Node with ID 'memcached' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "'redis' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "group-relationship-with-const-nodes-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [
+        {
+          "message": "'redis' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-8": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'redis' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-9": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'redis' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

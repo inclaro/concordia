@@ -1,0 +1,20 @@
+# The public entry points of the API service in production, with the assumption that only the API ingress is public.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-ROUTE
+version: 1
+type: security
+title: Public entry points of the API service
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: The routes that reach the API service from outside
+  dependencies:
+    - kind: public-entry-point
+      selector:
+        host: [api.example.com]
+assumptions: [ASM-ROUTE-1]
+evidence: []
+outcome: satisfactory
+state: ready-for-review

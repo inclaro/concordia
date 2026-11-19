@@ -1,0 +1,1141 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'b' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: x, path: /properties/nodes/prefixItems/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID '1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID '1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID '1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/2/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: 1, path: /properties/nodes/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'null' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'null' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: null, path: /properties/nodes/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-4": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-5": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'b' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'c' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'd' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/2/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: i, path: /properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: i, path: /properties/nodes/prefixItems/1/oneOf/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: i, path: /properties/nodes/prefixItems/2/anyOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/2/anyOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-6": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'b' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'c' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/anyOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: i, path: /properties/nodes/items/anyOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/items/anyOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-7": {
+      "findings": [
+        {
+          "message": "Node with ID 'a' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: a, path: /properties/relationships/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-8": {
+      "findings": [
+        {
+          "message": "Node with ID 'x' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: y, path: /properties/relationships/prefixItems/1/anyOf/0/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/1/anyOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "Duplicate unique-id detected. ID: webapp, path: /properties/nodes/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-10": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-11": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: rel1, path: /properties/relationships/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-12": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: rel1, path: /properties/relationships/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-13": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /properties/nodes/prefixItems/0/properties/interfaces/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/0/properties/interfaces/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-14": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'postgres' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'mysql' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-15": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'postgres' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'mysql' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-16": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-17": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'alt' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'base' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /properties/nodes/prefixItems/0/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-18": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'alt' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'base' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-19": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-20": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-21": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-22": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-23": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'n0' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n10' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/10/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/11/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/2/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n3' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/3/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n4' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/4/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n5' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/5/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n6' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/6/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n7' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/7/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n8' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/8/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'n9' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/9/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: n2, path: /properties/nodes/prefixItems/11/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/11/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-24": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-25": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-26": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: port, path: /properties/nodes/items/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/items/oneOf/0/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-27": {
+      "findings": [
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'dup' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: dup, path: /properties/nodes/items/oneOf/1/properties/unique-id/const",
+          "path": "/properties/nodes/items/oneOf/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-28": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: port, path: /properties/nodes/items/oneOf/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/items/oneOf/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /properties/nodes/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: rel1, path: /properties/relationships/prefixItems/1/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: intf1, path: /properties/nodes/prefixItems/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/1/properties/interfaces/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /properties/relationships/prefixItems/0/properties/unique-id/const",
+          "path": "/properties/relationships/prefixItems/0/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node2' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-8": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-9": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'node1' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Duplicate unique-id detected. ID: node1, path: /properties/nodes/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "path": "/properties/nodes/prefixItems/0/anyOf/1/properties/unique-id/const",
+          "rule": "unique-ids-must-be-unique-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

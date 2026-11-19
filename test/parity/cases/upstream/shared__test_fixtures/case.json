@@ -1,0 +1,30 @@
+{
+  "origin": "upstream:shared/test_fixtures",
+  "runs": [
+    {
+      "architecture": "api-gateway-implementation-that-does-not-match-schema.json",
+      "mode": "architecture",
+      "name": "api-gateway-implementation-that-does-not-match-schema"
+    },
+    {
+      "architecture": "api-gateway-implementation-that-does-not-pass-the-spectral-validation.json",
+      "mode": "architecture",
+      "name": "api-gateway-implementation-that-does-not-pass-the-spectral-validation"
+    },
+    {
+      "architecture": "api-gateway-implementation.json",
+      "mode": "architecture",
+      "name": "api-gateway-implementation"
+    },
+    {
+      "mode": "pattern",
+      "name": "api-gateway-with-no-relationships",
+      "pattern": "api-gateway-with-no-relationships.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "api-gateway",
+      "pattern": "api-gateway.json"
+    }
+  ]
+}

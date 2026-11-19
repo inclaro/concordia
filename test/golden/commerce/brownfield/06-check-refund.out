@@ -1,0 +1,44 @@
+FAIL CO-BND-001 Billing uses Fulfillment contracts only
+
+services/billing/src/Refund.ts
+  services.billing.src.Refund.__file__
+    -[IMPORTS syntactic]-> services/fulfillment/src/internal/ShipmentStore.ts
+
+Source: calm:node:billing-service
+Target: calm:node:fulfillment-service
+Coverage: 100.0% (required 90.0%)
+Disposition: active
+Owner: team-billing
+Finding: 4cc7…bc7
+
+services/billing/src/Refund.ts:5
+  services.billing.src.Refund.Refund.refund
+    -[CALLS syntactic]-> services.fulfillment.src.internal.ShipmentStore.ShipmentStore (services/fulfillment/src/internal/ShipmentStore.ts)
+
+Source: calm:node:billing-service
+Target: calm:node:fulfillment-service
+Coverage: 100.0% (required 90.0%)
+Disposition: active
+Owner: team-billing
+Finding: 8995…c40
+
+2 baselined finding(s) not shown (use --verbose)
+
+UNKNOWN CO-COV-001 Legacy must not call Billing
+  CO-CON-021: minimum coverage not met: 0.667 < 0.9
+  CO-CON-026: language coverage not met: .kt 0.000 < 0.9
+Coverage: 66.7% (required 90.0%)
+
+FAIL CO-CYC-001 Services are acyclic
+
+1 baselined finding(s) not shown (use --verbose)
+
+FAIL CO-DECL-001 Dependencies are declared
+
+2 baselined finding(s) not shown (use --verbose)
+
+FAIL CO-LYR-001 Billing sits above Fulfillment
+
+1 baselined finding(s) not shown (use --verbose)
+
+2 active error(s), 6 baselined, 0 waived, 0 expired waiver(s), 1 unknown

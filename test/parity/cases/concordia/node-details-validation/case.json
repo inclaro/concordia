@@ -1,0 +1,30 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "architecture",
+      "architecture": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "architecture",
+      "architecture": "pass.json"
+    },
+    {
+      "name": "nested-rules",
+      "mode": "architecture",
+      "architecture": "nested-rules.json"
+    },
+    {
+      "name": "twice",
+      "mode": "architecture",
+      "architecture": "twice.json"
+    },
+    {
+      "name": "twice-missing",
+      "mode": "architecture",
+      "architecture": "twice-missing.json"
+    }
+  ]
+}

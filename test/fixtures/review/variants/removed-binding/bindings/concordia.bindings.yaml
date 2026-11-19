@@ -1,0 +1,19 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  # One image repository is shared by the production and staging workloads.
+  - id: bind-api-image
+    architectureRef: calm:node:api-service
+    match:
+      any:
+        - {kind: image, repository: registry.example.com/payments/api}
+  - id: bind-api-source
+    architectureRef: calm:node:api-service
+    match:
+      any:
+        - sourceRoot: app/**
+  - id: bind-worker-workload
+    architectureRef: calm:node:worker-service
+    match:
+      any:
+        - {kind: workload, environment: staging, resourceKind: Deployment, name: worker, namespace: payments}

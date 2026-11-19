@@ -1,0 +1,5 @@
+project: golden-check
+generation: cbm:golden-check:b4dbb6af2d5c99c6
+files: 6/7 covered (85.7%)
+excluded: 1, stale: 0, unindexed: 0
+coverage file: build/concordia/coverage.json

@@ -1,0 +1,6 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: default
+  version: 1.0.0
+rules: []

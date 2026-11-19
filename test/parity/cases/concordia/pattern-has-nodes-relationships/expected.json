@@ -1,0 +1,92 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties/relationships",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

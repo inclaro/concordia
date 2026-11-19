@@ -1,0 +1,115 @@
+name: CALM CLI parity
+
+# compare: on every pull request, compare Concordia with the recorded calm CLI
+#   results (no Node.js, no network).
+# drift: every week, pin and record the latest calm CLI and open a pull request
+#   when the results changed. The pull request is opened with the
+#   CALM_PARITY_TOKEN secret, a fine-grained personal access token with
+#   contents and pull-requests write access (a stored GitHub App installation
+#   token expires after an hour, so it does not fit). The workflows of a pull
+#   request that the default GITHUB_TOKEN opens do not start automatically
+#   (they wait for a maintainer's approval); with the secret, CI and the compare
+#   job run on the parity pull request.
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calm-parity-${{ github.event_name == 'pull_request' && github.ref || 'drift' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  compare:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up mise
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      - name: Install repository-local development tools
+        run: mise run tools:install
+
+      - name: Compare Concordia with the recorded calm CLI results
+        run: mise exec -- .bin/gotestsum -- -count=1 ./test/parity/...
+
+  drift:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # The job runs the upstream CALM CLI build and tests; keep tokens out
+          # of the git configuration until the pull-request step.
+          persist-credentials: false
+
+      - name: Set up mise
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      - name: Verify host prerequisites
+        run: |
+          bash --version
+          git --version
+          jq --version
+
+      - name: Install repository-local development tools
+        run: mise run tools:install
+
+      - name: Pin and build the latest calm CLI
+        run: mise run calm:update
+
+      - name: Run the upstream tests
+        run: mise run calm:test-upstream
+
+      - name: Record the upstream results
+        run: mise run calm:record
+
+      - name: Open a pull request for upstream changes
+        env:
+          GH_TOKEN: ${{ secrets.CALM_PARITY_TOKEN }}
+        run: |
+          if [ -z "$(git status --porcelain -- test/parity internal/intent/schemas)" ]; then
+            echo "no upstream changes"; exit 0
+          fi
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::set the CALM_PARITY_TOKEN secret so the parity pull request runs its checks"
+            exit 1
+          fi
+          tag=$(jq -r .tag test/parity/upstream.json)
+          branch="calm-parity/${tag}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          gh auth setup-git
+          # An open parity branch may hold corrections; never overwrite it.
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "branch $branch exists; update its pull request by hand"; exit 0
+          fi
+          git switch -c "$branch"
+          git add test/parity internal/intent/schemas
+          git commit -m "test(parity): record calm CLI ${tag}"
+          git push origin "$branch"
+          if [ -z "$(gh pr list --head "$branch" --json number --jq '.[].number')" ]; then
+            gh pr create --base main --head "$branch" \
+              --title "test(parity): record calm CLI ${tag}" \
+              --body "The calm CLI changed. CI and the CALM CLI parity check run on this pull request; correct each difference in Concordia (\`mise run test-parity\`)."
+          fi
+
+      - name: Compare Concordia with the calm CLI
+        run: mise exec -- .bin/gotestsum -- -count=1 ./test/parity/...

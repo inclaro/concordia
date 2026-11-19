@@ -1,0 +1,82 @@
+FAIL CO-BND-001 Billing uses Fulfillment contracts only
+
+services/billing/src/InvoiceService.ts:6
+  services.billing.src.InvoiceService.InvoiceService.issue
+    -[CALLS syntactic]-> services.fulfillment.src.internal.ShipmentStore.ShipmentStore (services/fulfillment/src/internal/ShipmentStore.ts)
+
+Source: calm:node:billing-service
+Target: calm:node:fulfillment-service
+Coverage: 100.0% (required 90.0%)
+Disposition: active
+Owner: team-billing
+Finding: 25f9…f83
+
+services/billing/src/InvoiceService.ts
+  services.billing.src.InvoiceService.__file__
+    -[IMPORTS syntactic]-> services/fulfillment/src/internal/ShipmentStore.ts
+
+Source: calm:node:billing-service
+Target: calm:node:fulfillment-service
+Coverage: 100.0% (required 90.0%)
+Disposition: active
+Owner: team-billing
+Finding: 3e4b…230
+
+UNKNOWN CO-COV-001 Legacy must not call Billing
+  CO-CON-021: minimum coverage not met: 0.500 < 0.9
+  CO-CON-026: language coverage not met: .kt 0.000 < 0.9
+Coverage: 50.0% (required 90.0%)
+
+FAIL CO-CYC-001 Services are acyclic
+
+services/billing/src/InvoiceService.ts:6
+  services.billing.src.InvoiceService.InvoiceService.issue
+    -[CALLS syntactic]-> services.fulfillment.src.internal.ShipmentStore.ShipmentStore (services/fulfillment/src/internal/ShipmentStore.ts)
+  services.fulfillment.src.notify.notifyShipped
+    -[CALLS syntactic]-> services.billing.src.InvoiceService.InvoiceService (services/billing/src/InvoiceService.ts)
+
+Source: calm:node:billing-service
+Target: calm:node:billing-service, calm:node:fulfillment-service
+Coverage: 85.7% (required 90.0%)
+Disposition: active
+Owner: team-billing
+Finding: 8158…f73
+
+FAIL CO-DECL-001 Dependencies are declared
+
+services/fulfillment/src/notify.ts:4
+  services.fulfillment.src.notify.notifyShipped
+    -[CALLS syntactic]-> services.billing.src.InvoiceService.InvoiceService (services/billing/src/InvoiceService.ts)
+
+Source: calm:node:fulfillment-service
+Target: calm:node:billing-service
+Coverage: 85.7% (required 90.0%)
+Disposition: active
+Owner: team-fulfillment
+Finding: 91f4…c56
+
+services/fulfillment/src/notify.ts
+  services.fulfillment.src.notify.__file__
+    -[IMPORTS syntactic]-> services/billing/src/InvoiceService.ts
+
+Source: calm:node:fulfillment-service
+Target: calm:node:billing-service
+Coverage: 85.7% (required 90.0%)
+Disposition: active
+Owner: team-fulfillment
+Finding: b31d…99a
+
+FAIL CO-LYR-001 Billing sits above Fulfillment
+
+services/fulfillment/src/notify.ts
+  services.fulfillment.src.notify.__file__
+    -[IMPORTS syntactic]-> services/billing/src/InvoiceService.ts
+
+Source: calm:node:fulfillment-service
+Target: calm:node:billing-service
+Coverage: 100.0% (required 90.0%)
+Disposition: active
+Owner: team-fulfillment
+Finding: 5ce2…b28
+
+6 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 1 unknown

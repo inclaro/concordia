@@ -1,0 +1,14 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-NO-AUTHORITY
+    area: operability
+    qualityAttribute: operability
+    stimulusSource: on-call engineer
+    stimulus: an alert fires
+    environment: production
+    expectedResponse: the runbook leads to a fix
+    owner: sre-team
+    scope: [orders-service]
+    mode: reviewed
+    criterion: {subject: orders-runbook}

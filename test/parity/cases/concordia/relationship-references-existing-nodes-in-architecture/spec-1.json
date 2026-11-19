@@ -1,0 +1,17 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [],
+  "relationships": [
+    {
+      "unique-id": "rel",
+      "relationship-type": {
+        "interacts": {
+          "actor": null,
+          "nodes": [
+            "node1"
+          ]
+        }
+      }
+    }
+  ]
+}

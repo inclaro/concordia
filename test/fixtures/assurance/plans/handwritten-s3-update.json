@@ -1,0 +1,69 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.0",
+  "planned_values": { "root_module": {} },
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["update"],
+        "before": { "bucket": "acme-logs", "acl": "private" },
+        "after": {
+          "bucket": "acme-logs",
+          "acl": "private",
+          "versioning": [{ "enabled": true, "mfa_delete": false }],
+          "logging": [{ "target_bucket": "acme-audit", "target_prefix": "s3/" }],
+          "server_side_encryption_configuration": [{ "rule": [{ "kms_master_key_id": "alias/acme-secret-kms-key-material" }] }],
+          "grant": []
+        },
+        "after_unknown": {
+          "arn": true,
+          "id": true,
+          "versioning": [{}],
+          "logging": [{ "target_prefix": false }],
+          "cors_rule": [true]
+        },
+        "before_sensitive": {},
+        "after_sensitive": {
+          "server_side_encryption_configuration": true
+        }
+      }
+    },
+    {
+      "address": "module.net.aws_security_group.web[\"public\"]",
+      "module_address": "module.net",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "index": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "name": "web-public", "ingress": [{ "from_port": 443, "to_port": 443, "cidr_blocks": ["0.0.0.0/0"] }], "timeout": 30 },
+        "after_unknown": { "id": true },
+        "before_sensitive": false,
+        "after_sensitive": { "ingress": [{ "cidr_blocks": [false] }] }
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "before": null,
+        "after": { "engine": "postgres", "username": "admin", "password": "plain-db-password-1234", "tags": { "env": "production" } },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": { "password": true, "tags": {} }
+      }
+    }
+  ]
+}

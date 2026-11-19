@@ -1,0 +1,15 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 80%
+    patch:
+      default:
+        target: 80%
+        threshold: 80%
+
+ignore:
+  - "test"
+  - "docs"
+  - "contrib"

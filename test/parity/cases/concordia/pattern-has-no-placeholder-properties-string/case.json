@@ -1,0 +1,20 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "pattern",
+      "pattern": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "pattern",
+      "pattern": "pass.json"
+    },
+    {
+      "name": "edge-1",
+      "mode": "pattern",
+      "pattern": "edge-1.json"
+    }
+  ]
+}

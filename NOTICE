@@ -1,0 +1,15 @@
+Concordia
+Copyright 2026 Michael A. Davis
+
+This product includes software developed by third parties:
+
+- FINOS Common Architecture Language Model (CALM) JSON schemas
+  (internal/intent/schemas/calm-1.2, calm-1.3, standards/deployment-1.0)
+  and CALM CLI test fixtures (test/parity/cases/upstream),
+  from https://github.com/finos/architecture-as-code, Apache License 2.0.
+- CALM agent prompts (.agents/skills/calm), derived from FINOS
+  architecture-as-code, Apache License 2.0.
+- Harbor agent skills (.agents/skills/{create-adapter,create-task,harbor-exec,rewardkit,upload-parity-experiments}),
+  from https://github.com/harbor-framework/harbor, Apache License 2.0.
+- OpenSpec agent skills (.agents/skills/openspec-*), MIT License.
+- SARIF 2.1.0 JSON schema (test/schemas/sarif-schema-2.1.0.json), OASIS Open.

@@ -1,0 +1,6 @@
+UNKNOWN CO-COV-001 Legacy must not call Billing
+  CO-CON-021: minimum coverage not met: 0.500 < 0.9
+  CO-CON-026: language coverage not met: .kt 0.000 < 0.9
+Coverage: 50.0% (required 90.0%)
+
+0 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 1 unknown

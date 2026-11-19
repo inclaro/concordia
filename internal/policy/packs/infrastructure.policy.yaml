@@ -1,0 +1,109 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: infrastructure
+  version: 1.0.0
+# Deployment placement and deployment trace rules. They are typed rules: Concordia builds one obligation per
+# subject and declared environment. No rule declares `enforcement`, so every rule is advisory by default.
+# Set a mode per family and environment with `check.enforcement` (see docs/reference/infrastructure-rules.md).
+# Never reuse or renumber a rule ID: baselines and waivers key on it.
+rules:
+  - id: INFRA-PLC-001
+    name: A deployed service is placed in its declared container
+    severity: error
+    family: deployment-placement
+    rationale: A deployed-in relationship in the architecture model says where a service runs. Without a placement fact in the manifests of each environment, the model states something that the deployment definition does not show.
+    remediation: Place a workload of the service in the hosting target (the namespace) that is bound to the declared container, in every environment. When the manifests are templated or outside the environment sources, supply the evidence or bind the workload and the namespace.
+    subject: { deployedIn: true }
+    obligation:
+      type: required
+      multiplicity: forAll
+      relation: { kind: placed-in, direction: from-workload, target: { deployedIn: true } }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: explicitly-bound
+      completeness: complete
+      passCompleteness: any
+
+  - id: INFRA-PLC-002
+    name: A deployed service has no unexpected placement
+    severity: error
+    family: deployment-placement
+    rationale: A workload that is placed in a hosting target other than the declared container, or a placement in the reverse direction, contradicts the deployed-in relationship of the architecture model. It is reported apart from the missing placement of INFRA-PLC-001.
+    remediation: Move the workload to the declared container, or change the deployed-in relationship in the architecture model. If the hosting target has no binding, bind it to the architecture node it belongs to.
+    subject: { deployedIn: true }
+    obligation:
+      type: forbidden
+      multiplicity: forAll
+      relation: { kind: placed-in, direction: from-workload, target: { deployedIn: false } }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: explicitly-bound
+      completeness: complete
+
+  - id: INFRA-TRC-001
+    name: Each deployable service has a workload
+    severity: error
+    family: deployment-trace
+    rationale: A service that is tagged deployable needs a workload in each environment, or its deployment cannot be traced from the model to the manifests.
+    remediation: Add the workload to the manifests of the environment, or bind the existing workload to the service. When the extraction of the environment is partial, supply the missing evidence.
+    subject: { tags: [deployable] }
+    obligation:
+      type: required
+      multiplicity: exists
+      relation: { kind: placed-in, direction: from-workload }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: exact
+      completeness: complete
+      passCompleteness: any
+
+  - id: INFRA-TRC-002
+    name: Each workload of a deployable service has a resolved image reference
+    severity: error
+    family: deployment-trace
+    rationale: The image reference connects a workload to the artifact that it runs. A reference that is a template expression cannot be traced.
+    remediation: Write the image reference of each container in the manifest, or render the template so that the reference is a literal. Concordia never guesses an image.
+    subject: { tags: [deployable] }
+    obligation:
+      type: required
+      multiplicity: forAll
+      relation: { kind: uses-image, direction: from-workload }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: exact
+      completeness: complete
+      passCompleteness: partial
+
+  - id: INFRA-TRC-003
+    name: Each image of a deployable service has a build definition candidate
+    severity: error
+    family: deployment-trace
+    rationale: A build definition links an image to its source. The link exists only when a build command names the image, so an absence is never a definite violation and a link that is present is a candidate.
+    remediation: Name the image in a build command (for example docker build -t) that the index can read, or bind the image of a third-party service as not built here by leaving it without an image binding.
+    subject: { tags: [deployable] }
+    obligation:
+      type: required
+      multiplicity: forAll
+      relation: { kind: built-from, direction: from-image }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: exact
+      completeness: complete
+      passCompleteness: any
+
+  - id: INFRA-TRC-004
+    name: Occurrence and version coverage of the images is sufficient
+    severity: error
+    family: deployment-trace
+    rationale: The provider can merge the containers of one workload, so a workload can use an image that no fact shows. A trace over incomplete occurrence coverage must not read as complete.
+    remediation: Give each container of a workload a distinct image reference, or supply the missing occurrence evidence. A rule that stays unknown shows which coverage is missing.
+    subject: { tags: [deployable] }
+    obligation:
+      type: required
+      multiplicity: forAll
+      relation: { kind: uses-image, direction: from-workload }
+    evidence:
+      roles: [parsed-source-fact]
+      minimumResolution: exact
+      completeness: complete

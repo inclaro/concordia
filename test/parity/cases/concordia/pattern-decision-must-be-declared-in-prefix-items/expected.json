@@ -1,0 +1,292 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "The decision 'unknown' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/items/oneOf/0/properties/relationship-type/properties/options",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-4": {
+      "findings": [
+        {
+          "message": "'c' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/items/anyOf/0/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "group-relationship-with-const-nodes-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "'c' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/items/anyOf/1/properties/relationship-type/properties/options/prefixItems/0/anyOf/0/properties/nodes/const/0",
+          "rule": "group-relationship-with-const-nodes-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "The decision 'a' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/anyOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "The decision 'b' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/anyOf/1",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-5": {
+      "findings": [
+        {
+          "message": "The decision '7' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "The decision 'add-ons' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "The decision 'add-ons' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "The decision 'add-ons' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "The decision 'add-ons' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "The decision 'unknown' is declared in items. Declare a decision in relationships prefixItems, so that an answer can decline it.",
+          "path": "/properties/relationships/items/oneOf/0",
+          "rule": "pattern-decision-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [
+        {
+          "message": "'a' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/items/oneOf/0/properties/relationship-type/const/connects/source/node",
+          "rule": "connects-relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-8": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

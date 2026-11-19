@@ -1,0 +1,26 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Node with ID 'db' is not referenced by any relationships.",
+          "path": "/nodes/db/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

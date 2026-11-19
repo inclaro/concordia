@@ -1,0 +1,56 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-FAILOVER
+    area: availability
+    qualityAttribute: availability
+    stimulusSource: operator
+    stimulus: the primary database node fails
+    environment: production
+    expectedResponse: a replica takes over
+    owner: platform-team
+    scope: [orders-db, orders-service]
+    mode: measured
+    enforcement: mandatory
+    criterion:
+      metric: failover-seconds
+      unit: s
+      comparison: lte
+      threshold: 30
+      maxAgeDays: 30
+    addressedBy: [ADR-0007]
+  - id: QS-BOUNDARY
+    area: modifiability
+    qualityAttribute: modifiability
+    stimulusSource: developer
+    stimulus: a developer adds a feature to the order service
+    environment: development
+    expectedResponse: the change stays inside the service boundary
+    owner: orders-team
+    scope: [orders-service, orders-calls-db]
+    mode: structural
+    criterion:
+      rules: [boundary-rule, layering-rule]
+  - id: QS-RUNBOOK
+    area: operability
+    qualityAttribute: operability
+    stimulusSource: on-call engineer
+    stimulus: an alert fires at night
+    environment: production
+    expectedResponse: the runbook leads to a fix within the hour
+    owner: sre-team
+    scope: [orders-service]
+    mode: reviewed
+    criterion:
+      subject: orders-runbook
+      authority: sre-lead
+findings:
+  - id: F-REPLICA-TRADEOFF
+    type: tradeoff
+    statement: Synchronous replicas lower modifiability because schema changes need a coordinated rollout.
+    owner: platform-team
+    status: open
+    scenarios: [QS-FAILOVER]
+    areas: [modifiability]
+    addressedBy: [ADR-7]
+    assumptions: [ASM-ONE-REGION]

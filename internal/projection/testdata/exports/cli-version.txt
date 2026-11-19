@@ -1,0 +1,2 @@
+structurizr-cli: 2025.11.09
+structurizr-java: 5.0.2

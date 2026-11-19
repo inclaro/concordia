@@ -1,0 +1,12 @@
+apiVersion: concordia.io/v1alpha1
+kind: Assumption
+id: ASM-ROUTE-1
+statement: Only the API ingress is reachable from the internet.
+scope:
+  calmNodes: [api-service]
+owner: security-team
+verificationMethod: review
+selectors:
+  - kind: public-entry-point
+    selector:
+      host: [api.example.com]

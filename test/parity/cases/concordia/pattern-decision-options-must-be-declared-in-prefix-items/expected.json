@@ -1,0 +1,237 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "'str' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options",
+          "rule": "relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-4": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-5": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-6": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-7": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/a/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'w' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Declare decision options in options prefixItems. calm generate reads prefixItems only, so an options block declared in items is never built.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/items",
+          "rule": "pattern-decision-options-must-be-declared-in-prefix-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

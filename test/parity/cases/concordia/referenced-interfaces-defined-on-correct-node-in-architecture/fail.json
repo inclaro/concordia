@@ -1,0 +1,52 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web",
+      "description": "The web client",
+      "interfaces": [
+        {
+          "unique-id": "web-http",
+          "url": "https://web.example.com"
+        }
+      ]
+    },
+    {
+      "unique-id": "api",
+      "node-type": "service",
+      "name": "API",
+      "description": "The API",
+      "interfaces": [
+        {
+          "unique-id": "api-http",
+          "host": "api.example.com",
+          "port": 443
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "web-api",
+      "description": "Web calls the API",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "web",
+            "interfaces": [
+              "web-http"
+            ]
+          },
+          "destination": {
+            "node": "api",
+            "interfaces": [
+              "web-http"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/evidence/measurement/v1.schema.json",
+  "title": "Concordia measurement predicate v1",
+  "description": "The predicate of an in-toto Statement v1 with predicateType https://concordia.io/evidence/measurement/v1: one measured value for a quality scenario. Concordia compares `value` with the scenario criterion itself and never reads a verdict from the producer. `metric`, `unit`, `threshold`, and `comparison` must equal the scenario criterion, or the measurement is inadmissible (`threshold-mismatch`, `unit-mismatch`). The schema is open: Concordia ignores fields that it does not list and does not persist them.",
+  "type": "object",
+  "required": [
+    "scenario",
+    "metric",
+    "value",
+    "unit",
+    "threshold",
+    "comparison",
+    "testConditions",
+    "revision",
+    "environment",
+    "evaluator",
+    "outcome",
+    "window"
+  ],
+  "properties": {
+    "scenario": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "The id of the quality scenario."
+    },
+    "metric": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "value": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "threshold": {
+      "type": "number"
+    },
+    "comparison": {
+      "enum": [
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "eq"
+      ]
+    },
+    "testConditions": {
+      "description": "The conditions of the test, for example load and duration. Any value except null and an empty string.",
+      "not": {
+        "anyOf": [
+          {
+            "type": "null"
+          },
+          {
+            "const": ""
+          }
+        ]
+      }
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "environment": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "evaluator": {
+      "$ref": "#/$defs/evaluator"
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "errored",
+        "skipped"
+      ],
+      "description": "Only `passed` is a measurement; another outcome is inadmissible with `failed-run`."
+    },
+    "window": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/time"
+        },
+        "end": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "description": "The measurement window. The maximum age counts from `end`."
+    }
+  },
+  "$defs": {
+    "evaluator": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 time."
+    }
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "runs": {
+    "generate__expected-output__conference-secure-signup-amended.arch": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "generate__expected-output__conference-secure-signup.arch": {
+      "findings": [
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/conference-website/interfaces/conference-website-url/url",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/host",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "generate__expected-output__conference-signup.arch": {
+      "findings": [
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/conference-website/interfaces/conference-website-url/url",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/host",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "generate__patterns__conference-secure-signup.pattern": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "generate__patterns__conference-signup.pattern": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__empty-string-property": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty value.",
+          "path": "/nodes/node-1/description",
+          "rule": "architecture-has-no-empty-string-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__false-boolean-property": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__flows__flows-1.0-bad": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__flows__flows-1.1-bad": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "validate__flows__flows-good": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__flows__flows-spectral-sequence-non-unique": {
+      "findings": [
+        {
+          "message": "Duplicate sequence-number 1 detected. path: /1/sequence-number",
+          "path": "/flows/flow-1/transitions",
+          "rule": "flow-transitions-have-unique-sequence-numbers",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__flows__flows-spectral-unknown-relationship": {
+      "findings": [
+        {
+          "message": "'node-1-to-node-3' does not refer to the unique-id of an existing relationship.",
+          "path": "/flows/flow-1/transitions/0/relationship-unique-id",
+          "rule": "flow-transitions-references-existing-relationship-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__invalid-architecture-missing-relationship-type": {
+      "findings": [
+        {
+          "message": "Node with ID 'svc.payment-service' is not referenced by any relationships.",
+          "path": "/nodes/svc.payment-service/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'topic.payment-topic' is not referenced by any relationships.",
+          "path": "/nodes/topic.payment-topic/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "validate__options__arch": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    },
+    "validate__options__pattern": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__options__pattern-resolved": {
+      "findings": [
+        {
+          "message": "'node-1' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/properties/nodes/const/0",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "'node-2' is part of a pattern option and must be defined in a oneOf or anyOf block.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0/properties/nodes/const/1",
+          "rule": "nodes-referenced-in-pattern-decision-must-be-in-oneof-or-anyof-block",
+          "severity": "error"
+        },
+        {
+          "message": "At least one of \"oneOf\" or \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/properties/options/prefixItems/0",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "validate__zero-integer-property": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

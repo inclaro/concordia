@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/approval.schema.json",
+  "title": "Concordia AssessmentApproval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "id",
+    "decision",
+    "assessment",
+    "subject",
+    "scope",
+    "environment",
+    "assumptions",
+    "evidence",
+    "contractVersion",
+    "capabilityProfile",
+    "reviewer",
+    "decidedAt",
+    "producedUnder"
+  ],
+  "dependentRequired": { "previous": ["delta"], "delta": ["previous"] },
+  "properties": {
+    "apiVersion": { "const": "concordia.io/v1alpha1" },
+    "kind": { "const": "AssessmentApproval" },
+    "id": { "$ref": "#/$defs/id" },
+    "decision": { "enum": ["approved", "rejected"] },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "digest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "type": "integer", "minimum": 1 },
+        "digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "dependencies"],
+      "properties": {
+        "digest": { "$ref": "#/$defs/digest" },
+        "dependencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/item" }
+        }
+      }
+    },
+    "scope": { "$ref": "#/$defs/scope" },
+    "environment": { "$ref": "#/$defs/nonEmptyString" },
+    "assumptions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/boundRef" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/boundRef" }
+    },
+    "contractVersion": { "$ref": "#/$defs/nonEmptyString" },
+    "capabilityProfile": { "$ref": "#/$defs/nonEmptyString" },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "authority"],
+      "properties": {
+        "identity": { "$ref": "#/$defs/nonEmptyString" },
+        "authority": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "decidedAt": { "type": "string", "format": "date-time" },
+    "producedUnder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["normalizationVersion", "evaluatorVersions", "policyDigest", "authorityDigest"],
+      "properties": {
+        "normalizationVersion": { "$ref": "#/$defs/nonEmptyString" },
+        "evaluatorVersions": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "policyDigest": { "$ref": "#/$defs/digest" },
+        "authorityDigest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "expiry": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "previous": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval", "subjectDigest"],
+      "properties": {
+        "approval": { "$ref": "#/$defs/id" },
+        "subjectDigest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "modified"],
+      "properties": {
+        "added": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "removed": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "modified": { "type": "array", "items": { "$ref": "#/$defs/modifiedItem" } }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "calmNodes": { "$ref": "#/$defs/stringList" },
+        "calmRelationships": { "$ref": "#/$defs/stringList" },
+        "nodeTypes": { "$ref": "#/$defs/stringList" },
+        "tags": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "dependencyKind": {
+      "enum": [
+        "runtime-identity",
+        "role-binding",
+        "secret-reference",
+        "configuration-reference",
+        "storage-reference",
+        "public-entry-point",
+        "protocol",
+        "certificate-reference",
+        "external-destination",
+        "trust-context",
+        "data-classification",
+        "placement",
+        "binding",
+        "control",
+        "implementation",
+        "verification",
+        "quality-scenario"
+      ]
+    },
+    "boundRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "digest"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identity", "digest"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/dependencyKind" },
+        "identity": { "$ref": "#/$defs/nonEmptyString" },
+        "digest": { "$ref": "#/$defs/digest" }
+      }
+    },
+    "modifiedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "identity", "previousDigest", "digest"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/dependencyKind" },
+        "identity": { "$ref": "#/$defs/nonEmptyString" },
+        "previousDigest": { "$ref": "#/$defs/digest" },
+        "digest": { "$ref": "#/$defs/digest" }
+      }
+    }
+  }
+}

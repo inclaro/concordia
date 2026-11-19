@@ -1,0 +1,470 @@
+[
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-BND-001",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:fulfillment-service",
+      "canonicalEdgeKind": "imports",
+      "sourceQualifiedName": "services.billing.src.InvoiceService.__file__",
+      "targetQualifiedName": "services/fulfillment/src/internal/ShipmentStore.ts",
+      "normalizedRepositoryPath": "services/billing/src/InvoiceService.ts"
+    },
+    "result": "sha256:b5875394035eeec9bdd1f198d5e2d20b18b5b7e7c451ac93b85706126b39650b"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-BND-001",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:fulfillment-service",
+      "canonicalEdgeKind": "calls",
+      "sourceQualifiedName": "a.b.C.d",
+      "targetQualifiedName": "a.b.E",
+      "normalizedRepositoryPath": "services/billing/src/Refund.ts"
+    },
+    "result": "sha256:49fb5b8a11273a594421786871aa75596a5bedf5c579a6bea35502b2aabf5625"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-DECL-001",
+      "sourceArchitectureId": "calm:node:x",
+      "targetArchitectureId": "calm:node:y",
+      "canonicalEdgeKind": "imports",
+      "sourceQualifiedName": "q1",
+      "targetQualifiedName": "q2",
+      "normalizedRepositoryPath": "services\\win\\path.ts"
+    },
+    "result": "sha256:7b61f5a35e261dfb290ae503c875d99b5157145677d49edb0678fccc6fd5dad7"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-LYR-001",
+      "sourceArchitectureId": "calm:node:x",
+      "targetArchitectureId": "calm:node:y",
+      "canonicalEdgeKind": "calls",
+      "sourceQualifiedName": "q1",
+      "targetQualifiedName": "q2",
+      "normalizedRepositoryPath": "services/with space/file name.ts"
+    },
+    "result": "sha256:264c811ffb0a5f349728c70ede4720f07a56c57033fd37167e431d1d553f6628"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-BND-002",
+      "sourceArchitectureId": "",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:48a076a792d5441d0b557d778635ebd155feb7f8294593ea63abc8d3852f47fb"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-X-9",
+      "sourceArchitectureId": "id-é中",
+      "targetArchitectureId": "id-😀",
+      "canonicalEdgeKind": "inherits",
+      "sourceQualifiedName": "näme",
+      "targetQualifiedName": "tärget",
+      "normalizedRepositoryPath": "src/ünicode.ts"
+    },
+    "result": "sha256:708fd68ab2772ac5639ed64061a8eceda9650413ea66b7dfabbabefabbd20a56"
+  },
+  {
+    "fn": "cycleFingerprint",
+    "input": {
+      "ruleId": "CO-CYC-001",
+      "cycleIds": [
+        "calm:node:b",
+        "calm:node:a"
+      ]
+    },
+    "result": "sha256:80e6ece6d2eb9d459ce22e6e51e8f2b81caf6cb4b3b5fed1e86d7eb2f970c41b"
+  },
+  {
+    "fn": "cycleFingerprint",
+    "input": {
+      "ruleId": "CO-CYC-001",
+      "cycleIds": [
+        "z",
+        "a",
+        "m",
+        "B"
+      ]
+    },
+    "result": "sha256:8a4e28c10493841f15d8917633771f1e236ce47687c39cb6ac8fd0f19a7ee945"
+  },
+  {
+    "fn": "cycleFingerprint",
+    "input": {
+      "ruleId": "CO-CYC-002",
+      "cycleIds": []
+    },
+    "result": "sha256:891cb8db0b321dfc580c7dbb7006194edff97850ac08404d0a075d55c31c8fe2"
+  },
+  {
+    "fn": "unobservedFingerprint",
+    "input": {
+      "ruleId": "CO-COV-001",
+      "sourceId": "calm:node:a",
+      "targetIds": [
+        "calm:node:b",
+        "calm:node:c"
+      ],
+      "relationshipId": "calm:rel:ab"
+    },
+    "result": "sha256:8dfeb79fa770837c0ff82b3f8752ef19ce9678a473abe54890ba24f1322b9215"
+  },
+  {
+    "fn": "unobservedFingerprint",
+    "input": {
+      "ruleId": "CO-COV-001",
+      "sourceId": "calm:node:a",
+      "targetIds": [],
+      "relationshipId": "rel"
+    },
+    "result": "sha256:7fd03f2d2136b6df4e74c138e6ed8df82253e2dc3a3342913d81f16f0f827cf1"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "deploys-artifact",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml"
+    },
+    "result": "sha256:11fbde95f4e1a964faf058b7d21c625a3f453b75507f744164e9c676eeedc6fa"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "uses-image",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml"
+    },
+    "result": "sha256:a1dd92e86ec0fb02e1e5cf0655201946c5ef1a3e5c016f7eb49025bcb03dfd6f"
+  },
+  {
+    "fn": "typedFingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "routes-to",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml",
+      "environment": "staging",
+      "occurrence": ""
+    },
+    "result": "sha256:41ac97b7a0dabc5ac25fdbe96bb95a120bb1b5e7b82b18a1874cefc02acfea13"
+  },
+  {
+    "fn": "typedFingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "routes-to",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml",
+      "environment": "production",
+      "occurrence": ""
+    },
+    "result": "sha256:d198482cb51f676647d78b4bdbb9e8e944ee082869ceff561ce9cce1fa524fb0"
+  },
+  {
+    "fn": "typedFingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "uses-image",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml",
+      "environment": "production",
+      "occurrence": "container=api"
+    },
+    "result": "sha256:1d126e173458360701b090aa1efdd5ad7aac062d6d6a673bbdade808d2d8aa74"
+  },
+  {
+    "fn": "typedFingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "uses-image",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml",
+      "environment": "production",
+      "occurrence": "container=worker"
+    },
+    "result": "sha256:9ed9b28be9929a05ec6372effce8d28ee5232151040815235de88a020d2e1013"
+  },
+  {
+    "fn": "typedFingerprint",
+    "input": {
+      "ruleId": "CO-POL-020",
+      "sourceArchitectureId": "calm:node:billing-service",
+      "targetArchitectureId": "calm:node:payments-db",
+      "canonicalEdgeKind": "routes-to",
+      "sourceQualifiedName": "k8s:prod/~/networking.k8s.io/Ingress/shop/web",
+      "targetQualifiedName": "k8s:prod/~/~/Service/shop/web",
+      "normalizedRepositoryPath": "k8s/prod/ingress.yaml",
+      "environment": "",
+      "occurrence": ""
+    },
+    "result": "sha256:588ab09517e9332d53c3ef218578fb4d9c6eec04ac2554de96974f6248afc884"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "VIEW-PRES-001",
+      "sourceArchitectureId": "payments-container",
+      "targetArchitectureId": "output",
+      "canonicalEdgeKind": "view:presence:absent",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": "docs/architecture/views/payments-container.dsl"
+    },
+    "result": "sha256:f550d9a5a0d62d92d25af866e0d379e0f43f8a142260361317f67b684e4c1195"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "VIEW-FRESH-001",
+      "sourceArchitectureId": "payments-container",
+      "targetArchitectureId": "docs/architecture/views/payments-container.dsl",
+      "canonicalEdgeKind": "view:freshness:artifact",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": "docs/architecture/views/payments-container.dsl"
+    },
+    "result": "sha256:0e9405b8ebedcbb80cd2b0adc56f8cd1673ec11ec9f8693bb82506a3dbfbc6b6"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "VIEW-CORR-001",
+      "sourceArchitectureId": "payments-container",
+      "targetArchitectureId": "web>orders",
+      "canonicalEdgeKind": "view:correspondence:missing",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": "docs/architecture/payments.md"
+    },
+    "result": "sha256:18cc4f994d1affa77c3e867e9a436f8f63e41680ba9df1845e0b2c4128171175"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-001",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:index-only",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:e5b7feb5cdcdef5c82daff2cac183c458727436345f55c5f79c21b8efc644171"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-001",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:absent",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:b741d748b2fbf28ac960f4924849800a8fc8d602ab6974b899c5031376e204a4"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-002",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "ADR-7,CORE-DB-001,calm:node:orders-db",
+      "canonicalEdgeKind": "adr:superseded",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:277f7b09fa8ec2d439fa9d86a6f33353023561698911ee4c5c8ad423eb022a51"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-002",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:inactive",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:9903abaabd28a7d19a6293cbcf97e3450cbfa109e1032085d95f00a94bfc1b65"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-002",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "CORE-DB-001,calm:node:legacy",
+      "canonicalEdgeKind": "adr:historical-link",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:2df1295a2f346daa0d21ae28298cde011d1c77a9eeeb85c408a7c4a52c8f6ee5"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-003",
+      "sourceArchitectureId": "CORE-DB-001",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:rule-unjustified",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:21014cfb13e923aa1e8e672a4924466369a053ec5d685fb56f282519a4d59e93"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-004",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:enforcement-gap",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:269a8bddaa45395046f9104af9d0af43ea9360bcea719e77f7584e275eef2144"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-004",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "CORE-DB-001",
+      "canonicalEdgeKind": "adr:advisory-only",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:30a8392ca66c07bf1371e65edef6d05d9a4804fa8227cfc333eecdc3d2628a9b"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-005",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "ADR-3,ADR-7",
+      "canonicalEdgeKind": "adr:cycle",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:165f9249ed395752e1218d70c56aa974aae1757613fa200bcf80098c6757fc3c"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-005",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "0099-unknown.md",
+      "canonicalEdgeKind": "adr:missing-target",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:b6601ba18c794d50f290b88e5d3fc6c0318b6f2cc01bf08707dbb397220cad88"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-005",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:duplicate-id",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:0bc35aeeb37d200ba4b896e0d9011a05530fc9b01b25597bd7fc7839898c5121"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-005",
+      "sourceArchitectureId": "ADR-4",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:contradictory-status",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:77fd6c98b018a43d7f4241444e0e9d1b7d40baaaa646ba4ed3e321664efff445"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-005",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "ADR-3,ADR-6,ADR-7",
+      "canonicalEdgeKind": "adr:competing-successors",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:d32acbc0316b112447640eac5f12d22b6dcbc666bb12e5064c3970fb740fba08"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-006",
+      "sourceArchitectureId": "TRG-DEPLOY",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:trigger-unsatisfied",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:7f48f0fe7d7400a203565c58de3caaccc91b8244a52b4417c5df4ca55190ad3b"
+  },
+  {
+    "fn": "fingerprint",
+    "input": {
+      "ruleId": "GOV-ADR-001",
+      "sourceArchitectureId": "ADR-3",
+      "targetArchitectureId": "",
+      "canonicalEdgeKind": "adr:path-mismatch",
+      "sourceQualifiedName": "",
+      "targetQualifiedName": "",
+      "normalizedRepositoryPath": ""
+    },
+    "result": "sha256:7b8d9c12910cbe22d04fc83c41f0f522493b1567118215a3daa07ad078ffc1f0"
+  }
+]

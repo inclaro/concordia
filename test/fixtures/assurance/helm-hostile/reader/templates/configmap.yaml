@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reader
+  namespace: default
+data:
+  # A chart template cannot read a file outside the chart. If one of these lookups ever returned data, the canary
+  # of ../outside.txt would show up in the rendered output.
+  escaped: {{ .Files.Get "../outside.txt" | quote }}
+  absolute: {{ .Files.Get "/etc/hostname" | quote }}
+  cluster: {{ lookup "v1" "Secret" "default" "credentials" | toJson | quote }}

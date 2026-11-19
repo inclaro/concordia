@@ -1,0 +1,5 @@
+project: golden-brownfield
+generation: cbm:golden-brownfield:23b0a44eeca95485
+files: 6/7 covered (85.7%)
+excluded: 1, stale: 0, unindexed: 0
+coverage file: build/concordia/coverage.json

@@ -1,0 +1,59 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: commerce-boundaries
+  version: 1.0.0
+rules:
+  - id: CO-BND-001
+    name: Billing uses Fulfillment contracts only
+    severity: error
+    owner: team-billing
+    rationale: Billing must depend on the published fulfillment contract, not its internals.
+    remediation: Import from packages/fulfillment-contract instead.
+    subject:
+      calmNodes: [billing-service]
+    forbid:
+      target:
+        calmNodes: [fulfillment-service]
+      edges: [IMPORTS, CALLS]
+      traversal: direct
+    allow:
+      target:
+        sourceRoots: [packages/fulfillment-contract/**]
+  - id: CO-CYC-001
+    name: Services are acyclic
+    severity: error
+    subject:
+      nodeTypes: [service]
+    require:
+      graphProperty: acyclic
+      edges: [IMPORTS, CALLS]
+      collapseBy: architectureBinding
+  - id: CO-DECL-001
+    name: Dependencies are declared
+    severity: error
+    subject:
+      nodeTypes: [service, database]
+    declaredOnly:
+      edges: [IMPORTS, CALLS]
+  - id: CO-LYR-001
+    name: Billing sits above Fulfillment
+    severity: error
+    layerOrder:
+      layers:
+        - calmNodes: [billing-service]
+        - calmNodes: [fulfillment-service]
+      edges: [IMPORTS]
+  - id: CO-COV-001
+    name: Legacy must not call Billing
+    severity: error
+    subject:
+      calmNodes: [legacy-service]
+    forbid:
+      target:
+        calmNodes: [billing-service]
+      edges: [CALLS]
+      traversal: direct
+    evidence:
+      minimumConfidence: resolved
+      onUnknown: fail

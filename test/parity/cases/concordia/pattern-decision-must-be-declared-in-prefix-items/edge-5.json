@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "items": {
+        "oneOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": 7
+              },
+              "relationship-type": {
+                "properties": {
+                  "options": []
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

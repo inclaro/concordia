@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up mise
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      - name: Verify host prerequisites
+        run: |
+          bash --version
+          git --version
+          jq --version
+          curl --version
+          tar --version
+          sha256sum --version
+          cc --version
+
+      - name: Install repository-local development tools
+        run: mise run tools:install
+
+      - name: Verify repository-local runtimes
+        run: |
+          mise exec -- go version
+          mise exec -- node --version
+          mise exec -- npm --version
+
+      - name: Run CI checks
+        run: mise run ci
+
+  publish:
+    needs: validate
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up mise
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      - name: Verify host prerequisites
+        run: |
+          bash --version
+          git --version
+          jq --version
+          curl --version
+          tar --version
+          sha256sum --version
+          cc --version
+
+      - name: Install repository-local release tools
+        run: mise run setup
+
+      - name: Validate release configuration
+        run: mise run release:check
+
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mise exec -- goreleaser release --clean
+
+      - name: Verify the keyless release signature
+        run: |
+          mise exec -- cosign verify-blob \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/release.yml@${{ github.ref }}" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --bundle dist/concordia_checksums.txt.sigstore.json \
+            dist/concordia_checksums.txt
+
+      # GoReleaser publishes a draft. It becomes public only after the signature verified above.
+      - name: Make the verified release public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$GITHUB_REF_NAME" --draft=false

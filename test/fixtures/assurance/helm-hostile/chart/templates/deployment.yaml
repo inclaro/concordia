@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostile
+spec:
+  selector:
+    matchLabels:
+      app: hostile
+  template:
+    metadata:
+      labels:
+        app: hostile
+    spec:
+      containers:
+        - name: app
+          image: registry.example.com/hostile/app:1.0.0

@@ -1,0 +1,52 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/a",
+          "rule": "pattern-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/c",
+          "rule": "pattern-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/e/0",
+          "rule": "pattern-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/description",
+          "rule": "pattern-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

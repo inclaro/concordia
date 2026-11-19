@@ -1,0 +1,26 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  # The api Deployment exists in both environments under the same name (duplicate resource names, two namespaces).
+  - id: bind-api-workload
+    architectureRef: calm:node:api-service
+    match:
+      any:
+        - {kind: workload, environment: production, resourceKind: Deployment, name: api, namespace: payments}
+        - {kind: workload, environment: staging, resourceKind: Deployment, name: api, namespace: payments-staging}
+  # One image repository is shared by the production and staging workloads.
+  - id: bind-api-image
+    architectureRef: calm:node:api-service
+    match:
+      any:
+        - {kind: image, repository: registry.example.com/payments/api}
+  - id: bind-api-source
+    architectureRef: calm:node:api-service
+    match:
+      any:
+        - sourceRoot: app/**
+  - id: bind-worker-workload
+    architectureRef: calm:node:worker-service
+    match:
+      any:
+        - {kind: workload, environment: staging, resourceKind: Deployment, name: worker, namespace: payments}

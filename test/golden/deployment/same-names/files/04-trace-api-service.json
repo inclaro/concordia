@@ -1,0 +1,453 @@
+{
+  "architectureId": "api-service",
+  "levels": [
+    {
+      "level": "declared",
+      "status": "evaluated"
+    },
+    {
+      "level": "rendered-or-evaluated",
+      "status": "not-available"
+    },
+    {
+      "level": "deployment-execution",
+      "status": "not-available"
+    },
+    {
+      "level": "runtime-observation",
+      "status": "not-available"
+    }
+  ],
+  "schemaVersion": "1.1",
+  "traces": [
+    {
+      "architectureId": "api-service",
+      "cluster": "prod-eu",
+      "environment": "production",
+      "gaps": [
+        {
+          "detail": "container app of Deployment/api (k8s/prod/deployment.yaml:1) has no image occurrence: the provider keeps one reference for each workload and repository",
+          "lossModes": [
+            "merged-occurrences"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "container-image"
+        },
+        {
+          "detail": "container sidecar uses registry.example.com/payments/api:1.3.0: the tag can point to other content later, and no immutable digest is known",
+          "reason": "mutable-tag",
+          "step": "container-image"
+        },
+        {
+          "detail": "no build command names the image repository registry.example.com/payments/api",
+          "lossModes": [
+            "build-link-needs-build-command"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "build-definition"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for api-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "Other workloads use the same image repository (registry.example.com/payments/api). They belong to other subjects or environments, and this trace does not say that they agree with the service.",
+          "id": "other-consumers-belong-to-other-subjects"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "b594e222b8f82894",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "77708727ab0da2e6",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "f6ee81cda2c2c121",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "09711644dec9d473",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "d57ef3610bb1f2eb",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "98e03c4da123c10f",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "unknown"
+        }
+      ],
+      "status": "partial",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "api-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "API service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [
+            {
+              "bindings": [
+                "bind-api-workload"
+              ],
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/api",
+              "kind": "workload",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "apiGroup": "apps",
+                "kind": "Deployment",
+                "name": "api",
+                "namespace": "payments"
+              },
+              "resolution": "explicitly-bound"
+            },
+            {
+              "identity": "k8s:production/prod-eu/core/Namespace//payments",
+              "kind": "hosting-target",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/namespace.yaml"
+                }
+              ],
+              "properties": {
+                "kind": "Namespace",
+                "name": "payments"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [],
+          "resolution": "explicitly-bound",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [
+            {
+              "consumers": 2,
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/api#sidecar",
+              "kind": "container-image",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "container": "sidecar",
+                "reference": "registry.example.com/payments/api:1.3.0",
+                "registry": "registry.example.com",
+                "repository": "registry.example.com/payments/api",
+                "tag": "1.3.0"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "container app of Deployment/api (k8s/prod/deployment.yaml:1) has no image occurrence: the provider keeps one reference for each workload and repository",
+              "lossModes": [
+                "merged-occurrences"
+              ],
+              "reason": "coverage-incomplete"
+            },
+            {
+              "detail": "container sidecar uses registry.example.com/payments/api:1.3.0: the tag can point to other content later, and no immutable digest is known",
+              "reason": "mutable-tag"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            },
+            {
+              "detail": "Other workloads use the same image repository (registry.example.com/payments/api). They belong to other subjects or environments, and this trace does not say that they agree with the service.",
+              "id": "other-consumers-belong-to-other-subjects"
+            }
+          ],
+          "resolution": "exact",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [
+            {
+              "identity": "registry.example.com/payments/api",
+              "kind": "unlinked-image",
+              "lineage": "unknown",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "repository": "registry.example.com/payments/api"
+              },
+              "resolution": "unresolved"
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "no build command names the image repository registry.example.com/payments/api",
+              "lossModes": [
+                "build-link-needs-build-command"
+              ],
+              "reason": "coverage-incomplete"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [
+            {
+              "identity": "k8s:production/prod-eu/apps/Deployment/payments/api",
+              "kind": "manifest",
+              "locations": [
+                {
+                  "line": 1,
+                  "path": "k8s/prod/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "kind": "Deployment",
+                "name": "api"
+              }
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for api-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    },
+    {
+      "architectureId": "api-service",
+      "environment": "staging",
+      "gaps": [
+        {
+          "detail": "no workload is bound to api-service in staging, and the workload set of staging is complete",
+          "reason": "absent",
+          "step": "workload"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for api-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "4a0d1e512121ced8",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "5d63721ec863eea3",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "0166ab92065f6207",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "32916c0743594ed2",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "221b84774a97eebd",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "1ba99148103c80e2",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "violation"
+        }
+      ],
+      "status": "unresolved",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "api-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "API service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no workload is bound to api-service in staging, and the workload set of staging is complete",
+              "reason": "absent"
+            }
+          ],
+          "limits": [],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for api-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    }
+  ]
+}

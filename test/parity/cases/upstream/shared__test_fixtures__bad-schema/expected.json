@@ -1,0 +1,12 @@
+{
+  "runs": {
+    "bad-json-schema": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

@@ -1,0 +1,13 @@
+concordia:
+  image: node:22
+  script:
+    # Install codebase-memory-mcp 0.12.x first (see https://github.com/DeusData/codebase-memory-mcp).
+    - npm ci
+    - npx concordia index
+    - npx concordia check --format junit --output build/concordia/results.xml
+  artifacts:
+    when: always
+    paths:
+      - build/concordia/results.json
+    reports:
+      junit: build/concordia/results.xml

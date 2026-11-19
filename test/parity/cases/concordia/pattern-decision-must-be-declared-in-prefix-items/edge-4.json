@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "items": {
+        "anyOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "a"
+              },
+              "description": {
+                "const": "Pick an alternative"
+              },
+              "relationship-type": {
+                "properties": {
+                  "options": {
+                    "prefixItems": [
+                      {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "description": {
+                                "const": "Use c"
+                              },
+                              "nodes": {
+                                "const": [
+                                  "c"
+                                ]
+                              },
+                              "relationships": {
+                                "const": []
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "unique-id": {
+                "const": "b"
+              },
+              "description": {
+                "const": "Pick an alternative"
+              },
+              "relationship-type": {
+                "properties": {
+                  "options": {
+                    "prefixItems": [
+                      {
+                        "anyOf": [
+                          {
+                            "properties": {
+                              "description": {
+                                "const": "Use c"
+                              },
+                              "nodes": {
+                                "const": [
+                                  "c"
+                                ]
+                              },
+                              "relationships": {
+                                "const": []
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

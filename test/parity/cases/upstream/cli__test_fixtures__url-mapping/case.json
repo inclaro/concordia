@@ -1,0 +1,25 @@
+{
+  "origin": "upstream:cli/test_fixtures/url-mapping",
+  "runs": [
+    {
+      "architecture": "architectures/compliant.json",
+      "mode": "architecture",
+      "name": "architectures__compliant"
+    },
+    {
+      "architecture": "architectures/non-compliant.json",
+      "mode": "architecture",
+      "name": "architectures__non-compliant"
+    },
+    {
+      "mode": "pattern",
+      "name": "patterns__pattern-with-id",
+      "pattern": "patterns/pattern-with-id.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "patterns__pattern-without-id",
+      "pattern": "patterns/pattern-without-id.json"
+    }
+  ]
+}

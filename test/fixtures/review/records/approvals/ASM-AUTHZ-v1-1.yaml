@@ -1,0 +1,35 @@
+apiVersion: concordia.io/v1alpha1
+assessment:
+    digest: sha256:0edf15b40a38058b646b20136b59ec557675ce2c0826ae62366ba045ed20e2a5
+    id: ASM-AUTHZ
+    version: 1
+assumptions: []
+capabilityProfile: cbm-0.12.1
+contractVersion: review-digest/1
+decidedAt: "2026-11-01T10:00:00Z"
+decision: approved
+environment: production
+evidence:
+    - digest: sha256:15d9f43388f7268164f456ce5740996cc9d2e8d8ab4682ff7d51ff330c55a9b2
+      id: EV-AUTHZ
+id: ASM-AUTHZ-v1-1
+kind: AssessmentApproval
+producedUnder:
+    authorityDigest: sha256:ce8c67efe442ffc486d0a5f6bb01fdee07e971c3d361d5354bcb32b0d5fce82b
+    evaluatorVersions:
+        adapterSchema: concordia-cbm/v2
+        provider: 0.12.1
+    normalizationVersion: "2.1"
+    policyDigest: sha256:65d64948777b78e0fa1cdaf3a4447c4a926e9da85fb09a317ec9fa816ee89192
+reviewer:
+    authority: security-review
+    identity: alice@example.com
+scope:
+    calmNodes:
+        - api-service
+subject:
+    dependencies:
+        - digest: sha256:9f36fd601fdd6be2162cae2ad0bf48dc924b12cd2f0320d85c09ba06d3ec80fc
+          identity: k8s:production/prod-eu/apps/Deployment/payments/api#serviceAccountName:core/ServiceAccount/payments/api-sa
+          kind: runtime-identity
+    digest: sha256:2c163ea7433d9c62e6dc404155c05d10af14fc9e8e61ebea4150e1181d7e6a2c

@@ -1,0 +1,48 @@
+Deployment trace: chart-service in production (cluster prod-eu): partial
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of production: partial
+1. service [declared intent, exact]
+   chart-service
+2. workload [parsed source fact, explicitly bound]
+   Deployment <.Release.Name>-api  at charts/api/templates/deployment.yaml:2  (bound by bind-chart-workload)
+   gap: Deployment/<.Release.Name>-api is not rendered (charts/api/templates/deployment.yaml:2): its name or namespace is a template (unrendered-template)
+3. container image [parsed source fact, unresolved]
+   nothing found
+   gap: the image references of Deployment/<.Release.Name>-api is partial: family is partial in the capability profile (merged-occurrences, parse-partial, unrendered-template)
+4. build definition [inferred association, unresolved]
+   nothing found
+5. source evidence [inferred association, unresolved]
+   Deployment <.Release.Name>-api  at charts/api/templates/deployment.yaml:2
+   gap: no sourceRoot or package binding names source paths for chart-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 unknown
+  INFRA-PLC-002 unknown
+  INFRA-TRC-001 unknown
+  INFRA-TRC-002 unknown
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 unknown
+
+Deployment trace: chart-service in staging: unresolved
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of staging: complete
+1. service [declared intent, exact]
+   chart-service
+2. workload [parsed source fact, unresolved]
+   nothing found
+   gap: no workload is bound to chart-service in staging, and the workload set of staging is complete (absent)
+3. container image [parsed source fact, unresolved]
+   nothing found
+4. build definition [inferred association, unresolved]
+   nothing found
+5. source evidence [inferred association, unresolved]
+   nothing found
+   gap: no sourceRoot or package binding names source paths for chart-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 violation
+  INFRA-PLC-002 pass
+  INFRA-TRC-001 violation
+  INFRA-TRC-002 violation
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 violation

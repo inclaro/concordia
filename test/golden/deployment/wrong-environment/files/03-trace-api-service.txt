@@ -1,0 +1,49 @@
+Deployment trace: api-service in production (cluster prod-eu): unresolved
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of production: complete
+1. service [declared intent, exact]
+   api-service
+2. workload [parsed source fact, unresolved]
+   nothing found
+   gap: no workload is bound to api-service in production, and the workload set of production is complete (absent)
+3. container image [parsed source fact, unresolved]
+   nothing found
+4. build definition [inferred association, unresolved]
+   nothing found
+5. source evidence [inferred association, unresolved]
+   nothing found
+   gap: no sourceRoot or package binding names source paths for api-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 violation
+  INFRA-PLC-002 pass
+  INFRA-TRC-001 violation
+  INFRA-TRC-002 unknown
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 unknown
+
+Deployment trace: api-service in staging: partial
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of staging: complete
+1. service [declared intent, exact]
+   api-service
+2. workload [parsed source fact, explicitly bound]
+   Deployment payments-staging/api  at k8s/staging/deployment.yaml:1  (bound by bind-api-staging)
+   namespace payments-staging  at k8s/staging/namespace.yaml:1
+3. container image [parsed source fact, exact]
+   container app: registry.example.com/payments/api:1.3.0-rc1  at k8s/staging/deployment.yaml:1
+   gap: container app uses registry.example.com/payments/api:1.3.0-rc1: the tag can point to other content later, and no immutable digest is known (mutable-tag)
+4. build definition [inferred association, unresolved]
+   image registry.example.com/payments/api: no build definition names it, lineage unknown  at k8s/staging/deployment.yaml:1
+   gap: no build command names the image repository registry.example.com/payments/api (build-link-needs-build-command)
+5. source evidence [inferred association, unresolved]
+   Deployment api  at k8s/staging/deployment.yaml:1
+   gap: no sourceRoot or package binding names source paths for api-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, other-consumers-belong-to-other-subjects, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 violation
+  INFRA-PLC-002 violation
+  INFRA-TRC-001 pass
+  INFRA-TRC-002 pass
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 unknown

@@ -1,0 +1,66 @@
+{
+  "createdFrom": {
+    "graphGeneration": "cbm:golden-brownfield:23b0a44eeca95485",
+    "policyDigest": "sha256:63ebbb4efa7bf01d52fa0b23981cf8a6e03a6a68d46f48e10120d2a1acfa5c2c",
+    "sourceRevision": "46d2f68fc3dcb54b449f499a9aea200483811580"
+  },
+  "findings": [
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:0badb11bb604e9ee6ba84ff6dd68d58925562a65061169134a012adea716ff44",
+      "owner": "team-billing",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-CYC-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:305a36e03cbff4c1d427c3839a60f9afd176b09155a5ce04ef248d94daf8ff7d",
+      "owner": "team-fulfillment",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-DECL-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:466909a233c7b95de4bf757373c517490fb8bdc4ac3ed50cc3220bc489a794ba",
+      "owner": "team-billing",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-BND-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:846625ea3973da1021d2e5f2b76e675420a98ccbae086b9872fb92bbd7efa2f3",
+      "owner": "team-fulfillment",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-LYR-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:a06aeb1c2fdb473ed109683179bd63d386221b39426c5019efa9f3159970bfd3",
+      "owner": "team-fulfillment",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-DECL-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:b3d92e29480ad5d87429475a5dfba38051c4f0902eff7b4d0e609907793b27f8",
+      "owner": "team-fulfillment",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-DECL-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:ce47b243554b1fadd92a2d3375cd1bde9ad37d00fd4217c8f4baa215978ef251",
+      "owner": "team-billing",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-BND-001"
+    },
+    {
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "fingerprint": "sha256:d274f72afdfddceaa6c678a0415c0b43f1c7c62722fbcb084898f7ec9aa6111f",
+      "owner": "team-billing",
+      "reason": "Inherited before enforcement",
+      "ruleId": "CO-BND-001"
+    }
+  ],
+  "schemaVersion": "1.0"
+}

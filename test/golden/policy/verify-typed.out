@@ -1,0 +1,3 @@
+policy verified: 1 pack, 3 rules
+  ACME-DEP-001 family=deployment enforcement=advisory: required forAll from-workload uses-image scope=production roles=parsed-source-fact minimumResolution=exact completeness=complete applies=allOf(environment=production,(workload.kind=Deployment,workload.namespace=payments),not(protocol=http))
+  ACME-DEP-002: forbidden exists to-subject routes-to scope=any roles=parsed-source-fact,runtime-observation minimumResolution=explicitly-bound completeness=complete

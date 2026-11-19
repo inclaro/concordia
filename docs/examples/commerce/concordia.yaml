@@ -1,0 +1,26 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: commerce-platform
+architecture:
+  source: architecture/commerce.calm.json
+  urlMapping: architecture/url-mapping.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: commerce-example
+      root: .
+      include: [services/**, packages/**]
+      exclude: [services/legacy/**]
+  indexMode: fast
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/**/*.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

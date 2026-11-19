@@ -1,0 +1,128 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: core
+  version: 1.0.0
+# Core architecture rules. Most rules select nodes by tag, so they check nothing
+# until the architecture model carries the tags (see docs/reference/core-rules.md).
+# Never reuse or renumber a rule ID: baselines and waivers key on it.
+rules:
+  - id: CORE-CYC-001
+    name: Services and systems have no dependency cycles
+    severity: error
+    rationale: Cycles between deployable units make them impossible to build, test, release, or reason about on their own.
+    remediation: Break the cycle with an interface, an event, or by moving the shared code to a third unit that both sides depend on.
+    subject:
+      nodeTypes: [service, system]
+    require:
+      graphProperty: acyclic
+      edges: [IMPORTS, CALLS]
+      collapseBy: architectureBinding
+
+  - id: CORE-DECL-001
+    name: Dependencies between services, databases, and web clients are declared
+    severity: error
+    rationale: An architecture model is only a source of truth when it shows every dependency that exists in the code. A hidden dependency is a coupling that nobody decided on.
+    remediation: Remove the dependency from the code, or declare it as a relationship in the architecture model. Edges of kind HTTP_CALLS and ASYNC_CALLS are heuristic in the CBM adapter, so lower evidence.minimumConfidence to heuristic with a rule override to check them.
+    subject:
+      nodeTypes: [service, database, webclient]
+    declaredOnly:
+      edges: [IMPORTS, CALLS, HTTP_CALLS, ASYNC_CALLS, READS, WRITES]
+
+  - id: CORE-DB-001
+    name: Clients never access a database directly
+    severity: error
+    rationale: A client runs outside the trust boundary and outside the control of the data owner. Direct database access bypasses validation, authorization, and the freedom to change the schema.
+    remediation: Put a service between the client and the database. The client calls the service, and only the service reads or writes the database.
+    subject:
+      nodeTypes: [webclient]
+      tags: [client]
+    forbid:
+      target:
+        nodeTypes: [database]
+      edges: [IMPORTS, CALLS, READS, WRITES]
+      traversal: direct
+
+  - id: CORE-BND-001
+    name: Services do not import the code of other services
+    severity: error
+    rationale: Shared code between services couples their release cycles and hides the real contract between them. Each service must stay replaceable behind its published interface.
+    remediation: Depend on a published contract or on a shared kernel, not on the internals of another service. Tag the node that holds the contract with contract or shared-kernel in the architecture model.
+    subject:
+      nodeTypes: [service]
+    forbid:
+      target:
+        nodeTypes: [service]
+      edges: [IMPORTS, INHERITS, IMPLEMENTS]
+      traversal: direct
+    allow:
+      when:
+        any:
+          - targetTag: contract
+          - targetTag: shared-kernel
+
+  - id: CORE-LYR-001
+    name: Layers depend downward only
+    severity: error
+    rationale: When a lower layer depends on a higher layer, the layers cannot change or be tested on their own, and the layering is only a drawing.
+    remediation: Move the shared code to the lower layer, or invert the dependency with an interface that the lower layer owns.
+    layerOrder:
+      layers:
+        - tags: [presentation]
+        - tags: [application]
+        - tags: [domain]
+      edges: [IMPORTS, CALLS]
+
+  - id: CORE-LYR-002
+    name: The domain does not depend on infrastructure or presentation
+    severity: error
+    rationale: The domain holds the business rules. When it depends on infrastructure or on the user interface, you cannot change a database, a framework, or a screen without a change to the business rules.
+    remediation: Define an interface in the domain and let the infrastructure implement it (dependency inversion). Pass infrastructure to the domain from outside.
+    subject:
+      tags: [domain]
+    forbid:
+      target:
+        tags: [infrastructure, presentation]
+      edges: [IMPORTS, CALLS]
+      traversal: direct
+
+  - id: CORE-LYR-003
+    name: Shared code is a leaf
+    severity: warning
+    rationale: Shared code that depends on a service, a client, or a system turns into a hidden hub. Every unit that uses it then depends on that unit too.
+    remediation: Remove the dependency from the shared code, or move the shared code that needs it into the unit that owns it.
+    subject:
+      tags: [shared]
+    forbid:
+      target:
+        nodeTypes: [service, webclient, system]
+      edges: [IMPORTS, CALLS]
+      traversal: direct
+    allow:
+      when:
+        any:
+          - targetTag: shared
+
+  - id: CORE-SEC-001
+    name: Public and external code does not access restricted nodes directly
+    severity: error
+    rationale: A node tagged public or external is exposed to untrusted callers. A direct access from it to a restricted node removes the control point between them.
+    remediation: Route the access through a node that checks authorization, for example a gateway or an application service, and tag that node as neither public nor external.
+    evidence:
+      minimumConfidence: heuristic
+    subject:
+      tags: [public, external]
+    forbid:
+      target:
+        tags: [restricted]
+      edges: [IMPORTS, CALLS, READS, WRITES, HTTP_CALLS]
+      traversal: direct
+
+  - id: CORE-OBS-001
+    name: Required connections are observed in the code
+    severity: warning
+    rationale: A connection that the model marks as required but that the code does not show means the model is wrong or the code is missing. Either way, the architecture drifted.
+    remediation: Remove the relationship from the model, fix the code or the bindings so that the connection shows in the graph, or lower the requirement for that relationship.
+    subject:
+      nodeTypes: [actor, ecosystem, system, service, database, network, ldap, webclient, data-asset]
+    observedRequired: {}

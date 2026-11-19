@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/extensions.schema.json",
+  "title": "Concordia CALM extensions",
+  "$defs": {
+    "confidence": {
+      "enum": ["resolved", "runtime", "syntactic", "heuristic", "unknown"]
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "classification": { "type": "string", "minLength": 1 }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "c4-level": { "enum": ["person", "softwareSystem", "container", "component"] },
+        "owner": { "type": "string", "minLength": 1 },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "trust": { "$ref": "#/$defs/trust" },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "source-root",
+                      "package",
+                      "qualified-name",
+                      "build-target",
+                      "otel-service"
+                    ]
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "environment",
+                  "resource-kind",
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "workload"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "resource-kind": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cluster": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "api-group": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "namespace": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "repository"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "image"
+                  },
+                  "repository": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "digest": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "environment",
+                  "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "route"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cluster": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "api-group": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "resource-kind": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "namespace": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "environment",
+                  "address"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "infra-resource"
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "address": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cluster": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "file",
+                  "service"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "compose-service"
+                  },
+                  "file": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "service": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "environment": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cardinality": {
+                    "enum": [
+                      "one",
+                      "many"
+                    ]
+                  },
+                  "agreement": {
+                    "enum": [
+                      "all",
+                      "any"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "proposed"
+                    ]
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "relationshipObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed-edge-kinds": { "type": "array", "items": { "type": "string" } },
+        "minimum-confidence": { "$ref": "#/$defs/confidence" },
+        "required": { "type": "boolean" }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "observation": { "$ref": "#/$defs/relationshipObservation" },
+        "trust": { "$ref": "#/$defs/trust" }
+      }
+    },
+    "controlConfig": {
+      "type": "object",
+      "required": ["engine"],
+      "anyOf": [{ "required": ["rule-ids"] }, { "required": ["check-ids"] }],
+      "properties": {
+        "$schema": { "type": "string" },
+        "control-id": { "type": "string", "minLength": 1 },
+        "engine": { "const": "concordia" },
+        "policy-ref": { "type": "string", "minLength": 1 },
+        "rule-ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+        "check-ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+        "unknown-disposition": { "enum": ["fail", "warn", "ignore"] },
+        "minimum-policy-coverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+CO-BND-001 Billing uses Fulfillment contracts only
+Verdict: violation   Severity: error   Family: boundary   Policy: commerce-boundaries@1.0.0
+Rationale: Billing must depend on the published fulfillment contract, not its internals.
+Remediation: Import from packages/fulfillment-contract instead.
+Rule owner: team-billing
+Subjects: calm:node:billing-service
+Targets: calm:node:fulfillment-service
+Plan:
+  {
+    "aggregation": "edge",
+    "evidenceRequirements": {
+      "minimumConfidence": "syntactic",
+      "minimumCoverage": 0.9,
+      "onUnknown": "fail"
+    },
+    "name": "Billing uses Fulfillment contracts only",
+    "owner": "team-billing",
+    "pack": {
+      "id": "commerce-boundaries",
+      "version": "1.0.0"
+    },
+    "predicate": {
+      "allow": {
+        "edgeKinds": [],
+        "targetCalmNodes": [],
+        "targetSourceRoots": [
+          "packages/fulfillment-contract/**"
+        ],
+        "targetTags": []
+      },
+      "family": "boundary"
+    },
+    "rationale": "Billing must depend on the published fulfillment contract, not its internals.",
+    "remediation": "Import from packages/fulfillment-contract instead.",
+    "ruleId": "CO-BND-001",
+    "severity": "error",
+    "subjects": [
+      "billing-service"
+    ],
+    "targets": [
+      "fulfillment-service"
+    ],
+    "traversal": {
+      "direction": "outbound",
+      "edgeKinds": [
+        "calls",
+        "imports"
+      ],
+      "maximumDepth": 1,
+      "minimumDepth": 1
+    },
+    "unsupportedEdgeKinds": []
+  }
+Coverage:
+  files: 100.0% (4/4 covered, required 90.0%)
+  excluded: 0
+  stale: 0
+  unindexed: 0
+  unbound endpoints: 2
+  sub-threshold evidence: 0
+  evidence: minimum confidence syntactic, on unknown fail
+
+Finding 25f9…f83
+  Fingerprint: sha256:25f9d6ecb5c1ad0d9cbc726971736b336ec19488cf5d2c4170069123eff9bf83
+  Kind: forbidden-dependency
+  Message: forbidden dependency billing-service -> fulfillment-service
+  Source: calm:node:billing-service
+  Target: calm:node:fulfillment-service
+  Owner: team-billing
+  Disposition: active
+  Location: services/billing/src/InvoiceService.ts:6
+  Evidence path:
+    Method services.billing.src.InvoiceService.InvoiceService.issue (services/billing/src/InvoiceService.ts:5)
+    -[CALLS syntactic, cbm:CALLS:unique_name]-> at services/billing/src/InvoiceService.ts:6
+    Class services.fulfillment.src.internal.ShipmentStore.ShipmentStore (services/fulfillment/src/internal/ShipmentStore.ts:1)
+
+Finding 3e4b…230
+  Fingerprint: sha256:3e4b28753a077d4d956cd497b6f0573bd7fd5cc75c060395ea9940563a9c7230
+  Kind: forbidden-dependency
+  Message: forbidden dependency billing-service -> fulfillment-service
+  Source: calm:node:billing-service
+  Target: calm:node:fulfillment-service
+  Owner: team-billing
+  Disposition: active
+  Location: services/billing/src/InvoiceService.ts
+  Evidence path:
+    File services.billing.src.InvoiceService.__file__ (services/billing/src/InvoiceService.ts)
+    -[IMPORTS syntactic, cbm:IMPORTS]-> at services/billing/src/InvoiceService.ts
+    Module services.fulfillment.src.internal.ShipmentStore (services/fulfillment/src/internal/ShipmentStore.ts:1)

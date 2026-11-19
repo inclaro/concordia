@@ -1,0 +1,47 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "pass",
+      "mode": "architecture-with-pattern",
+      "architecture": "pass.json",
+      "pattern": "one-of.pattern.json"
+    },
+    {
+      "name": "fail",
+      "mode": "architecture-with-pattern",
+      "architecture": "fail.json",
+      "pattern": "one-of.pattern.json"
+    },
+    {
+      "name": "any-of-answered",
+      "mode": "architecture-with-pattern",
+      "architecture": "any-of-answered.json",
+      "pattern": "any-of.pattern.json"
+    },
+    {
+      "name": "any-of-empty",
+      "mode": "architecture-with-pattern",
+      "architecture": "any-of-empty.json",
+      "pattern": "any-of.pattern.json"
+    },
+    {
+      "name": "no-decision",
+      "mode": "architecture-with-pattern",
+      "architecture": "no-decision.json",
+      "pattern": "one-of.pattern.json"
+    },
+    {
+      "name": "wrong-answer",
+      "mode": "architecture-with-pattern",
+      "architecture": "wrong-answer.json",
+      "pattern": "one-of.pattern.json"
+    },
+    {
+      "name": "mismatch",
+      "mode": "architecture-with-pattern",
+      "architecture": "mismatch.json",
+      "pattern": "one-of.pattern.json"
+    }
+  ]
+}

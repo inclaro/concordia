@@ -1,0 +1,26 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty value.",
+          "path": "/nodes/api/description",
+          "rule": "architecture-has-no-empty-string-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

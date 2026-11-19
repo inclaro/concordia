@@ -1,0 +1,20 @@
+# The same subject as ASM-EDGE. Its approval expires on 2026-11-10.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-EXPIRING
+version: 1
+type: security
+title: Runtime identity of the API service
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: The identity that the API service runs under in production
+  dependencies:
+    - kind: runtime-identity
+      selector:
+        calmNodes: [api-service]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

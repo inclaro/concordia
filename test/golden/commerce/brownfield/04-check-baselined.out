@@ -1,0 +1,22 @@
+FAIL CO-BND-001 Billing uses Fulfillment contracts only
+
+2 baselined finding(s) not shown (use --verbose)
+
+UNKNOWN CO-COV-001 Legacy must not call Billing
+  CO-CON-021: minimum coverage not met: 0.500 < 0.9
+  CO-CON-026: language coverage not met: .kt 0.000 < 0.9
+Coverage: 50.0% (required 90.0%)
+
+FAIL CO-CYC-001 Services are acyclic
+
+1 baselined finding(s) not shown (use --verbose)
+
+FAIL CO-DECL-001 Dependencies are declared
+
+2 baselined finding(s) not shown (use --verbose)
+
+FAIL CO-LYR-001 Billing sits above Fulfillment
+
+1 baselined finding(s) not shown (use --verbose)
+
+0 active error(s), 6 baselined, 0 waived, 0 expired waiver(s), 1 unknown

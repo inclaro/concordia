@@ -1,0 +1,20 @@
+# The selector `via: terraform` is not mapped by the capability profile of the provider: the dependency is unknown.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-TERRAFORM
+version: 1
+type: security
+title: Terraform-managed network exposure
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: Entry points that terraform creates
+  dependencies:
+    - kind: public-entry-point
+      selector:
+        via: terraform
+assumptions: []
+evidence: []
+outcome: inconclusive
+state: ready-for-review

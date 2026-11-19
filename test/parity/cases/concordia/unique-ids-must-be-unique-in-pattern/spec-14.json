@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "unique-id": {
+                  "const": "postgres"
+                },
+                "interfaces": {
+                  "prefixItems": [
+                    {
+                      "properties": {
+                        "unique-id": {
+                          "const": "db-port"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "properties": {
+                "unique-id": {
+                  "const": "mysql"
+                },
+                "interfaces": {
+                  "prefixItems": [
+                    {
+                      "properties": {
+                        "unique-id": {
+                          "const": "db-port"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

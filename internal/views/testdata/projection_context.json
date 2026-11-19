@@ -1,0 +1,81 @@
+{
+  "basis": "declared",
+  "contract": "concordia-view-projection/1",
+  "coverage": {
+    "lost": [],
+    "required": {
+      "elements": [
+        "payments-system"
+      ],
+      "relationships": []
+    },
+    "unbound": null
+  },
+  "depicts": {
+    "elements": [
+      "customer",
+      "ledger",
+      "payments-system"
+    ],
+    "relationships": [
+      "customer-uses-web",
+      "orders-to-ledger"
+    ]
+  },
+  "elements": [
+    {
+      "id": "customer",
+      "level": "person",
+      "parent": null,
+      "type": "actor"
+    },
+    {
+      "id": "ledger",
+      "level": "softwareSystem",
+      "parent": null,
+      "type": "system"
+    },
+    {
+      "id": "payments-system",
+      "level": "softwareSystem",
+      "parent": null,
+      "type": "system"
+    }
+  ],
+  "missing": [
+    "relationship.context",
+    "relationship.interface"
+  ],
+  "relationships": [
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "customer",
+      "interface": null,
+      "kind": "interacts",
+      "protocol": null,
+      "status": null,
+      "to": "payments-system"
+    },
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "payments-system",
+      "interface": null,
+      "kind": "connects",
+      "protocol": "gRPC",
+      "status": null,
+      "to": "ledger"
+    }
+  ],
+  "view": {
+    "abstraction": "system",
+    "environment": null,
+    "id": "payments-context",
+    "kind": "system-context",
+    "scope": [
+      "payments-system"
+    ]
+  }
+}
+

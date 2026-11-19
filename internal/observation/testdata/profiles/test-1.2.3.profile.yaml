@@ -1,0 +1,34 @@
+# Test-only capability profile. It pins a build that does not exist.
+id: test-provider-1.2.3
+provider: test-provider
+build:
+  version: 1.2.3
+  adapterSchema: test-adapter/v1
+families:
+  - family: calls
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: CALLS
+    requiredProperties: [strategy]
+    fixtures: [present.json]
+  - family: deploys-artifact
+    level: partial
+    maturity: advisory
+    lossModes: [deploy-target-is-file]
+    nativeEdges:
+      - type: DEPLOYS
+        discriminators:
+          via: [kubectl, helm, chart]
+    requiredProperties: [via]
+    fixtures: [not-recorded-yet.json]
+  - family: infrastructure-dependency
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: DEPENDS_ON
+        absent: [via]
+        present: [repository]
+  - family: configures-key-symbol
+    level: unsupported
+    maturity: advisory

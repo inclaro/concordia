@@ -1,0 +1,43 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: review-currency
+  version: 1.0.0
+# Review currency rules. `check` evaluates them from the assessments of the workspace (`assessments.paths` and
+# `assessments.required`) and their verified approvals, not from a predicate over code edges: a rule has no `subject`.
+# Enable the pack with `policies.packs: [{use: builtin:review-currency}]`. No rule declares `enforcement`, and the family
+# defaults to `advisory`: set a mode per rule, pack, or family with `check.enforcement` (family `assessment-currency`).
+# A `mandatory` mode needs one authority and a trust anchor. Never reuse or renumber a rule ID: baselines and waivers
+# key on it.
+rules:
+  - id: REV-APR-001
+    name: A required assessment has a current verified approval
+    severity: error
+    family: assessment-currency
+    assessmentCurrency: approval
+    rationale: An assessment that nobody with authority approved for the subject as it is now, or whose approval expired, was revoked, or was bound to an earlier subject, is not review evidence for the architecture it covers.
+    remediation: Get review of the assessment version and record a verified approval, or write a new assessment version for the changed subject. When currency is unknown, supply the missing evidence or fix the analysis configuration.
+
+  - id: REV-DSP-001
+    name: A removed or narrowed subject has a recorded disposition
+    severity: error
+    family: assessment-currency
+    assessmentCurrency: disposition
+    rationale: A dependency that an approval covered and that is now gone, or no longer selected, may have been removed on purpose or by accident. Without a verified disposition the review cannot tell which.
+    remediation: Get review and approve a later assessment version that lists a disposition (removed-intentionally, retired, or moved) for the identity, or restore the dependency.
+
+  - id: REV-CAP-001
+    name: A lost capability has a recorded disposition
+    severity: error
+    family: assessment-currency
+    assessmentCurrency: capability
+    rationale: When the capability profile that supplied the evidence of an approval no longer supports a dependency kind, the approved subject can no longer be compared, and an apparent pass would hide the loss.
+    remediation: Restore the capability, or get review and approve a later assessment version that records a disposition for the affected dependencies.
+
+  - id: REV-GOV-001
+    name: A relaxation of review rules has a governance disposition
+    severity: error
+    family: assessment-currency
+    assessmentCurrency: governance
+    rationale: A candidate that removes a rule, lowers a severity, weakens an evidence requirement, narrows a scope, loosens `check.enforcement`, or edits an authority or reviewer could approve its own relaxation.
+    remediation: Get a governance review of the relaxation and record it at the trust anchor, or revert the change to the rules, the enforcement entries, or the authority configuration.

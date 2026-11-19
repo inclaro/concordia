@@ -1,0 +1,20 @@
+# The same subject as ASM-EDGE, assessed for staging. An approval of this version does not satisfy a production requirement.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-STAGING
+version: 1
+type: security
+title: Runtime identity of the API service in staging
+scope:
+  calmNodes: [api-service]
+environment: staging
+subject:
+  summary: The identity that the API service runs under in staging
+  dependencies:
+    - kind: runtime-identity
+      selector:
+        calmNodes: [api-service]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

@@ -1,0 +1,1610 @@
+{
+  "nodeLabels": {
+    "ADR": {
+      "properties": [
+        "adr_id",
+        "complexity",
+        "date",
+        "docstring",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines",
+        "status",
+        "status_text",
+        "superseded_by",
+        "title"
+      ],
+      "count": 2
+    },
+    "Branch": {
+      "properties": [
+        "base_sha",
+        "branch",
+        "canonical_root",
+        "git_common_dir",
+        "head_sha",
+        "is_detached",
+        "is_git",
+        "is_worktree",
+        "root_exists",
+        "worktree_root"
+      ],
+      "count": 1
+    },
+    "Chart": {
+      "properties": [
+        "external",
+        "repository",
+        "source"
+      ],
+      "count": 2
+    },
+    "Class": {
+      "properties": [
+        "complexity",
+        "importance",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines"
+      ],
+      "count": 8
+    },
+    "Diagram": {
+      "properties": [
+        "complexity",
+        "diagram_kind",
+        "docstring",
+        "format",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines",
+        "parent_class"
+      ],
+      "count": 1
+    },
+    "DiagramElement": {
+      "properties": [
+        "complexity",
+        "element_id",
+        "element_kind",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines",
+        "parent_class"
+      ],
+      "count": 4
+    },
+    "EnvVar": {
+      "properties": [
+        "container",
+        "env_key",
+        "scope",
+        "source"
+      ],
+      "count": 9
+    },
+    "File": {
+      "properties": [
+        "declares_build",
+        "docstring",
+        "extension"
+      ],
+      "count": 42
+    },
+    "Folder": {
+      "properties": [],
+      "count": 21
+    },
+    "Function": {
+      "properties": [
+        "alloc_in_loop",
+        "bt",
+        "cognitive",
+        "complexity",
+        "docstring",
+        "importance",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "linear_scan_in_loop",
+        "lines",
+        "loop_count",
+        "loop_depth",
+        "max_access_depth",
+        "param_count",
+        "param_names",
+        "param_types",
+        "recursion_in_loop",
+        "recursive",
+        "return_type",
+        "self_recursive",
+        "signature",
+        "transitive_loop_depth",
+        "unguarded_recursion"
+      ],
+      "count": 6
+    },
+    "Image": {
+      "properties": [
+        "registry",
+        "repository"
+      ],
+      "count": 8
+    },
+    "Module": {
+      "properties": [
+        "complexity",
+        "docstring",
+        "image_context",
+        "image_files",
+        "image_ignore",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines"
+      ],
+      "count": 40
+    },
+    "Project": {
+      "properties": [],
+      "count": 1
+    },
+    "Resource": {
+      "properties": [
+        "complexity",
+        "ecosystem",
+        "group",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "kind",
+        "labels",
+        "lines",
+        "namespace",
+        "obj_key",
+        "service",
+        "source",
+        "version"
+      ],
+      "count": 35
+    },
+    "Route": {
+      "properties": [
+        "host",
+        "path",
+        "source",
+        "via"
+      ],
+      "count": 2
+    },
+    "Section": {
+      "properties": [
+        "complexity",
+        "docstring",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines"
+      ],
+      "count": 13
+    },
+    "Variable": {
+      "properties": [
+        "complexity",
+        "is_entry_point",
+        "is_exported",
+        "is_test",
+        "lines"
+      ],
+      "count": 16
+    }
+  },
+  "edgeTypes": {
+    "CALLS": {
+      "discriminators": {
+        "strategy": {
+          "lsp_direct": 2
+        }
+      },
+      "properties": [
+        "callee",
+        "candidates",
+        "confidence",
+        "line",
+        "strategy"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "strategy": "lsp_direct"
+          },
+          "sourceLabel": "Function",
+          "sourceFileType": ".go",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 2
+        }
+      ],
+      "count": 2
+    },
+    "CONFIGURES": {
+      "discriminators": {
+        "strategy": {
+          "env_access": 1,
+          "env_read": 2,
+          "env_set": 8,
+          "helm_values": 1
+        }
+      },
+      "properties": [
+        "container",
+        "dockerfile",
+        "line",
+        "scope",
+        "source",
+        "strategy"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "strategy": "env_read"
+          },
+          "sourceLabel": "EnvVar",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "strategy": "env_read"
+          },
+          "sourceLabel": "EnvVar",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "strategy": "helm_values"
+          },
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Chart",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "strategy": "env_access"
+          },
+          "sourceLabel": "Function",
+          "sourceFileType": ".go",
+          "targetLabel": "EnvVar",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "strategy": "env_set"
+          },
+          "sourceLabel": "Module",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "EnvVar",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "strategy": "env_set"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "EnvVar",
+          "targetKind": "",
+          "count": 6
+        }
+      ],
+      "count": 12
+    },
+    "CONNECTS_TO": {
+      "discriminators": {
+        "via": {
+          "env": 1
+        }
+      },
+      "properties": [
+        "container",
+        "key",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "via": "env"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 1
+        }
+      ],
+      "count": 1
+    },
+    "CONTAINS_FILE": {
+      "discriminators": {},
+      "properties": [],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Branch",
+          "sourceFileType": "{}",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 4
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "adr",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "api",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "app",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "base",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "docker",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "docs",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "network",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "overrides",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "prod",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 16
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "scripts",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "staging",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 4
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "templates",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "terraform",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "workflows",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 42
+    },
+    "CONTAINS_FOLDER": {
+      "discriminators": {},
+      "properties": [],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Branch",
+          "sourceFileType": "{}",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 9
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "api",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "docs",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "k8s",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "kustomize",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Folder",
+          "sourceFileType": "terraform",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 15
+    },
+    "DEFINES": {
+      "discriminators": {},
+      "properties": [],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Diagram",
+          "sourceFileType": ".md",
+          "targetLabel": "DiagramElement",
+          "targetKind": "",
+          "count": 4
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".go",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".go",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 3
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "ADR",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "DiagramElement",
+          "targetKind": "",
+          "count": 4
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "Diagram",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 4
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "Section",
+          "targetKind": "",
+          "count": 13
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".mod",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".sh",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".tfvars",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".tfvars",
+          "targetLabel": "Variable",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".tf",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 8
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".tf",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Chart",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 26
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ClusterRole",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ConfigMap",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 8
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Gateway",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "HTTPRoute",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "HorizontalPodAutoscaler",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Ingress",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Namespace",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "NetworkPolicy",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "PersistentVolumeClaim",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "PodDisruptionBudget",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "RoleBinding",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Role",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Secret",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ServiceAccount",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 6
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Variable",
+          "targetKind": "",
+          "count": 12
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Variable",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "Makefile",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 3
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "Makefile",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "kustomization.yaml",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "kustomization.yaml",
+          "targetLabel": "Resource",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Route",
+          "targetKind": "",
+          "count": 3
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Section",
+          "sourceFileType": ".md",
+          "targetLabel": "Diagram",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 136
+    },
+    "DEPENDS_ON": {
+      "discriminators": {
+        "via": {
+          "build": 2,
+          "copy-from": 1,
+          "depends_on": 1,
+          "from": 2
+        }
+      },
+      "properties": [
+        "file",
+        "image",
+        "line",
+        "repository",
+        "stage",
+        "tool",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Chart",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Chart",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "build"
+          },
+          "sourceLabel": "Image",
+          "sourceFileType": "",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "copy-from"
+          },
+          "sourceLabel": "Module",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Image",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "from"
+          },
+          "sourceLabel": "Module",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Image",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "via": "build"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "depends_on"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 1
+        }
+      ],
+      "count": 7
+    },
+    "DEPLOYS": {
+      "discriminators": {
+        "via": {
+          "chart": 1,
+          "helm": 1,
+          "kubectl": 1
+        }
+      },
+      "properties": [
+        "chart",
+        "line",
+        "path",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "via": "chart"
+          },
+          "sourceLabel": "Chart",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "helm"
+          },
+          "sourceLabel": "Module",
+          "sourceFileType": ".sh",
+          "targetLabel": "Chart",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "kubectl"
+          },
+          "sourceLabel": "Module",
+          "sourceFileType": ".sh",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 3
+    },
+    "DIAGRAM_ARROW": {
+      "discriminators": {},
+      "properties": [
+        "label",
+        "line",
+        "style"
+      ],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "DiagramElement",
+          "sourceFileType": ".md",
+          "targetLabel": "DiagramElement",
+          "targetKind": "",
+          "count": 3
+        }
+      ],
+      "count": 3
+    },
+    "HAS_BRANCH": {
+      "discriminators": {},
+      "properties": [
+        "base_sha",
+        "branch",
+        "canonical_root",
+        "git_common_dir",
+        "head_sha",
+        "is_detached",
+        "is_git",
+        "is_worktree",
+        "root_exists",
+        "worktree_root"
+      ],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Project",
+          "sourceFileType": "{}",
+          "targetLabel": "Branch",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 1
+    },
+    "IMPORTS": {
+      "discriminators": {
+        "via": {
+          "terraform": 1
+        }
+      },
+      "properties": [
+        "line",
+        "local_name",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "via": "terraform"
+          },
+          "sourceLabel": "Class",
+          "sourceFileType": ".tf",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "kustomization.yaml",
+          "targetLabel": "Folder",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": "kustomization.yaml",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 2
+        }
+      ],
+      "count": 4
+    },
+    "INFRA_MAPS": {
+      "discriminators": {
+        "kind": {
+          "httproute": 1,
+          "ingress": 4,
+          "route": 1,
+          "selector": 3
+        }
+      },
+      "properties": [
+        "kind",
+        "service",
+        "workload"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "kind": "selector"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 3
+        },
+        {
+          "discriminators": {
+            "kind": "ingress"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "kind": "route"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "kind": "httproute"
+          },
+          "sourceLabel": "Route",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "kind": "ingress"
+          },
+          "sourceLabel": "Route",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Service",
+          "count": 2
+        }
+      ],
+      "count": 9
+    },
+    "MENTIONS": {
+      "discriminators": {
+        "syntax": {
+          "code_path": 2,
+          "link": 3,
+          "path": 35
+        },
+        "tier": {
+          "exact": 40
+        },
+        "via": {
+          "markdown": 40
+        }
+      },
+      "properties": [
+        "count",
+        "line",
+        "syntax",
+        "tier",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "syntax": "code_path",
+            "tier": "exact",
+            "via": "markdown"
+          },
+          "sourceLabel": "Section",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "syntax": "link",
+            "tier": "exact",
+            "via": "markdown"
+          },
+          "sourceLabel": "Section",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 3
+        },
+        {
+          "discriminators": {
+            "syntax": "path",
+            "tier": "exact",
+            "via": "markdown"
+          },
+          "sourceLabel": "Section",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 35
+        }
+      ],
+      "count": 40
+    },
+    "OVERRIDE": {
+      "discriminators": {
+        "via": {
+          "patch": 1,
+          "tfvars": 2
+        }
+      },
+      "properties": [
+        "kustomization",
+        "line",
+        "patch",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "via": "patch"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "via": "tfvars"
+          },
+          "sourceLabel": "Variable",
+          "sourceFileType": ".tfvars",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 2
+        }
+      ],
+      "count": 3
+    },
+    "REFERENCES_FILE": {
+      "discriminators": {
+        "strategy": {
+          "md_backtick_path": 2,
+          "md_bare_mention": 32,
+          "md_inline_link": 3
+        }
+      },
+      "properties": [
+        "confidence",
+        "count",
+        "strategy"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "strategy": "md_backtick_path"
+          },
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "strategy": "md_bare_mention"
+          },
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 32
+        },
+        {
+          "discriminators": {
+            "strategy": "md_inline_link"
+          },
+          "sourceLabel": "File",
+          "sourceFileType": ".md",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 3
+        }
+      ],
+      "count": 37
+    },
+    "SPAWNS": {
+      "discriminators": {},
+      "properties": [
+        "api",
+        "ci",
+        "confidence",
+        "instruction",
+        "job",
+        "line",
+        "path",
+        "program",
+        "target"
+      ],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Function",
+          "sourceFileType": "Makefile",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Module",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Module",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Module",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "Module",
+          "sourceFileType": "Dockerfile",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 5
+    },
+    "SUPERSEDES": {
+      "discriminators": {
+        "syntax": {
+          "supersedes": 1
+        },
+        "tier": {
+          "exact": 1
+        },
+        "via": {
+          "markdown": 1
+        }
+      },
+      "properties": [
+        "count",
+        "line",
+        "syntax",
+        "tier",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "syntax": "supersedes",
+            "tier": "exact",
+            "via": "markdown"
+          },
+          "sourceLabel": "ADR",
+          "sourceFileType": ".md",
+          "targetLabel": "ADR",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 1
+    },
+    "TESTS": {
+      "discriminators": {},
+      "properties": [],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "Function",
+          "sourceFileType": ".go",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 1
+    },
+    "TESTS_FILE": {
+      "discriminators": {},
+      "properties": [],
+      "combinations": [
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".go",
+          "targetLabel": "File",
+          "targetKind": "",
+          "count": 1
+        }
+      ],
+      "count": 1
+    },
+    "USAGE": {
+      "discriminators": {
+        "ref": {
+          "env": 1,
+          "envFrom": 1,
+          "image": 7,
+          "module": 1,
+          "output": 1,
+          "parentRef": 1,
+          "podSelector": 1,
+          "resource": 2,
+          "roleRef": 1,
+          "scaleTarget": 1,
+          "selector": 1,
+          "serviceAccountName": 1,
+          "subject": 1,
+          "tls": 1,
+          "var": 3,
+          "volume": 1
+        },
+        "via": {
+          "terraform": 7
+        }
+      },
+      "properties": [
+        "callee",
+        "container",
+        "image",
+        "line",
+        "ref",
+        "via"
+      ],
+      "combinations": [
+        {
+          "discriminators": {
+            "ref": "module",
+            "via": "terraform"
+          },
+          "sourceLabel": "Class",
+          "sourceFileType": ".tf",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "output",
+            "via": "terraform"
+          },
+          "sourceLabel": "Class",
+          "sourceFileType": ".tf",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "resource",
+            "via": "terraform"
+          },
+          "sourceLabel": "Class",
+          "sourceFileType": ".tf",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "ref": "var",
+            "via": "terraform"
+          },
+          "sourceLabel": "Class",
+          "sourceFileType": ".tf",
+          "targetLabel": "Class",
+          "targetKind": "",
+          "count": 3
+        },
+        {
+          "discriminators": {},
+          "sourceLabel": "File",
+          "sourceFileType": ".go",
+          "targetLabel": "Function",
+          "targetKind": "",
+          "count": 2
+        },
+        {
+          "discriminators": {
+            "ref": "image"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Image",
+          "targetKind": "",
+          "count": 7
+        },
+        {
+          "discriminators": {
+            "ref": "envFrom"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ConfigMap",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "podSelector"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "scaleTarget"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "selector"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Deployment",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "parentRef"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Gateway",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "volume"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "PersistentVolumeClaim",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "roleRef"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Role",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "env"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Secret",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "tls"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "Secret",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "serviceAccountName"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ServiceAccount",
+          "count": 1
+        },
+        {
+          "discriminators": {
+            "ref": "subject"
+          },
+          "sourceLabel": "Resource",
+          "sourceFileType": ".yaml",
+          "targetLabel": "Resource",
+          "targetKind": "ServiceAccount",
+          "count": 1
+        }
+      ],
+      "count": 27
+    }
+  },
+  "schema": "concordia-native-discriminators/v1",
+  "recording": "test/fixtures/cbm-recordings/infra.json",
+  "cbmVersion": "0.12.1"
+}

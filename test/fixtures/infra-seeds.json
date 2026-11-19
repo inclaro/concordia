@@ -1,0 +1,47 @@
+[
+  {
+    "path": "k8s/prod/secret.yaml",
+    "class": "k8s-secret-string-data",
+    "value": "CONCORDIA-SEED-k8s-secret-7f3a"
+  },
+  {
+    "path": "k8s/prod/secret.yaml",
+    "class": "k8s-secret-data-base64",
+    "value": "Q09OQ09SRElBLVNFRUQtazhzLWRhdGEtOTFjMg=="
+  },
+  {
+    "path": "k8s/prod/secret.yaml",
+    "class": "k8s-secret-data-decoded",
+    "value": "CONCORDIA-SEED-k8s-data-91c2"
+  },
+  {
+    "path": "k8s/prod/deployment.yaml",
+    "class": "k8s-container-env",
+    "value": "CONCORDIA-SEED-env-value-5d1e"
+  },
+  {
+    "path": "docker/Dockerfile",
+    "class": "dockerfile-env",
+    "value": "CONCORDIA-SEED-dockerfile-env-2b8c"
+  },
+  {
+    "path": "terraform/prod.tfvars",
+    "class": "tfvars",
+    "value": "CONCORDIA-SEED-tfvars-6e4d"
+  },
+  {
+    "path": "compose.yaml",
+    "class": "compose-env",
+    "value": "CONCORDIA-SEED-compose-env-3a9f"
+  },
+  {
+    "path": "scripts/deploy.sh",
+    "class": "shell-token",
+    "value": "ghp_CONCORDIASEEDshelltoken0000000000000"
+  },
+  {
+    "path": "certs/dev-key.pem",
+    "class": "pem-private-key",
+    "value": "CONCORDIASEEDPEM"
+  }
+]

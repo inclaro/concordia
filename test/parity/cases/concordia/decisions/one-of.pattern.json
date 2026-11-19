@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/decisions-oneOf.pattern.json",
+  "type": "object",
+  "title": "Decisions pattern",
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            },
+            "name": {
+              "const": "Web App"
+            },
+            "description": {
+              "const": "Web App node"
+            },
+            "node-type": {
+              "const": "service"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "unique-id": {
+              "const": "db"
+            },
+            "name": {
+              "const": "Database"
+            },
+            "description": {
+              "const": "Database node"
+            },
+            "node-type": {
+              "const": "service"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "unique-id": {
+                  "const": "redis"
+                },
+                "name": {
+                  "const": "Redis"
+                },
+                "description": {
+                  "const": "Redis node"
+                },
+                "node-type": {
+                  "const": "service"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "unique-id": {
+                  "const": "memcached"
+                },
+                "name": {
+                  "const": "Memcached"
+                },
+                "description": {
+                  "const": "Memcached node"
+                },
+                "node-type": {
+                  "const": "service"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "relationships": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "unique-id": {
+              "const": "web-db"
+            },
+            "description": {
+              "const": "Web calls db"
+            },
+            "relationship-type": {
+              "const": {
+                "connects": {
+                  "source": {
+                    "node": "webapp"
+                  },
+                  "destination": {
+                    "node": "db"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "unique-id": {
+              "const": "cache-choice"
+            },
+            "description": {
+              "const": "Pick a cache"
+            },
+            "relationship-type": {
+              "type": "object",
+              "properties": {
+                "options": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "description": {
+                              "const": "Use redis"
+                            },
+                            "nodes": {
+                              "const": [
+                                "redis"
+                              ]
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "description": {
+                              "const": "Use memcached"
+                            },
+                            "nodes": {
+                              "const": [
+                                "memcached"
+                              ]
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "api-gateway",
+      "node-type": "webclient",
+      "name": "Web",
+      "description": "The web client"
+    },
+    {
+      "unique-id": "api-core",
+      "node-type": "service",
+      "name": "API",
+      "description": "The API"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "web-api",
+      "description": "Web calls the API",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "api-gateway"
+          },
+          "destination": {
+            "node": "api-core"
+          }
+        }
+      }
+    }
+  ]
+}

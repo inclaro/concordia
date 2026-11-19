@@ -1,0 +1,1134 @@
+{
+  "controls": [
+    {
+      "controlId": "architecture-001",
+      "ruleIds": [
+        "CO-BND-001"
+      ],
+      "scope": {
+        "id": "billing-service",
+        "level": "node"
+      },
+      "verdict": "violation"
+    }
+  ],
+  "diagnostics": [],
+  "exceptions": {
+    "orphanedWaivers": [],
+    "resolvedBaselineEntries": [],
+    "waivers": []
+  },
+  "findings": [
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:unique_name"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-check:121",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:121",
+            "kind": "calls",
+            "location": {
+              "line": 6,
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:unique_name",
+            "to": "cbm:golden-check:100"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-check:100",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "fingerprint": "sha256:25f9d6ecb5c1ad0d9cbc726971736b336ec19488cf5d2c4170069123eff9bf83",
+      "kind": "forbidden-dependency",
+      "location": {
+        "line": 6,
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "owner": "team-billing",
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Class",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+        }
+      }
+    },
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "File",
+            "observedId": "cbm:golden-check:27",
+            "qualifiedName": "services.billing.src.InvoiceService.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:27",
+            "kind": "imports",
+            "location": {
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-check:99"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-check:99",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "fingerprint": "sha256:3e4b28753a077d4d956cd497b6f0573bd7fd5cc75c060395ea9940563a9c7230",
+      "kind": "forbidden-dependency",
+      "location": {
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "owner": "team-billing",
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "File",
+          "qualifiedName": "services.billing.src.InvoiceService.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Module",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore"
+        }
+      }
+    },
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:unique_name"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-check:121",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:121",
+            "kind": "calls",
+            "location": {
+              "line": 6,
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:unique_name",
+            "to": "cbm:golden-check:100"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-check:100",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+            "startLine": 1
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "Function",
+            "observedId": "cbm:golden-check:98",
+            "qualifiedName": "services.fulfillment.src.notify.notifyShipped",
+            "startLine": 3
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:98",
+            "kind": "calls",
+            "location": {
+              "line": 4,
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:unique_name",
+            "to": "cbm:golden-check:120"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-check:120",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+            "startLine": 4
+          }
+        }
+      ],
+      "fingerprint": "sha256:8158bf662ed067dc6dec7cd660d52b5abb36e5f46239fd0bfde87f884080ff73",
+      "kind": "cycle",
+      "location": {
+        "line": 6,
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "dependency cycle: billing-service -> fulfillment-service -> billing-service",
+      "owner": "team-billing",
+      "relatedLocations": [
+        {
+          "line": 4,
+          "path": "services/fulfillment/src/notify.ts"
+        }
+      ],
+      "ruleId": "CO-CYC-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service,fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Class",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+        }
+      }
+    },
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:unique_name"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "Function",
+            "observedId": "cbm:golden-check:98",
+            "qualifiedName": "services.fulfillment.src.notify.notifyShipped",
+            "startLine": 3
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:98",
+            "kind": "calls",
+            "location": {
+              "line": 4,
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:unique_name",
+            "to": "cbm:golden-check:120"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-check:120",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+            "startLine": 4
+          }
+        }
+      ],
+      "fingerprint": "sha256:91f4bf28af4367a34acf051e94dfa6728e1fd34a731be3a40824952409aadc56",
+      "kind": "undeclared",
+      "location": {
+        "line": 4,
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "undeclared dependency fulfillment-service -> billing-service",
+      "owner": "team-fulfillment",
+      "relatedLocations": [],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "Function",
+          "qualifiedName": "services.fulfillment.src.notify.notifyShipped"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Class",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService"
+        }
+      }
+    },
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "File",
+            "observedId": "cbm:golden-check:17",
+            "qualifiedName": "services.fulfillment.src.notify.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:17",
+            "kind": "imports",
+            "location": {
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-check:119"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-check:119",
+            "qualifiedName": "services.billing.src.InvoiceService",
+            "startLine": 1
+          }
+        }
+      ],
+      "fingerprint": "sha256:b31d8f09077bdfebc7e53a9f5af0d328a2f9dfeb40756b0d1f6174652019599a",
+      "kind": "undeclared",
+      "location": {
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "undeclared dependency fulfillment-service -> billing-service",
+      "owner": "team-fulfillment",
+      "relatedLocations": [],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "File",
+          "qualifiedName": "services.fulfillment.src.notify.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Module",
+          "qualifiedName": "services.billing.src.InvoiceService"
+        }
+      }
+    },
+    {
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "File",
+            "observedId": "cbm:golden-check:17",
+            "qualifiedName": "services.fulfillment.src.notify.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-check:17",
+            "kind": "imports",
+            "location": {
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-check:119"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-check:119",
+            "qualifiedName": "services.billing.src.InvoiceService",
+            "startLine": 1
+          }
+        }
+      ],
+      "fingerprint": "sha256:5ce282dfec1c0ccb99b0906aa987a3906684de2e0ea1d6c53a43ebb430203b28",
+      "kind": "layer-violation",
+      "location": {
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "layer violation: fulfillment-service (layer 1) depends on billing-service (layer 0)",
+      "owner": "team-fulfillment",
+      "relatedLocations": [],
+      "ruleId": "CO-LYR-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "File",
+          "qualifiedName": "services.fulfillment.src.notify.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Module",
+          "qualifiedName": "services.billing.src.InvoiceService"
+        }
+      }
+    }
+  ],
+  "inputs": {
+    "architecture": {
+      "digest": "sha256:79a4d3a65d50aae8353f621580e7a5bfa421475992dbcc4673a875ccd90595e9",
+      "path": "architecture/commerce.calm.json"
+    },
+    "bindings": [
+      {
+        "digest": "sha256:3eb50221613fede33a22a85697a6cfdd5d699ad5004e2e156913e02875a2aa40",
+        "path": "bindings/concordia.bindings.yaml"
+      }
+    ],
+    "lock": {
+      "digest": "sha256:95e76861cb03bd20ad43af1c24988a1adaf74cbf1939883a0ee1e3ff3d3c3b25",
+      "path": ".concordia.lock"
+    },
+    "patterns": [],
+    "policies": [
+      {
+        "digest": "sha256:ce04df26c44929c1273d1fb07127493291b5479b9a46ccc4c08f9a60d492e4f1",
+        "path": "policies/boundaries.policy.yaml"
+      }
+    ],
+    "queryPlanDigest": "1b1575a5cb1ea349a90cab26e0a72e34abfa709800b12d0d3bc2fd1f80ec28af",
+    "waivers": {
+      "digest": "sha256:0fe964782f0de3e329da96a3093e84fce48af340fbb3442bb0f391e863d8ee54",
+      "path": "exceptions/waivers.yaml"
+    },
+    "workspace": {
+      "digest": "sha256:fe4f614eb526b778cee179ef6935be9c983358affbbaf191bb3feef0cbaa1c45",
+      "path": "concordia.yaml"
+    }
+  },
+  "reconciliation": [
+    {
+      "classification": "conforming",
+      "edgeCount": 3,
+      "from": "billing-service",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "relationshipId": "billing-to-fulfillment",
+      "to": "fulfillment-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "customer",
+      "observedKinds": [],
+      "relationshipId": "customer-interacts-billing",
+      "to": "billing-service"
+    },
+    {
+      "classification": "undeclared",
+      "edgeCount": 2,
+      "from": "fulfillment-service",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "to": "billing-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "ledger-service",
+      "observedKinds": [],
+      "relationshipId": "ledger-to-database",
+      "to": "ledger-database"
+    }
+  ],
+  "rules": [
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 882,
+            "ratio": 1,
+            "total": 882
+          },
+          "covered": 4,
+          "excluded": [],
+          "languages": {
+            ".ts": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          "ratio": 1,
+          "stale": [],
+          "total": 4,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "required": 0.9,
+        "subThresholdEvidence": 0,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "family": "boundary",
+      "findingCount": 2,
+      "name": "Billing uses Fulfillment contracts only",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Billing uses Fulfillment contracts only",
+        "owner": "team-billing",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "allow": {
+            "edgeKinds": [],
+            "targetCalmNodes": [],
+            "targetSourceRoots": [
+              "packages/fulfillment-contract/**"
+            ],
+            "targetTags": []
+          },
+          "family": "boundary"
+        },
+        "rationale": "Billing must depend on the published fulfillment contract, not its internals.",
+        "remediation": "Import from packages/fulfillment-contract instead.",
+        "ruleId": "CO-BND-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service"
+        ],
+        "targets": [
+          "fulfillment-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service"
+      ],
+      "targets": [
+        "fulfillment-service"
+      ],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 3,
+            "minimumConfidence": "resolved",
+            "observed": 0,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 375,
+            "ratio": 0.7545271629778671,
+            "total": 497
+          },
+          "covered": 1,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".ts": {
+              "covered": 1,
+              "total": 1
+            }
+          },
+          "ratio": 0.5,
+          "stale": [],
+          "total": 2,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "required": 0.9,
+        "subThresholdEvidence": 0,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "family": "boundary",
+      "findingCount": 0,
+      "name": "Legacy must not call Billing",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "resolved",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Legacy must not call Billing",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "allow": {
+            "edgeKinds": [],
+            "targetCalmNodes": [],
+            "targetSourceRoots": [],
+            "targetTags": []
+          },
+          "family": "boundary"
+        },
+        "ruleId": "CO-COV-001",
+        "severity": "error",
+        "subjects": [
+          "legacy-service"
+        ],
+        "targets": [
+          "billing-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.500 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-COV-001",
+      "severity": "error",
+      "subjects": [
+        "legacy-service"
+      ],
+      "targets": [
+        "billing-service"
+      ],
+      "verdict": "unknown"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1152,
+            "ratio": 0.9042386185243328,
+            "total": 1274
+          },
+          "covered": 6,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".py": {
+              "covered": 2,
+              "total": 2
+            },
+            ".ts": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          "ratio": 0.8571428571428571,
+          "stale": [],
+          "total": 7,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "required": 0.9,
+        "subThresholdEvidence": 0,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "family": "acyclic",
+      "findingCount": 1,
+      "name": "Services are acyclic",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Services are acyclic",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "collapseBy": "architectureBinding",
+          "family": "acyclic"
+        },
+        "ruleId": "CO-CYC-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service",
+          "ledger-service",
+          "legacy-service"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.857 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-CYC-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service",
+        "ledger-service",
+        "legacy-service"
+      ],
+      "targets": [],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1152,
+            "ratio": 0.9042386185243328,
+            "total": 1274
+          },
+          "covered": 6,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".py": {
+              "covered": 2,
+              "total": 2
+            },
+            ".ts": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          "ratio": 0.8571428571428571,
+          "stale": [],
+          "total": 7,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "required": 0.9,
+        "subThresholdEvidence": 0,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "family": "declared-only",
+      "findingCount": 2,
+      "name": "Dependencies are declared",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Dependencies are declared",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "declared-only"
+        },
+        "ruleId": "CO-DECL-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service",
+          "ledger-database",
+          "ledger-service",
+          "legacy-service"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.857 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service",
+        "ledger-database",
+        "ledger-service",
+        "legacy-service"
+      ],
+      "targets": [],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 3,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 882,
+            "ratio": 1,
+            "total": 882
+          },
+          "covered": 4,
+          "excluded": [],
+          "languages": {
+            ".ts": {
+              "covered": 4,
+              "total": 4
+            }
+          },
+          "ratio": 1,
+          "stale": [],
+          "total": 4,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "required": 0.9,
+        "subThresholdEvidence": 0,
+        "unboundEndpoints": 0,
+        "unresolvedReferences": 0
+      },
+      "family": "layer",
+      "findingCount": 1,
+      "name": "Billing sits above Fulfillment",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "layers": [
+          [
+            "billing-service"
+          ],
+          [
+            "fulfillment-service"
+          ]
+        ],
+        "name": "Billing sits above Fulfillment",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "layer"
+        },
+        "ruleId": "CO-LYR-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service"
+        ],
+        "targets": [
+          "billing-service",
+          "fulfillment-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [],
+      "ruleId": "CO-LYR-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service"
+      ],
+      "targets": [
+        "billing-service",
+        "fulfillment-service"
+      ],
+      "verdict": "violation"
+    }
+  ],
+  "run": {
+    "dirtyTreeDigest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "finishedAt": "2026-06-01T00:00:00.000Z",
+    "graphGeneration": "cbm:golden-check:b4dbb6af2d5c99c6",
+    "host": {
+      "arch": "x64",
+      "node": "v24.21.0",
+      "platform": "linux"
+    },
+    "id": "20261021T000846Z-6b0dbd10",
+    "project": "golden-check",
+    "sourceRevision": "1ea64a7f82a6515e2269b25894b34bb0b9b50dc8",
+    "startedAt": "2026-06-01T00:00:00.000Z"
+  },
+  "schemaVersion": "1.1",
+  "summary": {
+    "active": 6,
+    "baselined": 0,
+    "exitCode": 1,
+    "expiredWaiver": 0,
+    "failOn": "error",
+    "rules": {
+      "error": 0,
+      "notApplicable": 0,
+      "pass": 0,
+      "unknown": 1,
+      "violation": 4
+    },
+    "unknownPolicy": "fail",
+    "unknownRules": 1,
+    "verdict": "violation",
+    "waived": 0
+  },
+  "toolchain": {
+    "calmSchema": "1.2",
+    "cbm": {
+      "adapterSchema": "concordia-cbm/v1",
+      "executableVersion": "0.9.0",
+      "profile": {
+        "applies": false
+      }
+    },
+    "concordia": "0.1.0"
+  }
+}

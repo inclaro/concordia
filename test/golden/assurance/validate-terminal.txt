@@ -1,0 +1,25 @@
+rendering staging deploy/plain
+  integrity: content verified by digest
+  admissible: yes
+  coverage: complete
+plan staging build/plans/create.json
+  integrity: content not verified
+  admissible: no
+  reasons: not-authenticated
+  gaps: unknown-after-apply
+  coverage: complete
+check-result build/results/fresh.json
+  integrity: content not verified
+  admissible: no
+  reasons: not-authenticated
+  signature: none
+check-result build/results/stale.json
+  integrity: content not verified
+  admissible: no
+  reasons: not-authenticated, stale
+  signature: none
+
+rendering by environment
+  staging: complete (1 source, 1 resource, 2 container occurrences)
+
+4 inputs, 1 admissible

@@ -1,0 +1,7 @@
+default: true
+MD040: false
+MD041: false
+MD060: false
+no-inline-html: false
+whitespace: false
+line-length: false

@@ -1,0 +1,46 @@
+{
+  "coverage": "complete",
+  "environment": "staging",
+  "occurrences": [
+    {
+      "container": "api",
+      "immutable": false,
+      "kind": "container",
+      "repository": "registry.example.com/shop/api",
+      "tag": "1.4.1-rc1",
+      "workload": "Deployment/shop/shop-api"
+    },
+    {
+      "container": "migrate",
+      "immutable": false,
+      "kind": "container",
+      "repository": "registry.example.com/shop/api-migrate",
+      "tag": "1.4.1-rc1",
+      "workload": "Job/shop/shop-migrate"
+    }
+  ],
+  "resources": [
+    {
+      "identity": "staging///Secret/shop/shop-credentials",
+      "location": "helm-shop/chart/templates/secret.yaml"
+    },
+    {
+      "identity": "staging///Service/shop/shop-api",
+      "location": "helm-shop/chart/templates/service.yaml"
+    },
+    {
+      "identity": "staging//apps/Deployment/shop/shop-api",
+      "location": "helm-shop/chart/templates/deployment.yaml"
+    },
+    {
+      "hook": "pre-install,pre-upgrade",
+      "identity": "staging//batch/Job/shop/shop-migrate",
+      "location": "helm-shop/chart/templates/hook-migrate.yaml"
+    },
+    {
+      "identity": "staging//networking.k8s.io/NetworkPolicy/shop/shop-default-deny",
+      "location": "helm-shop/chart/templates/networkpolicy.yaml"
+    }
+  ],
+  "tool": "helm"
+}

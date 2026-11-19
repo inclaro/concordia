@@ -1,0 +1,103 @@
+{
+  "inputs": {
+    "architecture": {
+      "digest": "sha256:ef2752da507c415766b77eec2445793cb5a8168d137c14550a93788a7ae77bbd",
+      "path": "architecture/commerce.calm.json"
+    },
+    "bindings": [
+      {
+        "digest": "sha256:58d94f32527149cca0e1cd9a547d187961c99c06927b97b25a81c67d4539f942",
+        "path": "bindings/concordia.bindings.yaml"
+      }
+    ],
+    "decorators": [],
+    "environments": {
+      "digest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "excluded": [],
+      "selected": []
+    },
+    "indexResults": [
+      {
+        "digest": "sha256:f9f73159cf9b8d415e8a28633aab2e93638da322f8c569faacfb500fd1f98e75",
+        "path": "build/concordia/index-result.json"
+      }
+    ],
+    "lock": {
+      "digest": "sha256:da7004ee9390a803b88014a485090ce001495ed840a5918992a4ba98692ede4a",
+      "path": ".concordia.lock"
+    },
+    "patterns": [],
+    "policies": [
+      {
+        "digest": "sha256:d7807c92ffeaa6f2bed23ad14182755e2994f84bd8265701073f9f040d3ea910",
+        "path": "policies/boundaries.policy.yaml"
+      }
+    ],
+    "queryPlanDigest": "4cc3c1daa233d8cb48209f5fb85bd1f087a400d670b87d9e65ae552ad3f62104",
+    "waivers": {
+      "digest": "sha256:0fe964782f0de3e329da96a3093e84fce48af340fbb3442bb0f391e863d8ee54",
+      "path": "exceptions/waivers.yaml"
+    },
+    "workspace": {
+      "digest": "sha256:208a43d9047365ad888d45952d774b1e5a4f1bd0b7f8819b1440b6c3f56a9af0",
+      "path": "concordia.yaml"
+    }
+  },
+  "observability": {
+    "cacheHits": 0,
+    "conflicts": 0,
+    "coverageGaps": 19,
+    "ingestedFacts": 107,
+    "normalizedFacts": 106,
+    "stageFailures": 0,
+    "unresolvedFacts": 2,
+    "unsupportedFacts": 1
+  },
+  "run": {
+    "dirtyTreeDigest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "finishedAt": "2026-06-01T00:00:00.000Z",
+    "graphGeneration": "cbm:golden-check:68efe45c6b7969df",
+    "host": {
+      "arch": "amd64",
+      "go": "go1.27.3",
+      "platform": "linux"
+    },
+    "id": "20260601T000000Z-8081f1e0",
+    "project": "golden-check",
+    "sourceRevision": "88d538dd5f5e50929a953202f44fb0f5060037ed",
+    "startedAt": "2026-06-01T00:00:00.000Z"
+  },
+  "status": "complete",
+  "summary": {
+    "active": 8,
+    "baselined": 0,
+    "exitCode": 1,
+    "expiredWaiver": 0,
+    "failOn": "error",
+    "resultDigest": "sha256:c12f8a313e117b504a617134d758754dc06fcc6c92c8ac7ac4190e98aa954fe0",
+    "rules": {
+      "error": 0,
+      "notApplicable": 0,
+      "pass": 0,
+      "unknown": 1,
+      "violation": 4
+    },
+    "unknownPolicy": "fail",
+    "unknownRules": 1,
+    "verdict": "violation",
+    "waived": 0
+  },
+  "toolchain": {
+    "calmSchema": "1.2",
+    "cbm": {
+      "adapterSchema": "concordia-cbm/v2",
+      "executableVersion": "0.12.1",
+      "profile": {
+        "applies": true,
+        "digest": "sha256:1ec34e18f13f92e6629cbb7ed313eccb46583a6e2ac035208b9003ab2a87110f",
+        "id": "cbm-0.12.1"
+      }
+    },
+    "concordia": "dev"
+  }
+}

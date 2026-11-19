@@ -1,0 +1,31 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: review
+architecture:
+  source: architecture/infra.calm.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: concordia-fixture-infra
+      root: .
+      include: ["**"]
+  indexMode: fast
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: []
+  packs:
+    - use: builtin:review-currency
+check:
+  minimumCoverage: 0
+  unknown: fail
+  failOn: error
+  enforcement:
+    - {family: assessment-currency, mode: mandatory}
+environments:
+  - id: production
+    cluster: prod-eu
+    sources: ["k8s/prod/**"]
+  - id: staging
+    sources: ["k8s/staging/**"]

@@ -1,0 +1,75 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/moments",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/moments",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

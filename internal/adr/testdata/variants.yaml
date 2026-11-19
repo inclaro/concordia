@@ -1,0 +1,586 @@
+# Supersession variants SUP-V01 to SUP-V17 of the ADR governance change (tasks 1.4, 4.x).
+#
+# The decisions are the `ADR` nodes that CBM 0.12.1 gave for the files of test/fixtures/adr/docs/adr/variants
+# (recording test/fixtures/cbm-recordings/adr.json, O12); TestVariantsMatchTheRecording compares them with the
+# recording. Each variant has its own directory and its own ADR numbers, so the variants never interfere.
+#
+# decisions   the ADR nodes: path (identity), adrId (label only), title, status (normalized), statusText (raw),
+#             date, supersededBy (link text, verbatim), line
+# supersedes  the `supersedes` edges, new decision (from) to old decision (to), both by path
+# registerIds register IDs that a test registers for the variant (unpinned): decisions that match by canonical ID
+# expect      what the history evaluation gives when every decision of the variant is committed:
+#   links        successor, predecessor, provenance (edge | metadata | both), effect (effective | pending)
+#   anomalies    kind (a history finding reason), paths (sorted), value (raw `superseded_by` of a missing target,
+#                the shared label of a duplicate ID)
+#   ambiguous    true when the component has an anomaly: every member is then `ambiguous`
+#   applicability  per decision path: active | inactive | superseded | ambiguous
+#   heads        decisions without an effective successor in a component without an anomaly (sorted)
+#   statusLags   predecessors whose own status is not `superseded` while an effective successor exists
+#   matches      register ID to the path that the canonical ID comparison selects
+variants:
+  - id: SUP-V01
+    title: "edge only"
+    note: "The predecessor says only `Superseded`; the successor links it with a `Supersedes` statement."
+    decisions:
+      - path: "docs/adr/variants/v01/0101-cache-local.md"
+        adrId: "ADR-101"
+        title: "ADR-0101: Local cache"
+        status: "superseded"
+        statusText: "Superseded"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v01/0102-cache-shared.md"
+        adrId: "ADR-102"
+        title: "ADR-0102: Shared cache"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v01/0102-cache-shared.md", to: "docs/adr/variants/v01/0101-cache-local.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v01/0102-cache-shared.md", predecessor: "docs/adr/variants/v01/0101-cache-local.md", provenance: edge, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v01/0101-cache-local.md": superseded
+        "docs/adr/variants/v01/0102-cache-shared.md": active
+      heads: ["docs/adr/variants/v01/0102-cache-shared.md"]
+      statusLags: []
+  - id: SUP-V02
+    title: "metadata only"
+    note: "`superseded_by` is a relative file name; the successor has no `Supersedes` statement."
+    decisions:
+      - path: "docs/adr/variants/v02/0201-queue-self.md"
+        adrId: "ADR-201"
+        title: "ADR-0201: Self-hosted queue"
+        status: "superseded"
+        statusText: "Superseded by ADR-0202"
+        date: "2026-01-01"
+        supersededBy: "0202-queue-managed.md"
+        line: 1
+      - path: "docs/adr/variants/v02/0202-queue-managed.md"
+        adrId: "ADR-202"
+        title: "ADR-0202: Managed queue"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes: []
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v02/0202-queue-managed.md", predecessor: "docs/adr/variants/v02/0201-queue-self.md", provenance: metadata, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v02/0201-queue-self.md": superseded
+        "docs/adr/variants/v02/0202-queue-managed.md": active
+      heads: ["docs/adr/variants/v02/0202-queue-managed.md"]
+      statusLags: []
+  - id: SUP-V03
+    title: "edge and metadata agree"
+    note: "Both name the same pair: provenance `both`."
+    decisions:
+      - path: "docs/adr/variants/v03/0301-search-solr.md"
+        adrId: "ADR-301"
+        title: "ADR-0301: Solr search"
+        status: "superseded"
+        statusText: "Superseded by ADR-0302"
+        date: "2026-01-01"
+        supersededBy: "0302-search-opensearch.md"
+        line: 1
+      - path: "docs/adr/variants/v03/0302-search-opensearch.md"
+        adrId: "ADR-302"
+        title: "ADR-0302: OpenSearch search"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v03/0302-search-opensearch.md", to: "docs/adr/variants/v03/0301-search-solr.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v03/0302-search-opensearch.md", predecessor: "docs/adr/variants/v03/0301-search-solr.md", provenance: both, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v03/0301-search-solr.md": superseded
+        "docs/adr/variants/v03/0302-search-opensearch.md": active
+      heads: ["docs/adr/variants/v03/0302-search-opensearch.md"]
+      statusLags: []
+  - id: SUP-V04
+    title: "superseded-by links two decision files"
+    note: "CBM joins the targets with a comma. 0403 supersedes 0402, so 0402 reaches 0403: the two successors do not compete."
+    decisions:
+      - path: "docs/adr/variants/v04/0401-auth-basic.md"
+        adrId: "ADR-401"
+        title: "ADR-0401: Basic auth"
+        status: "superseded"
+        statusText: "Superseded by ADR-0402 and ADR-0403"
+        date: "2026-01-01"
+        supersededBy: "0402-auth-token.md, 0403-auth-oidc.md"
+        line: 1
+      - path: "docs/adr/variants/v04/0402-auth-token.md"
+        adrId: "ADR-402"
+        title: "ADR-0402: Token auth"
+        status: "superseded"
+        statusText: "Superseded by ADR-0403"
+        date: "2026-02-01"
+        supersededBy: "0403-auth-oidc.md"
+        line: 1
+      - path: "docs/adr/variants/v04/0403-auth-oidc.md"
+        adrId: "ADR-403"
+        title: "ADR-0403: OIDC auth"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-03-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v04/0402-auth-token.md", to: "docs/adr/variants/v04/0401-auth-basic.md", line: 7}
+      - {from: "docs/adr/variants/v04/0403-auth-oidc.md", to: "docs/adr/variants/v04/0402-auth-token.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v04/0402-auth-token.md", predecessor: "docs/adr/variants/v04/0401-auth-basic.md", provenance: both, effect: effective}
+        - {successor: "docs/adr/variants/v04/0403-auth-oidc.md", predecessor: "docs/adr/variants/v04/0402-auth-token.md", provenance: both, effect: effective}
+        - {successor: "docs/adr/variants/v04/0403-auth-oidc.md", predecessor: "docs/adr/variants/v04/0401-auth-basic.md", provenance: metadata, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v04/0401-auth-basic.md": superseded
+        "docs/adr/variants/v04/0402-auth-token.md": superseded
+        "docs/adr/variants/v04/0403-auth-oidc.md": active
+      heads: ["docs/adr/variants/v04/0403-auth-oidc.md"]
+      statusLags: []
+  - id: SUP-V05
+    title: "cycle of two"
+    note: "Each decision supersedes the other."
+    decisions:
+      - path: "docs/adr/variants/v05/0501-log-a.md"
+        adrId: "ADR-501"
+        title: "ADR-0501: Log format A"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v05/0502-log-b.md"
+        adrId: "ADR-502"
+        title: "ADR-0502: Log format B"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v05/0501-log-a.md", to: "docs/adr/variants/v05/0502-log-b.md", line: 7}
+      - {from: "docs/adr/variants/v05/0502-log-b.md", to: "docs/adr/variants/v05/0501-log-a.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v05/0502-log-b.md", predecessor: "docs/adr/variants/v05/0501-log-a.md", provenance: edge, effect: effective}
+        - {successor: "docs/adr/variants/v05/0501-log-a.md", predecessor: "docs/adr/variants/v05/0502-log-b.md", provenance: edge, effect: effective}
+      anomalies:
+        - {kind: cycle, paths: ["docs/adr/variants/v05/0501-log-a.md", "docs/adr/variants/v05/0502-log-b.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v05/0501-log-a.md": ambiguous
+        "docs/adr/variants/v05/0502-log-b.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V06
+    title: "self-supersession"
+    note: "`superseded_by` names the file itself. CBM gives no `SUPERSEDES` edge from a file to itself, so the self link is metadata."
+    decisions:
+      - path: "docs/adr/variants/v06/0601-metrics-self.md"
+        adrId: "ADR-601"
+        title: "ADR-0601: Metrics self"
+        status: "superseded"
+        statusText: "Superseded by ADR-0601"
+        date: "2026-01-01"
+        supersededBy: "0601-metrics-self.md"
+        line: 1
+    supersedes: []
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v06/0601-metrics-self.md", predecessor: "docs/adr/variants/v06/0601-metrics-self.md", provenance: metadata, effect: effective}
+      anomalies:
+        - {kind: cycle, paths: ["docs/adr/variants/v06/0601-metrics-self.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v06/0601-metrics-self.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V07
+    title: "missing target"
+    note: "`superseded_by` names a file that is not a committed decision. The raw value is reported; no second contradictory-status finding is raised for the same missing successor."
+    decisions:
+      - path: "docs/adr/variants/v07/0701-tracing-old.md"
+        adrId: "ADR-701"
+        title: "ADR-0701: Old tracing"
+        status: "superseded"
+        statusText: "Superseded by ADR-0799"
+        date: "2026-01-01"
+        supersededBy: "0799-tracing-gone.md"
+        line: 1
+    supersedes: []
+    expect:
+      links: []
+      anomalies:
+        - {kind: missing-target, paths: ["docs/adr/variants/v07/0701-tracing-old.md"], value: "0799-tracing-gone.md"}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v07/0701-tracing-old.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V08
+    title: "superseded, no successor"
+    note: "Status `superseded` and no edge and no `superseded_by`."
+    decisions:
+      - path: "docs/adr/variants/v08/0801-batch-old.md"
+        adrId: "ADR-801"
+        title: "ADR-0801: Old batch"
+        status: "superseded"
+        statusText: "Superseded"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+    supersedes: []
+    expect:
+      links: []
+      anomalies:
+        - {kind: contradictory-status, paths: ["docs/adr/variants/v08/0801-batch-old.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v08/0801-batch-old.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V09
+    title: "superseded by a rejected decision"
+    note: "The successor is `rejected`: its lifecycle is neither active nor pending."
+    decisions:
+      - path: "docs/adr/variants/v09/0901-mail-old.md"
+        adrId: "ADR-901"
+        title: "ADR-0901: Old mail"
+        status: "superseded"
+        statusText: "Superseded by ADR-0902"
+        date: "2026-01-01"
+        supersededBy: "0902-mail-new.md"
+        line: 1
+      - path: "docs/adr/variants/v09/0902-mail-new.md"
+        adrId: "ADR-902"
+        title: "ADR-0902: New mail"
+        status: "rejected"
+        statusText: "Rejected"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v09/0902-mail-new.md", to: "docs/adr/variants/v09/0901-mail-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v09/0902-mail-new.md", predecessor: "docs/adr/variants/v09/0901-mail-old.md", provenance: both, effect: effective}
+      anomalies:
+        - {kind: contradictory-status, paths: ["docs/adr/variants/v09/0901-mail-old.md", "docs/adr/variants/v09/0902-mail-new.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v09/0901-mail-old.md": ambiguous
+        "docs/adr/variants/v09/0902-mail-new.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V10
+    title: "competing successors by edges"
+    note: "Two accepted decisions supersede the same one and neither reaches the other."
+    decisions:
+      - path: "docs/adr/variants/v10/1001-deploy-old.md"
+        adrId: "ADR-1001"
+        title: "ADR-1001: Old deploy"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v10/1002-deploy-blue.md"
+        adrId: "ADR-1002"
+        title: "ADR-1002: Blue deploy"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v10/1003-deploy-canary.md"
+        adrId: "ADR-1003"
+        title: "ADR-1003: Canary deploy"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-02"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v10/1002-deploy-blue.md", to: "docs/adr/variants/v10/1001-deploy-old.md", line: 7}
+      - {from: "docs/adr/variants/v10/1003-deploy-canary.md", to: "docs/adr/variants/v10/1001-deploy-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v10/1002-deploy-blue.md", predecessor: "docs/adr/variants/v10/1001-deploy-old.md", provenance: edge, effect: effective}
+        - {successor: "docs/adr/variants/v10/1003-deploy-canary.md", predecessor: "docs/adr/variants/v10/1001-deploy-old.md", provenance: edge, effect: effective}
+      anomalies:
+        - {kind: competing-successors, paths: ["docs/adr/variants/v10/1001-deploy-old.md", "docs/adr/variants/v10/1002-deploy-blue.md", "docs/adr/variants/v10/1003-deploy-canary.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v10/1001-deploy-old.md": ambiguous
+        "docs/adr/variants/v10/1002-deploy-blue.md": ambiguous
+        "docs/adr/variants/v10/1003-deploy-canary.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V11
+    title: "edge and metadata name different successors"
+    note: "`superseded_by` names 1102 and an edge from 1103 names 1101."
+    decisions:
+      - path: "docs/adr/variants/v11/1101-store-old.md"
+        adrId: "ADR-1101"
+        title: "ADR-1101: Old store"
+        status: "superseded"
+        statusText: "Superseded by ADR-1102"
+        date: "2026-01-01"
+        supersededBy: "1102-store-a.md"
+        line: 1
+      - path: "docs/adr/variants/v11/1102-store-a.md"
+        adrId: "ADR-1102"
+        title: "ADR-1102: Store A"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v11/1103-store-b.md"
+        adrId: "ADR-1103"
+        title: "ADR-1103: Store B"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-02"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v11/1103-store-b.md", to: "docs/adr/variants/v11/1101-store-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v11/1102-store-a.md", predecessor: "docs/adr/variants/v11/1101-store-old.md", provenance: metadata, effect: effective}
+        - {successor: "docs/adr/variants/v11/1103-store-b.md", predecessor: "docs/adr/variants/v11/1101-store-old.md", provenance: edge, effect: effective}
+      anomalies:
+        - {kind: competing-successors, paths: ["docs/adr/variants/v11/1101-store-old.md", "docs/adr/variants/v11/1102-store-a.md", "docs/adr/variants/v11/1103-store-b.md"], value: ""}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v11/1101-store-old.md": ambiguous
+        "docs/adr/variants/v11/1102-store-a.md": ambiguous
+        "docs/adr/variants/v11/1103-store-b.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V12
+    title: "duplicate ADR IDs"
+    note: "Two files whose titles carry 1201 have the same `adr_id` `ADR-1201`. Identity is the path."
+    decisions:
+      - path: "docs/adr/variants/v12/1201-api-first.md"
+        adrId: "ADR-1201"
+        title: "ADR-1201: API style first"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v12/1201-api-second.md"
+        adrId: "ADR-1201"
+        title: "ADR-1201: API style second"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes: []
+    expect:
+      links: []
+      anomalies:
+        - {kind: duplicate-id, paths: ["docs/adr/variants/v12/1201-api-first.md", "docs/adr/variants/v12/1201-api-second.md"], value: "ADR-1201"}
+      ambiguous: true
+      applicability:
+        "docs/adr/variants/v12/1201-api-first.md": ambiguous
+        "docs/adr/variants/v12/1201-api-second.md": ambiguous
+      heads: []
+      statusLags: []
+  - id: SUP-V13
+    title: "proposed successor"
+    note: "A `proposed` successor is pending: the predecessor stays active. Heads are the decisions without an effective successor."
+    decisions:
+      - path: "docs/adr/variants/v13/1301-cdn-old.md"
+        adrId: "ADR-1301"
+        title: "ADR-1301: Old CDN"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v13/1302-cdn-new.md"
+        adrId: "ADR-1302"
+        title: "ADR-1302: New CDN"
+        status: "proposed"
+        statusText: "Proposed"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v13/1302-cdn-new.md", to: "docs/adr/variants/v13/1301-cdn-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v13/1302-cdn-new.md", predecessor: "docs/adr/variants/v13/1301-cdn-old.md", provenance: edge, effect: pending}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v13/1301-cdn-old.md": active
+        "docs/adr/variants/v13/1302-cdn-new.md": inactive
+      heads: ["docs/adr/variants/v13/1301-cdn-old.md", "docs/adr/variants/v13/1302-cdn-new.md"]
+      statusLags: []
+  - id: SUP-V14
+    title: "predecessor status text lags"
+    note: "The predecessor still says `Accepted`; the accepted successor takes effect (`statusLags`)."
+    decisions:
+      - path: "docs/adr/variants/v14/1401-dns-old.md"
+        adrId: "ADR-1401"
+        title: "ADR-1401: Old DNS"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-01-01"
+        supersededBy: ""
+        line: 1
+      - path: "docs/adr/variants/v14/1402-dns-new.md"
+        adrId: "ADR-1402"
+        title: "ADR-1402: New DNS"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v14/1402-dns-new.md", to: "docs/adr/variants/v14/1401-dns-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v14/1402-dns-new.md", predecessor: "docs/adr/variants/v14/1401-dns-old.md", provenance: edge, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v14/1401-dns-old.md": superseded
+        "docs/adr/variants/v14/1402-dns-new.md": active
+      heads: ["docs/adr/variants/v14/1402-dns-new.md"]
+      statusLags: ["docs/adr/variants/v14/1401-dns-old.md"]
+  - id: SUP-V15
+    title: "valid three-step chain"
+    note: "1501 is superseded by 1502, which is superseded by 1503. No anomaly, one head."
+    decisions:
+      - path: "docs/adr/variants/v15/1501-ci-first.md"
+        adrId: "ADR-1501"
+        title: "ADR-1501: CI first"
+        status: "superseded"
+        statusText: "Superseded by ADR-1502"
+        date: "2026-01-01"
+        supersededBy: "1502-ci-second.md"
+        line: 1
+      - path: "docs/adr/variants/v15/1502-ci-second.md"
+        adrId: "ADR-1502"
+        title: "ADR-1502: CI second"
+        status: "superseded"
+        statusText: "Superseded by ADR-1503"
+        date: "2026-02-01"
+        supersededBy: "1503-ci-third.md"
+        line: 1
+      - path: "docs/adr/variants/v15/1503-ci-third.md"
+        adrId: "ADR-1503"
+        title: "ADR-1503: CI third"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-03-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v15/1502-ci-second.md", to: "docs/adr/variants/v15/1501-ci-first.md", line: 7}
+      - {from: "docs/adr/variants/v15/1503-ci-third.md", to: "docs/adr/variants/v15/1502-ci-second.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v15/1502-ci-second.md", predecessor: "docs/adr/variants/v15/1501-ci-first.md", provenance: both, effect: effective}
+        - {successor: "docs/adr/variants/v15/1503-ci-third.md", predecessor: "docs/adr/variants/v15/1502-ci-second.md", provenance: both, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v15/1501-ci-first.md": superseded
+        "docs/adr/variants/v15/1502-ci-second.md": superseded
+        "docs/adr/variants/v15/1503-ci-third.md": active
+      heads: ["docs/adr/variants/v15/1503-ci-third.md"]
+      statusLags: []
+  - id: SUP-V16
+    title: "register ID versus provider ID"
+    note: "The title carries `ADR-01601`; the provider `adr_id` is `ADR-1601`. A register entry `ADR-01601` matches it by canonical form. `superseded_by` is `./1602-flags-new.md#decision`: a `./` prefix and a fragment."
+    registerIds: ["ADR-01601", "ADR-1601"]
+    decisions:
+      - path: "docs/adr/variants/v16/1601-flags-old.md"
+        adrId: "ADR-1601"
+        title: "ADR-01601: Old flags"
+        status: "superseded"
+        statusText: "Superseded by ADR-1602"
+        date: "2026-01-01"
+        supersededBy: "./1602-flags-new.md#decision"
+        line: 1
+      - path: "docs/adr/variants/v16/1602-flags-new.md"
+        adrId: "ADR-1602"
+        title: "ADR-1602: New flags"
+        status: "accepted"
+        statusText: "Accepted"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes: []
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v16/1602-flags-new.md", predecessor: "docs/adr/variants/v16/1601-flags-old.md", provenance: metadata, effect: effective}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v16/1601-flags-old.md": superseded
+        "docs/adr/variants/v16/1602-flags-new.md": active
+      heads: ["docs/adr/variants/v16/1602-flags-new.md"]
+      statusLags: []
+      matches:
+        "ADR-01601": "docs/adr/variants/v16/1601-flags-old.md"
+        "ADR-1601": "docs/adr/variants/v16/1601-flags-old.md"
+  - id: SUP-V17
+    title: "superseded predecessor, proposed successor"
+    note: "The only successor is `proposed`: the link is pending and there is no contradictory-status anomaly. The predecessor keeps the applicability of its own lifecycle (`superseded` is not active)."
+    decisions:
+      - path: "docs/adr/variants/v17/1701-pay-old.md"
+        adrId: "ADR-1701"
+        title: "ADR-1701: Old payments"
+        status: "superseded"
+        statusText: "Superseded by ADR-1702"
+        date: "2026-01-01"
+        supersededBy: "1702-pay-new.md"
+        line: 1
+      - path: "docs/adr/variants/v17/1702-pay-new.md"
+        adrId: "ADR-1702"
+        title: "ADR-1702: New payments"
+        status: "proposed"
+        statusText: "Proposed"
+        date: "2026-02-01"
+        supersededBy: ""
+        line: 1
+    supersedes:
+      - {from: "docs/adr/variants/v17/1702-pay-new.md", to: "docs/adr/variants/v17/1701-pay-old.md", line: 7}
+    expect:
+      links:
+        - {successor: "docs/adr/variants/v17/1702-pay-new.md", predecessor: "docs/adr/variants/v17/1701-pay-old.md", provenance: both, effect: pending}
+      anomalies: []
+      ambiguous: false
+      applicability:
+        "docs/adr/variants/v17/1701-pay-old.md": inactive
+        "docs/adr/variants/v17/1702-pay-new.md": inactive
+      heads: ["docs/adr/variants/v17/1701-pay-old.md", "docs/adr/variants/v17/1702-pay-new.md"]
+      statusLags: []

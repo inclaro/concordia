@@ -1,0 +1,9 @@
+Conformance: pass (1 pass)
+
+ADR governance: pass (5 pass, 1 notApplicable)
+  ADR-3 accepted (docs/adr/0003-use-postgresql.md:3)
+    presence committed; applicability active; enforcement enforced (required; rules: CORE-DB-001@core/1.0.0)
+
+Not configured: Deployment trace, Diagram currency, Assessment currency, Quality evaluation
+
+0 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown

@@ -1,0 +1,7 @@
+replicaCount: 1
+image:
+  repository: registry.example.com/shop/api
+  tag: "1.4.0"
+sidecar:
+  enabled: false
+  image: registry.example.com/shop/api-sidecar:1.5.0

@@ -1,0 +1,12 @@
+{
+  "runs": {
+    "timeline-no-schema": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

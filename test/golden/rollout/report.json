@@ -1,0 +1,157 @@
+{
+  "failOn": "error",
+  "families": [
+    {
+      "enforcement": "mixed",
+      "environment": "",
+      "family": "",
+      "rules": [
+        {
+          "enforcement": "mandatory",
+          "ruleId": "CO-BND-001"
+        },
+        {
+          "enforcement": "advisory",
+          "ruleId": "CO-COV-001"
+        },
+        {
+          "enforcement": "advisory",
+          "ruleId": "CO-DEP-001"
+        }
+      ],
+      "superseded": 0,
+      "unknown": [
+        {
+          "detail": "file coverage is below the minimum",
+          "missing": [
+            {
+              "detail": "2 candidate edges have an endpoint that no binding maps to a CALM element",
+              "kind": "binding",
+              "nextAction": "resolve binding"
+            },
+            {
+              "detail": "file coverage 0.50 is below the required 0.90",
+              "kind": "coverage",
+              "nextAction": "fix analysis configuration",
+              "subject": "files"
+            },
+            {
+              "detail": "the coverage of imports is partial in demo: index result unavailable",
+              "kind": "coverage",
+              "nextAction": "supply evidence",
+              "subject": "imports"
+            }
+          ],
+          "reason": "CO-CON-020",
+          "ruleId": "CO-COV-001",
+          "wouldBlock": true
+        }
+      ],
+      "verdicts": {
+        "error": 0,
+        "notApplicable": 0,
+        "pass": 1,
+        "unknown": 1,
+        "violation": 1
+      },
+      "wouldBlock": [
+        {
+          "enforcement": "advisory",
+          "fingerprint": "sha256:b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+          "kind": "forbidden-dependency",
+          "message": "CO-DEP-001 is violated",
+          "ruleId": "CO-DEP-001",
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "enforcement": "shadow",
+      "environment": "production",
+      "family": "images",
+      "rules": [
+        {
+          "enforcement": "shadow",
+          "ruleId": "CO-IMG-001"
+        }
+      ],
+      "superseded": 0,
+      "unknown": [
+        {
+          "detail": "the coverage of uses-image is partial in infra",
+          "missing": [
+            {
+              "detail": "the coverage of uses-image is partial in infra",
+              "kind": "coverage",
+              "nextAction": "supply evidence",
+              "subject": "uses-image"
+            }
+          ],
+          "obligationId": "ob-prd-1",
+          "reason": "coverage-incomplete",
+          "ruleId": "CO-IMG-001",
+          "subject": "billing-service",
+          "wouldBlock": true
+        }
+      ],
+      "verdicts": {
+        "error": 0,
+        "notApplicable": 0,
+        "pass": 1,
+        "unknown": 1,
+        "violation": 0
+      },
+      "wouldBlock": []
+    },
+    {
+      "enforcement": "advisory",
+      "environment": "staging",
+      "family": "images",
+      "rules": [
+        {
+          "enforcement": "advisory",
+          "ruleId": "CO-IMG-001"
+        }
+      ],
+      "superseded": 0,
+      "unknown": [
+        {
+          "detail": "no binding maps Workload billing-api to a CALM element",
+          "missing": [
+            {
+              "detail": "no binding maps Workload billing-api to a CALM element",
+              "kind": "binding",
+              "nextAction": "resolve binding"
+            }
+          ],
+          "obligationId": "ob-stg-2",
+          "reason": "binding-gap",
+          "ruleId": "CO-IMG-001",
+          "subject": "billing-service",
+          "wouldBlock": true
+        }
+      ],
+      "verdicts": {
+        "error": 0,
+        "notApplicable": 0,
+        "pass": 0,
+        "unknown": 1,
+        "violation": 1
+      },
+      "wouldBlock": [
+        {
+          "enforcement": "advisory",
+          "fingerprint": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+          "kind": "forbidden-dependency",
+          "message": "CO-IMG-001 is violated",
+          "obligationId": "ob-stg-1",
+          "ruleId": "CO-IMG-001",
+          "severity": "error",
+          "subject": "billing-service"
+        }
+      ]
+    }
+  ],
+  "runId": "20260601T000000Z-deadbeef",
+  "schemaVersion": "1.0"
+}

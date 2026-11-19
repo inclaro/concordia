@@ -1,0 +1,18 @@
+{
+  "description": "CBM 0.12.1 observations O4, O5 and O7 for review currency. The repository is test/fixtures/infra. The baseline reuses the infra recording; the other variants are recorded by `go run ./cmd/record-cbm review` from the repository with the listed files removed.",
+  "repository": "test/fixtures/infra",
+  "project": "concordia-fixture-infra",
+  "variants": [
+    {
+      "name": "baseline",
+      "recording": "test/fixtures/cbm-recordings/infra.json",
+      "reuse": true
+    },
+    {
+      "name": "secret-declaration-removed",
+      "recording": "test/fixtures/review/cbm-0.12.1/secret-declaration-removed.json",
+      "message": "infra fixture without the Secret manifest api-secrets",
+      "remove": ["k8s/prod/secret.yaml"]
+    }
+  ]
+}

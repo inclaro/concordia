@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/evidence/plan/v1.schema.json",
+  "title": "Concordia plan predicate v1",
+  "description": "The predicate of an in-toto Statement v1 with predicateType https://concordia.io/evidence/plan/v1: the binding of a Terraform or OpenTofu plan file to a revision and an environment. The subject is the sha256 digest of the plan file (`show -json` output); Concordia compares it with the file. The schema is open: Concordia ignores fields that it does not list and does not persist them.",
+  "type": "object",
+  "required": [
+    "environment",
+    "revision",
+    "time"
+  ],
+  "properties": {
+    "environment": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "The source revision that the plan was made for. It must equal the evaluated revision."
+    },
+    "tool": {
+      "enum": [
+        "terraform",
+        "opentofu"
+      ]
+    },
+    "time": {
+      "$ref": "#/$defs/time",
+      "description": "When the plan was made. `assurance.plans[].maxAgeDays` counts from it."
+    }
+  },
+  "$defs": {
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 time."
+    }
+  }
+}

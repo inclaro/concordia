@@ -1,0 +1,116 @@
+{
+  "configuration" : { },
+  "description" : "Recording for export canonicalization",
+  "documentation" : { },
+  "id" : 0,
+  "model" : {
+    "people" : [ {
+      "id" : "1",
+      "name" : "User",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "relationships" : [ {
+        "description" : "Uses",
+        "destinationId" : "3",
+        "id" : "5",
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "2",
+        "id" : "6",
+        "linkedRelationshipId" : "5",
+        "sourceId" : "1",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "containers" : [ {
+        "documentation" : { },
+        "id" : "3",
+        "name" : "API",
+        "properties" : {
+          "structurizr.dsl.identifier" : "api"
+        },
+        "relationships" : [ {
+          "description" : "Reads",
+          "destinationId" : "4",
+          "id" : "7",
+          "sourceId" : "3",
+          "tags" : "Relationship",
+          "technology" : "SQL"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Go"
+      }, {
+        "documentation" : { },
+        "id" : "4",
+        "name" : "DB",
+        "properties" : {
+          "structurizr.dsl.identifier" : "db"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Postgres"
+      } ],
+      "documentation" : { },
+      "id" : "2",
+      "name" : "Shop",
+      "properties" : {
+        "structurizr.dsl.identifier" : "sys"
+      },
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Recorded",
+  "properties" : {
+    "structurizr.inspection.error" : "8",
+    "structurizr.dsl" : "d29ya3NwYWNlICJSZWNvcmRlZCIgIlJlY29yZGluZyBmb3IgZXhwb3J0IGNhbm9uaWNhbGl6YXRpb24iIHsKICAgIG1vZGVsIHsKICAgICAgICB1c2VyID0gcGVyc29uICJVc2VyIgogICAgICAgIHN5cyA9IHNvZnR3YXJlU3lzdGVtICJTaG9wIiB7CiAgICAgICAgICAgIGFwaSA9IGNvbnRhaW5lciAiQVBJIiAiIiAiR28iCiAgICAgICAgICAgIGRiID0gY29udGFpbmVyICJEQiIgIiIgIlBvc3RncmVzIgogICAgICAgIH0KICAgICAgICB1c2VyIC0+IGFwaSAiVXNlcyIgIkhUVFBTIgogICAgICAgIGFwaSAtPiBkYiAiUmVhZHMiICJTUUwiCiAgICB9CiAgICB2aWV3cyB7CiAgICAgICAgY29udGFpbmVyIHN5cyAic2hvcC1jb250YWluZXJzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgfQogICAgfQp9",
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.warning" : "0"
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "styles" : { },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "shop-containers",
+      "name" : "Container View: Shop",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "5"
+      }, {
+        "id" : "7"
+      } ],
+      "softwareSystemId" : "2"
+    } ]
+  }
+}

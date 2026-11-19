@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "items": {
+        "oneOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "c"
+              }
+            }
+          }
+        ],
+        "anyOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "q"
+              }
+            }
+          }
+        ]
+      },
+      "x": {
+        "items": {
+          "oneOf": [
+            1
+          ],
+          "anyOf": [
+            1
+          ]
+        }
+      }
+    },
+    "relationships": {
+      "prefixItems": []
+    }
+  }
+}

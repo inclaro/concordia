@@ -1,0 +1,50 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "timeline",
+      "timeline": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "timeline",
+      "timeline": "pass.json"
+    },
+    {
+      "name": "spec-1",
+      "mode": "timeline",
+      "timeline": "spec-1.json"
+    },
+    {
+      "name": "spec-2",
+      "mode": "timeline",
+      "timeline": "spec-2.json"
+    },
+    {
+      "name": "spec-3",
+      "mode": "timeline",
+      "timeline": "spec-3.json"
+    },
+    {
+      "name": "spec-4",
+      "mode": "timeline",
+      "timeline": "spec-4.json"
+    },
+    {
+      "name": "spec-5",
+      "mode": "timeline",
+      "timeline": "spec-5.json"
+    },
+    {
+      "name": "spec-6",
+      "mode": "timeline",
+      "timeline": "spec-6.json"
+    },
+    {
+      "name": "spec-7",
+      "mode": "timeline",
+      "timeline": "spec-7.json"
+    }
+  ]
+}

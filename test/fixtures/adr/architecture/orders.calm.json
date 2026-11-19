@@ -1,0 +1,35 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "orders-service",
+      "node-type": "service",
+      "name": "Orders",
+      "description": "Takes orders.",
+      "concordia": {"tags": ["orders"]}
+    },
+    {
+      "unique-id": "orders-db",
+      "node-type": "database",
+      "name": "Orders database",
+      "description": "Stores orders.",
+      "interfaces": [
+        {"unique-id": "sql", "host": "orders-db.internal", "port": 5432}
+      ],
+      "concordia": {"tags": ["orders-data"]}
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "orders-to-db",
+      "description": "Orders reads and writes its database.",
+      "protocol": "TCP",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "orders-service"},
+          "destination": {"node": "orders-db", "interfaces": ["sql"]}
+        }
+      }
+    }
+  ]
+}

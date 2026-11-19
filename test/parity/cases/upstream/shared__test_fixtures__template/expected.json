@@ -1,0 +1,84 @@
+{
+  "runs": {
+    "data__conference-secure-signup.amended.arch": {
+      "findings": [
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/conference-website/interfaces/conference-website-url/url",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "data__document-system": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "data__document-system-with-controls": {
+      "findings": [
+        {
+          "message": "Could not load requirement schema from 'https://calm.finos.org/controls/owner.requirement.json': Failed to load document from URL: https://calm.finos.org/controls/owner.requirement.json",
+          "path": "/controls/ownership/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        },
+        {
+          "message": "Could not load requirement schema from 'https://calm.finos.org/controls/owner.requirement.json': Failed to load document from URL: https://calm.finos.org/controls/owner.requirement.json",
+          "path": "/controls/ownership/requirements/1",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        },
+        {
+          "message": "Could not load requirement schema from 'https://calm.finos.org/controls/owner.requirement.json': Failed to load document from URL: https://calm.finos.org/controls/owner.requirement.json",
+          "path": "/controls/ownership/requirements/2",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        },
+        {
+          "message": "Could not load requirement schema from 'https://calm.finos.org/controls/owner.requirement.json': Failed to load document from URL: https://calm.finos.org/controls/owner.requirement.json",
+          "path": "/nodes/document-system/controls/ownership/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "data__simple-nodes": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'service-a' is not referenced by any relationships.",
+          "path": "/nodes/service-a/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'service-b' is not referenced by any relationships.",
+          "path": "/nodes/service-b/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

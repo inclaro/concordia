@@ -1,0 +1,14 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-BAD-COMPARISON
+    area: availability
+    qualityAttribute: availability
+    stimulusSource: operator
+    stimulus: the primary database node fails
+    environment: production
+    expectedResponse: a replica takes over
+    owner: platform-team
+    scope: [orders-db]
+    mode: measured
+    criterion: {metric: failover-seconds, unit: s, comparison: about, threshold: 30}

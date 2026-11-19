@@ -1,0 +1,74 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "Just one of \"oneOf\" and \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems/0",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems/1",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "\"prefixItems\" property must be shorter than 1",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems",
+          "rule": "pattern-option-relationship-must-have-max-one-item",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "At least one of \"oneOf\" or \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems/a",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "At least one of \"oneOf\" or \"anyOf\" must be defined",
+          "path": "/properties/relationships/prefixItems/1/properties/relationship-type/properties/options/prefixItems/0",
+          "rule": "pattern-option-relationship-must-only-have-oneof-or-anyof-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

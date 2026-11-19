@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/quality.schema.json",
+  "title": "Concordia QualityScenarioSet",
+  "description": "A set of quality scenarios and the findings (sensitivity points, risks, tradeoffs) that concern them. Each scenario states its criterion in the form that its mode needs (CO-QUA-001).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "scenarios"],
+  "properties": {
+    "apiVersion": { "const": "concordia.io/v1alpha1" },
+    "kind": { "const": "QualityScenarioSet" },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/scenario" }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+    "adrId": { "type": "string", "pattern": "^ADR-[0-9]+$" },
+    "area": {
+      "enum": ["availability", "modifiability", "security", "performance", "deployment-safety", "operability"]
+    },
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "area",
+        "qualityAttribute",
+        "stimulusSource",
+        "stimulus",
+        "environment",
+        "expectedResponse",
+        "criterion",
+        "owner",
+        "scope",
+        "mode"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "area": { "$ref": "#/$defs/area" },
+        "qualityAttribute": { "$ref": "#/$defs/nonEmptyString" },
+        "stimulusSource": { "$ref": "#/$defs/nonEmptyString" },
+        "stimulus": { "$ref": "#/$defs/nonEmptyString" },
+        "environment": { "$ref": "#/$defs/nonEmptyString" },
+        "expectedResponse": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/nonEmptyString" },
+        "scope": { "$ref": "#/$defs/idList" },
+        "mode": { "enum": ["structural", "measured", "reviewed"] },
+        "enforcement": { "enum": ["mandatory", "advisory"] },
+        "criterion": { "type": "object" },
+        "addressedBy": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/adrId" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "structural" } }, "required": ["mode"] },
+          "then": { "properties": { "criterion": { "$ref": "#/$defs/structuralCriterion" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "measured" } }, "required": ["mode"] },
+          "then": { "properties": { "criterion": { "$ref": "#/$defs/measuredCriterion" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "reviewed" } }, "required": ["mode"] },
+          "then": { "properties": { "criterion": { "$ref": "#/$defs/reviewedCriterion" } } }
+        }
+      ]
+    },
+    "structuralCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rules"],
+      "properties": {
+        "rules": { "$ref": "#/$defs/idList" }
+      }
+    },
+    "measuredCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "unit", "comparison", "threshold"],
+      "properties": {
+        "metric": { "$ref": "#/$defs/nonEmptyString" },
+        "unit": { "$ref": "#/$defs/nonEmptyString" },
+        "comparison": { "enum": ["lt", "lte", "gt", "gte", "eq"] },
+        "threshold": { "type": "number" },
+        "maxAgeDays": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reviewedCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject", "authority"],
+      "properties": {
+        "subject": { "$ref": "#/$defs/nonEmptyString" },
+        "authority": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "statement", "owner", "status", "scenarios"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["sensitivity-point", "risk", "tradeoff"] },
+        "statement": { "$ref": "#/$defs/nonEmptyString" },
+        "owner": { "$ref": "#/$defs/nonEmptyString" },
+        "status": { "enum": ["open", "accepted", "resolved"] },
+        "scenarios": { "$ref": "#/$defs/idList" },
+        "areas": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/area" }
+        },
+        "addressedBy": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/adrId" }
+        },
+        "assumptions": { "$ref": "#/$defs/idList" }
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "origin": "upstream:cli/test_fixtures/api-gateway",
+  "runs": [
+    {
+      "architecture": "api-gateway-architecture.json",
+      "mode": "architecture",
+      "name": "api-gateway-architecture"
+    },
+    {
+      "mode": "timeline",
+      "name": "api-gateway-timeline",
+      "timeline": "api-gateway-timeline.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "api-gateway",
+      "pattern": "api-gateway.json"
+    }
+  ]
+}

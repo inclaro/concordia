@@ -1,0 +1,4694 @@
+{
+  "calls": {
+    "00c45514de53bfb5a8f43660e4c826f6b7271f2833a306506c6e41b1501fee92": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "02c0050732e577c53ba6d6c2b9668664418dbb313152975fd663efa8a8f4a692": {
+      "adr_hint": "No ADR found. Use manage_adr(mode='update') to persist architectural decisions across sessions. Run get_architecture(aspects=['all']) first.",
+      "adr_present": false,
+      "edge_types": [
+        {
+          "count": 62,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "DEFINES"
+        },
+        {
+          "count": 9,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "CONTAINS_FILE"
+        },
+        {
+          "count": 7,
+          "properties": [
+            "source_id",
+            "target_id"
+          ],
+          "type": "CONTAINS_FOLDER"
+        },
+        {
+          "count": 6,
+          "properties": [
+            "source_id",
+            "target_id",
+            "label",
+            "line",
+            "style"
+          ],
+          "type": "DIAGRAM_ARROW"
+        },
+        {
+          "count": 5,
+          "properties": [
+            "source_id",
+            "target_id",
+            "args",
+            "callee",
+            "candidates",
+            "confidence",
+            "line",
+            "strategy"
+          ],
+          "type": "CALLS"
+        },
+        {
+          "count": 3,
+          "properties": [
+            "source_id",
+            "target_id",
+            "local_name"
+          ],
+          "type": "IMPORTS"
+        },
+        {
+          "count": 2,
+          "properties": [
+            "source_id",
+            "target_id",
+            "callee"
+          ],
+          "type": "USAGE"
+        },
+        {
+          "count": 1,
+          "properties": [
+            "source_id",
+            "target_id",
+            "base_sha",
+            "branch",
+            "canonical_root",
+            "git_common_dir",
+            "head_sha",
+            "is_detached",
+            "is_git",
+            "is_worktree",
+            "root_exists",
+            "worktree_root"
+          ],
+          "type": "HAS_BRANCH"
+        }
+      ],
+      "has_more": false,
+      "node_labels": [
+        {
+          "count": 17,
+          "label": "Variable",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 11,
+          "label": "Folder",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line"
+          ]
+        },
+        {
+          "count": 9,
+          "label": "DiagramElement",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "element_id",
+            "element_kind",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines",
+            "parent_class"
+          ]
+        },
+        {
+          "count": 9,
+          "label": "File",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "change_count",
+            "extension",
+            "last_modified"
+          ]
+        },
+        {
+          "count": 9,
+          "label": "Module",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 5,
+          "label": "Function",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "alloc_in_loop",
+            "cognitive",
+            "complexity",
+            "importance",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "linear_scan_in_loop",
+            "lines",
+            "loop_count",
+            "loop_depth",
+            "max_access_depth",
+            "param_count",
+            "param_names",
+            "recursion_in_loop",
+            "recursive",
+            "return_type",
+            "self_recursive",
+            "signature",
+            "transitive_loop_depth",
+            "unguarded_recursion"
+          ]
+        },
+        {
+          "count": 5,
+          "label": "Section",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "docstring",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 3,
+          "label": "Diagram",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "diagram_kind",
+            "docstring",
+            "format",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines",
+            "parent_class"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Branch",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "base_sha",
+            "branch",
+            "canonical_root",
+            "git_common_dir",
+            "head_sha",
+            "is_detached",
+            "is_git",
+            "is_worktree",
+            "root_exists",
+            "worktree_root"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Interface",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "complexity",
+            "is_entry_point",
+            "is_exported",
+            "is_test",
+            "lines"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Project",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line"
+          ]
+        },
+        {
+          "count": 1,
+          "label": "Resource",
+          "properties": [
+            "name",
+            "qualified_name",
+            "file_path",
+            "start_line",
+            "end_line",
+            "group",
+            "kind",
+            "obj_key",
+            "source",
+            "version"
+          ]
+        }
+      ],
+      "returned": 20,
+      "total": 20
+    },
+    "037787ba0ce6757e033b8593f792da1a650d3e5f8291d1c73bf83c3994792dff": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0435224bb6233680714e5fec13d88e69785c612601862d84e2ed3886e6e42872": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "07b3c4e4fe8d52456ec143bfd683fed6de055914c885a73dd99e14c8955ad9e5": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.label",
+        "r.line",
+        "r.style"
+      ],
+      "has_more": false,
+      "returned": 6,
+      "rows": [
+        [
+          "49",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.web",
+          "docs/architecture.md",
+          "7",
+          "50",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.orders",
+          "docs/architecture.md",
+          "7",
+          "place order",
+          "7",
+          "message"
+        ],
+        [
+          "52",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.customer",
+          "docs/architecture.md",
+          "12",
+          "53",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12",
+          "",
+          "12",
+          "arrow"
+        ],
+        [
+          "53",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12",
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13",
+          "HTTPS",
+          "13",
+          "arrow"
+        ],
+        [
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13",
+          "55",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.billing",
+          "docs/architecture.md",
+          "14",
+          "HTTPS",
+          "14",
+          "arrow"
+        ],
+        [
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13",
+          "56",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.db",
+          "docs/architecture.md",
+          "15",
+          "TCP",
+          "15",
+          "arrow"
+        ],
+        [
+          "61",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.customer",
+          "docs/drafts/context.md",
+          "7",
+          "62",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.web",
+          "docs/drafts/context.md",
+          "7",
+          "",
+          "7",
+          "arrow"
+        ]
+      ],
+      "total": 6,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "080671b6634dac3846b81889605d4773110e86c1f61dd5bedac0e048dc74b0b1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "090080fd95ee7a076c9a2efc72aa94156c7d59b463ea269ba471293f529e0161": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 2,
+      "rows": [
+        [
+          "65",
+          "64",
+          "{\"callee\":\"Charge\"}"
+        ],
+        [
+          "69",
+          "64",
+          "{\"callee\":\"Charge\"}"
+        ]
+      ],
+      "total": 2,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "096df009fb664d41b6aea4d9b4c20c7eb556f831f41935c440750f6669ec7895": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0b522d7b56bb64a27398ced5782a6d07e7085a89da74ca5b1bac6ddf72796348": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0bca0f0fec44b6c771ce71e6ae481d0608c168aac84c2b297c8add4690f2316b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0c7788eedc45cc6ff70ee313e97dbee5987c0933dcd198807f42fb638f1fa27d": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 62,
+      "rows": [
+        [
+          "4",
+          "24",
+          "{}"
+        ],
+        [
+          "4",
+          "25",
+          "{}"
+        ],
+        [
+          "4",
+          "26",
+          "{}"
+        ],
+        [
+          "4",
+          "27",
+          "{}"
+        ],
+        [
+          "4",
+          "28",
+          "{}"
+        ],
+        [
+          "4",
+          "29",
+          "{}"
+        ],
+        [
+          "4",
+          "30",
+          "{}"
+        ],
+        [
+          "4",
+          "31",
+          "{}"
+        ],
+        [
+          "4",
+          "32",
+          "{}"
+        ],
+        [
+          "4",
+          "33",
+          "{}"
+        ],
+        [
+          "4",
+          "34",
+          "{}"
+        ],
+        [
+          "4",
+          "35",
+          "{}"
+        ],
+        [
+          "4",
+          "36",
+          "{}"
+        ],
+        [
+          "4",
+          "37",
+          "{}"
+        ],
+        [
+          "4",
+          "38",
+          "{}"
+        ],
+        [
+          "4",
+          "39",
+          "{}"
+        ],
+        [
+          "4",
+          "40",
+          "{}"
+        ],
+        [
+          "4",
+          "41",
+          "{}"
+        ],
+        [
+          "6",
+          "42",
+          "{}"
+        ],
+        [
+          "3",
+          "23",
+          "{}"
+        ],
+        [
+          "3",
+          "72",
+          "{}"
+        ],
+        [
+          "10",
+          "45",
+          "{}"
+        ],
+        [
+          "10",
+          "46",
+          "{}"
+        ],
+        [
+          "10",
+          "47",
+          "{}"
+        ],
+        [
+          "10",
+          "48",
+          "{}"
+        ],
+        [
+          "10",
+          "49",
+          "{}"
+        ],
+        [
+          "10",
+          "50",
+          "{}"
+        ],
+        [
+          "10",
+          "51",
+          "{}"
+        ],
+        [
+          "10",
+          "52",
+          "{}"
+        ],
+        [
+          "10",
+          "53",
+          "{}"
+        ],
+        [
+          "10",
+          "54",
+          "{}"
+        ],
+        [
+          "10",
+          "55",
+          "{}"
+        ],
+        [
+          "10",
+          "56",
+          "{}"
+        ],
+        [
+          "47",
+          "48",
+          "{}"
+        ],
+        [
+          "47",
+          "51",
+          "{}"
+        ],
+        [
+          "48",
+          "49",
+          "{}"
+        ],
+        [
+          "48",
+          "50",
+          "{}"
+        ],
+        [
+          "51",
+          "52",
+          "{}"
+        ],
+        [
+          "51",
+          "53",
+          "{}"
+        ],
+        [
+          "51",
+          "54",
+          "{}"
+        ],
+        [
+          "51",
+          "55",
+          "{}"
+        ],
+        [
+          "51",
+          "56",
+          "{}"
+        ],
+        [
+          "8",
+          "43",
+          "{}"
+        ],
+        [
+          "8",
+          "44",
+          "{}"
+        ],
+        [
+          "11",
+          "57",
+          "{}"
+        ],
+        [
+          "11",
+          "58",
+          "{}"
+        ],
+        [
+          "11",
+          "59",
+          "{}"
+        ],
+        [
+          "11",
+          "60",
+          "{}"
+        ],
+        [
+          "11",
+          "61",
+          "{}"
+        ],
+        [
+          "11",
+          "62",
+          "{}"
+        ],
+        [
+          "59",
+          "60",
+          "{}"
+        ],
+        [
+          "60",
+          "61",
+          "{}"
+        ],
+        [
+          "60",
+          "62",
+          "{}"
+        ],
+        [
+          "13",
+          "63",
+          "{}"
+        ],
+        [
+          "13",
+          "64",
+          "{}"
+        ],
+        [
+          "13",
+          "65",
+          "{}"
+        ],
+        [
+          "17",
+          "66",
+          "{}"
+        ],
+        [
+          "17",
+          "67",
+          "{}"
+        ],
+        [
+          "17",
+          "68",
+          "{}"
+        ],
+        [
+          "17",
+          "69",
+          "{}"
+        ],
+        [
+          "20",
+          "70",
+          "{}"
+        ],
+        [
+          "20",
+          "71",
+          "{}"
+        ]
+      ],
+      "total": 62,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "0d9fa894e8bdbeaed0d72c1648d7d0b7d436e326994cd5cea98a1ec5f60d8ae7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "102be72a6db8c8be04f5a4dfcd326864842d61af1a003a5f992ee5285a9df165": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 9,
+      "rows": [
+        [
+          "48",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5",
+          "49",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.web",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "48",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5",
+          "50",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.orders",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "52",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.customer",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "53",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "55",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.billing",
+          "docs/architecture.md",
+          "14"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "56",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.db",
+          "docs/architecture.md",
+          "15"
+        ],
+        [
+          "60",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5",
+          "61",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.customer",
+          "docs/drafts/context.md",
+          "7"
+        ],
+        [
+          "60",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5",
+          "62",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.web",
+          "docs/drafts/context.md",
+          "7"
+        ]
+      ],
+      "total": 9,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "10dd2d06d913496df7aa5705e2fb9133aaafcc9e285212ee01f87f8964c525b1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "123d17e0cead0ccfea450cfdfdd18477938291e0caa07a0b1da680e69a8fae94": {
+      "cross_repo": {
+        "status": "never_run"
+      },
+      "doc_links": {
+        "mentions": 0,
+        "status": "ok",
+        "unresolved": {}
+      },
+      "edges": 95,
+      "git": {
+        "base_sha": "",
+        "branch": "main",
+        "branch_slug": "main",
+        "canonical_root": "/tmp/concordia-record-viewcurrency",
+        "git_common_dir": ".git",
+        "git_dir": ".git",
+        "head_sha": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "is_detached": false,
+        "is_git": true,
+        "is_worktree": false,
+        "root_exists": true,
+        "worktree_root": "/tmp/concordia-record-viewcurrency"
+      },
+      "indexed_at": "2026-10-29T16:00:22Z",
+      "nodes": 72,
+      "not_indexed": {
+        "dirs": [],
+        "dirs_count": 1,
+        "dirs_omitted": 1,
+        "files": [],
+        "files_count": 2,
+        "files_omitted": 2,
+        "truncated": true
+      },
+      "parse_partial": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "parse_unusable": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "project": "concordia-fixture-viewcurrency",
+      "root_path": "/tmp/concordia-record-viewcurrency",
+      "skipped": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "status": "ready",
+      "watch": {
+        "hint": "Auto-sync watches only the active MCP session's project; re-run index_repository to refresh this index.",
+        "reason": "not_session_project",
+        "watched": false
+      }
+    },
+    "180690e58db00c2b3ce79fba18be188029f45ff7a3270935f2e4d729c65ae262": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "19b1e5f9ec575aaffb45d1c252f120fa6e67c79e18efa2473f071eea4c481fa2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "1db51cb013767d99ab18f0a274eb38ba374f02b55d91397b73656f66ccf29139": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "24bee5ed358c7a377a94df2febabfde1c99270dbea06df1cea7c109d92902b8f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "26c266b22e2a38252b6672b432f37eef950fc144fe33edd775dc50a57752d89b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2a4b161dd8d1a5a1286bd16849e24bf8e0aa8432a5b5255d66e36d9a5c1ca6d8": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "9"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2d63270d193911d4a1a7244f7f1019bf808425bf12e511388c87386488367a9f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "50"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "2ee6575d973574e60de4caa7e1e40a6c0243d0b6bac10743af1bb818d0f9484d": {
+      "cross_repo": {
+        "status": "never_run"
+      },
+      "doc_links": {
+        "mentions": 0,
+        "status": "ok",
+        "unresolved": {}
+      },
+      "edges": 95,
+      "indexed_at": "2026-10-29T16:00:22Z",
+      "nodes": 72,
+      "not_indexed": {
+        "dirs": [],
+        "dirs_count": 1,
+        "dirs_omitted": 1,
+        "files": [],
+        "files_count": 2,
+        "files_omitted": 2,
+        "truncated": true
+      },
+      "parse_partial": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "parse_unusable": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "project": "concordia-fixture-viewcurrency",
+      "root_path": "/tmp/concordia-record-viewcurrency",
+      "skipped": {
+        "count": 0,
+        "files": [],
+        "truncated": false
+      },
+      "status": "ready",
+      "watch": {
+        "hint": "Auto-sync watches only the active MCP session's project; re-run index_repository to refresh this index.",
+        "reason": "not_session_project",
+        "watched": false
+      }
+    },
+    "2f7690d7776a576dd860d36eadee44ecf0b667cebd8c198e6e34e608449e930b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3092c010088193def58828f9b357945daa538a64cfe3887b5571beebf47f7518": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3499523c00bfc1e4a8c10aeb07a3a666b0b3427b61728f99dba26bb5021f31fa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3585c13c47bcf08ea5669bee498651062c4ad219323300bb922148347c337bc4": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "36b1a3257f55773a4cefc1e76ebe611a3e1a014fb79eafec2fc8991905406713": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "38229242bc82ff4f6b1e0c9c09cb55229ab2918bbb8223f6f658626859b40cd0": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "3d56e8f96f90e063d370b16de00e39ed02ba0210127ee35393e92afb18c19c56": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "40c2241aef745432c8c81e66e578302dd9f99a0b71b583d41c56fc54b6bb050a": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 6,
+      "rows": [
+        [
+          "49",
+          "50",
+          "{\"label\":\"place order\",\"style\":\"message\",\"line\":7}"
+        ],
+        [
+          "52",
+          "53",
+          "{\"style\":\"arrow\",\"line\":12}"
+        ],
+        [
+          "53",
+          "54",
+          "{\"label\":\"HTTPS\",\"style\":\"arrow\",\"line\":13}"
+        ],
+        [
+          "54",
+          "55",
+          "{\"label\":\"HTTPS\",\"style\":\"arrow\",\"line\":14}"
+        ],
+        [
+          "54",
+          "56",
+          "{\"label\":\"TCP\",\"style\":\"arrow\",\"line\":15}"
+        ],
+        [
+          "61",
+          "62",
+          "{\"style\":\"arrow\",\"line\":7}"
+        ]
+      ],
+      "total": 6,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4222b8dd767681d5818a258f7e9438cc80afe926df26f4307050c6c8d3c64600": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.callee",
+        "b.kind"
+      ],
+      "has_more": false,
+      "returned": 2,
+      "rows": [
+        [
+          "65",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.charge",
+          "services/billing/src/billing.ts",
+          "6",
+          "64",
+          "[\"Interface\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.Charge",
+          "services/billing/src/billing.ts",
+          "1",
+          "Charge",
+          ""
+        ],
+        [
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "64",
+          "[\"Interface\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.Charge",
+          "services/billing/src/billing.ts",
+          "1",
+          "Charge",
+          ""
+        ]
+      ],
+      "total": 2,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "42eafdef0cac04ff5450ccc1548f3a378c364a72cc593e09c78d417d475ac0d9": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "9",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs",
+          "docs",
+          "0",
+          "12",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs.drafts",
+          "docs/drafts",
+          "0"
+        ],
+        [
+          "16",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services",
+          "services",
+          "0",
+          "19",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services.orders",
+          "services/orders",
+          "0"
+        ],
+        [
+          "16",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services",
+          "services",
+          "0",
+          "22",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services.web",
+          "services/web",
+          "0"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "43751a6092fa98324f2e5858a85d65f240f8905c046f95e754db390992c91385": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "43fe0bc7b58cba63d88bf56ec0a560dac81fb32fe1f1468dc47f19fdd69c4446": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4598932542647adff289914b79d12d152bdca828565a1f578f412481b8bbdb4e": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4711cb9e630603be77fefba09dd1d55e529a240d0e971d4b9995720fbc0ff0d9": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4765447a8db0b2984ba7583b64202a0d671663aaeb5fc07789297d68ddc86a22": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "47771a293b7c2ec4c739cbbb52316b10ec87f46695dc0b415d71536c9cdbe4da": {
+      "columns": [
+        "id(n)",
+        "labels(n)",
+        "n.name",
+        "n.qualified_name",
+        "n.file_path",
+        "n.start_line",
+        "properties(n)"
+      ],
+      "has_more": false,
+      "returned": 72,
+      "rows": [
+        [
+          "5",
+          "[\"Folder\"]",
+          "architecture",
+          "concordia-fixture-viewcurrency.architecture",
+          "architecture",
+          "0",
+          "{}"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "shop.calm.json",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "{\"extension\":\".json\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "24",
+          "[\"Module\"]",
+          "architecture/shop.calm.json",
+          "concordia-fixture-viewcurrency.architecture.shop.calm",
+          "architecture/shop.calm.json",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "25",
+          "[\"Variable\"]",
+          "relationships",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.relationships",
+          "architecture/shop.calm.json",
+          "11",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "26",
+          "[\"Variable\"]",
+          "nodes",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.nodes",
+          "architecture/shop.calm.json",
+          "24",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "27",
+          "[\"Variable\"]",
+          "$schema",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.$schema",
+          "architecture/shop.calm.json",
+          "2",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "28",
+          "[\"Variable\"]",
+          "description",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.description",
+          "architecture/shop.calm.json",
+          "14",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "29",
+          "[\"Variable\"]",
+          "name",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.name",
+          "architecture/shop.calm.json",
+          "9",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "30",
+          "[\"Variable\"]",
+          "node-type",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.node-type",
+          "architecture/shop.calm.json",
+          "9",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "31",
+          "[\"Variable\"]",
+          "unique-id",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.unique-id",
+          "architecture/shop.calm.json",
+          "37",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "32",
+          "[\"Variable\"]",
+          "relationship-type",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.relationship-type",
+          "architecture/shop.calm.json",
+          "39",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "33",
+          "[\"Variable\"]",
+          "composed-of",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.composed-of",
+          "architecture/shop.calm.json",
+          "16",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "34",
+          "[\"Variable\"]",
+          "container",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.container",
+          "architecture/shop.calm.json",
+          "17",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "35",
+          "[\"Variable\"]",
+          "interacts",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.interacts",
+          "architecture/shop.calm.json",
+          "24",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "36",
+          "[\"Variable\"]",
+          "actor",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.actor",
+          "architecture/shop.calm.json",
+          "24",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "37",
+          "[\"Variable\"]",
+          "protocol",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.protocol",
+          "architecture/shop.calm.json",
+          "38",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "38",
+          "[\"Variable\"]",
+          "connects",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.connects",
+          "architecture/shop.calm.json",
+          "39",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "39",
+          "[\"Variable\"]",
+          "destination",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.destination",
+          "architecture/shop.calm.json",
+          "39",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "40",
+          "[\"Variable\"]",
+          "source",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.source",
+          "architecture/shop.calm.json",
+          "39",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "41",
+          "[\"Variable\"]",
+          "node",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.node",
+          "architecture/shop.calm.json",
+          "39",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "7",
+          "[\"Folder\"]",
+          "bindings",
+          "concordia-fixture-viewcurrency.bindings",
+          "bindings",
+          "0",
+          "{}"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia.bindings.yaml",
+          "concordia-fixture-viewcurrency.bindings.concordia.bindings.yaml.__file__",
+          "bindings/concordia.bindings.yaml",
+          "0",
+          "{\"extension\":\".yaml\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "42",
+          "[\"Module\"]",
+          "bindings/concordia.bindings.yaml",
+          "concordia-fixture-viewcurrency.bindings.concordia.bindings",
+          "bindings/concordia.bindings.yaml",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "3",
+          "[\"File\"]",
+          "concordia.yaml",
+          "concordia-fixture-viewcurrency.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0",
+          "{\"extension\":\".yaml\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "23",
+          "[\"Module\"]",
+          "concordia.yaml",
+          "concordia-fixture-viewcurrency.concordia",
+          "concordia.yaml",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "72",
+          "[\"Resource\"]",
+          "Workspace/shop-views",
+          "concordia-fixture-viewcurrency.concordia.yaml::concordia.io/Workspace/-/shop-views",
+          "concordia.yaml",
+          "1",
+          "{\"source\":\"k8s\",\"group\":\"concordia.io\",\"kind\":\"Workspace\",\"version\":\"v1alpha1\",\"obj_key\":\"concordia.io/Workspace/?/shop-views\"}"
+        ],
+        [
+          "9",
+          "[\"Folder\"]",
+          "docs",
+          "concordia-fixture-viewcurrency.docs",
+          "docs",
+          "0",
+          "{}"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "architecture.md",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "{\"extension\":\".md\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "45",
+          "[\"Module\"]",
+          "docs/architecture.md",
+          "concordia-fixture-viewcurrency.docs.architecture",
+          "docs/architecture.md",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "46",
+          "[\"Section\"]",
+          "Shop architecture",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-architecture",
+          "docs/architecture.md",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "47",
+          "[\"Section\"]",
+          "Shop containers",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers",
+          "docs/architecture.md",
+          "3",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"web orders place order Customer Web App Orders API Billing Orders DB HTTPS HTTPS TCP\"}"
+        ],
+        [
+          "48",
+          "[\"Diagram\"]",
+          "mermaid sequence",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"place order\",\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers\",\"format\":\"mermaid\",\"diagram_kind\":\"sequence\"}"
+        ],
+        [
+          "49",
+          "[\"DiagramElement\"]",
+          "web",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.web",
+          "docs/architecture.md",
+          "7",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1\",\"element_id\":\"web\",\"element_kind\":\"participant\"}"
+        ],
+        [
+          "50",
+          "[\"DiagramElement\"]",
+          "orders",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.orders",
+          "docs/architecture.md",
+          "7",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1\",\"element_id\":\"orders\",\"element_kind\":\"participant\"}"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "mermaid flowchart",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"Customer; Web App; Orders API; HTTPS; Billing; HTTPS; Orders DB; TCP\",\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers\",\"format\":\"mermaid\",\"diagram_kind\":\"flowchart\"}"
+        ],
+        [
+          "52",
+          "[\"DiagramElement\"]",
+          "Customer",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.customer",
+          "docs/architecture.md",
+          "12",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"customer\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "53",
+          "[\"DiagramElement\"]",
+          "Web App",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"web\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "54",
+          "[\"DiagramElement\"]",
+          "Orders API",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"orders\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "55",
+          "[\"DiagramElement\"]",
+          "Billing",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.billing",
+          "docs/architecture.md",
+          "14",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"billing\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "56",
+          "[\"DiagramElement\"]",
+          "Orders DB",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.db",
+          "docs/architecture.md",
+          "15",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"db\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "8",
+          "[\"File\"]",
+          "context.md",
+          "concordia-fixture-viewcurrency.docs.context.md.__file__",
+          "docs/context.md",
+          "0",
+          "{\"extension\":\".md\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "43",
+          "[\"Module\"]",
+          "docs/context.md",
+          "concordia-fixture-viewcurrency.docs.context",
+          "docs/context.md",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "44",
+          "[\"Section\"]",
+          "Shop context",
+          "concordia-fixture-viewcurrency.docs.context.Shop-context",
+          "docs/context.md",
+          "3",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"![Context](context.png)\"}"
+        ],
+        [
+          "12",
+          "[\"Folder\"]",
+          "drafts",
+          "concordia-fixture-viewcurrency.docs.drafts",
+          "docs/drafts",
+          "0",
+          "{}"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "context.md",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "{\"extension\":\".md\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "57",
+          "[\"Module\"]",
+          "docs/drafts/context.md",
+          "concordia-fixture-viewcurrency.docs.drafts.context",
+          "docs/drafts/context.md",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "58",
+          "[\"Section\"]",
+          "Draft",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft",
+          "docs/drafts/context.md",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "59",
+          "[\"Section\"]",
+          "Draft context",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context",
+          "docs/drafts/context.md",
+          "3",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"customer web\"}"
+        ],
+        [
+          "60",
+          "[\"Diagram\"]",
+          "mermaid flowchart",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context\",\"format\":\"mermaid\",\"diagram_kind\":\"flowchart\"}"
+        ],
+        [
+          "61",
+          "[\"DiagramElement\"]",
+          "customer",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.customer",
+          "docs/drafts/context.md",
+          "7",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1\",\"element_id\":\"customer\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "62",
+          "[\"DiagramElement\"]",
+          "web",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.web",
+          "docs/drafts/context.md",
+          "7",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1\",\"element_id\":\"web\",\"element_kind\":\"node\"}"
+        ],
+        [
+          "16",
+          "[\"Folder\"]",
+          "services",
+          "concordia-fixture-viewcurrency.services",
+          "services",
+          "0",
+          "{}"
+        ],
+        [
+          "15",
+          "[\"Folder\"]",
+          "billing",
+          "concordia-fixture-viewcurrency.services.billing",
+          "services/billing",
+          "0",
+          "{}"
+        ],
+        [
+          "14",
+          "[\"Folder\"]",
+          "src",
+          "concordia-fixture-viewcurrency.services.billing.src",
+          "services/billing/src",
+          "0",
+          "{}"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "billing.ts",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.ts.__file__",
+          "services/billing/src/billing.ts",
+          "0",
+          "{\"extension\":\".ts\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "63",
+          "[\"Module\"]",
+          "services/billing/src/billing.ts",
+          "concordia-fixture-viewcurrency.services.billing.src.billing",
+          "services/billing/src/billing.ts",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "64",
+          "[\"Interface\"]",
+          "Charge",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.Charge",
+          "services/billing/src/billing.ts",
+          "1",
+          "{\"complexity\":0,\"lines\":4,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "65",
+          "[\"Function\"]",
+          "charge",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.charge",
+          "services/billing/src/billing.ts",
+          "6",
+          "{\"complexity\":0,\"cognitive\":0,\"loop_count\":0,\"loop_depth\":0,\"self_recursive\":false,\"param_count\":2,\"max_access_depth\":0,\"linear_scan_in_loop\":0,\"alloc_in_loop\":0,\"recursion_in_loop\":false,\"unguarded_recursion\":false,\"lines\":3,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":true,\"signature\":\"(orderId: string, cents: number)\",\"return_type\":\": Charge\",\"param_names\":[\"orderId\",\"cents\"],\"transitive_loop_depth\":0,\"recursive\":false,\"importance\":1.000000}"
+        ],
+        [
+          "19",
+          "[\"Folder\"]",
+          "orders",
+          "concordia-fixture-viewcurrency.services.orders",
+          "services/orders",
+          "0",
+          "{}"
+        ],
+        [
+          "18",
+          "[\"Folder\"]",
+          "src",
+          "concordia-fixture-viewcurrency.services.orders.src",
+          "services/orders/src",
+          "0",
+          "{}"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "orders.ts",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "{\"extension\":\".ts\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "66",
+          "[\"Module\"]",
+          "services/orders/src/orders.ts",
+          "concordia-fixture-viewcurrency.services.orders.src.orders",
+          "services/orders/src/orders.ts",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "67",
+          "[\"Function\"]",
+          "price",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.price",
+          "services/orders/src/orders.ts",
+          "3",
+          "{\"complexity\":0,\"cognitive\":0,\"loop_count\":0,\"loop_depth\":0,\"self_recursive\":false,\"param_count\":1,\"max_access_depth\":1,\"linear_scan_in_loop\":0,\"alloc_in_loop\":0,\"recursion_in_loop\":false,\"unguarded_recursion\":false,\"lines\":3,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false,\"signature\":\"(items: number[])\",\"return_type\":\": number\",\"param_names\":[\"items\"],\"bt\":\"items reduce sum item\",\"transitive_loop_depth\":0,\"recursive\":false,\"importance\":1.414214}"
+        ],
+        [
+          "68",
+          "[\"Function\"]",
+          "validate",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.validate",
+          "services/orders/src/orders.ts",
+          "7",
+          "{\"complexity\":0,\"cognitive\":0,\"loop_count\":0,\"loop_depth\":0,\"self_recursive\":false,\"param_count\":1,\"max_access_depth\":1,\"linear_scan_in_loop\":0,\"alloc_in_loop\":0,\"recursion_in_loop\":false,\"unguarded_recursion\":false,\"lines\":3,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false,\"signature\":\"(items: number[])\",\"return_type\":\": boolean\",\"param_names\":[\"items\"],\"bt\":\"items length price\",\"transitive_loop_depth\":0,\"recursive\":false,\"importance\":1.000000}"
+        ],
+        [
+          "69",
+          "[\"Function\"]",
+          "placeOrder",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "{\"complexity\":1,\"cognitive\":1,\"loop_count\":0,\"loop_depth\":0,\"self_recursive\":false,\"param_count\":2,\"max_access_depth\":0,\"linear_scan_in_loop\":0,\"alloc_in_loop\":0,\"recursion_in_loop\":false,\"unguarded_recursion\":false,\"lines\":4,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":true,\"signature\":\"(orderId: string, items: number[])\",\"return_type\":\": Charge | null\",\"param_names\":[\"orderId\",\"items\"],\"bt\":\"validate items charge orderId price\",\"transitive_loop_depth\":0,\"recursive\":false,\"importance\":10.000000}"
+        ],
+        [
+          "22",
+          "[\"Folder\"]",
+          "web",
+          "concordia-fixture-viewcurrency.services.web",
+          "services/web",
+          "0",
+          "{}"
+        ],
+        [
+          "21",
+          "[\"Folder\"]",
+          "src",
+          "concordia-fixture-viewcurrency.services.web.src",
+          "services/web/src",
+          "0",
+          "{}"
+        ],
+        [
+          "20",
+          "[\"File\"]",
+          "main.ts",
+          "concordia-fixture-viewcurrency.services.web.src.main.ts.__file__",
+          "services/web/src/main.ts",
+          "0",
+          "{\"extension\":\".ts\",\"last_modified\":1767225600,\"change_count\":1}"
+        ],
+        [
+          "70",
+          "[\"Module\"]",
+          "services/web/src/main.ts",
+          "concordia-fixture-viewcurrency.services.web.src.main",
+          "services/web/src/main.ts",
+          "1",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":false}"
+        ],
+        [
+          "71",
+          "[\"Function\"]",
+          "checkout",
+          "concordia-fixture-viewcurrency.services.web.src.main.checkout",
+          "services/web/src/main.ts",
+          "3",
+          "{\"complexity\":0,\"cognitive\":0,\"loop_count\":0,\"loop_depth\":0,\"self_recursive\":false,\"param_count\":1,\"max_access_depth\":0,\"linear_scan_in_loop\":0,\"alloc_in_loop\":0,\"recursion_in_loop\":false,\"unguarded_recursion\":false,\"lines\":4,\"is_exported\":true,\"is_test\":false,\"is_entry_point\":true,\"signature\":\"(orderId: string)\",\"return_type\":\": string\",\"param_names\":[\"orderId\"],\"bt\":\"receipt placeOrder orderId\",\"transitive_loop_depth\":0,\"recursive\":false,\"importance\":0.000000}"
+        ],
+        [
+          "1",
+          "[\"Project\"]",
+          "concordia-fixture-viewcurrency",
+          "concordia-fixture-viewcurrency",
+          "{}",
+          "0",
+          "{}"
+        ],
+        [
+          "2",
+          "[\"Branch\"]",
+          "main",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "{\"is_git\":true,\"is_worktree\":false,\"is_detached\":false,\"root_exists\":true,\"canonical_root\":\"/tmp/concordia-record-viewcurrency\",\"worktree_root\":\"/tmp/concordia-record-viewcurrency\",\"git_common_dir\":\".git\",\"branch\":\"main\",\"head_sha\":\"073fb910369f4b4822b7ebbd65ae2448e01105b4\",\"base_sha\":\"\"}"
+        ]
+      ],
+      "total": 72,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4b784d6a5a8acb67a0938fe9fd07272e60b5ac8399eaa889f647c98d098ab5f2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4c4c35ef945e963a6818ce0586193a4b7219794ff6b08eeaf39b10222b72d104": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "17",
+          "63",
+          "{\"local_name\":\"charge\"}"
+        ],
+        [
+          "17",
+          "63",
+          "{\"local_name\":\"Charge\"}"
+        ],
+        [
+          "20",
+          "66",
+          "{\"local_name\":\"placeOrder\"}"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4d0dde1b332b789f223cd161cf008ee6d989a22d0eef3a8c3496e01a16b29dfb": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "6"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "4d32f96df84cd7d459ae2dfdb7936ffb02b3b217d26113788fc8119d5cbe8284": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "8"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "5329f212a9a16418008b2ac64a12092b8c6d1054cd02df2c0f0b5c46536d44e7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "53870f1fae76938919161ce7aadacfb40f0b1d7c7f7915b02501e38c0c9309dd": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "57dfb8cdb0154c2cc5a3d1dafeef194594d59738cf284628552b2399bcee1f90": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 5,
+      "rows": [
+        [
+          "68",
+          "67",
+          "{\"callee\":\"price\",\"confidence\":0.95,\"strategy\":\"lsp_ts_local\",\"candidates\":1,\"line\":8,\"args\":[{\"i\":0,\"e\":\"items\"}]}"
+        ],
+        [
+          "69",
+          "68",
+          "{\"callee\":\"validate\",\"confidence\":0.95,\"strategy\":\"lsp_ts_local\",\"candidates\":1,\"line\":12,\"args\":[{\"i\":0,\"e\":\"items\"}]}"
+        ],
+        [
+          "69",
+          "65",
+          "{\"callee\":\"charge\",\"confidence\":0.95,\"strategy\":\"lsp_ts_import\",\"candidates\":1,\"line\":13,\"args\":[{\"i\":0,\"e\":\"orderId\"},{\"i\":1,\"e\":\"price(items)\"}]}"
+        ],
+        [
+          "69",
+          "67",
+          "{\"callee\":\"price\",\"confidence\":0.95,\"strategy\":\"lsp_ts_local\",\"candidates\":1,\"line\":13,\"args\":[{\"i\":0,\"e\":\"items\"}]}"
+        ],
+        [
+          "71",
+          "69",
+          "{\"callee\":\"placeOrder\",\"confidence\":0.95,\"strategy\":\"lsp_ts_import\",\"candidates\":1,\"line\":4,\"args\":[{\"i\":0,\"e\":\"orderId\"},{\"i\":1,\"e\":\"[1200, 350]\"}]}"
+        ]
+      ],
+      "total": 5,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "5c44280817a13e7aaeaaa59bcae064cb27db9736863b9bdc28815f7eeb117863": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.base_sha",
+        "r.branch",
+        "r.canonical_root",
+        "r.git_common_dir",
+        "r.head_sha",
+        "r.is_detached",
+        "r.is_git",
+        "r.is_worktree",
+        "r.root_exists",
+        "r.worktree_root"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1",
+          "[\"Project\"]",
+          "concordia-fixture-viewcurrency",
+          "{}",
+          "0",
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "true",
+          "main",
+          "/tmp/concordia-record-viewcurrency",
+          ".git",
+          "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+          "false",
+          "true",
+          "false",
+          "true",
+          "/tmp/concordia-record-viewcurrency"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "5d9e20e1fd01be8b675885df54f1050fa454d92f30d617bb2bfbbcfc31e2b2aa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "5fef5469fa0025fda455149380f503d1ef1a66d332a3ca145bdfd966ba514996": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "61eafa82238e9027b333cd46625eecccaf7a0f26b688c01fa9c05eb13aa9a174": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "623d84d43e0e580a4d1eff58993207c47bf281b18a7f17341fd6a6b351b002c7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "62eb3b4b87ea8976d20f9b1877d0b8342287ec84f36c20b7893b6f5e64eb8590": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "63d6c08cbffb2a810edf4b514afbeffc3913bdf012396d82d4b399ab7d42b03b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "63f3aa93d2efa35ee04f8e22a8fc39467098d46d930593f56cc71b8d7cc60efb": {
+      "columns": [
+        "id(n)",
+        "labels(n)",
+        "n.qualified_name",
+        "n.file_path",
+        "n.start_line"
+      ],
+      "has_more": false,
+      "returned": 9,
+      "rows": [
+        [
+          "49",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.web",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "50",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.orders",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "52",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.customer",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "53",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13"
+        ],
+        [
+          "55",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.billing",
+          "docs/architecture.md",
+          "14"
+        ],
+        [
+          "56",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.db",
+          "docs/architecture.md",
+          "15"
+        ],
+        [
+          "61",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.customer",
+          "docs/drafts/context.md",
+          "7"
+        ],
+        [
+          "62",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.web",
+          "docs/drafts/context.md",
+          "7"
+        ]
+      ],
+      "total": 9,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "681e22650fc7c91de366c2f3c9284c70736eea68253dada695358c328b83aa3a": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "2"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "684c0c1dba82a15a647b0fc705958de726f19448e50e83d8ca4648f6cf99ae1e": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "6be2d915453eb30c9e43e1f1fe287b8f1413d126521e011f99cfd75da1c02eba": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "6d2438b6439fa71a4c43d7f4b890b03afc1d3b2bc605f1193a1ac98ff6a919c0": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "6ee89b861ae461a8b6d99df7937406cc6752b59b487fa76a24af16a282782265": {
+      "columns": [
+        "id(n)",
+        "properties(n)"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "48",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"place order\",\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers\",\"format\":\"mermaid\",\"diagram_kind\":\"sequence\"}"
+        ],
+        [
+          "51",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"docstring\":\"Customer; Web App; Orders API; HTTPS; Billing; HTTPS; Orders DB; TCP\",\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers\",\"format\":\"mermaid\",\"diagram_kind\":\"flowchart\"}"
+        ],
+        [
+          "60",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context\",\"format\":\"mermaid\",\"diagram_kind\":\"flowchart\"}"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "70cc8a0eadd97e1503a33bacfba17c8fa8605a9bcdd0ba0bd30947084c5eacc3": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "77014dde91a7b50eee12bce4fdaf3eab2fc8716b0451afb42e46929d574cec79": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7924f3bed2ddd8415c4d12064b7131d01455c42b865358bf834cd730f4b527fa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7a7a5fa9ff4ffa5db43168ae6ebb6b7ffda62d1b1d3a2a5dc409607cdb9467aa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7c59a353c153551519dbba062ad0f5beccf21d2ea111739b2c1d054e1417715d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7ce5621356f53c05bc8f3aae0c0cb7072cf70d9525a4763474362aa76f7c802d": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7dcb92c12a6ce040aa8d11c765c3d38afff16461291d3512489d87c2e4793894": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "7dd9ea6cf9d7fe49fca740234d5dbc816dc65bf82307b5f5563a0132241f9e45": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "837ec83fb8104158222c81bc8fb6bc73d1a0f0247cf1fc2b1e519d36624c0ded": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "88552b54fc2453303d8a443d8b8bba8d9f51830075a87ce73363ef40bd85d8fb": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "89221cdbe4ba2c90689c5fb414cbc060a2fa58955bfeaf6c322a3fd941b856cd": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "89f220bb1fd9510d5e0b35ec9b2c955b54cd7daf91a9df25f98bd948df162170": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "90307b3767e4d77e1b65b00b3444c84bf87414c536a843d1facf5ab77ef08954": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "90e4ce1cecabf8dbf071a2354c1ad4ddc2a3705a208fb7a9ec737dd4822aacd2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "90e6126d7646239732a6fee329481777234b6d410ccb5f3faa643be1b1bddbc1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9146fbd05daeb9aea2a826775ba970b4dcf42b68e0a7b2e168f350cdb3973939": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9226de97d35a8c78f08d018447733c69051192602e480b4585e33f972e6582b9": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "926a2b05616978e3599134f0527482d4383bc4cc75487e5a3159f4c492e35325": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "977260e189343d7bf7539c65258b1283116d0ec4a17125473543599e9fe92bd2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9b4d401ecc1a33a34b77b09d5ff8723ecb930857f679b14be68134ed98b35e66": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9df255d468031c1cd553e4a7c16ba89cccee7ed0e911e65d9d350fe323baf6be": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "9f4b645a8e9fa77b912e58b08b440a055f04947e26540d3dda6e141b7a58fa9f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a3c0a5719460d68fff5a0f469650f134a1bffa199b77096becf46bd158e1a85d": {
+      "columns": [
+        "COUNT(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a9061065a28ed406829bfe93a8580c4273a44c717c7f2000e7d69361a6861282": {
+      "columns": [
+        "COUNT(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "9"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "a951117137e977b17ad3213564ba6c11cc0fe24f3c6bc41b675ef367b299bb9b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "abc7deafc2471efdbfc14143abd589f61b7ee78365c78457e1060f557f9d806b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "3"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ae505571a676709a3598d9fa0a8fbda47c42e23f0d4f3bc3b1349af4a19d943a": {
+      "columns": [
+        "f.file_path"
+      ],
+      "has_more": false,
+      "returned": 9,
+      "rows": [
+        [
+          "concordia.yaml"
+        ],
+        [
+          "architecture/shop.calm.json"
+        ],
+        [
+          "bindings/concordia.bindings.yaml"
+        ],
+        [
+          "docs/context.md"
+        ],
+        [
+          "docs/architecture.md"
+        ],
+        [
+          "docs/drafts/context.md"
+        ],
+        [
+          "services/billing/src/billing.ts"
+        ],
+        [
+          "services/orders/src/orders.ts"
+        ],
+        [
+          "services/web/src/main.ts"
+        ]
+      ],
+      "total": 9,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "af62d5305e89424a128e52cf0340cf93bde88ace537e6e04e2c17773b259cee5": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "5"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b375ea7a27d771605939bab03049b06ff41500638344194aeef4b864f80863f7": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b3fe0ca1383dd2bfafe3d408b5a186cdde47c3dc394c757d0e099ffff963564f": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 7,
+      "rows": [
+        [
+          "9",
+          "12",
+          "{}"
+        ],
+        [
+          "16",
+          "19",
+          "{}"
+        ],
+        [
+          "16",
+          "22",
+          "{}"
+        ],
+        [
+          "2",
+          "5",
+          "{}"
+        ],
+        [
+          "2",
+          "7",
+          "{}"
+        ],
+        [
+          "2",
+          "9",
+          "{}"
+        ],
+        [
+          "2",
+          "16",
+          "{}"
+        ]
+      ],
+      "total": 7,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b4490593bced81f6bc71cbcaee712cea4fd2a0fbec9c9b3c200374c588da9010": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1",
+          "2",
+          "{\"is_git\":true,\"is_worktree\":false,\"is_detached\":false,\"root_exists\":true,\"canonical_root\":\"/tmp/concordia-record-viewcurrency\",\"worktree_root\":\"/tmp/concordia-record-viewcurrency\",\"git_common_dir\":\".git\",\"branch\":\"main\",\"head_sha\":\"073fb910369f4b4822b7ebbd65ae2448e01105b4\",\"base_sha\":\"\"}"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b990d375c429e2db959fd0a485149081ca3c04bc78719e555819dcb72082331f": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.local_name"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "63",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing",
+          "services/billing/src/billing.ts",
+          "1",
+          "charge"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "63",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing",
+          "services/billing/src/billing.ts",
+          "1",
+          "Charge"
+        ],
+        [
+          "20",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.ts.__file__",
+          "services/web/src/main.ts",
+          "0",
+          "66",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders",
+          "services/orders/src/orders.ts",
+          "1",
+          "placeOrder"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "b9c8ec898930827f72743cc0f998a4aa6cb2cb0e35da9aad098d659cbc5f53c0": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ba6b2efb5efed58bebda96e4852fb0c928d3f83336efe30b8ee41162365908fa": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "bd650d19cf940849b5775c02e33654a20cec415aabeea3cc129333c60bf0e454": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "be29828796449e99f4bc9bddaf8984ab20d8fcc00e9f2f610f64fd170e003e73": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c1066bfccb9a7c3e2c7643ebd2db56d9cf5cf96dd5bd8c3df1369f02783cd362": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c1a9af71195c96ea513f51575a52d1b616ef801ee3e05e1bbaa675b54904c4db": {
+      "columns": [
+        "id(n)",
+        "labels(n)",
+        "n.qualified_name",
+        "n.file_path",
+        "n.start_line"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "48",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5"
+        ],
+        [
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10"
+        ],
+        [
+          "60",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c262207a3ac16c20a30ffbf7c1de8d42cd56675ddfedf8eb1db3b190e0aafd01": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "3",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c2e01f193e51097fc963773a645a584d631a2390240f562135f5ba3d8667b085": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c3b67f690590ca530ce3b3757df7180abd65905798e72a1ed29071ba06b9118f": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c4f9fcba0d036682331999cab3739c6596a2e263054bdf94ae92203a570a8ad5": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "c858106803e4a3bd37bb7f7b2fd61f02b215c23c3d8fd795afd08831371c585b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ca0ce1c58982a614c3f51373c264a016dd676ff4e81583915336c76244365bda": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "cc248851e97ee8fdea416424abe85d4852ecc0c8eb4010e1e5fbb740d9ef0396": {
+      "columns": [
+        "id(a)",
+        "id(b)",
+        "properties(r)"
+      ],
+      "has_more": false,
+      "returned": 9,
+      "rows": [
+        [
+          "5",
+          "4",
+          "{}"
+        ],
+        [
+          "7",
+          "6",
+          "{}"
+        ],
+        [
+          "9",
+          "8",
+          "{}"
+        ],
+        [
+          "9",
+          "10",
+          "{}"
+        ],
+        [
+          "12",
+          "11",
+          "{}"
+        ],
+        [
+          "14",
+          "13",
+          "{}"
+        ],
+        [
+          "18",
+          "17",
+          "{}"
+        ],
+        [
+          "21",
+          "20",
+          "{}"
+        ],
+        [
+          "2",
+          "3",
+          "{}"
+        ]
+      ],
+      "total": 9,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "cf773ccfac1707c31d31eb6cb5629c04042968e8d50cde3d23cf0bad03bea2fd": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d0572e6ef7c3d142da53e0180536ccafd21ce14569508064dbe072eb7ed538ea": {
+      "columns": [
+        "id(n)",
+        "properties(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "72",
+          "{\"source\":\"k8s\",\"group\":\"concordia.io\",\"kind\":\"Workspace\",\"version\":\"v1alpha1\",\"obj_key\":\"concordia.io/Workspace/?/shop-views\"}"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d08947fe0d07b3aa81af186f6148e82cdcfe980d3dcaa69d5e3dc76aeaa2a855": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 50,
+      "rows": [
+        [
+          "3",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0",
+          "23",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.concordia",
+          "concordia.yaml",
+          "1"
+        ],
+        [
+          "3",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.concordia.yaml.__file__",
+          "concordia.yaml",
+          "0",
+          "72",
+          "[\"Resource\"]",
+          "concordia-fixture-viewcurrency.concordia.yaml::concordia.io/Workspace/-/shop-views",
+          "concordia.yaml",
+          "1"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "24",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm",
+          "architecture/shop.calm.json",
+          "1"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "25",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.relationships",
+          "architecture/shop.calm.json",
+          "11"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "26",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.nodes",
+          "architecture/shop.calm.json",
+          "24"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "27",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.$schema",
+          "architecture/shop.calm.json",
+          "2"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "28",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.description",
+          "architecture/shop.calm.json",
+          "14"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "29",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.name",
+          "architecture/shop.calm.json",
+          "9"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "30",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.node-type",
+          "architecture/shop.calm.json",
+          "9"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "31",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.unique-id",
+          "architecture/shop.calm.json",
+          "37"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "32",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.relationship-type",
+          "architecture/shop.calm.json",
+          "39"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "33",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.composed-of",
+          "architecture/shop.calm.json",
+          "16"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "34",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.container",
+          "architecture/shop.calm.json",
+          "17"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "35",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.interacts",
+          "architecture/shop.calm.json",
+          "24"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "36",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.actor",
+          "architecture/shop.calm.json",
+          "24"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "37",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.protocol",
+          "architecture/shop.calm.json",
+          "38"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "38",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.connects",
+          "architecture/shop.calm.json",
+          "39"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "39",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.destination",
+          "architecture/shop.calm.json",
+          "39"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "40",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.source",
+          "architecture/shop.calm.json",
+          "39"
+        ],
+        [
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0",
+          "41",
+          "[\"Variable\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.node",
+          "architecture/shop.calm.json",
+          "39"
+        ],
+        [
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.bindings.concordia.bindings.yaml.__file__",
+          "bindings/concordia.bindings.yaml",
+          "0",
+          "42",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.bindings.concordia.bindings",
+          "bindings/concordia.bindings.yaml",
+          "1"
+        ],
+        [
+          "8",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.context.md.__file__",
+          "docs/context.md",
+          "0",
+          "43",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.docs.context",
+          "docs/context.md",
+          "1"
+        ],
+        [
+          "8",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.context.md.__file__",
+          "docs/context.md",
+          "0",
+          "44",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.context.Shop-context",
+          "docs/context.md",
+          "3"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "45",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.docs.architecture",
+          "docs/architecture.md",
+          "1"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "46",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-architecture",
+          "docs/architecture.md",
+          "1"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "47",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers",
+          "docs/architecture.md",
+          "3"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "48",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "49",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.web",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "50",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1.orders",
+          "docs/architecture.md",
+          "7"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "52",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.customer",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "53",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.web",
+          "docs/architecture.md",
+          "12"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "54",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.orders",
+          "docs/architecture.md",
+          "13"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "55",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.billing",
+          "docs/architecture.md",
+          "14"
+        ],
+        [
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0",
+          "56",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2.db",
+          "docs/architecture.md",
+          "15"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "57",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context",
+          "docs/drafts/context.md",
+          "1"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "58",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft",
+          "docs/drafts/context.md",
+          "1"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "59",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context",
+          "docs/drafts/context.md",
+          "3"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "60",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "61",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.customer",
+          "docs/drafts/context.md",
+          "7"
+        ],
+        [
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0",
+          "62",
+          "[\"DiagramElement\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1.web",
+          "docs/drafts/context.md",
+          "7"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.ts.__file__",
+          "services/billing/src/billing.ts",
+          "0",
+          "63",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing",
+          "services/billing/src/billing.ts",
+          "1"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.ts.__file__",
+          "services/billing/src/billing.ts",
+          "0",
+          "64",
+          "[\"Interface\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.Charge",
+          "services/billing/src/billing.ts",
+          "1"
+        ],
+        [
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.ts.__file__",
+          "services/billing/src/billing.ts",
+          "0",
+          "65",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.charge",
+          "services/billing/src/billing.ts",
+          "6"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "66",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders",
+          "services/orders/src/orders.ts",
+          "1"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "67",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.price",
+          "services/orders/src/orders.ts",
+          "3"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "68",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.validate",
+          "services/orders/src/orders.ts",
+          "7"
+        ],
+        [
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0",
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11"
+        ],
+        [
+          "20",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.ts.__file__",
+          "services/web/src/main.ts",
+          "0",
+          "70",
+          "[\"Module\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main",
+          "services/web/src/main.ts",
+          "1"
+        ],
+        [
+          "20",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.ts.__file__",
+          "services/web/src/main.ts",
+          "0",
+          "71",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.checkout",
+          "services/web/src/main.ts",
+          "3"
+        ]
+      ],
+      "total": 50,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d11f7e2b924f6348b655fb80eea79774e1041df52429eeb99ba57b58cf7027a6": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 4,
+      "rows": [
+        [
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "5",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.architecture",
+          "architecture",
+          "0"
+        ],
+        [
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "7",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.bindings",
+          "bindings",
+          "0"
+        ],
+        [
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "9",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs",
+          "docs",
+          "0"
+        ],
+        [
+          "2",
+          "[\"Branch\"]",
+          "concordia-fixture-viewcurrency.__branch__.main",
+          "{}",
+          "0",
+          "16",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services",
+          "services",
+          "0"
+        ]
+      ],
+      "total": 4,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d3eba32ce3055387c757cbd474ffd7e0eb44491afa28052637413369f74e2ff2": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d48a7b15072002f20ac4308a17bd76abca439bf5db8eb99484a67bd8884c5596": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d681687ac7f8e15e19ad1fe2b49eb31b9c59e32fd02c808ab93cbfc44fb224cd": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d796f0355e4c8a6093a464f446df9887cc10823ad54b99f8151f98d249732c1f": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 8,
+      "rows": [
+        [
+          "5",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.architecture",
+          "architecture",
+          "0",
+          "4",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.architecture.shop.calm.json.__file__",
+          "architecture/shop.calm.json",
+          "0"
+        ],
+        [
+          "7",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.bindings",
+          "bindings",
+          "0",
+          "6",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.bindings.concordia.bindings.yaml.__file__",
+          "bindings/concordia.bindings.yaml",
+          "0"
+        ],
+        [
+          "9",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs",
+          "docs",
+          "0",
+          "8",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.context.md.__file__",
+          "docs/context.md",
+          "0"
+        ],
+        [
+          "9",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs",
+          "docs",
+          "0",
+          "10",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.md.__file__",
+          "docs/architecture.md",
+          "0"
+        ],
+        [
+          "12",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.docs.drafts",
+          "docs/drafts",
+          "0",
+          "11",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.md.__file__",
+          "docs/drafts/context.md",
+          "0"
+        ],
+        [
+          "14",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services.billing.src",
+          "services/billing/src",
+          "0",
+          "13",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.ts.__file__",
+          "services/billing/src/billing.ts",
+          "0"
+        ],
+        [
+          "18",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services.orders.src",
+          "services/orders/src",
+          "0",
+          "17",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.ts.__file__",
+          "services/orders/src/orders.ts",
+          "0"
+        ],
+        [
+          "21",
+          "[\"Folder\"]",
+          "concordia-fixture-viewcurrency.services.web.src",
+          "services/web/src",
+          "0",
+          "20",
+          "[\"File\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.ts.__file__",
+          "services/web/src/main.ts",
+          "0"
+        ]
+      ],
+      "total": 8,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d8b4de13466362abe5584406303d0f3e49e931f735eb05dc52d423af9088cac1": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "d9a9a45d22bd78a5d64d074e94745778b9df15f7054b1058d4c401f082f88c1b": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "de27fc29e7203c43062a2fda991db71196b0565d640952db92072a48c4f3c703": {
+      "columns": [
+        "COUNT(n)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "1"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e02ec66142a752d04fa239bc81161035930a5c13edaf2f9514a5891f46fa7588": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e0be245fb561e213bf66c48ead90ba3f2d1d8b55a1d5fd89f17589250404f6e3": {
+      "columns": [
+        "id(n)",
+        "properties(n)",
+        "n.name"
+      ],
+      "has_more": false,
+      "returned": 9,
+      "rows": [
+        [
+          "49",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1\",\"element_id\":\"web\",\"element_kind\":\"participant\"}",
+          "web"
+        ],
+        [
+          "50",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1\",\"element_id\":\"orders\",\"element_kind\":\"participant\"}",
+          "orders"
+        ],
+        [
+          "52",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"customer\",\"element_kind\":\"node\"}",
+          "Customer"
+        ],
+        [
+          "53",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"web\",\"element_kind\":\"node\"}",
+          "Web App"
+        ],
+        [
+          "54",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"orders\",\"element_kind\":\"node\"}",
+          "Orders API"
+        ],
+        [
+          "55",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"billing\",\"element_kind\":\"node\"}",
+          "Billing"
+        ],
+        [
+          "56",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2\",\"element_id\":\"db\",\"element_kind\":\"node\"}",
+          "Orders DB"
+        ],
+        [
+          "61",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1\",\"element_id\":\"customer\",\"element_kind\":\"node\"}",
+          "customer"
+        ],
+        [
+          "62",
+          "{\"complexity\":0,\"lines\":0,\"is_exported\":false,\"is_test\":false,\"is_entry_point\":false,\"parent_class\":\"concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1\",\"element_id\":\"web\",\"element_kind\":\"node\"}",
+          "web"
+        ]
+      ],
+      "total": 9,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "e4817fa26a6e0e35599dc669871643b27982e1ff5bd560b5cbefb3a89b296f57": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ef2e57fd928c92414f053b15bb6525b4bfaa531c4b23ff23a4dd7077db4051c0": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "returned": 1,
+      "rows": [
+        [
+          "4"
+        ]
+      ],
+      "total": 1,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "effa0a1013b5675c4c5e054499dad67cc079c544e42faa77661c3a5c37cc7470": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f0e551aa7e13e19a6f2b7f2976f8e780acec5fe9dee195c417eb73de1d7f9756": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f228264ae53557ea18506c730d36b6f9a9a6fd8e4d2995b9492b5d509c80ea93": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f2773fdb889f13abfa627b1599876b3b46e0db7dc02b9acbbbbd4d708776c9b4": {
+      "adr_hint": "Project indexed. Consider creating an Architecture Decision Record: explore the codebase with get_architecture(aspects=['all']), then use manage_adr(mode='update') to persist architectural insights across sessions.",
+      "adr_present": false,
+      "artifact_present": false,
+      "edges": 95,
+      "excluded": {
+        "count": 1,
+        "dirs": [
+          ".git"
+        ],
+        "truncated": false
+      },
+      "expected_edges": 95,
+      "expected_nodes": 72,
+      "nodes": 72,
+      "not_indexed_files": {
+        "count": 2,
+        "files": [
+          {
+            "path": "docs/context.png",
+            "reason": "ignored-suffix"
+          },
+          {
+            "path": "docs/context-depicted.png",
+            "reason": "ignored-suffix"
+          }
+        ],
+        "note": "Excluded by design (gitignore/.cbmignore/skip-lists); examples only — full list in 'logfile'.",
+        "truncated": false
+      },
+      "not_indexed_files_count": 2,
+      "parse_partial_count": 0,
+      "parse_unusable_count": 0,
+      "project": "concordia-fixture-viewcurrency",
+      "skipped_count": 0,
+      "status": "indexed"
+    },
+    "f397149060d292d1b170c6aab8840b58c428f4e084394e15fcdeec37ec5e2cbc": {
+      "adr_hint": "Project indexed. Consider creating an Architecture Decision Record: explore the codebase with get_architecture(aspects=['all']), then use manage_adr(mode='update') to persist architectural insights across sessions.",
+      "adr_present": false,
+      "artifact_present": false,
+      "edges": 95,
+      "excluded": {
+        "count": 2,
+        "dirs": [
+          ".git",
+          "docs"
+        ],
+        "truncated": false
+      },
+      "nodes": 72,
+      "not_indexed_files_count": 0,
+      "parse_partial_count": 0,
+      "parse_unusable_count": 0,
+      "project": "concordia-fixture-viewcurrency",
+      "skipped_count": 0,
+      "status": "indexed"
+    },
+    "f4b3cd55ca466fe5b0667d11fd649a2783252ab583f51f1b00cb55ab0030a758": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "f9eb06e2ebd106466b1016f6f3bc48276f7dd3986566173c31e87322d8689e78": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "fa1170b100b9db0bfbd11ca1a01bf46ae247359edd3bbb670436be57dc1927ac": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "fa68b934339934e45913062b18a507e3724439916c9ecc2b5c23f7e4274e1bf8": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line",
+        "r.args",
+        "r.callee",
+        "r.candidates",
+        "r.confidence",
+        "r.line",
+        "r.strategy"
+      ],
+      "has_more": false,
+      "returned": 5,
+      "rows": [
+        [
+          "68",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.validate",
+          "services/orders/src/orders.ts",
+          "7",
+          "67",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.price",
+          "services/orders/src/orders.ts",
+          "3",
+          "[{\"i\":0,\"e\":\"items\"}]",
+          "price",
+          "1",
+          "0.95",
+          "8",
+          "lsp_ts_local"
+        ],
+        [
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "68",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.validate",
+          "services/orders/src/orders.ts",
+          "7",
+          "[{\"i\":0,\"e\":\"items\"}]",
+          "validate",
+          "1",
+          "0.95",
+          "12",
+          "lsp_ts_local"
+        ],
+        [
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "65",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.billing.src.billing.charge",
+          "services/billing/src/billing.ts",
+          "6",
+          "[{\"i\":0,\"e\":\"orderId\"},{\"i\":1,\"e\":\"price(items)\"}]",
+          "charge",
+          "1",
+          "0.95",
+          "13",
+          "lsp_ts_import"
+        ],
+        [
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "67",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.price",
+          "services/orders/src/orders.ts",
+          "3",
+          "[{\"i\":0,\"e\":\"items\"}]",
+          "price",
+          "1",
+          "0.95",
+          "13",
+          "lsp_ts_local"
+        ],
+        [
+          "71",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.web.src.main.checkout",
+          "services/web/src/main.ts",
+          "3",
+          "69",
+          "[\"Function\"]",
+          "concordia-fixture-viewcurrency.services.orders.src.orders.placeOrder",
+          "services/orders/src/orders.ts",
+          "11",
+          "[{\"i\":0,\"e\":\"orderId\"},{\"i\":1,\"e\":\"[1200, 350]\"}]",
+          "placeOrder",
+          "1",
+          "0.95",
+          "4",
+          "lsp_ts_import"
+        ]
+      ],
+      "total": 5,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "fe180ff574d128ffbaa36f01be1082a29dfe4dc97b970d3a56982290bcd659d1": {
+      "columns": [
+        "id(a)",
+        "labels(a)",
+        "a.qualified_name",
+        "a.file_path",
+        "a.start_line",
+        "id(b)",
+        "labels(b)",
+        "b.qualified_name",
+        "b.file_path",
+        "b.start_line"
+      ],
+      "has_more": false,
+      "returned": 3,
+      "rows": [
+        [
+          "47",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers",
+          "docs/architecture.md",
+          "3",
+          "48",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-1",
+          "docs/architecture.md",
+          "5"
+        ],
+        [
+          "47",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers",
+          "docs/architecture.md",
+          "3",
+          "51",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.architecture.Shop-containers#diagram-2",
+          "docs/architecture.md",
+          "10"
+        ],
+        [
+          "59",
+          "[\"Section\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context",
+          "docs/drafts/context.md",
+          "3",
+          "60",
+          "[\"Diagram\"]",
+          "concordia-fixture-viewcurrency.docs.drafts.context.Draft-context#diagram-1",
+          "docs/drafts/context.md",
+          "5"
+        ]
+      ],
+      "total": 3,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ffcfc4690c646ead92629d3e5c48f742485465ce8a675bbe71839a9cdb4df64a": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    },
+    "ffff0fb73903c63f343936119c0c4b37e2d545cc00e5b07570c54eb74be981cf": {
+      "columns": [
+        "COUNT(r)"
+      ],
+      "has_more": false,
+      "hint": "Query returned no results. Use get_graph_schema() to see available labels and edge types.",
+      "returned": 0,
+      "rows": [],
+      "total": 0,
+      "total_relation": "eq",
+      "truncated": false
+    }
+  },
+  "headSha": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+  "version": "0.12.1"
+}

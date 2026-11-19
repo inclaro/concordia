@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug
+  namespace: payments
+  labels:
+    app: debug
+spec:
+  initContainers:
+    - name: migrate
+      image: registry.example.com/payments/migrate:3.1
+  containers:
+    - name: shell
+      image: registry:5000/tools/shell
+      ports:
+        - name: http
+          containerPort: 8080
+  ephemeralContainers:
+    - name: debugger
+      image: registry.example.com/tools/debugger@sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly
+  namespace: payments
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: nightly
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: report
+              image: registry.example.com/payments/report:1.0@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef

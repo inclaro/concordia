@@ -1,0 +1,275 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/prefixItems/0/anyOf",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-4": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/items",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'q' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'c' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/relationships/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/prefixItems/0",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/items",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "A choice declares both 'oneOf' and 'anyOf'. An element must satisfy both, so some alternatives can never be selected. Declare one keyword.",
+          "path": "/properties/nodes/items",
+          "rule": "pattern-choice-must-declare-one-keyword",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'queue' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

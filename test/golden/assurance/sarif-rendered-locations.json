@@ -1,0 +1,18 @@
+[
+  {
+    "rule": "ASR-PRV-001",
+    "uri": "assurance-render/production/deployment.yaml"
+  },
+  {
+    "rule": "ASR-PRV-001",
+    "uri": "assurance-render/production/deployment.yaml"
+  },
+  {
+    "rule": "ASR-PRV-002",
+    "uri": "assurance-render/production/deployment.yaml"
+  },
+  {
+    "rule": "ASR-PRV-002",
+    "uri": "assurance-render/production/deployment.yaml"
+  }
+]

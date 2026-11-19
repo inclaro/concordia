@@ -1,0 +1,116 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: shop-views
+architecture:
+  source: architecture/shop.calm.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: concordia-fixture-viewcurrency
+      root: .
+      include: [services/**, docs/**]
+  indexMode: fast
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+check:
+  minimumCoverage: 0.5
+  unknown: fail
+  failOn: error
+views:
+  # A15, A16: a generated container view. The declared projection is the diagram.
+  - id: shop-containers
+    kind: container
+    origin: generated
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: container
+    # The database has no code, so no binding: the necessary elements are the services.
+    coverage:
+      elements: [web-app, orders-service, billing-service]
+    output:
+      path: docs/architecture/views/shop-containers.dsl
+    projection:
+      edgeKinds: [imports, calls]
+    comparison:
+      against: [declared, observed]
+      minimumConfidence: syntactic
+  # A15: a generated system context view. Calls between the containers of the shop are inside one system.
+  - id: shop-context
+    kind: system-context
+    origin: generated
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: system
+    output:
+      path: docs/architecture/views/shop-context.dsl
+    projection:
+      edgeKinds: [imports, calls]
+    comparison:
+      against: [declared, observed]
+  # A17, A18: an authored Mermaid container diagram that has no methods. Its block sits in a section that holds
+  # a second diagram, so the provider ordinal of the block changes when the blocks swap places.
+  - id: shop-containers-diagram
+    kind: container
+    origin: authored
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: container
+    # The database has no code, so no binding: the necessary elements are the services.
+    coverage:
+      elements: [web-app, orders-service, billing-service]
+    source:
+      path: docs/architecture.md
+      format: mermaid
+      selector:
+        title: Shop containers
+    mapping:
+      elements:
+        customer: customer
+        web: web-app
+        orders: orders-service
+        billing: billing-service
+        db: orders-db
+    projection:
+      edgeKinds: [imports, calls]
+  # A14: a diagram that exists in the index workspace and not in the tracked revision.
+  - id: shop-draft
+    kind: system-context
+    origin: authored
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: system
+    source:
+      path: docs/drafts/context.md
+      format: mermaid
+      selector:
+        title: Draft context
+    mapping:
+      elements:
+        customer: customer
+        web: shop-system
+  # A19: an image with no structured source and no supplemental mapping.
+  - id: shop-context-image
+    kind: system-context
+    origin: authored
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: system
+    source:
+      path: docs/context.png
+      format: png
+  # A19: an image with a supplemental mapping that is bound to its digest.
+  - id: shop-context-depicted
+    kind: system-context
+    origin: authored
+    owner: team-shop
+    scope: [shop-system]
+    abstraction: system
+    source:
+      path: docs/context-depicted.png
+      format: png
+    mapping:
+      depicts:
+        digest: sha256:d3748985cf800f6a065299816d8da8ee2e45923500c49a5d6bae74541842bece
+        elements: [customer, shop-system]
+        relationships: [customer-uses-web]

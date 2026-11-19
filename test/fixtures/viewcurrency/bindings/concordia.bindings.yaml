@@ -1,0 +1,21 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  - id: bind-web
+    architectureRef: calm:node:web-app
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/web/**
+  - id: bind-orders
+    architectureRef: calm:node:orders-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/orders/**
+  - id: bind-billing
+    architectureRef: calm:node:billing-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/billing/**

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="concordia" tests="5" failures="5" errors="0" skipped="0">
+  <testsuite name="commerce-boundaries@1.0.0" tests="5" failures="5" errors="0" skipped="0">
+    <testcase classname="commerce-boundaries" name="CO-BND-001 Billing uses Fulfillment contracts only">
+      <failure type="violation" message="2 active finding(s)">sha256:25f9d6ecb5c1ad0d9cbc726971736b336ec19488cf5d2c4170069123eff9bf83 services/billing/src/InvoiceService.ts:6: forbidden dependency billing-service -&gt; fulfillment-service
+sha256:3e4b28753a077d4d956cd497b6f0573bd7fd5cc75c060395ea9940563a9c7230 services/billing/src/InvoiceService.ts: forbidden dependency billing-service -&gt; fulfillment-service</failure>
+    </testcase>
+    <testcase classname="commerce-boundaries" name="CO-COV-001 Legacy must not call Billing">
+      <failure type="unknown" message="CO-CON-021: minimum coverage not met: 0.500 &lt; 0.9">CO-CON-021: minimum coverage not met: 0.500 &lt; 0.9</failure>
+    </testcase>
+    <testcase classname="commerce-boundaries" name="CO-CYC-001 Services are acyclic">
+      <failure type="violation" message="1 active finding(s)">sha256:8158bf662ed067dc6dec7cd660d52b5abb36e5f46239fd0bfde87f884080ff73 services/billing/src/InvoiceService.ts:6: dependency cycle: billing-service -&gt; fulfillment-service -&gt; billing-service</failure>
+    </testcase>
+    <testcase classname="commerce-boundaries" name="CO-DECL-001 Dependencies are declared">
+      <failure type="violation" message="2 active finding(s)">sha256:91f4bf28af4367a34acf051e94dfa6728e1fd34a731be3a40824952409aadc56 services/fulfillment/src/notify.ts:4: undeclared dependency fulfillment-service -&gt; billing-service
+sha256:b31d8f09077bdfebc7e53a9f5af0d328a2f9dfeb40756b0d1f6174652019599a services/fulfillment/src/notify.ts: undeclared dependency fulfillment-service -&gt; billing-service</failure>
+    </testcase>
+    <testcase classname="commerce-boundaries" name="CO-LYR-001 Billing sits above Fulfillment">
+      <failure type="violation" message="1 active finding(s)">sha256:5ce282dfec1c0ccb99b0906aa987a3906684de2e0ea1d6c53a43ebb430203b28 services/fulfillment/src/notify.ts: layer violation: fulfillment-service (layer 1) depends on billing-service (layer 0)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

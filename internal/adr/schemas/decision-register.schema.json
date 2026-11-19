@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/decision-register.schema.json",
+  "title": "Concordia DecisionRegister",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["apiVersion", "kind", "decisions"],
+  "properties": {
+    "apiVersion": { "const": "concordia.io/v1alpha1" },
+    "kind": { "const": "DecisionRegister" },
+    "decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "subjectRef": {
+      "type": "string",
+      "pattern": "^calm:(node:[^/\\s]+|relationship:[^/\\s]+|interface:[^/\\s]+/[^/\\s]+)$"
+    },
+    "ruleRef": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)+@[^@/\\s]+/[^@/\\s]+$"
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "governsItem": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref"],
+          "properties": { "ref": { "$ref": "#/$defs/subjectRef" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["select"],
+          "properties": {
+            "select": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "calmNodes": { "$ref": "#/$defs/stringList" },
+                "nodeTypes": { "$ref": "#/$defs/stringList" },
+                "tags": { "$ref": "#/$defs/stringList" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "enforcedByItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "pack"],
+      "properties": {
+        "rule": { "$ref": "#/$defs/nonEmptyString" },
+        "pack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version"],
+          "properties": {
+            "id": { "$ref": "#/$defs/nonEmptyString" },
+            "version": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        }
+      }
+    },
+    "releasedItem": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ref", "reason"],
+          "properties": {
+            "ref": { "$ref": "#/$defs/subjectRef" },
+            "reason": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rule", "reason"],
+          "properties": {
+            "rule": { "$ref": "#/$defs/ruleRef" },
+            "reason": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        }
+      ]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "governs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "project": { "$ref": "#/$defs/nonEmptyString" },
+        "expect": { "enum": ["active", "historical"] },
+        "categories": { "$ref": "#/$defs/stringList" },
+        "governs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/governsItem" }
+        },
+        "enforcement": { "enum": ["required", "none"] },
+        "enforcedBy": { "type": "array", "items": { "$ref": "#/$defs/enforcedByItem" } },
+        "released": { "type": "array", "items": { "$ref": "#/$defs/releasedItem" } }
+      }
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Duplicate sequence-number 1 detected. path: /1/sequence-number",
+          "path": "/flows/flow/transitions",
+          "rule": "flow-transitions-have-unique-sequence-numbers",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Duplicate sequence-number 1 detected. path: /1/sequence-number",
+          "path": "/flows/flow/transitions",
+          "rule": "flow-transitions-have-unique-sequence-numbers",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/evidence/deployment-record/v1.schema.json",
+  "title": "Concordia deployment-record predicate v1",
+  "description": "The predicate of an in-toto Statement v1 with predicateType https://concordia.io/evidence/deployment-record/v1: one deployment of one container of one workload. The subject names the image digest of `digest`. The schema is open: Concordia ignores fields that it does not list and does not persist them. A missing required field makes the statement inadmissible with the detail `missing-field:<name>`.",
+  "type": "object",
+  "required": [
+    "environment",
+    "workload",
+    "container",
+    "digest",
+    "outcome",
+    "time",
+    "deployer"
+  ],
+  "properties": {
+    "environment": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "cluster": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "context": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "workload": {
+      "$ref": "#/$defs/workload"
+    },
+    "container": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "image": {
+      "type": "string",
+      "description": "The image reference as deployed."
+    },
+    "digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "outcome": {
+      "enum": [
+        "succeeded",
+        "failed"
+      ],
+      "description": "Only `succeeded` supports deployment-succeeded; `failed` gives a violation. Another value is inadmissible with `invalid-outcome`."
+    },
+    "time": {
+      "$ref": "#/$defs/time"
+    },
+    "deployer": {
+      "type": "string",
+      "pattern": "\\S"
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "cluster"
+      ],
+      "properties": {
+        "cluster": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    {
+      "required": [
+        "context"
+      ],
+      "properties": {
+        "context": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "workload": {
+      "type": "object",
+      "required": [
+        "namespace",
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "namespace": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "kind": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+:[0-9a-fA-F]+$",
+      "description": "`<algorithm>:<hex>`, for example `sha256:...`."
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 time."
+    }
+  }
+}

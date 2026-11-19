@@ -1,0 +1,30 @@
+# Binaries and shared libraries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+!test/golden/**/*.out
+
+# Go workspaces
+go.work
+go.work.sum
+
+# Local environment and generated output
+.env
+dist/
+build/
+.tmp/
+/.bin/
+mise.local.toml
+.concordia/
+.omp/
+
+# Not published: kept only in inclaro/concordia-internal
+/openspec
+/bench
+/record-cbm
+/calm-parity
+/concordia

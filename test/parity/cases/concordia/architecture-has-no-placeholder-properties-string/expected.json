@@ -1,0 +1,26 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/api/description",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

@@ -1,0 +1,2944 @@
+{
+  "areas": {
+    "adrGovernance": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "assessmentCurrency": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "conformance": {
+      "counts": {
+        "error": 0,
+        "findings": 11,
+        "notApplicable": 0,
+        "pass": 0,
+        "unknown": 1,
+        "violation": 4
+      },
+      "verdict": "violation"
+    },
+    "deploymentTrace": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "diagramCurrency": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "qualityEvaluation": {
+      "counts": {},
+      "verdict": "not-configured"
+    }
+  },
+  "controls": [
+    {
+      "controlId": "architecture-001",
+      "ruleIds": [
+        "CO-BND-001"
+      ],
+      "scope": {
+        "id": "billing-service",
+        "level": "node"
+      },
+      "verdict": "violation"
+    }
+  ],
+  "coverage": {
+    "crossCheck": {
+      "environments": [],
+      "filesChecked": 0,
+      "filesSkipped": []
+    },
+    "indexResults": [
+      {
+        "available": true,
+        "project": "golden-brownfield",
+        "record": {
+          "excludedDirs": [
+            ".concordia",
+            ".git",
+            "build"
+          ],
+          "graphGeneration": "cbm:golden-brownfield:b02c814bd3a1d584",
+          "notIndexedCount": 0,
+          "notIndexedFiles": [],
+          "parsePartial": [],
+          "parsePartialCount": 0,
+          "project": "golden-brownfield",
+          "sourceRevision": "9b491e6c586cd0cea8c7b7c9a05514abdf6d8612"
+        }
+      }
+    ],
+    "limits": {
+      "breaches": [],
+      "configured": {
+        "evidence": {
+          "maxFacts": 20000000
+        },
+        "graph": {
+          "maxEdges": 20000000,
+          "maxNodes": 5000000
+        },
+        "traversal": {
+          "maxVisited": 10000000
+        }
+      }
+    },
+    "predicates": [
+      {
+        "lossModes": [],
+        "predicate": "ambiguous-usage",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "base-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-applies-to-principal",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-refers-to-role",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "built-from",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-graphql",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-grpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-service",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-trpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configured-connection",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-access",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-read",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-set",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-helm-values",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-key-symbol",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "constructs",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "merged-occurrences"
+          }
+        ],
+        "predicate": "container-occurrence-versions",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "contains",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "copies-from-image",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "data-flows",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "defines",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deployment-workload-set",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deploys-artifact",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-arrow",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-identity",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dispatches-async",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "disruption-policy-target",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dockerfile-set",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "documentation-metadata",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "emits-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "file-changes-with",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "handles-route",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "implements",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "imports",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "includes-infrastructure",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "default-excluded-directory"
+          },
+          {
+            "id": "parse-partial"
+          },
+          {
+            "id": "raster-not-indexed"
+          }
+        ],
+        "predicate": "index-result",
+        "reasons": [
+          "family is partial in the capability profile"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "infrastructure-dependency",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "inherits",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "launches",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "listens-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "mentions",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "override-unsignalled"
+          }
+        ],
+        "predicate": "overrides",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "placed-in",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "policy-selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "reads",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-callable",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-certificate-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-configuration",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-storage",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "unrendered-template"
+          }
+        ],
+        "predicate": "rendered-templates",
+        "reasons": [
+          "family is partial in the capability profile"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "route-attaches-to-gateway",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "route-identity-unscoped"
+          }
+        ],
+        "predicate": "routes-to",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "scaling-target",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "semantically-related",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "similar-to",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "supersedes",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-runtime-identity",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-type",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "writes",
+        "reasons": [],
+        "scope": {
+          "project": "golden-brownfield"
+        },
+        "status": "complete",
+        "unresolved": 0
+      }
+    ],
+    "scopeFailures": [],
+    "skipReasons": {
+      "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+      "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+    },
+    "skipped": {
+      "endpointMissing": 0,
+      "outOfScope": 0,
+      "unbound": 2,
+      "unsupported": 1
+    }
+  },
+  "deploymentTrace": {
+    "environments": [],
+    "levels": [
+      {
+        "level": "declared",
+        "status": "evaluated"
+      },
+      {
+        "level": "rendered-or-evaluated",
+        "status": "not-available"
+      },
+      {
+        "level": "deployment-execution",
+        "status": "not-available"
+      },
+      {
+        "level": "runtime-observation",
+        "status": "not-available"
+      }
+    ],
+    "status": "not-configured",
+    "summary": {
+      "byStatus": {
+        "complete": 0,
+        "partial": 0,
+        "unknown": 0,
+        "unresolved": 0
+      },
+      "environments": 0,
+      "subjects": 0
+    },
+    "unresolvedEnvironmentActions": [],
+    "unresolvedEnvironmentWorkloads": []
+  },
+  "diagnostics": [
+    {
+      "code": "CO-EXC-006",
+      "message": "waiver expired: WV-1 (expired 2026-12-31)",
+      "severity": "warning"
+    },
+    {
+      "code": "CO-OBS-016",
+      "message": "native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)",
+      "severity": "warning"
+    }
+  ],
+  "exceptions": {
+    "orphanedWaivers": [],
+    "resolvedBaselineEntries": [],
+    "waivers": [
+      {
+        "expires": "2026-12-31",
+        "finding": "sha256:a26922d29928409536231c074ca000638bd358c73f2111f68f7e2a36d4a326c6",
+        "id": "WV-1",
+        "owner": "team-billing",
+        "reason": "Refund migration in progress",
+        "rule": "CO-BND-001",
+        "state": "expired"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "File",
+            "observedId": "cbm:golden-brownfield:24",
+            "qualifiedName": "services.billing.src.InvoiceService.ts.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:24",
+            "kind": "imports",
+            "location": {
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-brownfield:105"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-brownfield:105",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:1efd7ca9d4bf67534af113a43fa53900b6e8b59406c498f688c84a5f61bd9786",
+      "kind": "forbidden-dependency",
+      "location": {
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "imports edge (native IMPORTS, confidence syntactic) from services.billing.src.InvoiceService.ts.__file__ to services.fulfillment.src.internal.ShipmentStore at services/billing/src/InvoiceService.ts",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "imports",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "File",
+          "qualifiedName": "services.billing.src.InvoiceService.ts.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Module",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "resolved",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:lsp_ts_method"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:102",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        },
+        {
+          "edge": {
+            "confidence": "resolved",
+            "from": "cbm:golden-brownfield:102",
+            "kind": "calls",
+            "location": {
+              "line": 7,
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:lsp_ts_method",
+            "to": "cbm:golden-brownfield:107"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:107",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+            "startLine": 4
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:3f8c9c39703b27041ce8bb5f2a8c3e2f4bb7c3a8eaf9baac0d1a0bdcee90113a",
+      "kind": "forbidden-dependency",
+      "location": {
+        "line": 7,
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "calls edge (native CALLS, confidence resolved) from services.billing.src.InvoiceService.InvoiceService.issue to services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve at services/billing/src/InvoiceService.ts:7",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Method",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:import_map"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/Refund.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:99",
+            "qualifiedName": "services.billing.src.Refund.Refund.refund",
+            "startLine": 4
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:99",
+            "kind": "calls",
+            "location": {
+              "line": 5,
+              "path": "services/billing/src/Refund.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:import_map",
+            "to": "cbm:golden-brownfield:106"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-brownfield:106",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:61f9e65f0a620bfa9f3fc0625f6943f6b6f525c7ad83ec640ee0ec06b92fcf65",
+      "kind": "forbidden-dependency",
+      "location": {
+        "line": 5,
+        "path": "services/billing/src/Refund.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "calls edge (native CALLS, confidence syntactic) from services.billing.src.Refund.Refund.refund to services.fulfillment.src.internal.ShipmentStore.ShipmentStore at services/billing/src/Refund.ts:5",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/Refund.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.Refund.Refund.refund"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Class",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "expired-waiver",
+      "dispositionRef": "WV-1",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/Refund.ts",
+            "label": "File",
+            "observedId": "cbm:golden-brownfield:20",
+            "qualifiedName": "services.billing.src.Refund.ts.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:20",
+            "kind": "imports",
+            "location": {
+              "path": "services/billing/src/Refund.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-brownfield:105"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-brownfield:105",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:a26922d29928409536231c074ca000638bd358c73f2111f68f7e2a36d4a326c6",
+      "kind": "forbidden-dependency",
+      "location": {
+        "path": "services/billing/src/Refund.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "imports edge (native IMPORTS, confidence syntactic) from services.billing.src.Refund.ts.__file__ to services.fulfillment.src.internal.ShipmentStore at services/billing/src/Refund.ts",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "imports",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/Refund.ts",
+          "label": "File",
+          "qualifiedName": "services.billing.src.Refund.ts.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Module",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "active",
+      "dispositionRef": null,
+      "edge": {
+        "confidence": "resolved",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:lsp_ts_method"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/Refund.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:99",
+            "qualifiedName": "services.billing.src.Refund.Refund.refund",
+            "startLine": 4
+          }
+        },
+        {
+          "edge": {
+            "confidence": "resolved",
+            "from": "cbm:golden-brownfield:99",
+            "kind": "calls",
+            "location": {
+              "line": 6,
+              "path": "services/billing/src/Refund.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:lsp_ts_method",
+            "to": "cbm:golden-brownfield:107"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:107",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+            "startLine": 4
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:c2be32c8528410cd2422770669d2e6c82bd58bb4ff01360e01777519247c679c",
+      "kind": "forbidden-dependency",
+      "location": {
+        "line": 6,
+        "path": "services/billing/src/Refund.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "calls edge (native CALLS, confidence resolved) from services.billing.src.Refund.Refund.refund to services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve at services/billing/src/Refund.ts:6",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/Refund.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.Refund.Refund.refund"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Method",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:import_map"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:102",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:102",
+            "kind": "calls",
+            "location": {
+              "line": 6,
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:import_map",
+            "to": "cbm:golden-brownfield:106"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-brownfield:106",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "no dependency from billing-service to fulfillment-service",
+      "fingerprint": "sha256:d021e2b567a29f195262f7426788a8c73ab5c2ab3094f04bc073e3efec9cdcd2",
+      "kind": "forbidden-dependency",
+      "location": {
+        "line": 6,
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "forbidden dependency billing-service -> fulfillment-service",
+      "nextAction": "fix implementation",
+      "observed": "calls edge (native CALLS, confidence syntactic) from services.billing.src.InvoiceService.InvoiceService.issue to services.fulfillment.src.internal.ShipmentStore.ShipmentStore at services/billing/src/InvoiceService.ts:6",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      },
+      "target": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Class",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": null,
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:import_map"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:102",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:102",
+            "kind": "calls",
+            "location": {
+              "line": 6,
+              "path": "services/billing/src/InvoiceService.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:import_map",
+            "to": "cbm:golden-brownfield:106"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-brownfield:106",
+            "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+            "startLine": 1
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "Function",
+            "observedId": "cbm:golden-brownfield:104",
+            "qualifiedName": "services.fulfillment.src.notify.notifyShipped",
+            "startLine": 3
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:104",
+            "kind": "calls",
+            "location": {
+              "line": 4,
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:import_map",
+            "to": "cbm:golden-brownfield:101"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-brownfield:101",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+            "startLine": 4
+          }
+        }
+      ],
+      "expected": "no dependency cycle through billing-service",
+      "fingerprint": "sha256:eb3ce6eaed77ebcacaded87bd467e7c4457164971893488531fe9c50ce014103",
+      "kind": "cycle",
+      "location": {
+        "line": 6,
+        "path": "services/billing/src/InvoiceService.ts"
+      },
+      "message": "dependency cycle: billing-service -> fulfillment-service -> billing-service",
+      "nextAction": "fix implementation",
+      "observed": "calls edge (native CALLS, confidence syntactic) from services.billing.src.InvoiceService.InvoiceService.issue to services.fulfillment.src.internal.ShipmentStore.ShipmentStore at services/billing/src/InvoiceService.ts:6",
+      "owner": "team-billing",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [
+        {
+          "line": 4,
+          "path": "services/fulfillment/src/notify.ts"
+        }
+      ],
+      "ruleId": "CO-CYC-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service,fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/internal/ShipmentStore.ts",
+          "label": "Class",
+          "qualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": {
+        "class": "undeclared",
+        "from": "fulfillment-service",
+        "observedKinds": [
+          "calls",
+          "imports"
+        ],
+        "to": "billing-service"
+      },
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "File",
+            "observedId": "cbm:golden-brownfield:25",
+            "qualifiedName": "services.fulfillment.src.notify.ts.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:25",
+            "kind": "imports",
+            "location": {
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-brownfield:100"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-brownfield:100",
+            "qualifiedName": "services.billing.src.InvoiceService",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "an observed relationship from fulfillment-service to billing-service is declared in the architecture",
+      "fingerprint": "sha256:3fffacda49f047181b7a61e68c90a899dd83a834bfb70d9fc0c8c12c8bb72d47",
+      "kind": "undeclared",
+      "location": {
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "undeclared dependency fulfillment-service -> billing-service",
+      "nextAction": "correct intent",
+      "observed": "imports edge (native IMPORTS, confidence syntactic) from services.fulfillment.src.notify.ts.__file__ to services.billing.src.InvoiceService at services/fulfillment/src/notify.ts",
+      "owner": "team-fulfillment",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "imports",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "File",
+          "qualifiedName": "services.fulfillment.src.notify.ts.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Module",
+          "qualifiedName": "services.billing.src.InvoiceService"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": {
+        "class": "undeclared",
+        "from": "fulfillment-service",
+        "observedKinds": [
+          "calls",
+          "imports"
+        ],
+        "to": "billing-service"
+      },
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:import_map"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "Function",
+            "observedId": "cbm:golden-brownfield:104",
+            "qualifiedName": "services.fulfillment.src.notify.notifyShipped",
+            "startLine": 3
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:104",
+            "kind": "calls",
+            "location": {
+              "line": 4,
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:import_map",
+            "to": "cbm:golden-brownfield:101"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Class",
+            "observedId": "cbm:golden-brownfield:101",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+            "startLine": 4
+          }
+        }
+      ],
+      "expected": "an observed relationship from fulfillment-service to billing-service is declared in the architecture",
+      "fingerprint": "sha256:7e611dc4af8f3a4c117f08d9416eeb944e809beb5438403e43d0a1581cc68d6c",
+      "kind": "undeclared",
+      "location": {
+        "line": 4,
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "undeclared dependency fulfillment-service -> billing-service",
+      "nextAction": "correct intent",
+      "observed": "calls edge (native CALLS, confidence syntactic) from services.fulfillment.src.notify.notifyShipped to services.billing.src.InvoiceService.InvoiceService at services/fulfillment/src/notify.ts:4",
+      "owner": "team-fulfillment",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "Function",
+          "qualifiedName": "services.fulfillment.src.notify.notifyShipped"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Class",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": {
+        "class": "undeclared",
+        "from": "fulfillment-service",
+        "observedKinds": [
+          "calls",
+          "imports"
+        ],
+        "to": "billing-service"
+      },
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "resolved",
+        "kind": "calls",
+        "nativeKind": "CALLS",
+        "resolutionMethod": "cbm:CALLS:lsp_ts_method"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "Function",
+            "observedId": "cbm:golden-brownfield:104",
+            "qualifiedName": "services.fulfillment.src.notify.notifyShipped",
+            "startLine": 3
+          }
+        },
+        {
+          "edge": {
+            "confidence": "resolved",
+            "from": "cbm:golden-brownfield:104",
+            "kind": "calls",
+            "location": {
+              "line": 5,
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "CALLS",
+            "resolutionMethod": "cbm:CALLS:lsp_ts_method",
+            "to": "cbm:golden-brownfield:102"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Method",
+            "observedId": "cbm:golden-brownfield:102",
+            "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+            "startLine": 5
+          }
+        }
+      ],
+      "expected": "an observed relationship from fulfillment-service to billing-service is declared in the architecture",
+      "fingerprint": "sha256:d2939f8456785c42680b2a2b1f0229c488de6a97a99e87b4fc7046484950c298",
+      "kind": "undeclared",
+      "location": {
+        "line": 5,
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "undeclared dependency fulfillment-service -> billing-service",
+      "nextAction": "correct intent",
+      "observed": "calls edge (native CALLS, confidence resolved) from services.fulfillment.src.notify.notifyShipped to services.billing.src.InvoiceService.InvoiceService.issue at services/fulfillment/src/notify.ts:5",
+      "owner": "team-fulfillment",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "calls",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "Function",
+          "qualifiedName": "services.fulfillment.src.notify.notifyShipped"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Method",
+          "qualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue"
+        }
+      }
+    },
+    {
+      "area": "conformance",
+      "delta": {
+        "class": "undeclared",
+        "from": "fulfillment-service",
+        "observedKinds": [
+          "calls",
+          "imports"
+        ],
+        "to": "billing-service"
+      },
+      "disposition": "baselined",
+      "dispositionRef": "baseline",
+      "edge": {
+        "confidence": "syntactic",
+        "kind": "imports",
+        "nativeKind": "IMPORTS",
+        "resolutionMethod": "cbm:IMPORTS"
+      },
+      "enforcement": "mandatory",
+      "evidencePath": [
+        {
+          "node": {
+            "filePath": "services/fulfillment/src/notify.ts",
+            "label": "File",
+            "observedId": "cbm:golden-brownfield:25",
+            "qualifiedName": "services.fulfillment.src.notify.ts.__file__"
+          }
+        },
+        {
+          "edge": {
+            "confidence": "syntactic",
+            "from": "cbm:golden-brownfield:25",
+            "kind": "imports",
+            "location": {
+              "path": "services/fulfillment/src/notify.ts"
+            },
+            "nativeKind": "IMPORTS",
+            "resolutionMethod": "cbm:IMPORTS",
+            "to": "cbm:golden-brownfield:100"
+          }
+        },
+        {
+          "node": {
+            "filePath": "services/billing/src/InvoiceService.ts",
+            "label": "Module",
+            "observedId": "cbm:golden-brownfield:100",
+            "qualifiedName": "services.billing.src.InvoiceService",
+            "startLine": 1
+          }
+        }
+      ],
+      "expected": "fulfillment-service depends only on the layers that the architecture allows; billing-service is not one of them",
+      "fingerprint": "sha256:49a3eef0c407a991d8bf65e3cc018a43db027b37eb71f15b21df3f839b9857de",
+      "kind": "layer-violation",
+      "location": {
+        "path": "services/fulfillment/src/notify.ts"
+      },
+      "message": "layer violation: fulfillment-service (layer 1) depends on billing-service (layer 0)",
+      "nextAction": "fix implementation",
+      "observed": "imports edge (native IMPORTS, confidence syntactic) from services.fulfillment.src.notify.ts.__file__ to services.billing.src.InvoiceService at services/fulfillment/src/notify.ts",
+      "owner": "team-fulfillment",
+      "providerLimits": {
+        "families": [
+          {
+            "family": "imports",
+            "level": "supported",
+            "lossModes": [],
+            "maturity": "stable"
+          }
+        ],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [],
+      "relatedLocations": [],
+      "ruleId": "CO-LYR-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "fulfillment-service",
+        "observed": {
+          "filePath": "services/fulfillment/src/notify.ts",
+          "label": "File",
+          "qualifiedName": "services.fulfillment.src.notify.ts.__file__"
+        }
+      },
+      "target": {
+        "architectureId": "billing-service",
+        "observed": {
+          "filePath": "services/billing/src/InvoiceService.ts",
+          "label": "Module",
+          "qualifiedName": "services.billing.src.InvoiceService"
+        }
+      }
+    }
+  ],
+  "inputs": {
+    "architecture": {
+      "digest": "sha256:ef2752da507c415766b77eec2445793cb5a8168d137c14550a93788a7ae77bbd",
+      "path": "architecture/commerce.calm.json"
+    },
+    "baseline": {
+      "digest": "sha256:08097dbc29e799c07aa167ef80f7b6037b0f8e4fbb3c932dcc39e6abeb9defb0",
+      "path": "exceptions/concordia.baseline.json"
+    },
+    "bindings": [
+      {
+        "digest": "sha256:58d94f32527149cca0e1cd9a547d187961c99c06927b97b25a81c67d4539f942",
+        "path": "bindings/concordia.bindings.yaml"
+      }
+    ],
+    "decorators": [],
+    "environments": {
+      "digest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "excluded": [],
+      "selected": []
+    },
+    "indexResults": [
+      {
+        "digest": "sha256:6a078a219c633257c5896e160f7b731d88d24f644461814f1394daedbc6a331b",
+        "path": "build/concordia/index-result.json"
+      }
+    ],
+    "lock": {
+      "digest": "sha256:99e21da0ad1f7bad3520d57ae5725dc60c88470c84b59f77ab5344ba6d7648c5",
+      "path": ".concordia.lock"
+    },
+    "patterns": [],
+    "policies": [
+      {
+        "digest": "sha256:cb8151d01b1ce6a5d5b3887373fe746f77eec9039baafb6f0c43d5c2aba8051c",
+        "path": "policies/boundaries.policy.yaml"
+      }
+    ],
+    "queryPlanDigest": "4cc3c1daa233d8cb48209f5fb85bd1f087a400d670b87d9e65ae552ad3f62104",
+    "waivers": {
+      "digest": "sha256:3b3a8326d198e6c11d43c9205c5e4cfb3c86490743f278e1aa74dfb37531419e",
+      "path": "exceptions/waivers.yaml"
+    },
+    "workspace": {
+      "digest": "sha256:8080d4df63a49f12fe23fe9fb6dfdb2c438630e98da2cd3bce9ecf99d75e1c2c",
+      "path": "concordia.yaml"
+    }
+  },
+  "observability": {
+    "cacheHits": 0,
+    "conflicts": 0,
+    "coverageGaps": 19,
+    "ingestedFacts": 126,
+    "normalizedFacts": 125,
+    "stageFailures": 0,
+    "unresolvedFacts": 2,
+    "unsupportedFacts": 1
+  },
+  "reconciliation": [
+    {
+      "classification": "conforming",
+      "edgeCount": 7,
+      "from": "billing-service",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "relationshipId": "billing-to-fulfillment",
+      "to": "fulfillment-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "customer",
+      "observedKinds": [],
+      "relationshipId": "customer-interacts-billing",
+      "to": "billing-service"
+    },
+    {
+      "classification": "undeclared",
+      "edgeCount": 3,
+      "from": "fulfillment-service",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "to": "billing-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "ledger-service",
+      "observedKinds": [],
+      "relationshipId": "ledger-to-database",
+      "to": "ledger-database"
+    }
+  ],
+  "rules": [
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 7,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 4,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1090,
+            "ratio": 1,
+            "total": 1090
+          },
+          "covered": 5,
+          "excluded": [],
+          "languages": {
+            ".ts": {
+              "covered": 5,
+              "total": 5
+            }
+          },
+          "ratio": 1,
+          "stale": [],
+          "total": 5,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "calls",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          },
+          {
+            "lossModes": [],
+            "predicate": "imports",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 2,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "boundary",
+      "findingCount": 6,
+      "name": "Billing uses Fulfillment contracts only",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Billing uses Fulfillment contracts only",
+        "owner": "team-billing",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "allow": {
+            "edgeKinds": [],
+            "targetCalmNodes": [],
+            "targetSourceRoots": [
+              "packages/fulfillment-contract/**"
+            ],
+            "targetTags": []
+          },
+          "family": "boundary"
+        },
+        "rationale": "When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.",
+        "remediation": "Import from packages/fulfillment-contract instead.",
+        "ruleId": "CO-BND-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service"
+        ],
+        "targets": [
+          "fulfillment-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [],
+      "ruleId": "CO-BND-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service"
+      ],
+      "targets": [
+        "fulfillment-service"
+      ],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 4,
+            "minimumConfidence": "resolved",
+            "observed": 3,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 583,
+            "ratio": 0.826950354609929,
+            "total": 705
+          },
+          "covered": 2,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".ts": {
+              "covered": 2,
+              "total": 2
+            }
+          },
+          "ratio": 0.6666666666666666,
+          "stale": [],
+          "total": 3,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "calls",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 2,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "boundary",
+      "findingCount": 0,
+      "name": "Legacy must not call Billing",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "resolved",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Legacy must not call Billing",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "allow": {
+            "edgeKinds": [],
+            "targetCalmNodes": [],
+            "targetSourceRoots": [],
+            "targetTags": []
+          },
+          "family": "boundary"
+        },
+        "rationale": "The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.",
+        "remediation": "Index the legacy Kotlin code so that Concordia can show that legacy never calls billing.",
+        "ruleId": "CO-COV-001",
+        "severity": "error",
+        "subjects": [
+          "legacy-service"
+        ],
+        "targets": [
+          "billing-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.667 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-COV-001",
+      "severity": "error",
+      "subjects": [
+        "legacy-service"
+      ],
+      "targets": [
+        "billing-service"
+      ],
+      "verdict": "unknown"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 7,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 4,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1360,
+            "ratio": 0.9176788124156545,
+            "total": 1482
+          },
+          "covered": 7,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".py": {
+              "covered": 2,
+              "total": 2
+            },
+            ".ts": {
+              "covered": 5,
+              "total": 5
+            }
+          },
+          "ratio": 0.875,
+          "stale": [],
+          "total": 8,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "calls",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          },
+          {
+            "lossModes": [],
+            "predicate": "imports",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 2,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "acyclic",
+      "findingCount": 1,
+      "name": "Services are acyclic",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Services are acyclic",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "collapseBy": "architectureBinding",
+          "family": "acyclic"
+        },
+        "rationale": "A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.",
+        "remediation": "Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.",
+        "ruleId": "CO-CYC-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service",
+          "ledger-service",
+          "legacy-service"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.875 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-CYC-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service",
+        "ledger-service",
+        "legacy-service"
+      ],
+      "targets": [],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 7,
+            "supported": true
+          },
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 4,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1360,
+            "ratio": 0.9176788124156545,
+            "total": 1482
+          },
+          "covered": 7,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".py": {
+              "covered": 2,
+              "total": 2
+            },
+            ".ts": {
+              "covered": 5,
+              "total": 5
+            }
+          },
+          "ratio": 0.875,
+          "stale": [],
+          "total": 8,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "calls",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          },
+          {
+            "lossModes": [],
+            "predicate": "imports",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 2,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "declared-only",
+      "findingCount": 3,
+      "name": "Dependencies are declared",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Dependencies are declared",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "declared-only"
+        },
+        "rationale": "Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.",
+        "remediation": "Add the relationship to the CALM model if it is intended, or remove the dependency.",
+        "ruleId": "CO-DECL-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service",
+          "ledger-database",
+          "ledger-service",
+          "legacy-service"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls",
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.875 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-DECL-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service",
+        "ledger-database",
+        "ledger-service",
+        "legacy-service"
+      ],
+      "targets": [],
+      "verdict": "violation"
+    },
+    {
+      "coverage": {
+        "edgeKinds": {
+          "imports": {
+            "belowThreshold": 0,
+            "minimumConfidence": "syntactic",
+            "observed": 4,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 1090,
+            "ratio": 1,
+            "total": 1090
+          },
+          "covered": 5,
+          "excluded": [],
+          "languages": {
+            ".ts": {
+              "covered": 5,
+              "total": 5
+            }
+          },
+          "ratio": 1,
+          "stale": [],
+          "total": 5,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "imports",
+            "reasons": [],
+            "scope": {
+              "project": "golden-brownfield"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 0,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 0,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "layer",
+      "findingCount": 1,
+      "name": "Billing sits above Fulfillment",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "syntactic",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "layers": [
+          [
+            "billing-service"
+          ],
+          [
+            "fulfillment-service"
+          ]
+        ],
+        "name": "Billing sits above Fulfillment",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "layer"
+        },
+        "rationale": "Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.",
+        "remediation": "Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.",
+        "ruleId": "CO-LYR-001",
+        "severity": "error",
+        "subjects": [
+          "billing-service",
+          "fulfillment-service"
+        ],
+        "targets": [
+          "billing-service",
+          "fulfillment-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "imports"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [],
+      "ruleId": "CO-LYR-001",
+      "severity": "error",
+      "subjects": [
+        "billing-service",
+        "fulfillment-service"
+      ],
+      "targets": [
+        "billing-service",
+        "fulfillment-service"
+      ],
+      "verdict": "violation"
+    }
+  ],
+  "run": {
+    "dirtyTreeDigest": "sha256:44847c7d1d2a79d021a920eaadc027ba6e627ec67abd7d26c95acbec1a1dd99b",
+    "finishedAt": "2027-01-01T00:00:00.000Z",
+    "graphGeneration": "cbm:golden-brownfield:b02c814bd3a1d584",
+    "host": {
+      "arch": "amd64",
+      "go": "go1.27.3",
+      "platform": "linux"
+    },
+    "id": "20270101T000000Z-4296e345",
+    "project": "golden-brownfield",
+    "sourceRevision": "9b491e6c586cd0cea8c7b7c9a05514abdf6d8612",
+    "startedAt": "2027-01-01T00:00:00.000Z"
+  },
+  "schemaVersion": "1.1",
+  "summary": {
+    "active": 2,
+    "baselined": 8,
+    "exitCode": 1,
+    "expiredWaiver": 1,
+    "failOn": "error",
+    "resultDigest": "sha256:7d3e897a1da0847b099a839f25ab6ddeae26f13ab4968634886bec44d98bcbfb",
+    "rules": {
+      "error": 0,
+      "notApplicable": 0,
+      "pass": 0,
+      "unknown": 1,
+      "violation": 4
+    },
+    "unknownPolicy": "fail",
+    "unknownRules": 1,
+    "verdict": "violation",
+    "waived": 0
+  },
+  "toolchain": {
+    "calmSchema": "1.2",
+    "cbm": {
+      "adapterSchema": "concordia-cbm/v2",
+      "executableVersion": "0.12.1",
+      "profile": {
+        "applies": true,
+        "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+        "id": "cbm-0.12.1"
+      }
+    },
+    "concordia": "dev"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "Boolean property detected. Booleans should ideally be avoided as they are closed for extension; have you considered using an enum instead?",
+          "path": "/properties/c/type",
+          "rule": "avoid-boolean-properties",
+          "severity": "warning"
+        },
+        {
+          "message": "Boolean property detected. Booleans should ideally be avoided as they are closed for extension; have you considered using an enum instead?",
+          "path": "/properties/d/properties/type/type",
+          "rule": "avoid-boolean-properties",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "Boolean property detected. Booleans should ideally be avoided as they are closed for extension; have you considered using an enum instead?",
+          "path": "/properties/flag/type",
+          "rule": "avoid-boolean-properties",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

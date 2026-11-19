@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "minItems": 1,
+      "maxItems": 1,
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        }
+      ],
+      "items": {
+        "oneOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "cache"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "prefixItems": []
+    }
+  }
+}

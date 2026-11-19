@@ -1,0 +1,18 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: default
+  version: 1.0.0
+rules:
+  - id: CO-DECL-001
+    name: Services only depend on declared architecture relationships
+    severity: error
+    subject:
+      nodeTypes:
+        - service
+        - database
+        - webclient
+    declaredOnly:
+      edges:
+        - IMPORTS
+        - CALLS

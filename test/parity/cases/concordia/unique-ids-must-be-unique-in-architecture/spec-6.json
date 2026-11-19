@@ -1,0 +1,19 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "node1"
+    },
+    {
+      "unique-id": "node2"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "node1"
+    },
+    {
+      "unique-id": "rel2"
+    }
+  ]
+}

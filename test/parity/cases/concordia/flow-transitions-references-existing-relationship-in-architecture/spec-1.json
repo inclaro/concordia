@@ -1,0 +1,18 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [],
+  "relationships": [],
+  "flows": [
+    {
+      "unique-id": "flow",
+      "name": "Flow",
+      "description": "A flow",
+      "transitions": [
+        {
+          "relationship-unique-id": null,
+          "sequence-number": 1
+        }
+      ]
+    }
+  ]
+}

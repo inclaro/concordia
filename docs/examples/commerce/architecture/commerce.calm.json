@@ -1,0 +1,78 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {"unique-id": "customer", "node-type": "actor", "name": "Customer", "description": "A person who buys goods."},
+    {"unique-id": "commerce", "node-type": "system", "name": "Commerce Platform", "description": "The commerce system."},
+    {
+      "unique-id": "billing-service", "node-type": "service", "name": "Billing Service",
+      "description": "Issues invoices.",
+      "concordia": {"c4-level": "container", "owner": "team-billing", "tags": ["core"]},
+      "controls": {
+        "architecture-001": {
+          "description": "Billing may use fulfillment only through its contract.",
+          "requirements": [
+            {
+              "requirement-url": "https://example.org/concordia/controls/dependency-boundary/1.0/requirement.json",
+              "config": {
+                "control-id": "architecture-001",
+                "engine": "concordia",
+                "policy-ref": "../policies/boundaries.policy.yaml",
+                "rule-ids": ["CO-BND-001"],
+                "unknown-disposition": "fail",
+                "minimum-policy-coverage": 0.9
+              }
+            }
+          ]
+        }
+      }
+    },
+    {"unique-id": "fulfillment-service", "node-type": "service", "name": "Fulfillment Service", "description": "Ships orders.", "concordia": {"owner": "team-fulfillment"}},
+    {"unique-id": "ledger-service", "node-type": "service", "name": "Ledger Service", "description": "Records transactions.", "concordia": {"owner": "team-ledger"}},
+    {"unique-id": "ledger-database", "node-type": "database", "name": "Ledger Database", "description": "Stores ledger entries."},
+    {"unique-id": "legacy-service", "node-type": "service", "name": "Legacy Service", "description": "Old service pending retirement."}
+  ],
+  "relationships": [
+    {
+      "unique-id": "commerce-composition",
+      "description": "Commerce is composed of its services and database.",
+      "relationship-type": {
+        "composed-of": {
+          "container": "commerce",
+          "nodes": ["billing-service", "fulfillment-service", "ledger-service", "ledger-database", "legacy-service"]
+        }
+      }
+    },
+    {
+      "unique-id": "billing-to-fulfillment",
+      "description": "Billing hands invoices to fulfillment.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "billing-service"},
+          "destination": {"node": "fulfillment-service"}
+        }
+      },
+      "concordia": {
+        "observation": {"allowed-edge-kinds": ["IMPORTS", "CALLS"], "minimum-confidence": "syntactic", "required": true}
+      }
+    },
+    {
+      "unique-id": "ledger-to-database",
+      "description": "Ledger persists entries.",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "ledger-service"},
+          "destination": {"node": "ledger-database"}
+        }
+      }
+    },
+    {
+      "unique-id": "customer-interacts-billing",
+      "description": "Customer pays invoices.",
+      "relationship-type": {
+        "interacts": {"actor": "customer", "nodes": ["billing-service"]}
+      }
+    }
+  ]
+}

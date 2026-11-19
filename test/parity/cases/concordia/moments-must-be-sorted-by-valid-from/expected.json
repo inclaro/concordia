@@ -1,0 +1,109 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"moment2\" has valid-from \"2023-01-01\" which is before the previous valid-from \"2024-01-01\".",
+          "path": "/moments/moment2/valid-from",
+          "rule": "moments-must-be-sorted-by-valid-from",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"moment2\" has valid-from \"2023-01-01\" which is before the previous valid-from \"2024-01-01\".",
+          "path": "/moments/moment2/valid-from",
+          "rule": "moments-must-be-sorted-by-valid-from",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"undefined\" is after current-moment \"moment1\" but has a valid-from.",
+          "path": "/current-moment",
+          "rule": "moments-after-current-moment-may-not-have-valid-from",
+          "severity": "warning"
+        },
+        {
+          "message": "Moment with index 1 has valid-from \"2023-01-01\" which is before the previous valid-from \"2024-01-01\".",
+          "path": "/moments/1/valid-from",
+          "rule": "moments-must-be-sorted-by-valid-from",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

@@ -1,0 +1,23 @@
+{
+  "origin": "upstream:cli/test_fixtures/getting-started",
+  "runs": [
+    {
+      "architecture": "STEP-1/conference-signup.arch.json",
+      "mode": "architecture",
+      "name": "STEP-1__conference-signup.arch",
+      "urlMapping": "url-to-local-file-mapping.json"
+    },
+    {
+      "architecture": "STEP-3/conference-signup-with-flow.arch.json",
+      "mode": "architecture",
+      "name": "STEP-3__conference-signup-with-flow.arch",
+      "urlMapping": "url-to-local-file-mapping.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "conference-signup.pattern",
+      "pattern": "conference-signup.pattern.json",
+      "urlMapping": "url-to-local-file-mapping.json"
+    }
+  ]
+}

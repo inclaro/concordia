@@ -1,0 +1,12 @@
+{
+  "runs": {
+    "model__document-system": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

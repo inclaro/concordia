@@ -1,0 +1,25 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: orders-decisions
+architecture:
+  source: architecture/orders.calm.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: concordia-fixture-adr
+      root: .
+      include: [services/**, docs/**]
+  indexMode: full
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  packs:
+    - use: builtin:core
+    - use: builtin:adr-governance
+adr:
+  files: [governance/decisions.yaml]
+check:
+  minimumCoverage: 0.5
+  unknown: fail
+  failOn: error

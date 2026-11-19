@@ -1,0 +1,186 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "'typo' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/a/b/nodes/0",
+          "rule": "group-relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "'typo' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/composed-of/nodes/const/0",
+          "rule": "group-relationship-with-const-nodes-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "'x' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/composed-of/nodes/typo",
+          "rule": "group-relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "'typo' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/composed-of/nodes/0",
+          "rule": "group-relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/composed-of/nodes/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/anyOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "'typo' does not refer to the unique-id of an existing node.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/composed-of/nodes/0",
+          "rule": "group-relationship-references-existing-nodes-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

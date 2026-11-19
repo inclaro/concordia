@@ -1,0 +1,9 @@
+wrote concordia.yaml
+wrote architecture/architecture.json
+wrote bindings/concordia.bindings.yaml
+wrote policies/default.policy.yaml
+wrote exceptions/waivers.yaml
+wrote .concordia.lock
+wrote .github/workflows/concordia.yml
+updated .gitignore
+initialized: workspace, architecture, and policies are valid

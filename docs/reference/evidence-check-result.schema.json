@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/evidence/check-result/v1.schema.json",
+  "title": "Concordia check-result predicate v1",
+  "description": "The predicate of an in-toto Statement v1 with predicateType https://concordia.io/evidence/check-result/v1: a named check had an outcome for a revision and an environment. The subject is usually the revision (`gitCommit`). The schema is open: Concordia ignores fields that it does not list and does not persist them. `covers` is required and an empty list is a statement that the result covers nothing; a missing `covers` is a missing field. A `time` or a `window` with `start` and `end` is required.",
+  "type": "object",
+  "required": [
+    "check",
+    "outcome",
+    "revision",
+    "environment",
+    "evaluator",
+    "covers"
+  ],
+  "properties": {
+    "check": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "The check identifier, for example `unit-tests`."
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "failed",
+        "errored",
+        "skipped"
+      ]
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "The source revision that the check ran against. It must equal the evaluated revision."
+    },
+    "environment": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "evaluator": {
+      "$ref": "#/$defs/evaluator"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "description": "Evidence that backs the result, for example a test report, with digests."
+    },
+    "time": {
+      "$ref": "#/$defs/time"
+    },
+    "window": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/time"
+        },
+        "end": {
+          "$ref": "#/$defs/time"
+        }
+      },
+      "description": "Used instead of `time`. The maximum age counts from `end`."
+    },
+    "covers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The control, node, and scenario identifiers that the result covers. An empty list covers nothing."
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "time"
+      ]
+    },
+    {
+      "required": [
+        "window"
+      ]
+    }
+  ],
+  "$defs": {
+    "evaluator": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "\\S"
+        }
+      }
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 time."
+    }
+  }
+}

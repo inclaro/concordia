@@ -1,0 +1,41 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up mise
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      - name: Verify host prerequisites
+        run: |
+          bash --version
+          git --version
+          jq --version
+          curl --version
+          tar --version
+          sha256sum --version
+          cc --version
+
+      - name: Install repository-local development tools
+        run: mise run tools:install
+
+      - name: Verify repository-local runtime
+        run: mise exec -- go version
+
+      - name: Run vulnerability scan
+        run: mise run security

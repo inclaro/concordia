@@ -1,0 +1,1276 @@
+{
+  "areas": {
+    "adrGovernance": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "assessmentCurrency": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "conformance": {
+      "counts": {
+        "error": 0,
+        "findings": 0,
+        "notApplicable": 0,
+        "pass": 0,
+        "unknown": 1,
+        "violation": 0
+      },
+      "verdict": "unknown"
+    },
+    "deploymentTrace": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "diagramCurrency": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "qualityEvaluation": {
+      "counts": {},
+      "verdict": "not-configured"
+    }
+  },
+  "controls": [
+    {
+      "controlId": "architecture-001",
+      "ruleIds": [
+        "CO-BND-001"
+      ],
+      "scope": {
+        "id": "billing-service",
+        "level": "node"
+      },
+      "verdict": "not-applicable"
+    }
+  ],
+  "coverage": {
+    "crossCheck": {
+      "environments": [],
+      "filesChecked": 0,
+      "filesSkipped": []
+    },
+    "indexResults": [
+      {
+        "available": true,
+        "project": "golden-check",
+        "record": {
+          "excludedDirs": [
+            ".git"
+          ],
+          "graphGeneration": "cbm:golden-check:9ebc809f8a930ef6",
+          "notIndexedCount": 0,
+          "notIndexedFiles": [],
+          "parsePartial": [],
+          "parsePartialCount": 0,
+          "project": "golden-check",
+          "sourceRevision": "5bfa219c9765303fc7d8d0ee61b2bd9613367945"
+        }
+      }
+    ],
+    "limits": {
+      "breaches": [],
+      "configured": {
+        "evidence": {
+          "maxFacts": 20000000
+        },
+        "graph": {
+          "maxEdges": 20000000,
+          "maxNodes": 5000000
+        },
+        "traversal": {
+          "maxVisited": 10000000
+        }
+      }
+    },
+    "predicates": [
+      {
+        "lossModes": [],
+        "predicate": "ambiguous-usage",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "base-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-applies-to-principal",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-refers-to-role",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "built-from",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-graphql",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-grpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-service",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-trpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configured-connection",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-access",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-read",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-set",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-helm-values",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-key-symbol",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "constructs",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "merged-occurrences"
+          }
+        ],
+        "predicate": "container-occurrence-versions",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "contains",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "copies-from-image",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "data-flows",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "defines",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deployment-workload-set",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deploys-artifact",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-arrow",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-identity",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dispatches-async",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "disruption-policy-target",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dockerfile-set",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "documentation-metadata",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "emits-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "file-changes-with",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "handles-route",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "implements",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "imports",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "includes-infrastructure",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "default-excluded-directory"
+          },
+          {
+            "id": "parse-partial"
+          },
+          {
+            "id": "raster-not-indexed"
+          }
+        ],
+        "predicate": "index-result",
+        "reasons": [
+          "family is partial in the capability profile"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "infrastructure-dependency",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "inherits",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "launches",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "listens-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "mentions",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "override-unsignalled"
+          }
+        ],
+        "predicate": "overrides",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "placed-in",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "policy-selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "reads",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-callable",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-certificate-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-configuration",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-storage",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "unrendered-template"
+          }
+        ],
+        "predicate": "rendered-templates",
+        "reasons": [
+          "family is partial in the capability profile"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "route-attaches-to-gateway",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "route-identity-unscoped"
+          }
+        ],
+        "predicate": "routes-to",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "scaling-target",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "semantically-related",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "similar-to",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "supersedes",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-runtime-identity",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-type",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "writes",
+        "reasons": [],
+        "scope": {
+          "project": "golden-check"
+        },
+        "status": "complete",
+        "unresolved": 0
+      }
+    ],
+    "scopeFailures": [],
+    "skipReasons": {
+      "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+      "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+    },
+    "skipped": {
+      "endpointMissing": 0,
+      "outOfScope": 0,
+      "unbound": 2,
+      "unsupported": 1
+    }
+  },
+  "deploymentTrace": {
+    "environments": [],
+    "levels": [
+      {
+        "level": "declared",
+        "status": "evaluated"
+      },
+      {
+        "level": "rendered-or-evaluated",
+        "status": "not-available"
+      },
+      {
+        "level": "deployment-execution",
+        "status": "not-available"
+      },
+      {
+        "level": "runtime-observation",
+        "status": "not-available"
+      }
+    ],
+    "status": "not-configured",
+    "summary": {
+      "byStatus": {
+        "complete": 0,
+        "partial": 0,
+        "unknown": 0,
+        "unresolved": 0
+      },
+      "environments": 0,
+      "subjects": 0
+    },
+    "unresolvedEnvironmentActions": [],
+    "unresolvedEnvironmentWorkloads": []
+  },
+  "diagnostics": [
+    {
+      "code": "CO-OBS-016",
+      "message": "native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)",
+      "severity": "warning"
+    }
+  ],
+  "exceptions": {
+    "orphanedWaivers": [],
+    "resolvedBaselineEntries": [],
+    "waivers": []
+  },
+  "findings": [],
+  "inputs": {
+    "architecture": {
+      "digest": "sha256:ef2752da507c415766b77eec2445793cb5a8168d137c14550a93788a7ae77bbd",
+      "path": "architecture/commerce.calm.json"
+    },
+    "bindings": [
+      {
+        "digest": "sha256:58d94f32527149cca0e1cd9a547d187961c99c06927b97b25a81c67d4539f942",
+        "path": "bindings/concordia.bindings.yaml"
+      }
+    ],
+    "decorators": [],
+    "environments": {
+      "digest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "excluded": [],
+      "selected": []
+    },
+    "indexResults": [
+      {
+        "digest": "sha256:566ace698a6e623c2b9fcc2de9b3bfef366355c1ead1c50ba5ffbc62108d2304",
+        "path": "build/concordia/index-result.json"
+      }
+    ],
+    "lock": {
+      "digest": "sha256:99e21da0ad1f7bad3520d57ae5725dc60c88470c84b59f77ab5344ba6d7648c5",
+      "path": ".concordia.lock"
+    },
+    "patterns": [],
+    "policies": [
+      {
+        "digest": "sha256:cb8151d01b1ce6a5d5b3887373fe746f77eec9039baafb6f0c43d5c2aba8051c",
+        "path": "policies/boundaries.policy.yaml"
+      }
+    ],
+    "queryPlanDigest": "6221ae561f66d55d2f0d826eb141b89e511fa99c99b880aefc5627e2d0e3e410",
+    "waivers": {
+      "digest": "sha256:0fe964782f0de3e329da96a3093e84fce48af340fbb3442bb0f391e863d8ee54",
+      "path": "exceptions/waivers.yaml"
+    },
+    "workspace": {
+      "digest": "sha256:208a43d9047365ad888d45952d774b1e5a4f1bd0b7f8819b1440b6c3f56a9af0",
+      "path": "concordia.yaml"
+    }
+  },
+  "observability": {
+    "cacheHits": 0,
+    "conflicts": 0,
+    "coverageGaps": 19,
+    "ingestedFacts": 104,
+    "normalizedFacts": 103,
+    "stageFailures": 0,
+    "unresolvedFacts": 2,
+    "unsupportedFacts": 1
+  },
+  "reconciliation": [
+    {
+      "classification": "conforming",
+      "edgeCount": 2,
+      "from": "billing-service",
+      "observedKinds": [
+        "calls"
+      ],
+      "relationshipId": "billing-to-fulfillment",
+      "to": "fulfillment-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "customer",
+      "observedKinds": [],
+      "relationshipId": "customer-interacts-billing",
+      "to": "billing-service"
+    },
+    {
+      "classification": "undeclared",
+      "edgeCount": 2,
+      "from": "fulfillment-service",
+      "observedKinds": [
+        "calls"
+      ],
+      "to": "billing-service"
+    },
+    {
+      "classification": "unknown",
+      "edgeCount": 0,
+      "from": "ledger-service",
+      "observedKinds": [],
+      "relationshipId": "ledger-to-database",
+      "to": "ledger-database"
+    }
+  ],
+  "rules": [
+    {
+      "coverage": {
+        "edgeKinds": {
+          "calls": {
+            "belowThreshold": 3,
+            "minimumConfidence": "resolved",
+            "observed": 2,
+            "supported": true
+          }
+        },
+        "files": {
+          "bytes": {
+            "covered": 375,
+            "ratio": 0.7545271629778671,
+            "total": 497
+          },
+          "covered": 1,
+          "excluded": [
+            "services/legacy/src/Legacy.kt"
+          ],
+          "languages": {
+            ".kt": {
+              "covered": 0,
+              "total": 1
+            },
+            ".ts": {
+              "covered": 1,
+              "total": 1
+            }
+          },
+          "ratio": 0.5,
+          "stale": [],
+          "total": 2,
+          "unindexed": [],
+          "unsupported": []
+        },
+        "predicates": [
+          {
+            "lossModes": [],
+            "predicate": "calls",
+            "reasons": [],
+            "scope": {
+              "project": "golden-check"
+            },
+            "status": "complete",
+            "unresolved": 0
+          }
+        ],
+        "required": 0.9,
+        "skipReasons": {
+          "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+          "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+        },
+        "skipped": {
+          "endpointMissing": 0,
+          "outOfScope": 0,
+          "unbound": 2,
+          "unsupported": 1
+        },
+        "subThresholdEvidence": 0,
+        "traversalIncomplete": false,
+        "unboundEndpoints": 2,
+        "unresolvedReferences": 0
+      },
+      "enforcement": "mandatory",
+      "family": "boundary",
+      "findingCount": 0,
+      "name": "Legacy must not call Billing",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "resolved",
+          "minimumCoverage": 0.9,
+          "onUnknown": "fail"
+        },
+        "name": "Legacy must not call Billing",
+        "pack": {
+          "id": "commerce-boundaries",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "allow": {
+            "edgeKinds": [],
+            "targetCalmNodes": [],
+            "targetSourceRoots": [],
+            "targetTags": []
+          },
+          "family": "boundary"
+        },
+        "rationale": "The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.",
+        "remediation": "Index the legacy Kotlin code so that Concordia can show that legacy never calls billing.",
+        "ruleId": "CO-COV-001",
+        "severity": "error",
+        "subjects": [
+          "legacy-service"
+        ],
+        "targets": [
+          "billing-service"
+        ],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [
+            "calls"
+          ],
+          "maximumDepth": 1,
+          "minimumDepth": 1
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "commerce-boundaries",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "CO-CON-021",
+          "message": "minimum coverage not met: 0.500 < 0.9"
+        },
+        {
+          "code": "CO-CON-026",
+          "message": "language coverage not met: .kt 0.000 < 0.9"
+        }
+      ],
+      "ruleId": "CO-COV-001",
+      "severity": "error",
+      "subjects": [
+        "legacy-service"
+      ],
+      "targets": [
+        "billing-service"
+      ],
+      "verdict": "unknown"
+    }
+  ],
+  "run": {
+    "dirtyTreeDigest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "finishedAt": "2026-06-01T00:00:00.000Z",
+    "graphGeneration": "cbm:golden-check:9ebc809f8a930ef6",
+    "host": {
+      "arch": "amd64",
+      "go": "go1.27.3",
+      "platform": "linux"
+    },
+    "id": "20260601T000000Z-58427ec6",
+    "project": "golden-check",
+    "sourceRevision": "5bfa219c9765303fc7d8d0ee61b2bd9613367945",
+    "startedAt": "2026-06-01T00:00:00.000Z"
+  },
+  "schemaVersion": "1.1",
+  "summary": {
+    "active": 0,
+    "baselined": 0,
+    "exitCode": 4,
+    "expiredWaiver": 0,
+    "failOn": "error",
+    "resultDigest": "sha256:89d892b546b512374a39ad991901d7405f9dcca3c3c319805044d5e8c045d9de",
+    "rules": {
+      "error": 0,
+      "notApplicable": 0,
+      "pass": 0,
+      "unknown": 1,
+      "violation": 0
+    },
+    "unknownPolicy": "fail",
+    "unknownRules": 1,
+    "verdict": "unknown",
+    "waived": 0
+  },
+  "toolchain": {
+    "calmSchema": "1.2",
+    "cbm": {
+      "adapterSchema": "concordia-cbm/v2",
+      "executableVersion": "0.12.1",
+      "profile": {
+        "applies": true,
+        "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+        "id": "cbm-0.12.1"
+      }
+    },
+    "concordia": "dev"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "'typo' does not refer to the unique-id of an existing interface.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "'1' does not refer to the unique-id of an existing interface.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source/interfaces/1",
+          "rule": "referenced-interfaces-defined-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'database' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "'typo' does not refer to the unique-id of an existing interface.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Referenced interface with ID 'typo' was not defined on the node with ID 'webapp'.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source/interfaces/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "'intf2' does not refer to the unique-id of an existing interface.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-pattern",
+          "severity": "error"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/properties/relationships/prefixItems/0/properties/relationship-type/const/connects/source",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-pattern",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

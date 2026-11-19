@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "cache"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "r"
+            },
+            "relationship-type": {
+              "const": {
+                "x": {
+                  "nodes": {
+                    "const": [
+                      "cache"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "d"
+            },
+            "description": {
+              "const": "Pick an alternative"
+            },
+            "relationship-type": {
+              "properties": {
+                "options": {
+                  "prefixItems": [
+                    {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "description": {
+                              "const": "Use webapp"
+                            },
+                            "nodes": {
+                              "const": [
+                                "webapp"
+                              ]
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

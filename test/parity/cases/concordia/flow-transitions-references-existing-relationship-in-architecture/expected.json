@@ -1,0 +1,67 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "'missing' does not refer to the unique-id of an existing relationship.",
+          "path": "/flows/flow/transitions/1/relationship-unique-id",
+          "rule": "flow-transitions-references-existing-relationship-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "'relationship2' does not refer to the unique-id of an existing relationship.",
+          "path": "/flows/flow/transitions/0/relationship-unique-id",
+          "rule": "flow-transitions-references-existing-relationship-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

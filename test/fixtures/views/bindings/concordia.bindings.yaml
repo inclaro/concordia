@@ -1,0 +1,15 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  - id: bind-orders
+    architectureRef: calm:node:orders-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/orders/**
+  - id: bind-payments-db
+    architectureRef: calm:node:payments-db
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/payments/**

@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            runner: ubuntu-24.04
+          - platform: macos
+            runner: macos-latest
+          - platform: windows
+            runner: windows-2022
+    runs-on: ${{ matrix.runner }}
+    steps:
+      # MinGit is a portable git with core.longpaths set system-wide. It must precede Checkout,
+      # so that checkout and every later git call handle paths over 260 characters
+      # (test/parity/cases).
+      - name: Install git on Windows
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dir = Join-Path $env:RUNNER_TEMP 'mingit'
+          $zip = Join-Path $env:RUNNER_TEMP 'mingit.zip'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/git-for-windows/git/releases/download/v2.47.1.windows.1/MinGit-2.47.1-64-bit.zip' -OutFile $zip
+          Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $dir 'cmd')
+          # Long paths for checkout and every later git invocation.
+          & (Join-Path $dir 'cmd\git.exe') config --system core.longpaths true
+          if ($LASTEXITCODE -ne 0) { throw "git config --system failed with exit code $LASTEXITCODE" }
+          Add-Content -Path $env:GITHUB_ENV -Value 'GIT_CONFIG_COUNT=1'
+          Add-Content -Path $env:GITHUB_ENV -Value 'GIT_CONFIG_KEY_0=core.longpaths'
+          Add-Content -Path $env:GITHUB_ENV -Value 'GIT_CONFIG_VALUE_0=true'
+
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up mise
+        if: runner.os != 'Windows'
+        uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          version: "2026.10.17"
+          install: false
+
+      # The Windows runner image has no `unzip`, which jdx/mise-action needs.
+      - name: Set up mise (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # mise.exe needs the Visual C++ runtime, which the runner image lacks (exit code 0xC0000135).
+          if (-not (Test-Path 'C:\Windows\System32\vcruntime140.dll')) {
+            $redist = Join-Path $env:RUNNER_TEMP 'vc_redist.x64.exe'
+            Invoke-WebRequest -UseBasicParsing -Uri 'https://aka.ms/vs/17/release/vc_redist.x64.exe' -OutFile $redist
+            $install = Start-Process -FilePath $redist -ArgumentList '/install', '/quiet', '/norestart' -Wait -PassThru
+            if ($install.ExitCode -ne 0 -and $install.ExitCode -ne 3010) { throw "vc_redist failed with exit code $($install.ExitCode)" }
+          }
+          $dir = Join-Path $env:RUNNER_TEMP 'mise-bin'
+          $zip = Join-Path $env:RUNNER_TEMP 'mise.zip'
+          Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/jdx/mise/releases/download/v2026.10.17/mise-v2026.10.17-windows-x64.zip' -OutFile $zip
+          Expand-Archive -LiteralPath $zip -DestinationPath $dir -Force
+          Add-Content -Path $env:GITHUB_PATH -Value (Join-Path $dir 'mise\bin')
+          Add-Content -Path $env:GITHUB_ENV -Value 'MISE_YES=1'
+          Add-Content -Path $env:GITHUB_ENV -Value ('MISE_TRUSTED_CONFIG_PATHS=' + $env:GITHUB_WORKSPACE)
+
+      - name: Verify Linux host prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          bash --version
+          git --version
+          jq --version
+          curl --version
+          tar --version
+          sha256sum --version
+          cc --version
+
+      - name: Verify macOS host prerequisites
+        if: runner.os == 'macOS'
+        run: |
+          bash --version
+          git --version
+          jq --version
+          curl --version
+          tar --version
+          shasum --version
+          cc --version
+
+      - name: Verify Windows host prerequisites
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $PSVersionTable.PSVersion
+          git --version
+
+      - name: Install repository-local development tools
+        if: runner.os != 'Windows'
+        run: mise run tools:install
+
+      - name: Install repository-local development tools (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          mise --version
+          mise run tools:install 2>&1 | ForEach-Object { "$_" }
+          exit $LASTEXITCODE
+
+      - name: Verify repository-local runtimes
+        run: |
+          mise exec -- go version
+          mise exec -- node --version
+          mise exec -- npm --version
+
+      - name: Run CI checks
+        run: mise run ci
+
+      - name: Upload test and coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: reports-${{ matrix.platform }}-${{ github.run_id }}
+          path: |
+            dist/coverage/coverage.out
+            dist/coverage/coverage.txt
+            dist/coverage/coverage.html
+            dist/test-results.json
+          if-no-files-found: warn
+
+      - name: Upload coverage to Codecov
+        if: matrix.platform == 'linux'
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5.5.5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          files: dist/coverage/coverage.out
+          fail_ci_if_error: false

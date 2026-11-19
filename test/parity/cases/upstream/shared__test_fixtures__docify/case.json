@@ -1,0 +1,40 @@
+{
+  "origin": "upstream:shared/test_fixtures/docify",
+  "runs": [
+    {
+      "architecture": "c4/cloud-native-architecture/cloud-native-architecture.arch.json",
+      "mode": "architecture",
+      "name": "c4__cloud-native-architecture__cloud-native-architecture.arch"
+    },
+    {
+      "architecture": "c4/ecommerce-architecture/ecommerce-architecture.arch.json",
+      "mode": "architecture",
+      "name": "c4__ecommerce-architecture__ecommerce-architecture.arch"
+    },
+    {
+      "architecture": "c4/enterprise-multi-system/enterprise-multi-system.arch.json",
+      "mode": "architecture",
+      "name": "c4__enterprise-multi-system__enterprise-multi-system.arch"
+    },
+    {
+      "architecture": "c4/iot-platform-architecture/iot-platform-architecture.arch.json",
+      "mode": "architecture",
+      "name": "c4__iot-platform-architecture__iot-platform-architecture.arch"
+    },
+    {
+      "architecture": "c4/multi-system-architecture/multi-system-architecture.arch.json",
+      "mode": "architecture",
+      "name": "c4__multi-system-architecture__multi-system-architecture.arch"
+    },
+    {
+      "architecture": "c4/simple-banking/simple-banking.arch.json",
+      "mode": "architecture",
+      "name": "c4__simple-banking__simple-banking.arch"
+    },
+    {
+      "architecture": "c4/three-tier-architecture/three-tier-architecture.arch.json",
+      "mode": "architecture",
+      "name": "c4__three-tier-architecture__three-tier-architecture.arch"
+    }
+  ]
+}

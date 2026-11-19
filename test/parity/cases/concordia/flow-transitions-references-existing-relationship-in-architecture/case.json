@@ -1,0 +1,30 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "architecture",
+      "architecture": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "architecture",
+      "architecture": "pass.json"
+    },
+    {
+      "name": "spec-1",
+      "mode": "architecture",
+      "architecture": "spec-1.json"
+    },
+    {
+      "name": "spec-2",
+      "mode": "architecture",
+      "architecture": "spec-2.json"
+    },
+    {
+      "name": "spec-3",
+      "mode": "architecture",
+      "architecture": "spec-3.json"
+    }
+  ]
+}

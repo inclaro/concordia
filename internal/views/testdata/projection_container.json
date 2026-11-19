@@ -1,0 +1,130 @@
+{
+  "basis": "declared",
+  "contract": "concordia-view-projection/1",
+  "coverage": {
+    "lost": [],
+    "required": {
+      "elements": [
+        "audit-db",
+        "orders-service",
+        "payments-db",
+        "web-ui"
+      ],
+      "relationships": [
+        "orders-to-db",
+        "web-to-orders"
+      ]
+    },
+    "unbound": null
+  },
+  "depicts": {
+    "elements": [
+      "audit-db",
+      "customer",
+      "ledger",
+      "orders-service",
+      "payments-db",
+      "web-ui"
+    ],
+    "relationships": [
+      "customer-uses-web",
+      "orders-to-db",
+      "orders-to-ledger",
+      "web-to-orders"
+    ]
+  },
+  "elements": [
+    {
+      "id": "audit-db",
+      "level": "container",
+      "parent": "payments-system",
+      "type": "database"
+    },
+    {
+      "id": "customer",
+      "level": "person",
+      "parent": null,
+      "type": "actor"
+    },
+    {
+      "id": "ledger",
+      "level": "softwareSystem",
+      "parent": null,
+      "type": "system"
+    },
+    {
+      "id": "orders-service",
+      "level": "container",
+      "parent": "payments-system",
+      "type": "service"
+    },
+    {
+      "id": "payments-db",
+      "level": "container",
+      "parent": "payments-system",
+      "type": "database"
+    },
+    {
+      "id": "web-ui",
+      "level": "container",
+      "parent": "payments-system",
+      "type": "webclient"
+    }
+  ],
+  "missing": [
+    "relationship.context",
+    "relationship.interface"
+  ],
+  "relationships": [
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "customer",
+      "interface": null,
+      "kind": "interacts",
+      "protocol": null,
+      "status": null,
+      "to": "web-ui"
+    },
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "orders-service",
+      "interface": null,
+      "kind": "connects",
+      "protocol": "gRPC",
+      "status": null,
+      "to": "ledger"
+    },
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "orders-service",
+      "interface": null,
+      "kind": "connects",
+      "protocol": "SQL",
+      "status": null,
+      "to": "payments-db"
+    },
+    {
+      "context": null,
+      "direction": "forward",
+      "from": "web-ui",
+      "interface": null,
+      "kind": "connects",
+      "protocol": "HTTPS",
+      "status": null,
+      "to": "orders-service"
+    }
+  ],
+  "view": {
+    "abstraction": "container",
+    "environment": null,
+    "id": "payments-container",
+    "kind": "container",
+    "scope": [
+      "payments-system"
+    ]
+  }
+}
+

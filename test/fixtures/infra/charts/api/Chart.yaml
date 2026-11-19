@@ -1,0 +1,9 @@
+apiVersion: v2
+name: api
+description: Payments API chart
+version: 0.1.0
+appVersion: "1.2.0"
+dependencies:
+  - name: postgresql
+    version: 15.2.0
+    repository: https://charts.example.com/stable

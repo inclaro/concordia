@@ -1,0 +1,24 @@
+Conformance: pass (1 pass)
+
+ADR governance: violation (2 violation, 3 pass, 1 notApplicable, 2 findings)
+  ADR-3 accepted (docs/adr/0003-use-postgresql.md:3)
+    presence committed; applicability superseded (superseded-by ADR-7; status lags); enforcement enforced (required; rules: CORE-DB-001@core/1.0.0)
+
+FAIL GOV-ADR-002 A registered decision is active for the architecture it governs
+  ADR-3 -> calm:node:orders-db, ADR-7: 1 finding(s)
+    docs/adr/0003-use-postgresql.md:3
+      Decision: ADR-3 (status: accepted)
+      Governs: calm:node:orders-db
+      Enforced by: CORE-DB-001@core/1.0.0
+      Successors: ADR-7
+    Next action: get review
+
+FAIL GOV-ADR-003 A mandatory rule is justified by an active decision
+  CORE-DB-001 -> ADR-3: 1 finding(s)
+    docs/adr/register.yaml:12
+    Next action: get review
+
+Not configured: Deployment trace, Diagram currency, Assessment currency, Quality evaluation
+
+Violation area(s): ADR governance
+2 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "unique-id": {
+                  "const": "a"
+                },
+                "interfaces": {
+                  "prefixItems": [
+                    {
+                      "properties": {
+                        "unique-id": {
+                          "const": "i"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": {
+        "anyOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "b"
+              },
+              "interfaces": {
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "unique-id": {
+                        "const": "i"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "properties": {
+              "unique-id": {
+                "const": "c"
+              },
+              "interfaces": {
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "unique-id": {
+                        "const": "j"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

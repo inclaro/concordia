@@ -1,0 +1,50 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "architecture",
+      "architecture": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "architecture",
+      "architecture": "pass.json"
+    },
+    {
+      "name": "config-url",
+      "mode": "architecture",
+      "architecture": "config-url.json"
+    },
+    {
+      "name": "config-url-missing",
+      "mode": "architecture",
+      "architecture": "config-url-missing.json"
+    },
+    {
+      "name": "relative-requirement",
+      "mode": "architecture",
+      "architecture": "relative-requirement.json"
+    },
+    {
+      "name": "pointer-without-pattern",
+      "mode": "architecture",
+      "architecture": "pointer-without-pattern.json"
+    },
+    {
+      "name": "pointer-fail",
+      "mode": "architecture",
+      "architecture": "pointer-fail.json"
+    },
+    {
+      "name": "pointer-pass",
+      "mode": "architecture",
+      "architecture": "pointer-pass.json"
+    },
+    {
+      "name": "pointer-unknown",
+      "mode": "architecture",
+      "architecture": "pointer-unknown.json"
+    }
+  ]
+}

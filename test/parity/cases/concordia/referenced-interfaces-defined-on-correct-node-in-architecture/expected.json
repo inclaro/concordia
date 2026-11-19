@@ -1,0 +1,188 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Referenced interface with ID 'web-http' was not defined on the node with ID 'api'.",
+          "path": "/relationships/web-api/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "'node1' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/rel/relationship-type/connects/source/node",
+          "rule": "connects-relationship-references-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-10": {
+      "findings": [
+        {
+          "message": "'intf2' does not refer to the unique-id of an existing interface.",
+          "path": "/relationships/rel/relationship-type/connects/destination/interfaces/1",
+          "rule": "referenced-interfaces-defined-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "Referenced interface with ID 'intf2' was not defined on the node with ID 'node1'.",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "'node1' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/rel/relationship-type/connects/source/node",
+          "rule": "connects-relationship-references-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "'node1' does not refer to the unique-id of an existing node.",
+          "path": "/relationships/rel/relationship-type/connects/source/node",
+          "rule": "connects-relationship-references-existing-nodes-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "'intf1' does not refer to the unique-id of an existing interface.",
+          "path": "/relationships/rel/relationship-type/connects/destination/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "Invalid connects relationship - no node defined.",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "'intf2' does not refer to the unique-id of an existing interface.",
+          "path": "/relationships/rel/relationship-type/connects/destination/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "Node with unique-id node1 has no interfaces defined, expected interfaces [intf2].",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "'intf2' does not refer to the unique-id of an existing interface.",
+          "path": "/relationships/rel/relationship-type/connects/destination/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "Referenced interface with ID 'intf2' was not defined on the node with ID 'node1'.",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-8": {
+      "findings": [
+        {
+          "message": "Referenced interface with ID 'intf2' was not defined on the node with ID 'node1'.",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-9": {
+      "findings": [
+        {
+          "message": "'intf2' does not refer to the unique-id of an existing interface.",
+          "path": "/relationships/rel/relationship-type/connects/destination/interfaces/0",
+          "rule": "referenced-interfaces-defined-in-architecture",
+          "severity": "error"
+        },
+        {
+          "message": "Referenced interface with ID 'intf2' was not defined on the node with ID 'node1'.",
+          "path": "/relationships/rel/relationship-type/connects/destination",
+          "rule": "referenced-interfaces-defined-on-correct-node-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

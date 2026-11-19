@@ -1,0 +1,372 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-10": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties/nodes",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-11": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-2": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/maxItems",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "maxItems is null and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-3": {
+      "findings": [
+        {
+          "message": "maxItems is 2 and 2 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-4": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/maxItems",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "maxItems is 0 and 0 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-5": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-6": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-7": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/relationships",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-8": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "edge-9": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-10": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-11": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-12": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-13": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-14": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "Node with ID 'cache' is not referenced by any relationships.",
+          "path": "/properties/nodes/items/oneOf/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'webapp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nodes/maxItems",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "maxItems is 0 and 0 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [
+        {
+          "message": "maxItems is 1 and 1 prefixItems entries already fill it, so no items member can ever be built. Raise maxItems or remove items.",
+          "path": "/properties/nodes",
+          "rule": "pattern-items-must-fit-within-max-items",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-8": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "spec-9": {
+      "findings": [],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

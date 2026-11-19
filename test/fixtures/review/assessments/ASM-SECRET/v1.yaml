@@ -1,0 +1,20 @@
+# The secrets that the API service refers to in production. The reference is a dependency, never the secret value.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-SECRET
+version: 1
+type: security
+title: Secret references of the API service
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: The Secrets that the API workloads read
+  dependencies:
+    - kind: secret-reference
+      selector:
+        calmNodes: [api-service]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

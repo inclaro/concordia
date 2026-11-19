@@ -1,0 +1,1383 @@
+min_version = "2026.10.17"
+
+[settings]
+auto_install = false
+task.run_auto_install = false
+
+[task_config]
+shell = '{{ "powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command" if os() == "windows" else "bash -c" }}'
+dir = "{{config_root}}"
+
+[vars]
+go_version = "1.27.4"
+node_version = "24"
+golangci_lint_version = "v2.15.0"
+gofumpt_version = "v0.12.0"
+goimports_version = "v0.52.0"
+gotestsum_version = "v1.13.0"
+gotestfmt_version = "v2.5.0"
+go_mod_outdated_version = "v0.9.0"
+actionlint_version = "v1.7.12"
+svu_version = "v3.4.1"
+govulncheck_version = "v1.9.0"
+markdownlint_cli2_version = "0.24.0"
+goreleaser_version = "v2.20.2"
+cosign_version = "v3.1.4"
+helm_version = "v4.3.1"
+kustomize_version = "v5.8.3"
+repo_name = "concordia"
+binary_name = "concordia"
+output_dir = "./dist"
+
+[env]
+GOBIN = "{{config_root}}/.bin"
+GOTOOLCHAIN = "local"
+GOROOT = false
+_.path = [
+  "{{config_root}}/.bin",
+  "{{config_root}}/.bin/go/bin",
+  "{{config_root}}/.bin/node/bin",
+  "{{config_root}}/.bin/node",
+  "{{config_root}}/.bin/npm/bin",
+  "{{config_root}}/.bin/npm",
+]
+
+[tasks.default]
+description = "Show available tasks."
+run = "'{{mise_bin}}' tasks ls"
+run_windows = "& '{{mise_bin}}' tasks ls"
+
+[tasks.setup]
+description = "Install all development and release tools."
+run = [{ task = "tools:install" }, { task = "tools:release" }, { task = "tools:cbm" }]
+
+[tasks."tools:install"]
+description = "Install pinned repository-local development tools."
+run = '''
+set -euo pipefail
+root=$PWD
+bin=$root/.bin
+go_version='{{vars.go_version}}'
+node_version='{{vars.node_version}}'
+cosign_version='{{vars.cosign_version}}'
+helm_version='{{vars.helm_version}}'
+kustomize_version='{{vars.kustomize_version}}'
+stage=
+
+fail() {
+  printf 'tools:install: %s\n' "$*" >&2
+  exit 1
+}
+
+cleanup() {
+  if [[ -n $stage ]]; then
+    rm -rf "$stage"
+  fi
+}
+trap cleanup EXIT INT TERM
+
+[[ ! -L $bin ]] || fail '.bin must not be a symlink'
+mkdir -p "$bin" "$root/.tmp"
+for path in "$bin/go" "$bin/node" "$bin/npm"; do
+  [[ ! -L $path ]] || fail "tool installation path must not be a symlink: $path"
+done
+for name in golangci-lint gofumpt goimports gotestsum gotestfmt go-mod-outdated actionlint svu govulncheck cosign helm kustomize; do
+  [[ ! -L $bin/$name ]] || fail "tool destination must not be a symlink: $bin/$name"
+done
+
+stage=$(mktemp -d "$root/.tmp/tools-install.XXXXXX")
+if [[ ! -x $bin/go/bin/go ]] || [[ $($bin/go/bin/go version 2>/dev/null) != "go version go${go_version} "* ]]; then
+  "{{mise_bin}}" install-into "go@${go_version}" "$stage/go"
+  rm -rf "$bin/go"
+  mv "$stage/go" "$bin/go"
+fi
+if [[ ! -x $bin/node/bin/node ]] || [[ $($bin/node/bin/node --version 2>/dev/null) != "v${node_version}."* ]]; then
+  "{{mise_bin}}" install-into "node@${node_version}" "$stage/node"
+  rm -rf "$bin/node"
+  mv "$stage/node" "$bin/node"
+fi
+if [[ ! -x $bin/cosign ]] || ! "$bin/cosign" version 2>/dev/null | grep -Eq "^GitVersion:[[:space:]]+${cosign_version}\$"; then
+  "{{mise_bin}}" install-into "cosign@${cosign_version}" "$stage/cosign"
+  [[ -f $stage/cosign/cosign ]] || fail "cosign@${cosign_version} did not install a cosign binary"
+  rm -f "$bin/cosign"
+  mv "$stage/cosign/cosign" "$bin/cosign"
+  chmod 0755 "$bin/cosign"
+fi
+# helm prints `v4.3.1+g<commit>`; the release archive nests the binary in a platform directory.
+if [[ ! -x $bin/helm ]] || [[ $("$bin/helm" version --short 2>/dev/null) != "${helm_version}+g"* ]]; then
+  "{{mise_bin}}" install-into "helm@${helm_version}" "$stage/helm"
+  helm_staged=$(find "$stage/helm" -type f -name helm -print -quit)
+  [[ -n $helm_staged ]] || fail "helm@${helm_version} did not install a helm binary"
+  rm -f "$bin/helm"
+  mv "$helm_staged" "$bin/helm"
+  chmod 0755 "$bin/helm"
+fi
+if [[ ! -x $bin/kustomize ]] || [[ $("$bin/kustomize" version 2>/dev/null) != "${kustomize_version}" ]]; then
+  "{{mise_bin}}" install-into "kustomize@${kustomize_version}" "$stage/kustomize"
+  [[ -f $stage/kustomize/kustomize ]] || fail "kustomize@${kustomize_version} did not install a kustomize binary"
+  rm -f "$bin/kustomize"
+  mv "$stage/kustomize/kustomize" "$bin/kustomize"
+  chmod 0755 "$bin/kustomize"
+fi
+
+export PATH="$bin:$bin/go/bin:$bin/node/bin:$bin/npm/bin:$PATH"
+export GOBIN="$bin"
+export GOTOOLCHAIN=local
+unset GOROOT
+
+"$bin/go/bin/go" install 'github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{vars.golangci_lint_version}}'
+"$bin/go/bin/go" install 'mvdan.cc/gofumpt@{{vars.gofumpt_version}}'
+"$bin/go/bin/go" install 'golang.org/x/tools/cmd/goimports@{{vars.goimports_version}}'
+"$bin/go/bin/go" install 'gotest.tools/gotestsum@{{vars.gotestsum_version}}'
+"$bin/go/bin/go" install 'github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@{{vars.gotestfmt_version}}'
+"$bin/go/bin/go" install 'github.com/psampaz/go-mod-outdated@{{vars.go_mod_outdated_version}}'
+"$bin/go/bin/go" install 'github.com/rhysd/actionlint/cmd/actionlint@{{vars.actionlint_version}}'
+"$bin/go/bin/go" install 'github.com/caarlos0/svu/v3@{{vars.svu_version}}'
+"$bin/go/bin/go" install 'golang.org/x/vuln/cmd/govulncheck@{{vars.govulncheck_version}}'
+"$bin/node/bin/npm" install --global --prefix "$bin/npm" 'markdownlint-cli2@{{vars.markdownlint_cli2_version}}'
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+
+$root = (Get-Location).ProviderPath
+$bin = Join-Path $root '.bin'
+$goVersion = '{{vars.go_version}}'
+$nodeVersion = '{{vars.node_version}}'
+$cosignVersion = '{{vars.cosign_version}}'
+$helmVersion = '{{vars.helm_version}}'
+$kustomizeVersion = '{{vars.kustomize_version}}'
+$stage = $null
+$npmStage = $null
+
+function Stop-ToolInstall {
+    param([Parameter(Mandatory = $true)][string]$Message)
+    throw "tools:install: $Message"
+}
+
+function Assert-NotReparsePoint {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    if (Test-Path -LiteralPath $Path) {
+        $item = Get-Item -LiteralPath $Path -Force
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Stop-ToolInstall "tool installation path must not be a symlink or reparse point: $Path"
+        }
+    }
+}
+
+function Invoke-NativeCommand {
+    param(
+        [Parameter(Mandatory = $true)][string]$Command,
+        [Parameter(Mandatory = $true)][string[]]$Arguments
+    )
+    & $Command @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        Stop-ToolInstall "command failed with exit code ${LASTEXITCODE}: $Command"
+    }
+}
+
+Assert-NotReparsePoint -Path $bin
+New-Item -ItemType Directory -Path $bin -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $root '.tmp') -Force | Out-Null
+
+foreach ($path in @(
+    (Join-Path $bin 'go'),
+    (Join-Path $bin 'node'),
+    (Join-Path $bin 'npm')
+)) {
+    Assert-NotReparsePoint -Path $path
+}
+foreach ($name in @(
+    'golangci-lint.exe',
+    'gofumpt.exe',
+    'goimports.exe',
+    'gotestsum.exe',
+    'gotestfmt.exe',
+    'go-mod-outdated.exe',
+    'actionlint.exe',
+    'svu.exe',
+    'govulncheck.exe',
+    'cosign.exe',
+    'helm.exe',
+    'kustomize.exe'
+)) {
+    Assert-NotReparsePoint -Path (Join-Path $bin $name)
+}
+
+$stage = Join-Path $root ('.tmp\tools-install.' + [System.Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $stage | Out-Null
+try {
+    $goExecutable = Join-Path $bin 'go\bin\go.exe'
+    $installGo = -not (Test-Path -LiteralPath $goExecutable -PathType Leaf)
+    if (-not $installGo) {
+        $reportedGoVersion = (& $goExecutable version 2>$null) -join "`n"
+        $installGo = $LASTEXITCODE -ne 0 -or $reportedGoVersion -notlike "go version go$goVersion *"
+    }
+    if ($installGo) {
+        $stagedGo = Join-Path $stage 'go'
+        Invoke-NativeCommand -Command '{{mise_bin}}' -Arguments @('install-into', "go@$goVersion", $stagedGo)
+        $goPath = Join-Path $bin 'go'
+        if (Test-Path -LiteralPath $goPath) {
+            Remove-Item -LiteralPath $goPath -Recurse -Force
+        }
+        Move-Item -LiteralPath $stagedGo -Destination $goPath
+    }
+
+    $nodeExecutable = Join-Path $bin 'node\node.exe'
+    $installNode = -not (Test-Path -LiteralPath $nodeExecutable -PathType Leaf)
+    if (-not $installNode) {
+        $reportedNodeVersion = (& $nodeExecutable --version 2>$null) -join "`n"
+        $installNode = $LASTEXITCODE -ne 0 -or $reportedNodeVersion -notlike "v$nodeVersion.*"
+    }
+    if ($installNode) {
+        $stagedNode = Join-Path $stage 'node'
+        Invoke-NativeCommand -Command '{{mise_bin}}' -Arguments @('install-into', "node@$nodeVersion", $stagedNode)
+        $nodePath = Join-Path $bin 'node'
+        if (Test-Path -LiteralPath $nodePath) {
+            Remove-Item -LiteralPath $nodePath -Recurse -Force
+        }
+        Move-Item -LiteralPath $stagedNode -Destination $nodePath
+    }
+
+    $cosignExecutable = Join-Path $bin 'cosign.exe'
+    $installCosign = -not (Test-Path -LiteralPath $cosignExecutable -PathType Leaf)
+    if (-not $installCosign) {
+        $reportedCosignVersion = (& $cosignExecutable version 2>$null) -join "`n"
+        $installCosign = $LASTEXITCODE -ne 0 -or $reportedCosignVersion -notmatch "(?m)^GitVersion:\s+$([regex]::Escape($cosignVersion))$"
+    }
+    if ($installCosign) {
+        $stagedCosign = Join-Path $stage 'cosign'
+        Invoke-NativeCommand -Command '{{mise_bin}}' -Arguments @('install-into', "cosign@$cosignVersion", $stagedCosign)
+        $stagedCosignExecutable = Get-ChildItem -LiteralPath $stagedCosign -Filter 'cosign*.exe' -File | Select-Object -First 1
+        if ($null -eq $stagedCosignExecutable) {
+            Stop-ToolInstall "cosign@$cosignVersion did not install a cosign executable"
+        }
+        if (Test-Path -LiteralPath $cosignExecutable) {
+            Remove-Item -LiteralPath $cosignExecutable -Force
+        }
+        Move-Item -LiteralPath $stagedCosignExecutable.FullName -Destination $cosignExecutable
+    }
+
+    # helm prints `v4.3.1+g<commit>`; the release archive nests the binary in a platform directory.
+    $helmExecutable = Join-Path $bin 'helm.exe'
+    $installHelm = -not (Test-Path -LiteralPath $helmExecutable -PathType Leaf)
+    if (-not $installHelm) {
+        $reportedHelmVersion = (& $helmExecutable version --short 2>$null) -join "`n"
+        $installHelm = $LASTEXITCODE -ne 0 -or $reportedHelmVersion -notlike "$helmVersion+g*"
+    }
+    if ($installHelm) {
+        $stagedHelm = Join-Path $stage 'helm'
+        Invoke-NativeCommand -Command '{{mise_bin}}' -Arguments @('install-into', "helm@$helmVersion", $stagedHelm)
+        $stagedHelmExecutable = Get-ChildItem -LiteralPath $stagedHelm -Filter 'helm.exe' -File -Recurse | Select-Object -First 1
+        if ($null -eq $stagedHelmExecutable) {
+            Stop-ToolInstall "helm@$helmVersion did not install a helm executable"
+        }
+        if (Test-Path -LiteralPath $helmExecutable) {
+            Remove-Item -LiteralPath $helmExecutable -Force
+        }
+        Move-Item -LiteralPath $stagedHelmExecutable.FullName -Destination $helmExecutable
+    }
+
+    $kustomizeExecutable = Join-Path $bin 'kustomize.exe'
+    $installKustomize = -not (Test-Path -LiteralPath $kustomizeExecutable -PathType Leaf)
+    if (-not $installKustomize) {
+        $reportedKustomizeVersion = ((& $kustomizeExecutable version 2>$null) -join "`n").Trim()
+        $installKustomize = $LASTEXITCODE -ne 0 -or $reportedKustomizeVersion -ne $kustomizeVersion
+    }
+    if ($installKustomize) {
+        $stagedKustomize = Join-Path $stage 'kustomize'
+        Invoke-NativeCommand -Command '{{mise_bin}}' -Arguments @('install-into', "kustomize@$kustomizeVersion", $stagedKustomize)
+        $stagedKustomizeExecutable = Get-ChildItem -LiteralPath $stagedKustomize -Filter 'kustomize*.exe' -File | Select-Object -First 1
+        if ($null -eq $stagedKustomizeExecutable) {
+            Stop-ToolInstall "kustomize@$kustomizeVersion did not install a kustomize executable"
+        }
+        if (Test-Path -LiteralPath $kustomizeExecutable) {
+            Remove-Item -LiteralPath $kustomizeExecutable -Force
+        }
+        Move-Item -LiteralPath $stagedKustomizeExecutable.FullName -Destination $kustomizeExecutable
+    }
+
+    $goExecutable = Join-Path $bin 'go\bin\go.exe'
+    $npmExecutable = Join-Path $bin 'node\npm.cmd'
+    $npmPrefix = Join-Path $bin 'npm'
+    $env:PATH = @(
+        $bin,
+        (Join-Path $bin 'go\bin'),
+        (Join-Path $bin 'node'),
+        (Join-Path $bin 'npm'),
+        $env:PATH
+    ) -join [System.IO.Path]::PathSeparator
+    $env:GOBIN = $bin
+    $env:GOTOOLCHAIN = 'local'
+    Remove-Item Env:GOROOT -ErrorAction SilentlyContinue
+
+    foreach ($package in @(
+        'github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{vars.golangci_lint_version}}',
+        'mvdan.cc/gofumpt@{{vars.gofumpt_version}}',
+        'golang.org/x/tools/cmd/goimports@{{vars.goimports_version}}',
+        'gotest.tools/gotestsum@{{vars.gotestsum_version}}',
+        'github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@{{vars.gotestfmt_version}}',
+        'github.com/psampaz/go-mod-outdated@{{vars.go_mod_outdated_version}}',
+        'github.com/rhysd/actionlint/cmd/actionlint@{{vars.actionlint_version}}',
+        'github.com/caarlos0/svu/v3@{{vars.svu_version}}',
+        'golang.org/x/vuln/cmd/govulncheck@{{vars.govulncheck_version}}'
+    )) {
+        Invoke-NativeCommand -Command $goExecutable -Arguments @('install', $package)
+    }
+    # npm.cmd delegates through cmd.exe, which cannot use UNC paths.
+    # Install locally, then move only the completed package tree into .bin.
+    $npmStage = Join-Path $env:TEMP (
+        'go-project-template-npm.' + [System.Guid]::NewGuid().ToString('N')
+    )
+    Invoke-NativeCommand -Command $npmExecutable -Arguments @(
+        'install',
+        '--global',
+        '--prefix',
+        $npmStage,
+        'markdownlint-cli2@{{vars.markdownlint_cli2_version}}'
+    )
+    $stagedNpmPrefix = Join-Path $stage 'npm'
+    Copy-Item -LiteralPath $npmStage -Destination $stagedNpmPrefix -Recurse
+    if (Test-Path -LiteralPath $npmPrefix) {
+        Remove-Item -LiteralPath $npmPrefix -Recurse -Force
+    }
+    Move-Item -LiteralPath $stagedNpmPrefix -Destination $npmPrefix
+} finally {
+    if ($null -ne $stage -and (Test-Path -LiteralPath $stage)) {
+        Remove-Item -LiteralPath $stage -Recurse -Force
+    }
+    if ($null -ne $npmStage -and (Test-Path -LiteralPath $npmStage)) {
+        Remove-Item -LiteralPath $npmStage -Recurse -Force
+    }
+}
+'''
+
+[tasks."tools:release"]
+description = "Install the pinned repository-local GoReleaser binary."
+run = '''
+set -euo pipefail
+root=$PWD
+bin=$root/.bin
+version='{{vars.goreleaser_version}}'
+stage=
+
+fail() {
+  printf 'tools:release: %s\n' "$*" >&2
+  exit 1
+}
+
+cleanup() {
+  if [[ -n $stage ]]; then
+    rm -rf "$stage"
+  fi
+}
+trap cleanup EXIT INT TERM
+
+[[ ! -L $bin ]] || fail '.bin must not be a symlink'
+[[ ! -L $bin/goreleaser ]] || fail 'GoReleaser destination must not be a symlink'
+mkdir -p "$bin" "$root/.tmp"
+case "$(uname -s)" in
+  Linux) os=Linux ;;
+  Darwin) os=Darwin ;;
+  *) fail "unsupported GoReleaser host: $(uname -s)" ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) arch=x86_64 ;;
+  arm64|aarch64) arch=arm64 ;;
+  *) fail "unsupported GoReleaser architecture: $(uname -m)" ;;
+esac
+asset="goreleaser_${os}_${arch}.tar.gz"
+base="https://github.com/goreleaser/goreleaser/releases/download/${version}"
+stage=$(mktemp -d "$root/.tmp/goreleaser-install.XXXXXX")
+mkdir -p "$stage/extract"
+curl --fail --location --silent --show-error "$base/$asset" --output "$stage/$asset"
+curl --fail --location --silent --show-error "$base/checksums.txt" --output "$stage/checksums.txt"
+expected=
+while read -r checksum filename; do
+  if [[ $filename == "$asset" ]]; then
+    expected=$checksum
+    break
+  fi
+done < "$stage/checksums.txt"
+[[ -n $expected ]] || fail "checksum missing for $asset"
+if command -v sha256sum >/dev/null 2>&1; then
+  output=$(sha256sum "$stage/$asset")
+  actual=${output%% *}
+elif command -v shasum >/dev/null 2>&1; then
+  output=$(shasum -a 256 "$stage/$asset")
+  actual=${output%% *}
+else
+  fail 'sha256sum or shasum is required'
+fi
+[[ $actual == "$expected" ]] || fail "checksum verification failed for $asset"
+tar -xzf "$stage/$asset" -C "$stage/extract"
+[[ -f $stage/extract/goreleaser ]] || fail 'release archive does not contain goreleaser'
+install -m 0755 "$stage/extract/goreleaser" "$bin/goreleaser"
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+
+$root = (Get-Location).ProviderPath
+$bin = Join-Path $root '.bin'
+$version = '{{vars.goreleaser_version}}'
+$stage = $null
+
+function Stop-ReleaseInstall {
+    param([Parameter(Mandatory = $true)][string]$Message)
+    throw "tools:release: $Message"
+}
+
+function Assert-NotReparsePoint {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    if (Test-Path -LiteralPath $Path) {
+        $item = Get-Item -LiteralPath $Path -Force
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Stop-ReleaseInstall "destination must not be a symlink or reparse point: $Path"
+        }
+    }
+}
+
+Assert-NotReparsePoint -Path $bin
+New-Item -ItemType Directory -Path $bin -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $root '.tmp') -Force | Out-Null
+$destination = Join-Path $bin 'goreleaser.exe'
+Assert-NotReparsePoint -Path $destination
+
+$architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
+    'AMD64' { 'x86_64' }
+    'ARM64' { 'arm64' }
+    default { Stop-ReleaseInstall "unsupported GoReleaser architecture: $env:PROCESSOR_ARCHITECTURE" }
+}
+$asset = "goreleaser_Windows_${architecture}.zip"
+$baseUrl = "https://github.com/goreleaser/goreleaser/releases/download/$version"
+$stage = Join-Path $root ('.tmp\goreleaser-install.' + [System.Guid]::NewGuid().ToString('N'))
+$extract = Join-Path $stage 'extract'
+New-Item -ItemType Directory -Path $extract -Force | Out-Null
+
+try {
+    $archive = Join-Path $stage $asset
+    $checksums = Join-Path $stage 'checksums.txt'
+    Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/$asset" -OutFile $archive
+    Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/checksums.txt" -OutFile $checksums
+
+    $expected = $null
+    foreach ($line in [System.IO.File]::ReadAllLines($checksums)) {
+        if ($line -match '^([0-9a-fA-F]{64})\s+(.+)$' -and $Matches[2] -eq $asset) {
+            $expected = $Matches[1].ToLowerInvariant()
+            break
+        }
+    }
+    if ([string]::IsNullOrEmpty($expected)) {
+        Stop-ReleaseInstall "checksum missing for $asset"
+    }
+
+    $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant()
+    if ($actual -ne $expected) {
+        Stop-ReleaseInstall "checksum verification failed for $asset"
+    }
+
+    Expand-Archive -LiteralPath $archive -DestinationPath $extract -Force
+    $source = Join-Path $extract 'goreleaser.exe'
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+        Stop-ReleaseInstall 'release archive does not contain goreleaser.exe'
+    }
+    Copy-Item -LiteralPath $source -Destination $destination -Force
+} finally {
+    if ($null -ne $stage -and (Test-Path -LiteralPath $stage)) {
+        Remove-Item -LiteralPath $stage -Recurse -Force
+    }
+}
+'''
+
+[tasks."tools:cbm"]
+description = "Install the pinned codebase-memory-mcp build into .bin."
+run = '''
+set -euo pipefail
+root=$PWD
+bin=$root/.bin
+pin=$root/internal/cbmpin/cbm-pin.tsv
+stage=
+
+fail() {
+  printf 'tools:cbm: %s\n' "$*" >&2
+  exit 1
+}
+
+cleanup() {
+  if [[ -n $stage ]]; then
+    rm -rf "$stage"
+  fi
+}
+trap cleanup EXIT INT TERM
+
+sha256_of() {
+  local output
+  if command -v sha256sum >/dev/null 2>&1; then
+    output=$(sha256sum "$1")
+  elif command -v shasum >/dev/null 2>&1; then
+    output=$(shasum -a 256 "$1")
+  else
+    fail 'sha256sum or shasum is required'
+  fi
+  printf '%s' "${output%% *}"
+}
+
+[[ -f $pin ]] || fail "missing $pin"
+[[ ! -L $bin ]] || fail '.bin must not be a symlink'
+[[ ! -L $bin/codebase-memory-mcp ]] || fail 'destination must not be a symlink'
+mkdir -p "$bin" "$root/.tmp"
+case "$(uname -s)" in
+  Linux) goos=linux ;;
+  Darwin) goos=darwin ;;
+  *) fail "unsupported host: $(uname -s)" ;;
+esac
+case "$(uname -m)" in
+  x86_64|amd64) goarch=amd64 ;;
+  arm64|aarch64) goarch=arm64 ;;
+  *) fail "unsupported architecture: $(uname -m)" ;;
+esac
+platform=$goos-$goarch
+version=$(awk -F '\t' '$1 == "version" {print $2}' "$pin")
+repository=$(awk -F '\t' '$1 == "repository" {print $2}' "$pin")
+row=$(awk -F '\t' -v platform="$platform" '$1 == platform {print}' "$pin")
+[[ -n $version && -n $repository ]] || fail "$pin has no version or repository"
+[[ -n $row ]] || fail "$pin has no entry for $platform"
+IFS=$'\t' read -r _ archive archive_sha binary binary_sha <<< "$row"
+
+if [[ -f $bin/$binary ]] && [[ $(sha256_of "$bin/$binary") == "$binary_sha" ]]; then
+  printf 'codebase-memory-mcp %s already installed in %s\n' "$version" "$bin"
+  exit 0
+fi
+
+stage=$(mktemp -d "$root/.tmp/cbm-install.XXXXXX")
+mkdir -p "$stage/extract"
+curl --fail --location --silent --show-error \
+  "https://github.com/$repository/releases/download/$version/$archive" --output "$stage/$archive"
+[[ $(sha256_of "$stage/$archive") == "$archive_sha" ]] || fail "checksum verification failed for $archive"
+tar -xzf "$stage/$archive" -C "$stage/extract" "$binary"
+[[ -f $stage/extract/$binary ]] || fail "release archive does not contain $binary"
+[[ $(sha256_of "$stage/extract/$binary") == "$binary_sha" ]] || fail "checksum verification failed for $binary"
+install -m 0755 "$stage/extract/$binary" "$bin/.$binary.new"
+mv -f "$bin/.$binary.new" "$bin/$binary"
+printf 'installed codebase-memory-mcp %s into %s\n' "$version" "$bin"
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+
+$root = (Get-Location).ProviderPath
+$bin = Join-Path $root '.bin'
+$pin = Join-Path $root 'internal\cbmpin\cbm-pin.tsv'
+$stage = $null
+
+function Stop-CbmInstall {
+    param([Parameter(Mandatory = $true)][string]$Message)
+    throw "tools:cbm: $Message"
+}
+
+function Assert-NotReparsePoint {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    if (Test-Path -LiteralPath $Path) {
+        $item = Get-Item -LiteralPath $Path -Force
+        if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Stop-CbmInstall "destination must not be a symlink or reparse point: $Path"
+        }
+    }
+}
+
+function Get-Sha256 {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
+}
+
+if (-not (Test-Path -LiteralPath $pin -PathType Leaf)) {
+    Stop-CbmInstall "missing $pin"
+}
+Assert-NotReparsePoint -Path $bin
+New-Item -ItemType Directory -Path $bin -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $root '.tmp') -Force | Out-Null
+
+$goarch = switch ($env:PROCESSOR_ARCHITECTURE) {
+    'AMD64' { 'amd64' }
+    'ARM64' { 'arm64' }
+    default { Stop-CbmInstall "unsupported architecture: $env:PROCESSOR_ARCHITECTURE" }
+}
+$platform = "windows-$goarch"
+$version = $null
+$repository = $null
+$fields = $null
+foreach ($line in [System.IO.File]::ReadAllLines($pin)) {
+    if ($line.StartsWith('#') -or [string]::IsNullOrWhiteSpace($line)) { continue }
+    $columns = $line.Split("`t")
+    if ($columns[0] -eq 'version') { $version = $columns[1] }
+    elseif ($columns[0] -eq 'repository') { $repository = $columns[1] }
+    elseif ($columns[0] -eq $platform) { $fields = $columns }
+}
+if ([string]::IsNullOrEmpty($version) -or [string]::IsNullOrEmpty($repository)) {
+    Stop-CbmInstall "$pin has no version or repository"
+}
+if ($null -eq $fields -or $fields.Count -lt 5) {
+    Stop-CbmInstall "$pin has no entry for $platform"
+}
+$archiveName = $fields[1]
+$archiveSha = $fields[2]
+$binaryName = $fields[3]
+$binarySha = $fields[4]
+
+$destination = Join-Path $bin $binaryName
+Assert-NotReparsePoint -Path $destination
+if ((Test-Path -LiteralPath $destination -PathType Leaf) -and ((Get-Sha256 -Path $destination) -eq $binarySha)) {
+    Write-Output "codebase-memory-mcp $version already installed in $bin"
+    return
+}
+
+$stage = Join-Path $root ('.tmp\cbm-install.' + [System.Guid]::NewGuid().ToString('N'))
+$extract = Join-Path $stage 'extract'
+New-Item -ItemType Directory -Path $extract -Force | Out-Null
+try {
+    $archive = Join-Path $stage $archiveName
+    Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/$repository/releases/download/$version/$archiveName" -OutFile $archive
+    if ((Get-Sha256 -Path $archive) -ne $archiveSha) {
+        Stop-CbmInstall "checksum verification failed for $archiveName"
+    }
+    Expand-Archive -LiteralPath $archive -DestinationPath $extract -Force
+    $source = Join-Path $extract $binaryName
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+        Stop-CbmInstall "release archive does not contain $binaryName"
+    }
+    if ((Get-Sha256 -Path $source) -ne $binarySha) {
+        Stop-CbmInstall "checksum verification failed for $binaryName"
+    }
+    $partial = Join-Path $bin ".$binaryName.new"
+    Copy-Item -LiteralPath $source -Destination $partial -Force
+    Move-Item -LiteralPath $partial -Destination $destination -Force
+    Write-Output "installed codebase-memory-mcp $version into $bin"
+} finally {
+    if ($null -ne $stage -and (Test-Path -LiteralPath $stage)) {
+        Remove-Item -LiteralPath $stage -Recurse -Force
+    }
+}
+'''
+
+[tasks."cbm:pin"]
+description = "Pin a codebase-memory-mcp release: verify it and rewrite internal/cbmpin/cbm-pin.tsv (needs gh)."
+usage = 'arg "<tag>" help "CBM release tag, for example v0.12.1"'
+run = '''
+set -euo pipefail
+fail() { printf 'cbm:pin: %s\n' "$*" >&2; exit 1; }
+tag=${usage_tag:-}
+[[ -n $tag ]] || fail 'usage: mise run cbm:pin <tag>'
+command -v gh >/dev/null || fail 'missing gh'
+[[ -x .bin/cosign ]] || fail 'missing local cosign; run mise run tools:install'
+root=$PWD
+pin=$root/internal/cbmpin/cbm-pin.tsv
+repository=DeusData/codebase-memory-mcp
+identity="https://github.com/$repository/.github/workflows/release.yml@refs/heads/main"
+issuer=https://token.actions.githubusercontent.com
+mkdir -p "$root/.tmp"
+stage=$(mktemp -d "$root/.tmp/cbm-pin.XXXXXX")
+trap 'rm -rf "$stage"' EXIT INT TERM
+gh release download "$tag" -R "$repository" -D "$stage" \
+  -p checksums.txt -p checksums.txt.bundle -p release-selection.tsv
+.bin/cosign verify-blob --bundle "$stage/checksums.txt.bundle" \
+  --certificate-identity "$identity" --certificate-oidc-issuer "$issuer" "$stage/checksums.txt"
+
+checksum_of() {
+  awk -v name="$1" '$2 == name {print $1}' "$stage/checksums.txt"
+}
+selection_sha=$(checksum_of release-selection.tsv)
+if [[ -n $selection_sha ]]; then
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$stage/release-selection.tsv")
+  else
+    actual=$(shasum -a 256 "$stage/release-selection.tsv")
+  fi
+  [[ ${actual%% *} == "$selection_sha" ]] || fail 'release-selection.tsv does not match checksums.txt'
+fi
+
+out=$stage/cbm-pin.tsv
+{
+  printf '%s\n' '# The codebase-memory-mcp (CBM) release that Concordia is tested with.'
+  printf '%s\n' '# Read by the concordia binary (embedded: `concordia cbm install` and `doctor`) and by the mise task tools:cbm.'
+  printf '%s\n' '# Linux uses the fully static "-portable" build, as the upstream installer does.'
+  printf '%s\n' '# Regenerate with: mise run cbm:pin <tag>'
+  printf '%s\n' '# Rows: "version <tag>", "repository <owner/name>", then one row per platform:'
+  printf '%s\n' '# <goos-goarch> <archive> <archive sha256> <binary in archive> <binary sha256>'
+  printf 'version\t%s\nrepository\t%s\n' "$tag" "$repository"
+  for platform in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64 windows-amd64 windows-arm64; do
+    goos=${platform%%-*}
+    target=$platform
+    case $goos in
+      linux) archive=codebase-memory-mcp-$platform-portable.tar.gz; target=$platform-portable; binary=codebase-memory-mcp ;;
+      darwin) archive=codebase-memory-mcp-$platform.tar.gz; binary=codebase-memory-mcp ;;
+      *) archive=codebase-memory-mcp-$platform.zip; binary=codebase-memory-mcp.exe ;;
+    esac
+    archive_sha=$(checksum_of "$archive")
+    binary_sha=$(awk -F '\t' -v target="$target" '$1 == target {print $4}' "$stage/release-selection.tsv")
+    [[ -n $archive_sha ]] || fail "checksums.txt has no entry for $archive"
+    [[ -n $binary_sha ]] || fail "release-selection.tsv has no entry for $target"
+    printf '%s\t%s\t%s\t%s\t%s\n' "$platform" "$archive" "$archive_sha" "$binary" "$binary_sha"
+  done
+} > "$out"
+mv -f "$out" "$pin"
+printf 'pinned codebase-memory-mcp %s in %s\n' "$tag" "$pin"
+'''
+run_windows = '''
+[Console]::Error.WriteLine('cbm:pin needs bash; run it on Linux or macOS')
+exit 1
+'''
+
+[tasks.tidy]
+description = "Tidy the application module."
+run = '''
+set -euo pipefail
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+.bin/go/bin/go mod tidy -compat=1.26
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$go = Join-Path (Get-Location).ProviderPath '.bin\go\bin\go.exe'
+if (-not (Test-Path -LiteralPath $go -PathType Leaf)) {
+    throw 'missing local Go; run mise run tools:install'
+}
+& $go mod tidy -compat=1.26
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.fmt]
+description = "Format Go source and imports."
+run = '''
+set -euo pipefail
+for tool in .bin/go/bin/go .bin/gofumpt .bin/golangci-lint; do
+  [[ -x $tool ]] || { printf 'missing local tool %s; run mise run tools:install\n' "$tool" >&2; exit 1; }
+done
+mapfile -t go_files < <(.bin/go/bin/go list -f '{% raw %}{{range .GoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .XTestGoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{% endraw %}' ./...)
+if [[ -n ${go_files[*]-} ]]; then
+  .bin/gofumpt -w "${go_files[@]}"
+fi
+.bin/golangci-lint fmt ./...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$root = (Get-Location).ProviderPath
+$go = Join-Path $root '.bin\go\bin\go.exe'
+$gofumpt = Join-Path $root '.bin\gofumpt.exe'
+$golangciLint = Join-Path $root '.bin\golangci-lint.exe'
+foreach ($tool in @($go, $gofumpt, $golangciLint)) {
+    if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+        throw "missing local tool $tool; run mise run tools:install"
+    }
+}
+$goFiles = @(& $go list -f '{% raw %}{{range .GoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{{range .XTestGoFiles}}{{$.Dir}}/{{.}}{{"\n"}}{{end}}{% endraw %}' ./...)
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($goFiles.Count -gt 0) {
+    & $gofumpt -w @goFiles
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+& $golangciLint fmt ./...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.lint]
+description = "Verify configuration and run strict Go linting."
+run = '''
+set -euo pipefail
+[[ -x .bin/golangci-lint ]] || { printf 'missing local golangci-lint; run mise run tools:install\n' >&2; exit 1; }
+.bin/golangci-lint config verify
+.bin/golangci-lint run --timeout=5m ./...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\golangci-lint.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local golangci-lint; run mise run tools:install'
+}
+& $tool config verify
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& $tool run --timeout=5m ./...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks."lint-fix"]
+description = "Apply supported lint fixes."
+run = '''
+set -euo pipefail
+[[ -x .bin/golangci-lint ]] || { printf 'missing local golangci-lint; run mise run tools:install\n' >&2; exit 1; }
+.bin/golangci-lint run --timeout=5m --fix ./...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\golangci-lint.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local golangci-lint; run mise run tools:install'
+}
+& $tool run --timeout=5m --fix ./...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.actionlint]
+description = "Validate GitHub Actions workflows."
+run = '''
+set -euo pipefail
+[[ -x .bin/actionlint ]] || { printf 'missing local actionlint; run mise run tools:install\n' >&2; exit 1; }
+.bin/actionlint .github/workflows/*.yml
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\actionlint.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local actionlint; run mise run tools:install'
+}
+$workflows = @(Get-ChildItem -Path '.github\workflows\*.yml' -File | Select-Object -ExpandProperty FullName)
+& $tool @workflows
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.markdownlint]
+description = "Validate Markdown documentation."
+run = '''
+set -euo pipefail
+[[ -x .bin/npm/bin/markdownlint-cli2 ]] || { printf 'missing local markdownlint-cli2; run mise run tools:install\n' >&2; exit 1; }
+.bin/npm/bin/markdownlint-cli2 --config .markdownlint.yaml README.md CONTRIBUTING.md 'docs/**/*.md' '#docs/tutorials/**'
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\npm\markdownlint-cli2.ps1'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local markdownlint-cli2; run mise run tools:install'
+}
+& $tool --config .markdownlint.yaml README.md CONTRIBUTING.md 'docs/**/*.md' '#docs/tutorials/**'
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.install]
+description = "Install concordia into .bin so that it is on the mise PATH."
+run = '''
+set -euo pipefail
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+.bin/go/bin/go install ./cmd/concordia
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$go = Join-Path (Get-Location).ProviderPath '.bin\go\bin\go.exe'
+if (-not (Test-Path -LiteralPath $go -PathType Leaf)) {
+    throw 'missing local Go; run mise run tools:install'
+}
+& $go install ./cmd/concordia
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.test-e2e]
+description = "Run the end-to-end tests (uses the pinned codebase-memory-mcp in .bin)."
+env = { CONCORDIA_E2E = "1" }
+depends = ["tools:cbm"]
+run = '''
+set -euo pipefail
+[[ -x .bin/gotestsum ]] || { printf 'missing local gotestsum; run mise run tools:install\n' >&2; exit 1; }
+# Each `codebase-memory-mcp cli` call takes about 0.4 s (CBM 0.12.x), so the suite needs more than the 10 minutes of go test.
+.bin/gotestsum -- -count=1 -timeout 60m ./test/e2e/...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\gotestsum.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local gotestsum; run mise run tools:install'
+}
+& $tool -- -count=1 -timeout 60m ./test/e2e/...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.record-cbm]
+description = "Record the CBM calls of the commerce and infra fixtures (needs codebase-memory-mcp)."
+depends = ["tools:cbm"]
+run = '''
+set -euo pipefail
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+.bin/go/bin/go run ./cmd/record-cbm
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$go = Join-Path (Get-Location).ProviderPath '.bin\go\bin\go.exe'
+if (-not (Test-Path -LiteralPath $go -PathType Leaf)) {
+    throw 'missing local Go; run mise run tools:install'
+}
+& $go run ./cmd/record-cbm
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.docs-verify]
+description = "Verify the showboat tutorials (needs codebase-memory-mcp and showboat)."
+depends = ["install", "tools:cbm"]
+run = '''
+set -euo pipefail
+showboat verify docs/tutorials/getting-started.md
+showboat verify docs/tutorials/brownfield-adoption.md
+# The tour records an approval, and `assessment approve` refuses to run when CI is true (a person records a
+# decision, not a pipeline). The tour is still verified from an agent or CI shell, with CI unset for it only.
+env -u CI showboat verify docs/tutorials/tour-of-concordia.md
+'''
+run_windows = '''
+Write-Output 'docs-verify: not available on Windows'
+exit 0
+'''
+
+[tasks."calm:update"]
+description = "Pin the latest calm CLI release and build it."
+run = [
+  '''
+set -euo pipefail
+fail() { printf 'calm:update: %s\n' "$*" >&2; exit 1; }
+command -v jq >/dev/null || fail 'missing jq'
+command -v git >/dev/null || fail 'missing git'
+[[ -x .bin/go/bin/go ]] || fail 'missing local Go; run mise run tools:install'
+repository=https://github.com/finos/architecture-as-code
+refs=$(git ls-remote --tags --refs "$repository" 'refs/tags/cli-v*')
+tag=$(printf '%s\n' "$refs" | awk '{sub("refs/tags/", "", $2); print $2}' | grep -E '^cli-v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
+[[ -n $tag ]] || fail 'no cli-v* tags found'
+commit=$(printf '%s\n' "$refs" | awk -v ref="refs/tags/$tag" '$2 == ref {print $1}')
+mkdir -p test/parity
+jq -n --indent 2 --arg repository "$repository" --arg tag "$tag" --arg commit "$commit" \
+  '{repository: $repository, tag: $tag, commit: $commit}' > test/parity/upstream.json
+printf 'pinned calm CLI %s (%s)\n' "$tag" "$commit"
+''',
+  { task = "calm:build" },
+]
+run_windows = '''
+[Console]::Error.WriteLine('calm parity tasks need bash; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."calm:build"]
+description = "Check out and build the pinned calm CLI in .tmp/calm-upstream."
+run = '''
+set -euo pipefail
+fail() { printf 'calm:build: %s\n' "$*" >&2; exit 1; }
+command -v jq >/dev/null || fail 'missing jq'
+command -v git >/dev/null || fail 'missing git'
+[[ -x .bin/go/bin/go ]] || fail 'missing local Go; run mise run tools:install'
+root=$PWD
+pin=test/parity/upstream.json
+[[ -f $pin ]] || fail 'missing test/parity/upstream.json; run mise run calm:update'
+repository=$(jq -r .repository "$pin")
+commit=$(jq -r .commit "$pin")
+tag=$(jq -r .tag "$pin")
+checkout=$root/.tmp/calm-upstream
+# A cache hit also needs the Node.js of the checkout's .nvmrc (.bin and .tmp are removed separately).
+if [[ -f $checkout/.concordia-commit && $(<"$checkout/.concordia-commit") == "$commit" && -f $checkout/cli/dist/index.js ]] &&
+  [[ $(.bin/calm-node/bin/node --version 2>/dev/null) == "v$(tr -d '[:space:]' < "$checkout/.nvmrc" | sed 's/^v//')" ]]; then
+  printf 'calm CLI %s already built\n' "$tag"
+  exit 0
+fi
+rm -rf "$checkout"
+mkdir -p "$checkout"
+git -C "$checkout" init -q
+git -C "$checkout" fetch -q --depth 1 "$repository" "$commit"
+git -C "$checkout" checkout -q FETCH_HEAD
+nvmrc=$(tr -d '[:space:]' < "$checkout/.nvmrc")
+nvmrc=${nvmrc#v}
+if [[ ! -x .bin/calm-node/bin/node ]] || [[ $(.bin/calm-node/bin/node --version 2>/dev/null) != "v$nvmrc" ]]; then
+  rm -rf .tmp/calm-node-stage
+  "{{mise_bin}}" install-into "node@$nvmrc" .tmp/calm-node-stage
+  rm -rf .bin/calm-node
+  mv .tmp/calm-node-stage .bin/calm-node
+fi
+# The user npm configuration must not change the upstream build.
+: > "$root/.tmp/calm-npmrc"
+export PATH=$root/.bin/calm-node/bin:$PATH HUSKY=0 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 NPM_CONFIG_USERCONFIG=$root/.tmp/calm-npmrc
+cd "$checkout"
+if ! { npm ci --ignore-scripts --no-audit --no-fund --include-workspace-root \
+        --workspace calm-models --workspace calm-widgets --workspace shared --workspace cli &&
+      npm run build:cli; }; then
+  printf 'calm:build: workspace build failed; retrying with all workspaces\n' >&2
+  npm ci --no-audit --no-fund || fail 'npm ci failed'
+  npm run build:cli || fail 'npm run build:cli failed'
+fi
+printf '%s\n' "$commit" > "$checkout/.concordia-commit"
+printf 'built calm CLI %s\n' "$tag"
+'''
+run_windows = '''
+[Console]::Error.WriteLine('calm parity tasks need bash; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."calm:test-upstream"]
+description = "Run the tests of the pinned calm CLI."
+depends = ["calm:build"]
+run = '''
+set -euo pipefail
+fail() { printf 'calm:test-upstream: %s\n' "$*" >&2; exit 1; }
+command -v jq >/dev/null || fail 'missing jq'
+command -v git >/dev/null || fail 'missing git'
+[[ -x .bin/go/bin/go ]] || fail 'missing local Go; run mise run tools:install'
+# The user npm configuration must not change the upstream tests.
+: > "$PWD/.tmp/calm-npmrc"
+export PATH=$PWD/.bin/calm-node/bin:$PATH HUSKY=0 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 NPM_CONFIG_USERCONFIG=$PWD/.tmp/calm-npmrc
+cd .tmp/calm-upstream
+npm test --workspace shared --workspace cli
+'''
+run_windows = '''
+[Console]::Error.WriteLine('calm parity tasks need bash; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."calm:record"]
+description = "Record the calm CLI results of the parity cases."
+depends = ["calm:build"]
+run = '''
+set -euo pipefail
+fail() { printf 'calm:record: %s\n' "$*" >&2; exit 1; }
+command -v jq >/dev/null || fail 'missing jq'
+command -v git >/dev/null || fail 'missing git'
+[[ -x .bin/go/bin/go ]] || fail 'missing local Go; run mise run tools:install'
+.bin/go/bin/go run ./cmd/calm-parity record \
+  --upstream .tmp/calm-upstream --node .bin/calm-node/bin/node --cases test/parity
+'''
+run_windows = '''
+[Console]::Error.WriteLine('calm parity tasks need bash; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."codescene:delta"]
+description = "CodeScene delta of the branch against a base ref (needs CS_ACCESS_TOKEN)."
+usage = 'arg "[base]" default="main" help="git ref to compare HEAD against"'
+run = '''
+set -euo pipefail
+fail() { printf 'codescene:delta: %s\n' "$*" >&2; exit 1; }
+[[ -n ${CS_ACCESS_TOKEN:-} ]] || fail 'set CS_ACCESS_TOKEN to a CodeScene personal access token'
+cs=$(command -v cs || ls -d "$HOME"/.cache/codehealth-mcp/MCP-*/cs 2>/dev/null | sort -V | tail -n 1 || true)
+[[ -n $cs && -x $cs ]] || fail 'missing the cs CLI; install it or the CodeScene MCP server'
+base=${usage_base:-main}
+files=$(mktemp)
+trap 'rm -f "$files"' EXIT
+git diff --name-only --diff-filter=d "$base" HEAD -- . > "$files"
+"$cs" delta "$base" --file-list "$files" --error-on-warnings
+'''
+run_windows = '''
+[Console]::Error.WriteLine('codescene:delta needs bash; run it on Linux or macOS')
+exit 1
+'''
+
+[tasks."test-parity"]
+description = "Record the calm CLI results and compare Concordia with them (needs network)."
+depends = ["calm:record"]
+run = '''
+set -euo pipefail
+fail() { printf 'test-parity: %s\n' "$*" >&2; exit 1; }
+command -v jq >/dev/null || fail 'missing jq'
+command -v git >/dev/null || fail 'missing git'
+[[ -x .bin/go/bin/go ]] || fail 'missing local Go; run mise run tools:install'
+.bin/gotestsum -- -count=1 ./test/parity/...
+'''
+run_windows = '''
+[Console]::Error.WriteLine('calm parity tasks need bash; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks.test]
+description = "Run race-enabled shuffled tests."
+run = '''
+set -euo pipefail
+[[ -x .bin/gotestsum ]] || { printf 'missing local gotestsum; run mise run tools:install\n' >&2; exit 1; }
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+.bin/gotestsum -- -race -shuffle=on ./...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$root = (Get-Location).ProviderPath
+$gotestsum = Join-Path $root '.bin\gotestsum.exe'
+$go = Join-Path $root '.bin\go\bin\go.exe'
+foreach ($tool in @($gotestsum, $go)) {
+    if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+        throw "missing local tool $tool; run mise run tools:install"
+    }
+}
+& $gotestsum -- -race -shuffle=on ./...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks."test-reports"]
+description = "Generate test JSON and atomic coverage reports."
+run = '''
+set -euo pipefail
+for tool in .bin/go/bin/go .bin/gotestfmt; do
+  [[ -x $tool ]] || { printf 'missing local tool %s; run mise run tools:install\n' "$tool" >&2; exit 1; }
+done
+rm -rf '{{vars.output_dir}}/coverage'
+mkdir -p '{{vars.output_dir}}/coverage'
+.bin/go/bin/go test -json -race -shuffle=on -covermode=atomic -coverprofile='{{vars.output_dir}}/coverage/coverage.out' ./... \
+  | tee '{{vars.output_dir}}/test-results.json' \
+  | .bin/gotestfmt
+test -f '{{vars.output_dir}}/coverage/coverage.out'
+.bin/go/bin/go tool cover -func='{{vars.output_dir}}/coverage/coverage.out' | tee '{{vars.output_dir}}/coverage/coverage.txt'
+.bin/go/bin/go tool cover -html='{{vars.output_dir}}/coverage/coverage.out' -o '{{vars.output_dir}}/coverage/coverage.html'
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$root = (Get-Location).ProviderPath
+$go = Join-Path $root '.bin\go\bin\go.exe'
+$gotestfmt = Join-Path $root '.bin\gotestfmt.exe'
+foreach ($tool in @($go, $gotestfmt)) {
+    if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+        throw "missing local tool $tool; run mise run tools:install"
+    }
+}
+$output = Join-Path $root '{{vars.output_dir}}'
+$coverage = Join-Path $output 'coverage'
+$results = Join-Path $output 'test-results.json'
+if (Test-Path -LiteralPath $coverage) {
+    Remove-Item -LiteralPath $coverage -Recurse -Force
+}
+New-Item -ItemType Directory -Path $coverage -Force | Out-Null
+$coverageOut = Join-Path $coverage 'coverage.out'
+$testProcess = Start-Process -FilePath $go -ArgumentList @(
+    'test',
+    '-json',
+    # No -race on Windows: the CI runner image has no C compiler.
+    '-shuffle=on',
+    '-covermode=atomic',
+    '-coverprofile={{vars.output_dir}}/coverage/coverage.out',
+    './...'
+) -RedirectStandardOutput $results -NoNewWindow -Wait -PassThru
+Get-Content -LiteralPath $results | & $gotestfmt
+$formatExitCode = $LASTEXITCODE
+if ($testProcess.ExitCode -ne 0) { exit $testProcess.ExitCode }
+if ($formatExitCode -ne 0) { exit $formatExitCode }
+if (-not (Test-Path -LiteralPath $coverageOut -PathType Leaf)) {
+    throw "missing coverage profile: $coverageOut"
+}
+$coverageText = & $go tool cover "-func=$coverageOut"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+$coverageText | Tee-Object -FilePath (Join-Path $coverage 'coverage.txt')
+& $go tool cover "-html=$coverageOut" "-o=$(Join-Path $coverage 'coverage.html')"
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.security]
+description = "Scan reachable Go code for known vulnerabilities."
+run = '''
+set -euo pipefail
+[[ -x .bin/govulncheck ]] || { printf 'missing local govulncheck; run mise run tools:install\n' >&2; exit 1; }
+.bin/govulncheck ./...
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\govulncheck.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local govulncheck; run mise run tools:install'
+}
+& $tool ./...
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.build]
+description = "Build the local executable."
+run = '''
+set -euo pipefail
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+target_os=${GOOS:-$(.bin/go/bin/go env GOOS)}
+suffix=
+[[ $target_os == windows ]] && suffix=.exe
+mkdir -p '{{vars.output_dir}}'
+CGO_ENABLED=0 .bin/go/bin/go build -trimpath -o '{{vars.output_dir}}/{{vars.binary_name}}'"$suffix" './cmd/{{vars.binary_name}}'
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$root = (Get-Location).ProviderPath
+$go = Join-Path $root '.bin\go\bin\go.exe'
+if (-not (Test-Path -LiteralPath $go -PathType Leaf)) {
+    throw 'missing local Go; run mise run tools:install'
+}
+$targetOS = $env:GOOS
+if ([string]::IsNullOrEmpty($targetOS)) {
+    $targetOS = (& $go env GOOS | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+$suffix = if ($targetOS -eq 'windows') { '.exe' } else { '' }
+New-Item -ItemType Directory -Path '{{vars.output_dir}}' -Force | Out-Null
+$env:CGO_ENABLED = '0'
+& $go build -trimpath -o "{{vars.output_dir}}/{{vars.binary_name}}$suffix" './cmd/{{vars.binary_name}}'
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.snapshot]
+description = "Build an unpublished GoReleaser snapshot."
+run = '''
+set -euo pipefail
+[[ -x .bin/goreleaser ]] || { printf 'missing local GoReleaser; run mise run setup\n' >&2; exit 1; }
+# Snapshots are not signed: keyless signing needs the OIDC identity of the release workflow.
+goreleaser release --snapshot --clean --skip=sign
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\goreleaser.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local GoReleaser; run mise run setup'
+}
+& $tool release --snapshot --clean --skip=sign
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks."release:check"]
+description = "Validate the GoReleaser configuration."
+run = '''
+set -euo pipefail
+[[ -x .bin/goreleaser ]] || { printf 'missing local GoReleaser; run mise run setup\n' >&2; exit 1; }
+goreleaser check
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\goreleaser.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local GoReleaser; run mise run setup'
+}
+& $tool check
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks."outdated-deps"]
+description = "Report outdated direct dependencies."
+run = '''
+set -euo pipefail
+for tool in .bin/go/bin/go .bin/go-mod-outdated; do
+  [[ -x $tool ]] || { printf 'missing local tool %s; run mise run tools:install\n' "$tool" >&2; exit 1; }
+done
+.bin/go/bin/go list -u -m -json all | .bin/go-mod-outdated -direct
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$root = (Get-Location).ProviderPath
+$go = Join-Path $root '.bin\go\bin\go.exe'
+$outdated = Join-Path $root '.bin\go-mod-outdated.exe'
+foreach ($tool in @($go, $outdated)) {
+    if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+        throw "missing local tool $tool; run mise run tools:install"
+    }
+}
+$modules = & $go list -u -m -json all
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+$modules | & $outdated -direct
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks."update-deps"]
+description = "Update direct dependencies within their current major versions."
+run = '''
+set -euo pipefail
+[[ -x .bin/go/bin/go ]] || { printf 'missing local Go; run mise run tools:install\n' >&2; exit 1; }
+mapfile -t direct_modules < <(.bin/go/bin/go mod edit -json | jq -r '.Require // [] | .[] | select(.Indirect | not) | .Path')
+if [[ -n ${direct_modules[*]-} ]]; then
+  .bin/go/bin/go get -u "${direct_modules[@]}"
+fi
+.bin/go/bin/go mod tidy -compat=1.26
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$go = Join-Path (Get-Location).ProviderPath '.bin\go\bin\go.exe'
+if (-not (Test-Path -LiteralPath $go -PathType Leaf)) {
+    throw 'missing local Go; run mise run tools:install'
+}
+$moduleJson = (& $go mod edit -json | Out-String)
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+$module = $moduleJson | ConvertFrom-Json
+$directModules = @(
+    $module.Require |
+        Where-Object { -not $_.Indirect } |
+        Select-Object -ExpandProperty Path
+)
+if ($directModules.Count -gt 0) {
+    & $go get -u @directModules
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+& $go mod tidy -compat=1.26
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.version]
+description = "Show the current semantic version."
+run = '''
+set -euo pipefail
+[[ -x .bin/svu ]] || { printf 'missing local svu; run mise run tools:install\n' >&2; exit 1; }
+.bin/svu current
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\svu.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local svu; run mise run tools:install'
+}
+& $tool current
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.tag]
+description = "Create and push the next semantic version tag."
+run = '''
+set -euo pipefail
+[[ -x .bin/svu ]] || { printf 'missing local svu; run mise run tools:install\n' >&2; exit 1; }
+[[ -z $(git status --porcelain) ]] || { printf 'working tree must be clean\n' >&2; exit 1; }
+next=$(.bin/svu next)
+git tag "$next"
+git push origin "$next"
+'''
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$tool = Join-Path (Get-Location).ProviderPath '.bin\svu.exe'
+if (-not (Test-Path -LiteralPath $tool -PathType Leaf)) {
+    throw 'missing local svu; run mise run tools:install'
+}
+$status = (& git status --porcelain | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if (-not [string]::IsNullOrEmpty($status)) {
+    throw 'working tree must be clean'
+}
+$next = (& $tool next | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& git tag $next
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& git push origin $next
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+'''
+
+[tasks.ci]
+description = "Run ordinary CI checks without release secrets."
+run = [
+  { task = "lint" },
+  { task = "actionlint" },
+  { task = "markdownlint" },
+  { task = "test-reports" },
+  { task = "security" },
+  { task = "build" },
+]
+
+[tasks.clean]
+description = "Remove generated output."
+run = "rm -rf '{{vars.output_dir}}'"
+run_windows = '''
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version 3.0
+$output = Join-Path (Get-Location).ProviderPath '{{vars.output_dir}}'
+if (Test-Path -LiteralPath $output) {
+    Remove-Item -LiteralPath $output -Recurse -Force
+}
+'''
+

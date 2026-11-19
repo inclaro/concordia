@@ -1,0 +1,102 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"moment3\" is after current-moment \"moment2\" but has a valid-from.",
+          "path": "/current-moment",
+          "rule": "moments-after-current-moment-may-not-have-valid-from",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/moments",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [
+        {
+          "message": "'moment1' does not refer to the unique-id of an existing moment.",
+          "path": "/current-moment",
+          "rule": "current-moment-must-reference-moment-in-timeline",
+          "severity": "error"
+        },
+        {
+          "message": "Timeline must define at least one moment.",
+          "path": "/moments",
+          "rule": "timeline-moments-must-be-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-4": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-5": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-6": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-7": {
+      "findings": [
+        {
+          "message": "Moment with unique-id \"moment3\" is after current-moment \"moment2\" but has a valid-from.",
+          "path": "/current-moment",
+          "rule": "moments-after-current-moment-may-not-have-valid-from",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

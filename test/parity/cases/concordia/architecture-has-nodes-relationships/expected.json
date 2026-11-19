@@ -1,0 +1,38 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/",
+          "rule": "architecture-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'api' is not referenced by any relationships.",
+          "path": "/nodes/api/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'web' is not referenced by any relationships.",
+          "path": "/nodes/web/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

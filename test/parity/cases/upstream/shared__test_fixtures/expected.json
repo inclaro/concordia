@@ -1,0 +1,71 @@
+{
+  "runs": {
+    "api-gateway": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "api-gateway-implementation": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    },
+    "api-gateway-implementation-that-does-not-match-schema": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    },
+    "api-gateway-implementation-that-does-not-pass-the-spectral-validation": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": true
+    },
+    "api-gateway-with-no-relationships": {
+      "findings": [
+        {
+          "message": "Should have nodes and relationships as top level properties on the CALM document",
+          "path": "/properties",
+          "rule": "pattern-has-nodes-relationships",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'api-gateway' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/0/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'api-consumer' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/1/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'api-producer' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/2/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "Node with ID 'idp' is not referenced by any relationships.",
+          "path": "/properties/nodes/prefixItems/3/properties/unique-id/const",
+          "rule": "pattern-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

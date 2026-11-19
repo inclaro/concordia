@@ -1,0 +1,20 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "architecture",
+      "architecture": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "architecture",
+      "architecture": "pass.json"
+    },
+    {
+      "name": "missing",
+      "mode": "architecture",
+      "architecture": "missing.json"
+    }
+  ]
+}

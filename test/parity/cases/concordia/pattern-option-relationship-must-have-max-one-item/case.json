@@ -1,0 +1,60 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "pattern",
+      "pattern": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "pattern",
+      "pattern": "pass.json"
+    },
+    {
+      "name": "edge-1",
+      "mode": "pattern",
+      "pattern": "edge-1.json"
+    },
+    {
+      "name": "edge-2",
+      "mode": "pattern",
+      "pattern": "edge-2.json"
+    },
+    {
+      "name": "edge-3",
+      "mode": "pattern",
+      "pattern": "edge-3.json"
+    },
+    {
+      "name": "edge-4",
+      "mode": "pattern",
+      "pattern": "edge-4.json"
+    },
+    {
+      "name": "edge-5",
+      "mode": "pattern",
+      "pattern": "edge-5.json"
+    },
+    {
+      "name": "edge-6",
+      "mode": "pattern",
+      "pattern": "edge-6.json"
+    },
+    {
+      "name": "edge-7",
+      "mode": "pattern",
+      "pattern": "edge-7.json"
+    },
+    {
+      "name": "edge-8",
+      "mode": "pattern",
+      "pattern": "edge-8.json"
+    },
+    {
+      "name": "edge-9",
+      "mode": "pattern",
+      "pattern": "edge-9.json"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "origin": "upstream:shared/test_fixtures/template",
+  "runs": [
+    {
+      "architecture": "data/conference-secure-signup.amended.arch.json",
+      "mode": "architecture",
+      "name": "data__conference-secure-signup.amended.arch"
+    },
+    {
+      "architecture": "data/document-system-with-controls.json",
+      "mode": "architecture",
+      "name": "data__document-system-with-controls"
+    },
+    {
+      "architecture": "data/document-system.json",
+      "mode": "architecture",
+      "name": "data__document-system"
+    },
+    {
+      "architecture": "data/simple-nodes.json",
+      "mode": "architecture",
+      "name": "data__simple-nodes"
+    }
+  ]
+}

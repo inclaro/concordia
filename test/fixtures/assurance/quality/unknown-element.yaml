@@ -1,0 +1,16 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-UNKNOWN-ELEMENT
+    area: availability
+    qualityAttribute: availability
+    stimulusSource: operator
+    stimulus: the primary database node fails
+    environment: production
+    expectedResponse: a replica takes over
+    owner: platform-team
+    scope:
+      - orders-db
+      - ghost-service
+    mode: reviewed
+    criterion: {subject: failover-drill, authority: sre-lead}

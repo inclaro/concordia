@@ -1,0 +1,61 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "'moment9' does not refer to the unique-id of an existing moment.",
+          "path": "/current-moment",
+          "rule": "current-moment-must-reference-moment-in-timeline",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-1": {
+      "findings": [
+        {
+          "message": "Timeline has moments but no current-moment is set.",
+          "path": "/",
+          "rule": "current-moment-required-when-moments-non-empty",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-2": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "spec-3": {
+      "findings": [
+        {
+          "message": "'moment3' does not refer to the unique-id of an existing moment.",
+          "path": "/current-moment",
+          "rule": "current-moment-must-reference-moment-in-timeline",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

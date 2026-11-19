@@ -1,0 +1,21 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-ONE
+    area: availability
+    qualityAttribute: availability
+    stimulusSource: operator
+    stimulus: the primary database node fails
+    environment: production
+    expectedResponse: a replica takes over
+    owner: platform-team
+    scope: [orders-db]
+    mode: reviewed
+    criterion: {subject: failover-drill, authority: sre-lead}
+findings:
+  - id: F-ORPHAN
+    type: risk
+    statement: The failover path is untested at peak load.
+    owner: platform-team
+    status: open
+    scenarios: []

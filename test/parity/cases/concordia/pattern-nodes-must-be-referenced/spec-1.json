@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "database"
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "unique-id": {
+                  "const": "redis"
+                }
+              }
+            },
+            {
+              "properties": {
+                "unique-id": {
+                  "const": "memcached"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "relationships": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "w-d"
+            },
+            "relationship-type": {
+              "const": {
+                "connects": {
+                  "source": {
+                    "node": "webapp"
+                  },
+                  "destination": {
+                    "node": "database"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "pick"
+            },
+            "description": {
+              "const": "Pick an alternative"
+            },
+            "relationship-type": {
+              "properties": {
+                "options": {
+                  "prefixItems": [
+                    {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "description": {
+                              "const": "Use redis"
+                            },
+                            "nodes": {
+                              "const": [
+                                "redis"
+                              ]
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "description": {
+                              "const": "Use memcached"
+                            },
+                            "nodes": {
+                              "const": [
+                                "memcached"
+                              ]
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

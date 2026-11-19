@@ -1,0 +1,512 @@
+# Capability profile of codebase-memory-mcp 0.12.1 with adapter schema concordia-cbm/v2.
+# Grounded in the committed recordings (test/fixtures/cbm-recordings/infra.json, commerce.json) and the observations O1-O12 listed in test/fixtures/infra/README.md.
+# Family names equal canonical edge kinds, plus the property families
+# container-occurrence-versions, rendered-templates, index-result,
+# deployment-workload-set, dockerfile-set, documentation-metadata and diagram-identity. The digest is computed by the loader.
+id: cbm-0.12.1
+provider: codebase-memory-mcp
+build:
+  version: 0.12.1
+  adapterSchema: concordia-cbm/v2
+families:
+  - family: contains
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: CONTAINS_FILE
+      - type: CONTAINS_FOLDER
+    fixtures: [commerce.json]
+  - family: defines
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: DEFINES
+      - type: DEFINES_METHOD
+    fixtures: [commerce.json]
+  - family: imports
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: IMPORTS
+    fixtures: [commerce.json]
+  - family: inherits
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: INHERITS
+    fixtures: [commerce.json]
+  - family: implements
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: IMPLEMENTS
+    fixtures: [commerce.json]
+  - family: calls
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: CALLS
+    fixtures: [commerce.json]
+  - family: references-callable
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: CALL_REFERENCE
+    fixtures: [commerce.json]
+  - family: reads
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: READS
+    fixtures: [commerce.json]
+  - family: writes
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: WRITES
+    fixtures: [commerce.json]
+  - family: handles-route
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: HANDLES
+    fixtures: [commerce.json]
+  - family: calls-service
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: HTTP_CALLS
+      - type: CROSS_HTTP_CALLS
+    fixtures: [commerce.json]
+  - family: dispatches-async
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: ASYNC_CALLS
+      - type: CROSS_ASYNC_CALLS
+    fixtures: [commerce.json]
+  - family: emits-event
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: EMITS
+      - type: CROSS_CHANNEL
+    fixtures: [commerce.json]
+  - family: listens-event
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: LISTENS_ON
+    fixtures: [commerce.json]
+  - family: data-flows
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: DATA_FLOWS
+    fixtures: [commerce.json]
+  - family: ambiguous-usage
+    level: supported
+    maturity: stable
+    nativeEdges:
+      - type: USAGE
+        absent: [ref]
+    fixtures: [commerce.json]
+  - family: uses-type
+    level: unsupported
+    maturity: advisory
+  - family: constructs
+    level: unsupported
+    maturity: advisory
+  - family: calls-grpc
+    level: unsupported
+    maturity: advisory
+  - family: calls-graphql
+    level: unsupported
+    maturity: advisory
+  - family: calls-trpc
+    level: unsupported
+    maturity: advisory
+  - family: deploys-artifact
+    level: supported
+    maturity: advisory
+    lossModes: [deploy-target-is-file]
+    nativeEdges:
+      - type: DEPLOYS
+        discriminators:
+          via: [kubectl, helm, chart]
+    requiredProperties: [via]
+    fixtures: [infra.json]
+  - family: selects-workload
+    level: partial
+    maturity: advisory
+    lossModes: [selector-join-directory-scoped, selector-join-one-of-competing, empty-selector, unsupported-selector-expression]
+    nativeEdges:
+      - type: INFRA_MAPS
+        discriminators:
+          kind: [selector]
+    requiredProperties: [kind]
+    fixtures: [infra.json]
+  - family: routes-to
+    level: partial
+    maturity: advisory
+    lossModes: [route-identity-unscoped]
+    nativeEdges:
+      - type: INFRA_MAPS
+        discriminators:
+          kind: [ingress, route, httproute]
+    requiredProperties: [kind]
+    fixtures: [infra.json]
+  - family: configured-connection
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: CONNECTS_TO
+        discriminators:
+          via: [env]
+    requiredProperties: [via]
+    fixtures: [infra.json]
+  - family: uses-image
+    level: supported
+    maturity: advisory
+    lossModes: [merged-occurrences]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [image]
+    requiredProperties: [ref, container, image]
+    fixtures: [infra.json]
+  - family: container-occurrence-versions
+    level: partial
+    maturity: advisory
+    lossModes: [merged-occurrences]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [image]
+    requiredProperties: [ref, container, image]
+    fixtures: [infra.json]
+  - family: built-from
+    level: partial
+    maturity: advisory
+    lossModes: [build-link-needs-build-command]
+    nativeEdges:
+      - type: DEPENDS_ON
+        discriminators:
+          via: [build]
+    requiredProperties: [via]
+    fixtures: [infra.json]
+  - family: base-image
+    level: supported
+    maturity: advisory
+    lossModes: [build-link-needs-build-command]
+    nativeEdges:
+      - type: DEPENDS_ON
+        discriminators:
+          via: [from]
+    requiredProperties: [via, image, stage]
+    fixtures: [infra.json]
+  - family: copies-from-image
+    level: partial
+    maturity: advisory
+    lossModes: [build-link-needs-build-command]
+    nativeEdges:
+      - type: DEPENDS_ON
+        discriminators:
+          via: [copy-from]
+    requiredProperties: [via, image, stage]
+    fixtures: [infra.json]
+  - family: launches
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: SPAWNS
+    fixtures: [infra.json]
+  - family: overrides
+    level: partial
+    maturity: advisory
+    lossModes: [override-unsignalled]
+    nativeEdges:
+      - type: OVERRIDE
+        discriminators:
+          via: [tfvars, patch]
+    requiredProperties: [via]
+    fixtures: [infra.json]
+  - family: includes-infrastructure
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: IMPORTS
+        discriminators:
+          via: [terraform]
+      - type: IMPORTS
+        sourceFiles: [kustomization.yaml, kustomization.yml]
+    fixtures: [infra.json]
+  - family: infrastructure-dependency
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: DEPENDS_ON
+        discriminators:
+          via: [depends_on]
+      - type: DEPENDS_ON
+        present: [repository]
+        absent: [via]
+      - type: USAGE
+        discriminators:
+          via: [terraform]
+          ref: [var, module, output, resource]
+    fixtures: [infra.json]
+  - family: placed-in
+    level: supported
+    maturity: advisory
+    fixtures: [infra.json]
+  - family: configures-env-access
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: CONFIGURES
+        discriminators:
+          strategy: [env_access]
+    requiredProperties: [strategy]
+    fixtures: [infra.json]
+  - family: configures-env-set
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: CONFIGURES
+        discriminators:
+          strategy: [env_set]
+    requiredProperties: [strategy]
+    fixtures: [infra.json]
+  - family: configures-env-read
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: CONFIGURES
+        discriminators:
+          strategy: [env_read]
+    requiredProperties: [strategy]
+    fixtures: [infra.json]
+  - family: configures-helm-values
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: CONFIGURES
+        discriminators:
+          strategy: [helm_values]
+    requiredProperties: [strategy]
+    fixtures: [infra.json]
+  - family: configures-key-symbol
+    level: unsupported
+    maturity: advisory
+    nativeEdges:
+      - type: CONFIGURES
+        discriminators:
+          strategy: [key_symbol]
+    requiredProperties: [strategy]
+  - family: references-secret
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [env, envFrom, volume]
+        targetKinds: [Secret]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: references-configuration
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [env, envFrom, volume]
+        targetKinds: [ConfigMap]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: references-storage
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [volume]
+        targetKinds: [PersistentVolumeClaim]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: references-certificate-secret
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [tls]
+        targetKinds: [Secret]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: uses-runtime-identity
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [serviceAccountName]
+        targetKinds: [ServiceAccount]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: route-attaches-to-gateway
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [parentRef]
+        targetKinds: [Gateway]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: binding-refers-to-role
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [roleRef]
+        targetKinds: [Role, ClusterRole]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: binding-applies-to-principal
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [subject]
+        targetKinds: [ServiceAccount]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: policy-selects-workload
+    level: partial
+    maturity: advisory
+    lossModes: [target-not-declared, selector-join-directory-scoped, selector-join-one-of-competing, empty-selector, unsupported-selector-expression]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [podSelector]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: disruption-policy-target
+    level: partial
+    maturity: advisory
+    lossModes: [target-not-declared, selector-join-directory-scoped, selector-join-one-of-competing, empty-selector, unsupported-selector-expression]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [selector]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: scaling-target
+    level: supported
+    maturity: advisory
+    lossModes: [target-not-declared]
+    nativeEdges:
+      - type: USAGE
+        discriminators:
+          ref: [scaleTarget]
+    requiredProperties: [ref]
+    fixtures: [infra.json]
+  - family: supersedes
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: SUPERSEDES
+        discriminators:
+          syntax: [supersedes]
+    requiredProperties: [syntax]
+    fixtures: [infra.json]
+  - family: mentions
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: MENTIONS
+        discriminators:
+          syntax: [link, code_path, path]
+    requiredProperties: [syntax]
+    fixtures: [infra.json]
+  - family: references-file
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: REFERENCES_FILE
+        discriminators:
+          strategy: [md_inline_link, md_backtick_path, md_bare_mention]
+    requiredProperties: [strategy]
+    fixtures: [infra.json]
+  - family: diagram-arrow
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: DIAGRAM_ARROW
+    fixtures: [infra.json]
+  - family: tests
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: TESTS
+    fixtures: [infra.json]
+  - family: tests-file
+    level: supported
+    maturity: advisory
+    nativeEdges:
+      - type: TESTS_FILE
+    fixtures: [infra.json]
+  - family: similar-to
+    level: partial
+    maturity: advisory
+    nativeEdges:
+      - type: SIMILAR_TO
+  - family: semantically-related
+    level: partial
+    maturity: advisory
+    nativeEdges:
+      - type: SEMANTICALLY_RELATED
+  - family: file-changes-with
+    level: partial
+    maturity: advisory
+    nativeEdges:
+      - type: FILE_CHANGES_WITH
+  - family: rendered-templates
+    level: partial
+    maturity: advisory
+    lossModes: [unrendered-template]
+    fixtures: [infra.json]
+  - family: index-result
+    level: partial
+    maturity: advisory
+    lossModes: [default-excluded-directory, raster-not-indexed, parse-partial]
+    fixtures: [infra.json, infra-reinclude-deploy.json]
+  - family: documentation-metadata
+    level: supported
+    maturity: advisory
+    fixtures: [infra.json]
+  - family: diagram-identity
+    level: supported
+    maturity: advisory
+    fixtures: [infra.json]
+  - family: deployment-workload-set
+    level: supported
+    maturity: advisory
+    lossModes: [default-excluded-directory, parse-partial, unrendered-template, override-unsignalled]
+    fixtures: [infra.json]
+  - family: dockerfile-set
+    level: supported
+    maturity: advisory
+    lossModes: [default-excluded-directory, parse-partial]
+    fixtures: [infra.json]

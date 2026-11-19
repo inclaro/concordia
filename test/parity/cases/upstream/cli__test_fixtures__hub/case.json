@@ -1,0 +1,10 @@
+{
+  "origin": "upstream:cli/test_fixtures/hub",
+  "runs": [
+    {
+      "architecture": "sample-architecture.json",
+      "mode": "architecture",
+      "name": "sample-architecture"
+    }
+  ]
+}

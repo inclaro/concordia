@@ -1,0 +1,1044 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/errata01/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "invocations": [
+        {
+          "endTimeUtc": "2026-06-01T00:00:00.000Z",
+          "executionSuccessful": true,
+          "exitCode": 1,
+          "startTimeUtc": "2026-06-01T00:00:00.000Z",
+          "toolExecutionNotifications": [
+            {
+              "descriptor": {
+                "id": "CO-COV-001"
+              },
+              "level": "warning",
+              "message": {
+                "text": "CO-CON-021: minimum coverage not met: 0.500 < 0.9"
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "graphGeneration": "cbm:golden-check:b4dbb6af2d5c99c6",
+        "project": "golden-check",
+        "queryPlanDigest": "1b1575a5cb1ea349a90cab26e0a72e34abfa709800b12d0d3bc2fd1f80ec28af",
+        "sourceRevision": "1ea64a7f82a6515e2269b25894b34bb0b9b50dc8"
+      },
+      "results": [
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+                            "kind": "Method"
+                          }
+                        ],
+                        "message": {
+                          "text": "Method services.billing.src.InvoiceService.InvoiceService.issue"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 5
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS resolved]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 7
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "resolved",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:lsp_ts_method"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve",
+                            "kind": "Method"
+                          }
+                        ],
+                        "message": {
+                          "text": "Method services.fulfillment.src.internal.ShipmentStore.ShipmentStore.reserve"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/internal/ShipmentStore.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 4
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/billing/src/InvoiceService.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "forbidden dependency billing-service -> fulfillment-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:466909a233c7b95de4bf757373c517490fb8bdc4ac3ed50cc3220bc489a794ba"
+          },
+          "properties": {
+            "confidence": "resolved",
+            "disposition": "active",
+            "findingKind": "forbidden-dependency",
+            "owner": "team-billing",
+            "sourceArchitectureId": "billing-service",
+            "targetArchitectureId": "fulfillment-service"
+          },
+          "ruleId": "CO-BND-001",
+          "ruleIndex": 0
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+                            "kind": "Method"
+                          }
+                        ],
+                        "message": {
+                          "text": "Method services.billing.src.InvoiceService.InvoiceService.issue"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 5
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 6
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:import_map"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+                            "kind": "Class"
+                          }
+                        ],
+                        "message": {
+                          "text": "Class services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/internal/ShipmentStore.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/billing/src/InvoiceService.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 6
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "forbidden dependency billing-service -> fulfillment-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:ce47b243554b1fadd92a2d3375cd1bde9ad37d00fd4217c8f4baa215978ef251"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "forbidden-dependency",
+            "owner": "team-billing",
+            "sourceArchitectureId": "billing-service",
+            "targetArchitectureId": "fulfillment-service"
+          },
+          "ruleId": "CO-BND-001",
+          "ruleIndex": 0
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.ts.__file__",
+                            "kind": "File"
+                          }
+                        ],
+                        "message": {
+                          "text": "File services.billing.src.InvoiceService.ts.__file__"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[IMPORTS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "imports",
+                        "nativeKind": "IMPORTS",
+                        "resolutionMethod": "cbm:IMPORTS"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.internal.ShipmentStore",
+                            "kind": "Module"
+                          }
+                        ],
+                        "message": {
+                          "text": "Module services.fulfillment.src.internal.ShipmentStore"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/internal/ShipmentStore.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/billing/src/InvoiceService.ts",
+                  "uriBaseId": "SRCROOT"
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "forbidden dependency billing-service -> fulfillment-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:d274f72afdfddceaa6c678a0415c0b43f1c7c62722fbcb084898f7ec9aa6111f"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "forbidden-dependency",
+            "owner": "team-billing",
+            "sourceArchitectureId": "billing-service",
+            "targetArchitectureId": "fulfillment-service"
+          },
+          "ruleId": "CO-BND-001",
+          "ruleIndex": 0
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+                            "kind": "Method"
+                          }
+                        ],
+                        "message": {
+                          "text": "Method services.billing.src.InvoiceService.InvoiceService.issue"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 5
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 6
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:import_map"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.internal.ShipmentStore.ShipmentStore",
+                            "kind": "Class"
+                          }
+                        ],
+                        "message": {
+                          "text": "Class services.fulfillment.src.internal.ShipmentStore.ShipmentStore"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/internal/ShipmentStore.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 1
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.notify.notifyShipped",
+                            "kind": "Function"
+                          }
+                        ],
+                        "message": {
+                          "text": "Function services.fulfillment.src.notify.notifyShipped"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 3
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 4
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:import_map"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+                            "kind": "Class"
+                          }
+                        ],
+                        "message": {
+                          "text": "Class services.billing.src.InvoiceService.InvoiceService"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 4
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/billing/src/InvoiceService.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 6
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "dependency cycle: billing-service -> fulfillment-service -> billing-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:0badb11bb604e9ee6ba84ff6dd68d58925562a65061169134a012adea716ff44"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "cycle",
+            "owner": "team-billing",
+            "sourceArchitectureId": "billing-service",
+            "targetArchitectureId": "billing-service,fulfillment-service"
+          },
+          "relatedLocations": [
+            {
+              "id": 0,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/fulfillment/src/notify.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "ruleId": "CO-CYC-001",
+          "ruleIndex": 2
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.notify.notifyShipped",
+                            "kind": "Function"
+                          }
+                        ],
+                        "message": {
+                          "text": "Function services.fulfillment.src.notify.notifyShipped"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 3
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS resolved]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 5
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "resolved",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:lsp_ts_method"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService.issue",
+                            "kind": "Method"
+                          }
+                        ],
+                        "message": {
+                          "text": "Method services.billing.src.InvoiceService.InvoiceService.issue"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 5
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/fulfillment/src/notify.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 5
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "undeclared dependency fulfillment-service -> billing-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:305a36e03cbff4c1d427c3839a60f9afd176b09155a5ce04ef248d94daf8ff7d"
+          },
+          "properties": {
+            "confidence": "resolved",
+            "disposition": "active",
+            "findingKind": "undeclared",
+            "owner": "team-fulfillment",
+            "sourceArchitectureId": "fulfillment-service",
+            "targetArchitectureId": "billing-service"
+          },
+          "ruleId": "CO-DECL-001",
+          "ruleIndex": 3
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.notify.notifyShipped",
+                            "kind": "Function"
+                          }
+                        ],
+                        "message": {
+                          "text": "Function services.fulfillment.src.notify.notifyShipped"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 3
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[CALLS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 4
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "calls",
+                        "nativeKind": "CALLS",
+                        "resolutionMethod": "cbm:CALLS:import_map"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService.InvoiceService",
+                            "kind": "Class"
+                          }
+                        ],
+                        "message": {
+                          "text": "Class services.billing.src.InvoiceService.InvoiceService"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 4
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/fulfillment/src/notify.ts",
+                  "uriBaseId": "SRCROOT"
+                },
+                "region": {
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "undeclared dependency fulfillment-service -> billing-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:a06aeb1c2fdb473ed109683179bd63d386221b39426c5019efa9f3159970bfd3"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "undeclared",
+            "owner": "team-fulfillment",
+            "sourceArchitectureId": "fulfillment-service",
+            "targetArchitectureId": "billing-service"
+          },
+          "ruleId": "CO-DECL-001",
+          "ruleIndex": 3
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.notify.ts.__file__",
+                            "kind": "File"
+                          }
+                        ],
+                        "message": {
+                          "text": "File services.fulfillment.src.notify.ts.__file__"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[IMPORTS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "imports",
+                        "nativeKind": "IMPORTS",
+                        "resolutionMethod": "cbm:IMPORTS"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService",
+                            "kind": "Module"
+                          }
+                        ],
+                        "message": {
+                          "text": "Module services.billing.src.InvoiceService"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/fulfillment/src/notify.ts",
+                  "uriBaseId": "SRCROOT"
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "undeclared dependency fulfillment-service -> billing-service"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:b3d92e29480ad5d87429475a5dfba38051c4f0902eff7b4d0e609907793b27f8"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "undeclared",
+            "owner": "team-fulfillment",
+            "sourceArchitectureId": "fulfillment-service",
+            "targetArchitectureId": "billing-service"
+          },
+          "ruleId": "CO-DECL-001",
+          "ruleIndex": 3
+        },
+        {
+          "baselineState": "new",
+          "codeFlows": [
+            {
+              "threadFlows": [
+                {
+                  "locations": [
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.fulfillment.src.notify.ts.__file__",
+                            "kind": "File"
+                          }
+                        ],
+                        "message": {
+                          "text": "File services.fulfillment.src.notify.ts.__file__"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "location": {
+                        "message": {
+                          "text": "-[IMPORTS syntactic]->"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/fulfillment/src/notify.ts",
+                            "uriBaseId": "SRCROOT"
+                          }
+                        }
+                      },
+                      "properties": {
+                        "confidence": "syntactic",
+                        "kind": "imports",
+                        "nativeKind": "IMPORTS",
+                        "resolutionMethod": "cbm:IMPORTS"
+                      }
+                    },
+                    {
+                      "location": {
+                        "logicalLocations": [
+                          {
+                            "fullyQualifiedName": "services.billing.src.InvoiceService",
+                            "kind": "Module"
+                          }
+                        ],
+                        "message": {
+                          "text": "Module services.billing.src.InvoiceService"
+                        },
+                        "physicalLocation": {
+                          "artifactLocation": {
+                            "uri": "services/billing/src/InvoiceService.ts",
+                            "uriBaseId": "SRCROOT"
+                          },
+                          "region": {
+                            "startLine": 1
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "services/fulfillment/src/notify.ts",
+                  "uriBaseId": "SRCROOT"
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "layer violation: fulfillment-service (layer 1) depends on billing-service (layer 0)"
+          },
+          "partialFingerprints": {
+            "concordia/v1": "sha256:846625ea3973da1021d2e5f2b76e675420a98ccbae086b9872fb92bbd7efa2f3"
+          },
+          "properties": {
+            "confidence": "syntactic",
+            "disposition": "active",
+            "findingKind": "layer-violation",
+            "owner": "team-fulfillment",
+            "sourceArchitectureId": "fulfillment-service",
+            "targetArchitectureId": "billing-service"
+          },
+          "ruleId": "CO-LYR-001",
+          "ruleIndex": 4
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Concordia",
+          "rules": [
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "Billing must depend on the published fulfillment contract, not its internals."
+              },
+              "help": {
+                "text": "Import from packages/fulfillment-contract instead."
+              },
+              "id": "CO-BND-001",
+              "name": "Billing uses Fulfillment contracts only",
+              "properties": {
+                "family": "boundary",
+                "policy": "commerce-boundaries@1.0.0"
+              },
+              "shortDescription": {
+                "text": "Billing uses Fulfillment contracts only"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "id": "CO-COV-001",
+              "name": "Legacy must not call Billing",
+              "properties": {
+                "family": "boundary",
+                "policy": "commerce-boundaries@1.0.0"
+              },
+              "shortDescription": {
+                "text": "Legacy must not call Billing"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "id": "CO-CYC-001",
+              "name": "Services are acyclic",
+              "properties": {
+                "family": "acyclic",
+                "policy": "commerce-boundaries@1.0.0"
+              },
+              "shortDescription": {
+                "text": "Services are acyclic"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "id": "CO-DECL-001",
+              "name": "Dependencies are declared",
+              "properties": {
+                "family": "declared-only",
+                "policy": "commerce-boundaries@1.0.0"
+              },
+              "shortDescription": {
+                "text": "Dependencies are declared"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "id": "CO-LYR-001",
+              "name": "Billing sits above Fulfillment",
+              "properties": {
+                "family": "layer",
+                "policy": "commerce-boundaries@1.0.0"
+              },
+              "shortDescription": {
+                "text": "Billing sits above Fulfillment"
+              }
+            }
+          ],
+          "version": "0.1.0"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

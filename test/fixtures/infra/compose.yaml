@@ -1,0 +1,14 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      LISTEN_ADDR: ":8080"
+      DATABASE_URL: postgres://db:5432/payments
+    depends_on:
+      - db
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: CONCORDIA-SEED-compose-env-3a9f

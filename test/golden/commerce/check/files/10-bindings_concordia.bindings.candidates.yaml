@@ -1,0 +1,149 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingCandidates
+candidates:
+  - architectureRef: calm:node:billing-service
+    match:
+      sourceRoot: services/billing/**
+    score: 0.8
+    reasons:
+      - directory name 'billing' equals a name slug of 'billing-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 4
+    sampleObservedIds:
+      - cbm:golden-check:19
+      - cbm:golden-check:83
+      - cbm:golden-check:84
+      - cbm:golden-check:85
+    conflictsWith: []
+  - architectureRef: calm:node:billing-service
+    match:
+      package: services.billing..
+    score: 0.6
+    reasons:
+      - qualified-name segment equals a slug of 'billing-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 4
+    sampleObservedIds:
+      - cbm:golden-check:19
+      - cbm:golden-check:83
+      - cbm:golden-check:84
+      - cbm:golden-check:85
+    conflictsWith: []
+  - architectureRef: calm:node:commerce
+    match:
+      package: architecture.commerce..
+    score: 0.6
+    reasons:
+      - qualified-name segment equals a slug of 'commerce'
+    reviewStatus: unreviewed
+    matchedObservedCount: 38
+    sampleObservedIds:
+      - cbm:golden-check:38
+      - cbm:golden-check:39
+      - cbm:golden-check:40
+      - cbm:golden-check:41
+      - cbm:golden-check:42
+    conflictsWith: []
+  - architectureRef: calm:node:fulfillment-service
+    match:
+      sourceRoot: services/fulfillment/**
+    score: 0.8
+    reasons:
+      - directory name 'fulfillment' equals a name slug of 'fulfillment-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 7
+    sampleObservedIds:
+      - cbm:golden-check:23
+      - cbm:golden-check:26
+      - cbm:golden-check:86
+      - cbm:golden-check:87
+      - cbm:golden-check:88
+    conflictsWith: []
+  - architectureRef: calm:node:fulfillment-service
+    match:
+      package: services.fulfillment..
+    score: 0.6
+    reasons:
+      - qualified-name segment equals a slug of 'fulfillment-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 7
+    sampleObservedIds:
+      - cbm:golden-check:23
+      - cbm:golden-check:26
+      - cbm:golden-check:86
+      - cbm:golden-check:87
+      - cbm:golden-check:88
+    conflictsWith: []
+  - architectureRef: calm:node:ledger-service
+    match:
+      sourceRoot: services/ledger/**
+    score: 0.8
+    reasons:
+      - directory name 'ledger' equals a name slug of 'ledger-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 7
+    sampleObservedIds:
+      - cbm:golden-check:106
+      - cbm:golden-check:107
+      - cbm:golden-check:28
+      - cbm:golden-check:31
+      - cbm:golden-check:91
+    conflictsWith: []
+  - architectureRef: calm:node:ledger-service
+    match:
+      sourceRoot: services/ledger/ledger/**
+    score: 0.8
+    reasons:
+      - directory name 'ledger' equals a name slug of 'ledger-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 7
+    sampleObservedIds:
+      - cbm:golden-check:106
+      - cbm:golden-check:107
+      - cbm:golden-check:28
+      - cbm:golden-check:31
+      - cbm:golden-check:91
+    conflictsWith: []
+  - architectureRef: calm:node:ledger-service
+    match:
+      package: services.ledger..
+    score: 0.6
+    reasons:
+      - qualified-name segment equals a slug of 'ledger-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 7
+    sampleObservedIds:
+      - cbm:golden-check:106
+      - cbm:golden-check:107
+      - cbm:golden-check:28
+      - cbm:golden-check:31
+      - cbm:golden-check:91
+    conflictsWith: []
+  - architectureRef: calm:node:legacy-service
+    match:
+      sourceRoot: services/legacy/**
+    score: 0.8
+    reasons:
+      - directory name 'legacy' equals a name slug of 'legacy-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 4
+    sampleObservedIds:
+      - cbm:golden-check:108
+      - cbm:golden-check:109
+      - cbm:golden-check:110
+      - cbm:golden-check:32
+    conflictsWith: []
+  - architectureRef: calm:node:legacy-service
+    match:
+      package: services.legacy..
+    score: 0.6
+    reasons:
+      - qualified-name segment equals a slug of 'legacy-service'
+    reviewStatus: unreviewed
+    matchedObservedCount: 4
+    sampleObservedIds:
+      - cbm:golden-check:108
+      - cbm:golden-check:109
+      - cbm:golden-check:110
+      - cbm:golden-check:32
+    conflictsWith: []

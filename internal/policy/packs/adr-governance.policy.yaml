@@ -1,0 +1,58 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: adr-governance
+  version: 1.0.0
+# Decision governance rules. `check` evaluates them from the decision register (`adr.files` in the workspace) and
+# the committed ADR documents, not from a predicate over code edges: a rule has no `subject`. Enable the pack with
+# `policies.packs: [{use: builtin:adr-governance}]`. No rule declares `enforcement`, so a violation gates like any
+# code rule; set a mode per family with `check.enforcement` (family `decision-governance`) to roll the pack out in
+# `advisory` or `shadow` mode. Never reuse or renumber a rule ID: baselines and waivers key on it.
+rules:
+  - id: GOV-ADR-001
+    name: Required decisions are committed in the evaluated revision
+    severity: error
+    family: decision-governance
+    decisions: { obligation: presence }
+    rationale: A decision that is only in the index or in the working tree is not part of what the team reviews and ships, so it cannot justify the architecture.
+    remediation: Commit the ADR document at the path that the register names, or correct the path in the register. When the repository state cannot be read, fix the analysis configuration.
+
+  - id: GOV-ADR-002
+    name: A registered decision is active for the architecture it governs
+    severity: error
+    family: decision-governance
+    decisions: { obligation: applicability }
+    rationale: A decision that is proposed, deprecated, rejected, or superseded no longer governs the subjects it names. Rules and nodes that still depend on it rest on a decision that is not in force.
+    remediation: Accept the decision, or move its links and subjects to the decision that replaces it, or release them in the register. Resolve an ambiguous status with an explicit status mapping.
+
+  - id: GOV-ADR-003
+    name: A mandatory rule is justified by an active decision
+    severity: error
+    family: decision-governance
+    decisions: { obligation: justification }
+    rationale: A mandatory rule whose linking decisions are all inactive enforces a choice that the team has not currently accepted.
+    remediation: Link the rule from an active decision, or activate the decision that justifies it. If the rule no longer has a decision behind it, review the rule.
+
+  - id: GOV-ADR-004
+    name: A decision that requires enforcement links a mandatory rule
+    severity: error
+    family: decision-governance
+    decisions: { obligation: enforcement }
+    rationale: A decision that is marked `enforcement.required` but has no mandatory rule behind it is not checked by any run, so a violation of it passes unnoticed.
+    remediation: Add an `enforcedBy` link to a mandatory rule, make the linked rule mandatory, or set the enforcement of the decision to none.
+
+  - id: GOV-ADR-005
+    name: The supersession history of decisions is consistent
+    severity: error
+    family: decision-governance
+    decisions: { obligation: history }
+    rationale: A supersession cycle, a link to a decision that does not exist, a duplicate ID, contradictory statuses, or competing successors make it impossible to say which decision is in force.
+    remediation: Correct the supersession links and statuses in the ADR documents and the register so that each decision has at most one active successor and no cycle.
+
+  - id: GOV-ADR-006
+    name: An architecturally significant change has a decision
+    severity: warning
+    family: decision-governance
+    decisions: { obligation: scope }
+    rationale: A change that raises a configured trigger (paths, node types, tags, or architecture changes) is architecturally significant and should be recorded in a decision.
+    remediation: Add or update a decision that governs the changed subjects in the same change set, or adjust the trigger if the change is not significant.

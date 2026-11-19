@@ -1,0 +1,389 @@
+{
+  "architectureId": "chart-service",
+  "levels": [
+    {
+      "level": "declared",
+      "status": "evaluated"
+    },
+    {
+      "level": "rendered-or-evaluated",
+      "status": "not-available"
+    },
+    {
+      "level": "deployment-execution",
+      "status": "not-available"
+    },
+    {
+      "level": "runtime-observation",
+      "status": "not-available"
+    }
+  ],
+  "schemaVersion": "1.1",
+  "traces": [
+    {
+      "architectureId": "chart-service",
+      "cluster": "prod-eu",
+      "environment": "production",
+      "gaps": [
+        {
+          "detail": "Deployment/<.Release.Name>-api is not rendered (charts/api/templates/deployment.yaml:2): its name or namespace is a template",
+          "lossModes": [
+            "unrendered-template"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "workload"
+        },
+        {
+          "detail": "the image references of Deployment/<.Release.Name>-api is partial: family is partial in the capability profile",
+          "lossModes": [
+            "merged-occurrences",
+            "parse-partial",
+            "unrendered-template"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "container-image"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for chart-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "123933d4d217c1a7",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "baa86e1da44f4061",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "c4aaac2d5a2993cc",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "3e981ce022fb784c",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "447b6b367b384581",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "ff09048729a96278",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "unknown"
+        }
+      ],
+      "status": "partial",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "chart-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Chart service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [
+            {
+              "bindings": [
+                "bind-chart-workload"
+              ],
+              "identity": "k8s:production/prod-eu/apps/Deployment/~/<.Release.Name>-api",
+              "kind": "workload",
+              "locations": [
+                {
+                  "line": 2,
+                  "path": "charts/api/templates/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "apiGroup": "apps",
+                "kind": "Deployment",
+                "name": "<.Release.Name>-api",
+                "templated": "true"
+              },
+              "resolution": "explicitly-bound"
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "Deployment/<.Release.Name>-api is not rendered (charts/api/templates/deployment.yaml:2): its name or namespace is a template",
+              "lossModes": [
+                "unrendered-template"
+              ],
+              "reason": "coverage-incomplete"
+            }
+          ],
+          "limits": [],
+          "resolution": "explicitly-bound",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "the image references of Deployment/<.Release.Name>-api is partial: family is partial in the capability profile",
+              "lossModes": [
+                "merged-occurrences",
+                "parse-partial",
+                "unrendered-template"
+              ],
+              "reason": "coverage-incomplete"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [
+            {
+              "identity": "k8s:production/prod-eu/apps/Deployment/~/<.Release.Name>-api",
+              "kind": "manifest",
+              "locations": [
+                {
+                  "line": 2,
+                  "path": "charts/api/templates/deployment.yaml"
+                }
+              ],
+              "properties": {
+                "kind": "Deployment",
+                "name": "<.Release.Name>-api"
+              }
+            }
+          ],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for chart-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    },
+    {
+      "architectureId": "chart-service",
+      "environment": "staging",
+      "gaps": [
+        {
+          "detail": "no workload is bound to chart-service in staging, and the workload set of staging is complete",
+          "reason": "absent",
+          "step": "workload"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for chart-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "9b29dc43c7f081f9",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "4f1bee730eed251b",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "f994e4f088bedf00",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "ec79502246be21d8",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "9f07597755cfed39",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "f53125b0171f872e",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "violation"
+        }
+      ],
+      "status": "unresolved",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "chart-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Chart service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no workload is bound to chart-service in staging, and the workload set of staging is complete",
+              "reason": "absent"
+            }
+          ],
+          "limits": [],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for chart-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    }
+  ]
+}

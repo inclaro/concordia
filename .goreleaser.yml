@@ -1,0 +1,74 @@
+version: 2
+
+project_name: concordia
+
+builds:
+  - id: concordia
+    main: ./cmd/concordia
+    binary: concordia
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.revision={{.ShortCommit}}
+      - -X main.date={{.CommitDate}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+
+archives:
+  - formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+      - NOTICE
+
+checksum:
+  name_template: "{{ .ProjectName }}_checksums.txt"
+  algorithm: sha256
+
+# The checksum file is signed keyless with the GitHub OIDC identity of the release workflow (Sigstore). Verify a
+# release with:
+#   cosign verify-blob --bundle concordia_checksums.txt.sigstore.json \
+#     --certificate-identity "https://github.com/inclaro/concordia/.github/workflows/release.yml@refs/tags/<tag>" \
+#     --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+#     concordia_checksums.txt
+signs:
+  - id: cosign
+    cmd: cosign
+    artifacts: checksum
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - --bundle=${signature}
+      - --yes
+      - ${artifact}
+
+snapshot:
+  version_template: "{{ .Version }}-SNAPSHOT"
+
+release:
+  prerelease: auto
+  # The workflow verifies the keyless signature.
+  draft: true
+  # The installers download the public release.
+  extra_files:
+    - glob: ./install.sh
+    - glob: ./install.ps1

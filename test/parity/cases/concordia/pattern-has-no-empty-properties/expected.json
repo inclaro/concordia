@@ -1,0 +1,70 @@
+{
+  "runs": {
+    "edge-1": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/flag",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/list/0",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/list/1",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/list/2",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/minItems",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        },
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/properties/nothing",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": true,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty, nonzero value.",
+          "path": "/title",
+          "rule": "pattern-has-no-empty-properties",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

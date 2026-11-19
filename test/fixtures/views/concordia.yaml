@@ -1,0 +1,60 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: views-fixture
+architecture:
+  source: architecture/payments.calm.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: concordia-fixture-views
+      root: .
+      include: [services/**]
+  indexMode: full
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+environments:
+  - id: staging
+    sources: [deploy/staging/**]
+views:
+  - id: payments-container
+    kind: container
+    origin: generated
+    owner: team-payments
+    scope: [payments-system]
+    abstraction: container
+    environment: staging
+    coverage:
+      elements: [orders-service, payments-db]
+      relationships: [orders-to-db]
+    output:
+      path: docs/architecture/views/payments-container.dsl
+      exports:
+        - format: mermaid
+          path: docs/architecture/views/payments-container.mmd
+    projection:
+      merge: binding
+      edgeKinds: [calls, imports]
+      selfEdges: omit
+      parallelEdges: merge
+    comparison:
+      against: [declared, observed]
+      minimumConfidence: syntactic
+      severity: warning
+  - id: payments-context
+    kind: system-context
+    origin: authored
+    owner: team-payments
+    scope: [payments-system]
+    abstraction: system
+    source:
+      path: docs/arch/payments.md
+      format: mermaid
+      selector:
+        title: Payments context
+    mapping:
+      elements:
+        customer: customer
+        payments: payments-system
+projection:
+  allowIncludes: []

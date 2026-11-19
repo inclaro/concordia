@@ -1,0 +1,93 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "customer",
+      "node-type": "actor",
+      "name": "Customer",
+      "description": "A customer"
+    },
+    {
+      "unique-id": "billing-service",
+      "node-type": "service",
+      "name": "Billing",
+      "description": "Billing",
+      "concordia": {
+        "c4-level": "container",
+        "owner": "team-billing",
+        "tags": [
+          "core"
+        ],
+        "bindings": [
+          {
+            "kind": "source-root",
+            "value": "services/billing/**"
+          }
+        ]
+      },
+      "controls": {
+        "architecture-001": {
+          "description": "Boundaries",
+          "requirements": [
+            {
+              "requirement-url": "https://calm.finos.org/release/1.2/meta/control.json",
+              "config": {
+                "control-id": "architecture-001",
+                "engine": "concordia",
+                "policy-ref": "../policies/boundaries.policy.yaml",
+                "rule-ids": [
+                  "CO-BND-001"
+                ],
+                "unknown-disposition": "fail",
+                "minimum-policy-coverage": 0.9
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "billing-service",
+      "node-type": "service",
+      "name": "Fulfillment",
+      "description": "Fulfillment"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "rel-bf",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "billing-service"
+          },
+          "destination": {
+            "node": "fulfillment-service"
+          }
+        }
+      },
+      "protocol": "HTTPS",
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS",
+            "calls"
+          ],
+          "minimum-confidence": "syntactic",
+          "required": true
+        }
+      }
+    },
+    {
+      "unique-id": "rel-ci",
+      "relationship-type": {
+        "interacts": {
+          "actor": "customer",
+          "nodes": [
+            "billing-service"
+          ]
+        }
+      }
+    }
+  ]
+}

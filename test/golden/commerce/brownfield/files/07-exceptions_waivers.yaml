@@ -1,0 +1,7 @@
+waivers:
+  - id: WV-1
+    finding: sha256:0a7c63d6508891bd5ccf362bdfee429d30bb9d701584aa71705f63b30dab6331
+    rule: CO-BND-001
+    owner: team-billing
+    reason: Refund migration in progress
+    expires: 2026-12-31

@@ -1,0 +1,26 @@
+{
+  "rules": [
+    "ASR-PRV-001",
+    "ASR-PRV-002",
+    "ASR-REN-001",
+    "CORE-BND-001",
+    "CORE-CYC-001",
+    "CORE-DB-001",
+    "CORE-DECL-001",
+    "CORE-LYR-001",
+    "CORE-LYR-002",
+    "CORE-LYR-003",
+    "CORE-OBS-001",
+    "CORE-SEC-001",
+    "INFRA-PLC-001",
+    "INFRA-PLC-002",
+    "INFRA-TRC-001",
+    "INFRA-TRC-002",
+    "INFRA-TRC-003",
+    "INFRA-TRC-004",
+    "VIEW-CORR-001",
+    "VIEW-FRESH-001",
+    "VIEW-PRES-001"
+  ],
+  "reserved": []
+}

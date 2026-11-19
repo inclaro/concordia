@@ -1,0 +1,54 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "webapp",
+      "name": "Web App",
+      "description": "Web App node",
+      "node-type": "service"
+    },
+    {
+      "unique-id": "db",
+      "name": "Database",
+      "description": "Database node",
+      "node-type": "service"
+    },
+    {
+      "unique-id": "redis",
+      "name": "Redis",
+      "description": "Redis node",
+      "node-type": "service"
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "web-db",
+      "description": "Web calls db",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "webapp"
+          },
+          "destination": {
+            "node": "db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "cache-choice",
+      "description": "Pick a cache",
+      "relationship-type": {
+        "options": [
+          {
+            "description": "Use redis",
+            "nodes": [
+              "redis"
+            ],
+            "relationships": []
+          }
+        ]
+      }
+    }
+  ]
+}

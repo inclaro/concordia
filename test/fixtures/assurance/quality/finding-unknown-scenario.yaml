@@ -1,0 +1,21 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-ONE
+    area: availability
+    qualityAttribute: availability
+    stimulusSource: operator
+    stimulus: the primary database node fails
+    environment: production
+    expectedResponse: a replica takes over
+    owner: platform-team
+    scope: [orders-db]
+    mode: reviewed
+    criterion: {subject: failover-drill, authority: sre-lead}
+findings:
+  - id: F-MISSING
+    type: sensitivity-point
+    statement: Failover time depends on the replica lag.
+    owner: platform-team
+    status: open
+    scenarios: [QS-NOT-DECLARED]

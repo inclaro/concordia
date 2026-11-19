@@ -1,0 +1,117 @@
+{
+  "runs": {
+    "config-url": {
+      "findings": [
+        {
+          "message": "must have required property 'name'",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "config-url-missing": {
+      "findings": [
+        {
+          "message": "Could not load config from 'configs/missing.json': ENOENT: no such file or directory, open '<case>/configs/missing.json'",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "fail": {
+      "findings": [
+        {
+          "message": "must have required property 'name'",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pointer-fail": {
+      "findings": [
+        {
+          "message": "must be string",
+          "path": "/nodes/api/controls/api-access/requirements/0/owner",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pointer-pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pointer-unknown": {
+      "findings": [
+        {
+          "message": "Could not resolve requirement-url '#/$defs/nope' as a JSON pointer in the pattern document",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pointer-without-pattern": {
+      "findings": [
+        {
+          "message": "requirement-url '#/$defs/access' is a JSON pointer but no pattern document is available",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "relative-requirement": {
+      "findings": [
+        {
+          "message": "Could not load requirement schema from 'requirements/access.json': Not a valid absolute URL: requirements/access.json",
+          "path": "/nodes/api/controls/api-access/requirements/0",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

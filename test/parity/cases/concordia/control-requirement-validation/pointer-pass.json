@@ -1,0 +1,46 @@
+{
+  "$schema": "./pointer-pattern.json",
+  "nodes": [
+    {
+      "unique-id": "web",
+      "node-type": "webclient",
+      "name": "Web",
+      "description": "The web client"
+    },
+    {
+      "unique-id": "api",
+      "node-type": "service",
+      "name": "API",
+      "description": "The API",
+      "controls": {
+        "api-access": {
+          "description": "API access control",
+          "requirements": [
+            {
+              "requirement-url": "#/$defs/access",
+              "config": {
+                "owner": "x"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "web-api",
+      "description": "Web calls the API",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "web"
+          },
+          "destination": {
+            "node": "api"
+          }
+        }
+      }
+    }
+  ]
+}

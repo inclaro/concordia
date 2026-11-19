@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/binding-set.schema.json",
+  "title": "Concordia BindingSet",
+  "type": "object",
+  "required": ["apiVersion", "kind", "bindings"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": { "const": "concordia.io/v1alpha1" },
+    "kind": { "const": "BindingSet" },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "architectureRef", "match"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "architectureRef": { "type": "string", "pattern": "^calm:node:[A-Za-z0-9._-]+$" },
+          "exclusive": { "type": "boolean", "default": true },
+          "required": { "type": "boolean", "default": true },
+          "match": {
+            "type": "object",
+            "required": ["any"],
+            "additionalProperties": false,
+            "properties": {
+              "any": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": ["sourceRoot"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "sourceRoot": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["package"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "package": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["qualifiedName"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "qualifiedName": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["buildTarget"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "buildTarget": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["otelService"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "otelService": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "value"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "enum": ["sourceRoot", "package", "qualifiedName", "buildTarget", "otelService"] },
+                        "value": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "environment", "resourceKind", "name"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "const": "workload" },
+                        "environment": { "type": "string", "minLength": 1 },
+                        "resourceKind": { "type": "string", "minLength": 1 },
+                        "name": { "type": "string", "minLength": 1 },
+                        "cluster": { "type": "string", "minLength": 1 },
+                        "apiGroup": { "type": "string", "minLength": 1 },
+                        "namespace": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "repository"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "const": "image" },
+                        "repository": { "type": "string", "minLength": 1 },
+                        "digest": { "type": "string", "minLength": 1 },
+                        "environment": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "environment", "name"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "const": "route" },
+                        "environment": { "type": "string", "minLength": 1 },
+                        "name": { "type": "string", "minLength": 1 },
+                        "cluster": { "type": "string", "minLength": 1 },
+                        "apiGroup": { "type": "string", "minLength": 1 },
+                        "resourceKind": { "type": "string", "minLength": 1 },
+                        "namespace": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "environment", "address"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "const": "infraResource" },
+                        "environment": { "type": "string", "minLength": 1 },
+                        "address": { "type": "string", "minLength": 1 },
+                        "cluster": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["kind", "file", "service"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": { "const": "composeService" },
+                        "file": { "type": "string", "minLength": 1 },
+                        "service": { "type": "string", "minLength": 1 },
+                        "environment": { "type": "string", "minLength": 1 }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "projection": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "c4Level": { "enum": ["person", "softwareSystem", "container", "component"] }
+            }
+          },
+          "cardinality": { "enum": ["one", "many"], "default": "many" },
+          "agreement": { "enum": ["all", "any"], "default": "all" },
+          "status": { "enum": ["active", "proposed"], "default": "active" },
+          "authority": { "type": "string", "minLength": 1 },
+          "trust": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "dimensions": {
+                "type": "object",
+                "additionalProperties": { "type": "string", "minLength": 1 }
+              },
+              "classification": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

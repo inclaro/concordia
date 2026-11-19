@@ -1,0 +1,45 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "architecture",
+      "architecture": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "architecture",
+      "architecture": "pass.json"
+    },
+    {
+      "name": "spec-1",
+      "mode": "architecture",
+      "architecture": "spec-1.json"
+    },
+    {
+      "name": "spec-2",
+      "mode": "architecture",
+      "architecture": "spec-2.json"
+    },
+    {
+      "name": "spec-3",
+      "mode": "architecture",
+      "architecture": "spec-3.json"
+    },
+    {
+      "name": "spec-4",
+      "mode": "architecture",
+      "architecture": "spec-4.json"
+    },
+    {
+      "name": "spec-5",
+      "mode": "architecture",
+      "architecture": "spec-5.json"
+    },
+    {
+      "name": "spec-6",
+      "mode": "architecture",
+      "architecture": "spec-6.json"
+    }
+  ]
+}

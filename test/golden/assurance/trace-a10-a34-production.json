@@ -1,0 +1,291 @@
+[
+  {
+    "entities": [
+      {
+        "identity": "api-service",
+        "kind": "service",
+        "locations": [],
+        "properties": {
+          "name": "API service",
+          "nodeType": "service"
+        },
+        "resolution": "exact"
+      }
+    ],
+    "gaps": [],
+    "limits": [
+      {
+        "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+        "id": "declared-level-only"
+      }
+    ],
+    "resolution": "exact",
+    "role": "declared-intent",
+    "step": "service"
+  },
+  {
+    "entities": [
+      {
+        "bindings": [
+          "bind-api-workload"
+        ],
+        "identity": "k8s:production/prod-eu/apps/Deployment/payments/api",
+        "kind": "workload",
+        "locations": [
+          {
+            "line": 1,
+            "path": "k8s/prod/deployment.yaml"
+          }
+        ],
+        "properties": {
+          "apiGroup": "apps",
+          "kind": "Deployment",
+          "name": "api",
+          "namespace": "payments"
+        },
+        "resolution": "explicitly-bound"
+      },
+      {
+        "identity": "k8s:production/prod-eu/core/Namespace//payments",
+        "kind": "hosting-target",
+        "locations": [
+          {
+            "line": 1,
+            "path": "k8s/prod/namespace.yaml"
+          }
+        ],
+        "properties": {
+          "kind": "Namespace",
+          "name": "payments"
+        },
+        "resolution": "exact"
+      },
+      {
+        "identity": "kubectl:k8s/prod/deployment.yaml",
+        "kind": "deployment-action",
+        "locations": [
+          {
+            "line": 6,
+            "path": "scripts/deploy.sh"
+          }
+        ],
+        "properties": {
+          "target": "k8s/prod/deployment.yaml",
+          "targetKind": "file",
+          "tool": "kubectl"
+        },
+        "resolution": "exact"
+      }
+    ],
+    "gaps": [],
+    "limits": [],
+    "resolution": "explicitly-bound",
+    "role": "parsed-source-fact",
+    "step": "workload"
+  },
+  {
+    "entities": [
+      {
+        "consumers": 2,
+        "identity": "k8s:production/prod-eu/apps/Deployment/payments/api#sidecar",
+        "kind": "container-image",
+        "locations": [
+          {
+            "line": 1,
+            "path": "k8s/prod/deployment.yaml"
+          }
+        ],
+        "properties": {
+          "container": "sidecar",
+          "reference": "registry.example.com/payments/api:1.3.0",
+          "registry": "registry.example.com",
+          "repository": "registry.example.com/payments/api",
+          "tag": "1.3.0"
+        },
+        "resolution": "exact"
+      }
+    ],
+    "gaps": [
+      {
+        "detail": "container sidecar uses registry.example.com/payments/api:1.3.0: the tag can point to other content later, and no immutable digest is known",
+        "reason": "mutable-tag"
+      }
+    ],
+    "limits": [
+      {
+        "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+        "id": "provider-may-merge-occurrences"
+      },
+      {
+        "detail": "Other workloads use the same image repository (registry.example.com/payments/api). They belong to other subjects or environments, and this trace does not say that they agree with the service.",
+        "id": "other-consumers-belong-to-other-subjects"
+      }
+    ],
+    "resolution": "exact",
+    "role": "parsed-source-fact",
+    "step": "container-image"
+  },
+  {
+    "entities": [
+      {
+        "identity": "k8s:production/prod-eu/apps/Deployment/payments/api#sidecar",
+        "kind": "build-provenance",
+        "lineage": "verified",
+        "locations": [
+          {
+            "path": "build/attestations/shop.provenance.sigstore.json"
+          }
+        ],
+        "properties": {
+          "builder": "https://github.com/acme/shop/.github/workflows/build.yml@refs/heads/main",
+          "container": "sidecar",
+          "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "repository": "registry.example.com/payments/api",
+          "sourceRepository": "shop",
+          "trustContract": "sha256:d38f6bef0660414d256368512d220f592dd7c8a05d3cd2ad27e78c54ecbe4a26"
+        },
+        "resolution": "exact"
+      },
+      {
+        "identity": "docker/Dockerfile",
+        "kind": "dockerfile",
+        "lineage": "candidate",
+        "locations": [
+          {
+            "line": 1,
+            "path": "docker/Dockerfile"
+          },
+          {
+            "line": 4,
+            "path": "scripts/build.sh"
+          }
+        ],
+        "properties": {
+          "repository": "registry.example.com/payments/api",
+          "tool": "docker-build"
+        },
+        "resolution": "inferred"
+      },
+      {
+        "identity": "docker/Dockerfile#stage:0:golang",
+        "kind": "base-image",
+        "locations": [
+          {
+            "line": 1,
+            "path": "docker/Dockerfile"
+          }
+        ],
+        "properties": {
+          "reference": "golang:1.22",
+          "repository": "golang",
+          "stage": "0",
+          "tag": "1.22"
+        },
+        "resolution": "exact"
+      },
+      {
+        "identity": "docker/Dockerfile#stage:1:gcr.io/distroless/static",
+        "kind": "base-image",
+        "locations": [
+          {
+            "line": 6,
+            "path": "docker/Dockerfile"
+          }
+        ],
+        "properties": {
+          "reference": "gcr.io/distroless/static:nonroot",
+          "registry": "gcr.io",
+          "repository": "gcr.io/distroless/static",
+          "stage": "1",
+          "tag": "nonroot"
+        },
+        "resolution": "exact"
+      },
+      {
+        "identity": "docker/Dockerfile#stage:1:ghcr.io/example/healthcheck",
+        "kind": "external-copy-source",
+        "locations": [
+          {
+            "line": 10,
+            "path": "docker/Dockerfile"
+          }
+        ],
+        "properties": {
+          "reference": "ghcr.io/example/healthcheck:1.0.0",
+          "registry": "ghcr.io",
+          "repository": "ghcr.io/example/healthcheck",
+          "stage": "1",
+          "tag": "1.0.0"
+        },
+        "resolution": "exact"
+      }
+    ],
+    "gaps": [],
+    "limits": [
+      {
+        "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+        "id": "image-provenance-unverified"
+      }
+    ],
+    "resolution": "inferred",
+    "role": "inferred-association",
+    "step": "build-definition"
+  },
+  {
+    "entities": [
+      {
+        "identity": "docker/Dockerfile",
+        "kind": "dockerfile",
+        "locations": [
+          {
+            "line": 1,
+            "path": "docker/Dockerfile"
+          }
+        ],
+        "properties": {
+          "repository": "registry.example.com/payments/api"
+        }
+      },
+      {
+        "identity": "k8s:production/prod-eu/apps/Deployment/payments/api",
+        "kind": "manifest",
+        "locations": [
+          {
+            "line": 1,
+            "path": "k8s/prod/deployment.yaml"
+          }
+        ],
+        "properties": {
+          "kind": "Deployment",
+          "name": "api"
+        }
+      },
+      {
+        "bindings": [
+          "bind-api-source"
+        ],
+        "identity": "app/**",
+        "kind": "source-path",
+        "locations": [
+          {
+            "path": "app/**"
+          }
+        ],
+        "properties": {
+          "bindingKind": "sourceRoot"
+        },
+        "resolution": "explicitly-bound"
+      }
+    ],
+    "gaps": [],
+    "limits": [
+      {
+        "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+        "id": "source-provenance-unverified"
+      }
+    ],
+    "resolution": "explicitly-bound",
+    "role": "inferred-association",
+    "step": "source-evidence"
+  }
+]

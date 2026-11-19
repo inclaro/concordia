@@ -1,0 +1,90 @@
+{
+  "origin": "upstream:shared/test_fixtures/command",
+  "runs": [
+    {
+      "architecture": "generate/expected-output/conference-secure-signup-amended.arch.json",
+      "mode": "architecture",
+      "name": "generate__expected-output__conference-secure-signup-amended.arch"
+    },
+    {
+      "architecture": "generate/expected-output/conference-secure-signup.arch.json",
+      "mode": "architecture",
+      "name": "generate__expected-output__conference-secure-signup.arch"
+    },
+    {
+      "architecture": "generate/expected-output/conference-signup.arch.json",
+      "mode": "architecture",
+      "name": "generate__expected-output__conference-signup.arch"
+    },
+    {
+      "mode": "pattern",
+      "name": "generate__patterns__conference-secure-signup.pattern",
+      "pattern": "generate/patterns/conference-secure-signup.pattern.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "generate__patterns__conference-signup.pattern",
+      "pattern": "generate/patterns/conference-signup.pattern.json"
+    },
+    {
+      "architecture": "validate/empty-string-property.json",
+      "mode": "architecture",
+      "name": "validate__empty-string-property"
+    },
+    {
+      "architecture": "validate/false-boolean-property.json",
+      "mode": "architecture",
+      "name": "validate__false-boolean-property"
+    },
+    {
+      "architecture": "validate/flows/flows-1.0-bad.json",
+      "mode": "architecture",
+      "name": "validate__flows__flows-1.0-bad"
+    },
+    {
+      "architecture": "validate/flows/flows-1.1-bad.json",
+      "mode": "architecture",
+      "name": "validate__flows__flows-1.1-bad"
+    },
+    {
+      "architecture": "validate/flows/flows-good.json",
+      "mode": "architecture",
+      "name": "validate__flows__flows-good"
+    },
+    {
+      "architecture": "validate/flows/flows-spectral-sequence-non-unique.json",
+      "mode": "architecture",
+      "name": "validate__flows__flows-spectral-sequence-non-unique"
+    },
+    {
+      "architecture": "validate/flows/flows-spectral-unknown-relationship.json",
+      "mode": "architecture",
+      "name": "validate__flows__flows-spectral-unknown-relationship"
+    },
+    {
+      "architecture": "validate/invalid-architecture-missing-relationship-type.json",
+      "mode": "architecture",
+      "name": "validate__invalid-architecture-missing-relationship-type"
+    },
+    {
+      "architecture": "validate/options/arch.json",
+      "mode": "architecture",
+      "name": "validate__options__arch"
+    },
+    {
+      "mode": "pattern",
+      "name": "validate__options__pattern-resolved",
+      "pattern": "validate/options/pattern-resolved.json"
+    },
+    {
+      "mode": "pattern",
+      "name": "validate__options__pattern",
+      "pattern": "validate/options/pattern.json"
+    },
+    {
+      "architecture": "validate/zero-integer-property.json",
+      "mode": "architecture",
+      "name": "validate__zero-integer-property"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "coverage": "complete",
+  "environment": "production",
+  "occurrences": [
+    {
+      "container": "api",
+      "digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "immutable": true,
+      "kind": "container",
+      "repository": "registry.example.com/shop/api",
+      "workload": "Deployment/shop-production/api"
+    },
+    {
+      "container": "sidecar",
+      "immutable": false,
+      "kind": "container",
+      "repository": "registry.example.com/shop/api-sidecar",
+      "tag": "1.5.2",
+      "workload": "Deployment/shop-production/api"
+    }
+  ],
+  "resources": [
+    {
+      "identity": "production///Service/shop-production/api",
+      "location": "kustomize-shop/overlays/production"
+    },
+    {
+      "identity": "production//apps/Deployment/shop-production/api",
+      "location": "kustomize-shop/overlays/production"
+    }
+  ],
+  "tool": "kustomize"
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "redis"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "dec"
+            },
+            "description": {
+              "const": "Pick"
+            },
+            "relationship-type": {
+              "properties": {
+                "options": {
+                  "prefixItems": [
+                    {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "description": {
+                              "const": "d"
+                            },
+                            "nodes": {
+                              "const": []
+                            },
+                            "relationships": {
+                              "const": []
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

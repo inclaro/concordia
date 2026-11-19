@@ -1,0 +1,1562 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/results-1.1.schema.json",
+  "title": "Concordia check result (schemaVersion 1.1)",
+  "type": "object",
+  "required": [
+    "schemaVersion", "run", "toolchain", "inputs", "summary", "rules", "findings", "reconciliation", "controls",
+    "exceptions", "diagnostics", "coverage", "areas", "deploymentTrace", "observability"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.1" },
+    "run": {
+      "type": "object",
+      "required": ["id", "startedAt", "finishedAt", "graphGeneration", "project", "host"],
+      "properties": {
+        "id": { "type": "string" },
+        "startedAt": { "type": "string" },
+        "finishedAt": { "type": "string" },
+        "graphGeneration": { "type": "string" },
+        "project": { "type": "string" },
+        "host": {
+          "type": "object",
+          "required": ["platform", "arch", "go"],
+          "properties": {
+            "platform": { "type": "string" },
+            "arch": { "type": "string" },
+            "go": { "type": "string" }
+          }
+        }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "required": ["concordia", "calmSchema", "cbm"],
+      "properties": {
+        "concordia": { "type": "string" },
+        "calmSchema": { "type": "string" },
+        "cbm": {
+          "type": "object",
+          "required": ["executableVersion", "adapterSchema", "profile"],
+          "properties": {
+            "executableVersion": { "type": "string" },
+            "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+            "adapterSchema": { "type": "string" },
+            "profile": { "$ref": "#/$defs/cbmProfile" }
+          }
+        },
+        "structurizr": { "type": "string" },
+        "assurance": { "$ref": "#/$defs/assuranceToolchain" }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["workspace", "architecture", "policies", "bindings", "environments", "indexResults"],
+      "properties": {
+        "decisions": {
+          "description": "The decision register files and the lifecycle profile that the ADR governance checks read. Left out when no register is configured (additive, schemaVersion stays 1.1).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/inputRef" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "verdict", "failOn", "unknownPolicy", "rules", "exitCode", "active", "baselined", "waived", "expiredWaiver",
+        "unknownRules", "resultDigest"
+      ],
+      "properties": {
+        "verdict": { "$ref": "#/$defs/ruleVerdict" },
+        "exitCode": { "type": "integer", "enum": [0, 1, 2, 3, 4, 5, 6, 7, 130] },
+        "resultDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "rules": {
+          "type": "object",
+          "required": ["pass", "violation", "unknown", "notApplicable", "error"],
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ruleId", "name", "severity", "family", "verdict", "reasons", "subjects", "targets", "plan", "findingCount"],
+        "properties": {
+          "ruleId": { "type": "string" },
+          "verdict": { "$ref": "#/$defs/ruleVerdict" },
+          "enforcement": { "$ref": "#/$defs/enforcement" },
+          "reasons": { "type": "array" },
+          "findingCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "views": {
+      "description": "One result for each declared view, sorted by view ID. Left out when the workspace declares no view (additive, schemaVersion stays 1.1).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/view" }
+    },
+    "decisionSummary": {
+      "description": "The per-decision detail of the adrGovernance area. Left out when no register is configured (additive, schemaVersion stays 1.1).",
+      "$ref": "#/$defs/decisionSummary"
+    },
+    "trust": {
+      "description": "The boundary crossings of the relationships, flow steps and observed flows. Left out when no node, relationship or binding declares a trust value (additive, schemaVersion stays 1.1).",
+      "$ref": "#/$defs/trust"
+    },
+    "assessmentCurrency": {
+      "description": "The currency of every assessment version and required assessment (design D13 of add-review-currency). Left out when the run does not evaluate assessments (additive, schemaVersion stays 1.1).",
+      "$ref": "#/$defs/assessmentCurrency"
+    },
+    "governance": {
+      "description": "The relaxations of the review configuration against the trust anchor and the dispositions of removed subjects. Left out with assessmentCurrency (additive).",
+      "$ref": "#/$defs/governance"
+    },
+    "analysis": {
+      "description": "How the review evaluation ran and how complete it was. Left out with assessmentCurrency (additive).",
+      "$ref": "#/$defs/analysis"
+    },
+    "assurance": {
+      "description": "The rendered sources, plans, statements, lineage, effective-policy evaluations, check results, and quality scenarios of the run. Left out without an `assurance` key in the workspace (additive, schemaVersion stays 1.1). Every list is sorted.",
+      "type": "object",
+      "required": ["rendered", "plans", "statements", "lineage", "evaluations", "checkResults", "candidates", "quality", "qualityAreas"],
+      "properties": {
+        "rendered": { "type": "array", "items": { "$ref": "#/$defs/renderedEntry" } },
+        "plans": { "type": "array", "items": { "$ref": "#/$defs/planEntry" } },
+        "statements": { "type": "array", "items": { "$ref": "#/$defs/statementSummary" } },
+        "lineage": { "type": "array", "items": { "$ref": "#/$defs/lineageEntry" } },
+        "evaluations": { "type": "array", "items": { "$ref": "#/$defs/evaluationEntry" } },
+        "checkResults": { "type": "array", "items": { "$ref": "#/$defs/checkResultEntry" } },
+        "candidates": { "type": "array", "items": { "$ref": "#/$defs/testCandidate" } },
+        "quality": { "type": "array", "items": { "$ref": "#/$defs/qualityEntry" } },
+        "qualityAreas": { "type": "array", "items": { "$ref": "#/$defs/qualityAreaEntry" } }
+      }
+    },
+    "reconciliation": { "type": "array" },
+    "controls": { "type": "array", "items": { "$ref": "#/$defs/controlResult" } },
+    "exceptions": {
+      "type": "object",
+      "required": ["resolvedBaselineEntries", "orphanedWaivers", "waivers"],
+      "properties": {
+        "scopedWaivers": { "type": "array", "items": { "$ref": "#/$defs/scopedWaiver" } }
+      }
+    },
+    "diagnostics": { "type": "array" },
+    "coverage": {
+      "type": "object",
+      "required": ["predicates", "scopeFailures", "indexResults", "skipped", "skipReasons", "limits", "crossCheck"]
+    },
+    "deploymentTrace": { "$ref": "#/$defs/deploymentTrace" },
+    "areas": {
+      "type": "object",
+      "required": ["conformance", "deploymentTrace", "adrGovernance", "diagramCurrency", "assessmentCurrency", "qualityEvaluation"],
+      "properties": {
+        "conformance": { "$ref": "#/$defs/area" },
+        "deploymentTrace": { "$ref": "#/$defs/area" },
+        "adrGovernance": { "$ref": "#/$defs/area" },
+        "diagramCurrency": { "$ref": "#/$defs/area" },
+        "assessmentCurrency": { "$ref": "#/$defs/area" },
+        "qualityEvaluation": { "$ref": "#/$defs/area" }
+      },
+      "additionalProperties": false
+    },
+    "observability": {
+      "type": "object",
+      "required": [
+        "ingestedFacts", "normalizedFacts", "unresolvedFacts", "unsupportedFacts", "coverageGaps", "conflicts",
+        "cacheHits", "stageFailures"
+      ],
+      "properties": {
+        "ingestedFacts": { "type": "integer", "minimum": 0 },
+        "normalizedFacts": { "type": "integer", "minimum": 0 },
+        "unresolvedFacts": { "type": "integer", "minimum": 0 },
+        "unsupportedFacts": { "type": "integer", "minimum": 0 },
+        "coverageGaps": { "type": "integer", "minimum": 0 },
+        "conflicts": { "type": "integer", "minimum": 0 },
+        "cacheHits": { "type": "integer", "minimum": 0 },
+        "stageFailures": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    }
+  },
+  "$defs": {
+    "scopedWaiver": {
+      "type": "object",
+      "required": [
+        "id", "rule", "scope", "owner", "expires", "state", "digest", "approver", "verification",
+        "compensatingEvidence", "coveredFindings"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "rule": { "type": "string" },
+        "scope": {
+          "type": "object",
+          "minProperties": 1,
+          "properties": {
+            "subject": { "type": "string" },
+            "environment": { "type": "string" },
+            "obligation": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "owner": { "type": "string" },
+        "expires": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "state": { "enum": ["active", "expired"] },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "approver": {
+          "type": "object",
+          "required": ["identity", "authority"],
+          "properties": {
+            "identity": { "type": "string" },
+            "authority": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "verification": {
+          "type": "object",
+          "required": ["verified", "authority"],
+          "properties": {
+            "verified": { "type": "boolean" },
+            "mechanism": { "enum": ["protected-review", "signed"] },
+            "authority": { "type": "string" },
+            "signer": { "type": "string" },
+            "reason": { "type": "string" },
+            "detail": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "compensatingEvidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256", "state"],
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+              "state": { "enum": ["resolved", "unresolved", "digest-mismatch"] }
+            },
+            "additionalProperties": false
+          }
+        },
+        "coveredFindings": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "inputRef": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "properties": {
+        "path": { "type": "string" },
+        "digest": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "decisionState": {
+      "type": "object",
+      "required": ["state", "reason"],
+      "properties": {
+        "state": { "type": "string" },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "stringList": { "type": "array", "items": { "type": "string" } },
+    "qualityLocation": {
+      "type": "object",
+      "required": ["file"],
+      "properties": { "file": { "type": "string" }, "line": { "type": "integer", "minimum": 1 } },
+      "additionalProperties": false
+    },
+    "qualityLink": {
+      "description": "One `addressedBy` link of a scenario or finding. Only `active` counts as the rationale of its owner; `adr-governance-not-available` is the detail when the run evaluates no ADR governance.",
+      "type": "object",
+      "required": ["adr", "canonical", "status", "reviewRationale", "location"],
+      "properties": {
+        "adr": { "type": "string" },
+        "canonical": { "type": "string" },
+        "status": { "enum": ["active", "not-active", "unknown"] },
+        "state": { "enum": ["active", "inactive", "superseded", "ambiguous", "unknown"] },
+        "detail": { "type": "string" },
+        "reviewRationale": { "type": "boolean" },
+        "location": { "$ref": "#/$defs/qualityLocation" }
+      },
+      "additionalProperties": false
+    },
+    "qualityEntry": {
+      "description": "One quality scenario with the verdict of its own mode. The three modes are never merged into one score.",
+      "type": "object",
+      "required": [
+        "scenario", "area", "mode", "environment", "enforcement", "verdict", "details", "evidence", "ruleId", "links",
+        "reviewRationale", "findings", "location"
+      ],
+      "properties": {
+        "scenario": { "type": "string", "minLength": 1 },
+        "area": { "enum": ["availability", "modifiability", "security", "performance", "deployment-safety", "operability"] },
+        "mode": { "enum": ["structural", "measured", "reviewed"] },
+        "environment": { "type": "string" },
+        "enforcement": { "enum": ["mandatory", "advisory"] },
+        "verdict": { "$ref": "#/$defs/ruleVerdict" },
+        "reason": { "$ref": "#/$defs/unknownReason" },
+        "details": { "$ref": "#/$defs/stringList" },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "ref"],
+            "properties": { "kind": { "enum": ["rule", "measurement", "assessment"] }, "ref": { "type": "string" } },
+            "additionalProperties": false
+          }
+        },
+        "ruleId": { "type": "string" },
+        "links": { "type": "array", "items": { "$ref": "#/$defs/qualityLink" } },
+        "reviewRationale": { "type": "boolean" },
+        "findings": { "$ref": "#/$defs/stringList" },
+        "location": { "$ref": "#/$defs/qualityLocation" }
+      },
+      "additionalProperties": false
+    },
+    "qualityAreaEntry": {
+      "description": "The coverage of one quality area: its scenarios with their verdicts and the findings (sensitivity points, risks, tradeoffs) that concern it. An area without a scenario is `no-scenario`, never a pass; a required one is a violation.",
+      "type": "object",
+      "required": ["area", "verdict", "required", "scenarios", "findings", "reported"],
+      "properties": {
+        "area": { "enum": ["availability", "modifiability", "security", "performance", "deployment-safety", "operability"] },
+        "verdict": { "enum": ["pass", "violation", "unknown", "error", "no-scenario"] },
+        "required": { "type": "boolean" },
+        "detail": { "type": "string" },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "mode", "verdict"],
+            "properties": {
+              "id": { "type": "string" },
+              "mode": { "enum": ["structural", "measured", "reviewed"] },
+              "verdict": { "$ref": "#/$defs/ruleVerdict" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "status", "statement", "owner", "scenarios", "links"],
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "enum": ["sensitivity-point", "risk", "tradeoff"] },
+              "status": { "enum": ["open", "accepted", "resolved"] },
+              "statement": { "type": "string" },
+              "owner": { "type": "string" },
+              "scenarios": { "$ref": "#/$defs/stringList" },
+              "links": { "type": "array", "items": { "$ref": "#/$defs/qualityLink" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "reported": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "assuranceGap": {
+      "type": "object",
+      "required": ["kind", "detail"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "detail": { "type": "string" },
+        "path": { "type": "string" }
+      }
+    },
+    "assuranceCoverage": { "enum": ["complete", "partial", "failed"] },
+    "assuranceIntegrity": { "enum": ["content-not-verified", "content-verified-by-digest", "producer-authenticated"] },
+    "renderedEntry": {
+      "description": "One rendered source: what rendered it, what it read and gave, how complete it is. Digests and counts only, never a rendered value.",
+      "type": "object",
+      "required": ["environment", "source", "tool", "confinement", "resourceCount", "coverage", "level", "gaps"],
+      "properties": {
+        "environment": { "type": "string" },
+        "source": { "type": "string" },
+        "tool": { "enum": ["helm", "kustomize", "plain"] },
+        "toolVersion": { "type": "string" },
+        "rendererDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "confinement": { "enum": ["none", "process", "process+os"] },
+        "inputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "outputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "resourceCount": { "type": "integer", "minimum": 0 },
+        "coverage": { "$ref": "#/$defs/assuranceCoverage" },
+        "level": { "const": "rendered-or-evaluated" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/assuranceGap" } }
+      }
+    },
+    "planEntry": {
+      "description": "One plan. It is shown whatever its binding says; `admissible` says whether a mandatory claim may rest on it. A plan is never evidence of a deployment.",
+      "type": "object",
+      "required": ["environment", "tool", "file", "integrity", "admissible", "details", "resourceCount", "coverage", "level", "gaps"],
+      "properties": {
+        "environment": { "type": "string" },
+        "tool": { "enum": ["terraform", "opentofu"] },
+        "file": { "type": "string" },
+        "digest": { "type": "string" },
+        "formatVersion": { "type": "string" },
+        "integrity": { "$ref": "#/$defs/assuranceIntegrity" },
+        "admissible": { "type": "boolean" },
+        "details": { "type": "array", "items": { "type": "string" } },
+        "resourceCount": { "type": "integer", "minimum": 0 },
+        "coverage": { "$ref": "#/$defs/assuranceCoverage" },
+        "level": { "const": "rendered-or-evaluated" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/assuranceGap" } }
+      }
+    },
+    "evaluationEntry": {
+      "description": "One effective-policy query that a rule used, with the evaluator that answered it. The same rendered input gives the same answer and digest.",
+      "type": "object",
+      "required": [
+        "environment", "kind", "query", "verdict", "policies", "assumptions", "declaredAssumptions", "limits", "gaps",
+        "evaluator", "evaluatorVersion", "inputDigest"
+      ],
+      "properties": {
+        "environment": { "type": "string" },
+        "kind": { "enum": ["network-policy", "rbac"] },
+        "query": { "type": "string", "minLength": 1 },
+        "verdict": { "enum": ["allowed", "denied", "granted", "not-granted", "unknown"] },
+        "reason": { "type": "string" },
+        "policies": { "$ref": "#/$defs/stringList" },
+        "assumptions": { "$ref": "#/$defs/stringList" },
+        "declaredAssumptions": { "$ref": "#/$defs/stringList" },
+        "limits": { "$ref": "#/$defs/stringList" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/assuranceGap" } },
+        "evaluator": { "type": "string" },
+        "evaluatorVersion": { "type": "string" },
+        "inputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "checkResultEntry": {
+      "description": "One check result with its admissibility. An inadmissible result stays listed with every reason and never gives a verdict. `coversNothing` is true for an explicitly empty `covers` list, which differs from a missing field.",
+      "type": "object",
+      "required": [
+        "check", "outcome", "revision", "environment", "evaluator", "evaluatorVersion", "integrity", "admissible", "reasons", "path",
+        "statementDigest"
+      ],
+      "properties": {
+        "check": { "type": "string" },
+        "outcome": { "type": "string" },
+        "revision": { "type": "string" },
+        "environment": { "type": "string" },
+        "evaluator": { "type": "string" },
+        "evaluatorVersion": { "type": "string" },
+        "time": { "type": "string" },
+        "producer": { "type": "string" },
+        "integrity": { "$ref": "#/$defs/assuranceIntegrity" },
+        "admissible": { "type": "boolean" },
+        "reasons": { "$ref": "#/$defs/stringList" },
+        "covers": { "$ref": "#/$defs/stringList" },
+        "coversNothing": { "type": "boolean" },
+        "path": { "type": "string" },
+        "statementDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "testCandidate": {
+      "description": "A TESTS or TESTS_FILE association of the code graph. It is a candidate verification artifact and never evidence: it holds the test node and the tested node only (CBM 0.12.1 gives these edges no properties), and `nodes` is a suggested mapping that no verdict uses.",
+      "type": "object",
+      "required": ["kind", "test", "tested"],
+      "properties": {
+        "kind": { "enum": ["tests", "tests-file"] },
+        "test": { "type": "string" },
+        "tested": { "type": "string" },
+        "nodes": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "statementSummary": {
+      "description": "One statement file that was read: its digest, subjects, how far it is verified, and why it is not admissible when it is not.",
+      "type": "object",
+      "required": ["kind", "path", "digest", "subjectDigests", "integrity", "signature", "details", "admissible"],
+      "properties": {
+        "kind": { "enum": ["build-provenance", "deployment-record", "workload-observation", "check-result", "measurement", "plan"] },
+        "path": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "subjectDigests": { "type": "array", "items": { "type": "string" } },
+        "producer": { "type": "string" },
+        "integrity": { "$ref": "#/$defs/assuranceIntegrity" },
+        "signature": { "enum": ["none", "no-producer", "unavailable", "failed", "verified"] },
+        "details": { "type": "array", "items": { "type": "string" } },
+        "admissible": { "type": "boolean" }
+      }
+    },
+    "evaluatorIdentity": {
+      "type": "object",
+      "required": ["id", "version", "contractDigest"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "contractDigest": { "type": "string" }
+      }
+    },
+    "assuranceToolchain": {
+      "description": "What the assurance evidence used besides Concordia: the renderers that ran, the cosign that verified, the evaluators, and the digests of the claim registry and of the trust contract.",
+      "type": "object",
+      "required": ["renderers", "evaluators", "claimsRegistryDigest"],
+      "properties": {
+        "renderers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "version", "sha256"],
+            "properties": { "name": { "type": "string" }, "version": { "type": "string" }, "sha256": { "type": "string" } }
+          }
+        },
+        "cosign": { "type": "string" },
+        "evaluators": { "type": "array", "items": { "$ref": "#/$defs/evaluatorIdentity" } },
+        "claimsRegistryDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "trustContractDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "required": ["crossings"],
+      "properties": {
+        "crossings": {
+          "description": "One entry for each flow and dimension, sorted by flow and dimension.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/trustCrossing" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "currencyState": { "enum": ["current", "review-required", "expired", "revoked", "unknown"] },
+    "unknownReason": { "type": "string", "minLength": 1 },
+    "reviewTrigger": {
+      "description": "A reason to review: the changed dependency, its class, the assessment that it reaches, and the shortest path. The action is `get review`.",
+      "type": "object",
+      "required": ["class", "change", "dependency", "assumption", "assessment", "path", "evidence", "related", "action"],
+      "properties": {
+        "class": { "type": "string", "minLength": 1 },
+        "change": { "enum": ["added", "removed", "modified"] },
+        "dependency": { "type": "string", "minLength": 1 },
+        "assumption": { "$ref": "#/$defs/stringList" },
+        "assessment": { "type": "string", "minLength": 1 },
+        "path": { "$ref": "#/$defs/stringList" },
+        "evidence": { "$ref": "#/$defs/stringList" },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["class", "change", "dependency"],
+            "properties": {
+              "class": { "type": "string", "minLength": 1 },
+              "change": { "enum": ["added", "removed", "modified"] },
+              "dependency": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "action": { "const": "get review" }
+      },
+      "additionalProperties": false
+    },
+    "currencyApproval": {
+      "type": "object",
+      "required": ["id", "decision", "reviewer", "authority", "verified", "decidedAt", "conditions"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "decision": { "enum": ["approved", "rejected"] },
+        "reviewer": { "type": "string" },
+        "authority": { "type": "string" },
+        "mechanism": { "type": "string" },
+        "verified": { "type": "boolean" },
+        "decidedAt": { "type": "string" },
+        "expiresAt": { "type": "string" },
+        "conditions": { "$ref": "#/$defs/stringList" },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "currencyAnalysis": {
+      "type": "object",
+      "required": ["complete", "visited", "closureSize", "widened"],
+      "properties": {
+        "complete": { "type": "boolean" },
+        "visited": { "type": "integer", "minimum": 0 },
+        "closureSize": { "type": "integer", "minimum": 0 },
+        "widened": { "type": "boolean" },
+        "incomplete": { "$ref": "#/$defs/analysisIncomplete" }
+      },
+      "additionalProperties": false
+    },
+    "analysisIncomplete": {
+      "description": "The limit that stopped an analysis: maxDepth, maxVisited, or maxSeconds.",
+      "type": "object",
+      "required": ["limit", "configured", "visited"],
+      "properties": {
+        "limit": { "enum": ["maxDepth", "maxVisited", "maxSeconds"] },
+        "configured": { "type": "integer", "minimum": 0 },
+        "visited": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "assessmentEntry": {
+      "type": "object",
+      "required": ["id", "version", "type", "environment", "outcome", "state", "currency", "reasons", "details", "causes", "approval", "notApplied", "triggers", "required", "file", "digest", "latest", "analysis"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "integer", "minimum": 1 },
+        "type": { "enum": ["security", "quality"] },
+        "title": { "type": "string" },
+        "environment": { "type": "string" },
+        "outcome": { "type": "string" },
+        "state": { "enum": ["draft", "ready-for-review", "approved", "rejected", "review-required", "expired", "revoked"] },
+        "currency": { "$ref": "#/$defs/currencyState" },
+        "unknownReason": { "$ref": "#/$defs/unknownReason" },
+        "reasons": { "$ref": "#/$defs/stringList" },
+        "details": { "$ref": "#/$defs/stringList" },
+        "causes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["reason", "detail"],
+            "properties": { "reason": { "$ref": "#/$defs/unknownReason" }, "detail": { "type": "string" } },
+            "additionalProperties": false
+          }
+        },
+        "approval": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/currencyApproval" }] },
+        "basis": { "type": "string" },
+        "notApplied": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["record", "kind", "reason"],
+            "properties": {
+              "record": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "minLength": 1 },
+              "authority": { "type": "string" },
+              "mechanism": { "type": "string" },
+              "reason": { "type": "string", "minLength": 1 },
+              "detail": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "triggers": { "type": "array", "items": { "$ref": "#/$defs/reviewTrigger" } },
+        "required": { "$ref": "#/$defs/stringList" },
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "digest": { "type": "string" },
+        "latest": { "type": "boolean" },
+        "analysis": { "$ref": "#/$defs/currencyAnalysis" }
+      },
+      "additionalProperties": false
+    },
+    "requiredEntry": {
+      "type": "object",
+      "required": ["id", "assessment", "type", "environment", "authority", "version", "currency", "reasons", "verdict"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "assessment": { "type": "string" },
+        "type": { "type": "string" },
+        "environment": { "type": "string" },
+        "authority": { "type": "string" },
+        "version": { "type": "integer", "minimum": 0 },
+        "currency": { "$ref": "#/$defs/currencyState" },
+        "unknownReason": { "$ref": "#/$defs/unknownReason" },
+        "reasons": { "$ref": "#/$defs/stringList" },
+        "verdict": { "enum": ["pass", "violation", "unknown"] }
+      },
+      "additionalProperties": false
+    },
+    "assessmentCurrency": {
+      "type": "object",
+      "required": ["evaluatedAt", "contractVersion", "capabilityProfile", "assessments", "required"],
+      "properties": {
+        "evaluatedAt": { "type": "string" },
+        "contractVersion": { "type": "string", "minLength": 1 },
+        "capabilityProfile": { "type": "string" },
+        "assessments": { "type": "array", "items": { "$ref": "#/$defs/assessmentEntry" } },
+        "required": { "type": "array", "items": { "$ref": "#/$defs/requiredEntry" } }
+      },
+      "additionalProperties": false
+    },
+    "governance": {
+      "type": "object",
+      "required": ["relaxations", "dispositions"],
+      "properties": {
+        "relaxations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "subject", "change", "comparison", "relaxation", "digest", "detail"],
+            "properties": {
+              "kind": { "enum": ["rule", "enforcement", "authority"] },
+              "subject": { "type": "string", "minLength": 1 },
+              "change": { "enum": ["added", "removed", "modified"] },
+              "comparison": { "enum": ["stricter", "equal", "looser", "incomparable"] },
+              "relaxation": { "type": "boolean" },
+              "digest": { "type": "string" },
+              "detail": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "dispositions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["assessment", "kind", "identity", "state"],
+            "properties": {
+              "assessment": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "minLength": 1 },
+              "identity": { "type": "string", "minLength": 1 },
+              "state": { "enum": ["disposed", "undisposed"] },
+              "disposition": { "enum": ["removed-intentionally", "retired", "moved"] },
+              "movedTo": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["mode", "complete", "visited", "closureSize", "invalidations", "cacheHits", "cacheMisses", "incompleteAnalyses"],
+      "properties": {
+        "mode": { "enum": ["full", "incremental"] },
+        "complete": { "type": "boolean" },
+        "visited": { "type": "integer", "minimum": 0 },
+        "closureSize": { "type": "integer", "minimum": 0 },
+        "invalidations": { "type": "integer", "minimum": 0 },
+        "cacheHits": { "type": "integer", "minimum": 0 },
+        "cacheMisses": { "type": "integer", "minimum": 0 },
+        "incompleteAnalyses": { "type": "integer", "minimum": 0 },
+        "incomplete": { "$ref": "#/$defs/analysisIncomplete" }
+      },
+      "additionalProperties": false
+    },
+    "trustCrossing": {
+      "type": "object",
+      "required": ["flow", "kind", "source", "destination", "dimension", "from", "to", "direction", "state", "classification"],
+      "properties": {
+        "flow": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["relationship", "flow-step", "observed"] },
+        "relationship": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "destination": { "type": "string", "minLength": 1 },
+        "dimension": { "type": "string", "minLength": 1 },
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "direction": { "type": "string", "minLength": 1 },
+        "state": { "enum": ["crossing", "same", "unknown"] },
+        "classification": { "type": "string", "minLength": 1 },
+        "externalDestination": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "decisionSummary": {
+      "type": "object",
+      "required": ["providerSupport", "decisions", "history", "ruleJustification", "triggers", "candidates", "findings"],
+      "properties": {
+        "providerSupport": { "enum": ["supported", "unsupported"] },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id", "title", "path", "status", "statusText", "expect", "categories", "presence", "applicability", "enforcement",
+              "governs", "released", "successors", "predecessors"
+            ],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "path": { "type": "string" },
+              "line": { "type": "integer", "minimum": 1 },
+              "project": { "type": "string" },
+              "status": { "type": "string" },
+              "statusText": { "type": "string" },
+              "mappedStatus": { "type": "string" },
+              "expect": { "type": "string" },
+              "categories": { "$ref": "#/$defs/stringList" },
+              "presence": { "$ref": "#/$defs/decisionState" },
+              "applicability": {
+                "type": "object",
+                "required": ["state", "reason"],
+                "properties": {
+                  "state": { "type": "string" },
+                  "reason": { "type": "string" },
+                  "statusLags": { "type": "boolean" }
+                },
+                "additionalProperties": false
+              },
+              "enforcement": {
+                "type": "object",
+                "required": ["state", "required", "rules"],
+                "properties": {
+                  "state": { "type": "string" },
+                  "required": { "type": "boolean" },
+                  "rules": { "$ref": "#/$defs/stringList" }
+                },
+                "additionalProperties": false
+              },
+              "governs": { "$ref": "#/$defs/stringList" },
+              "released": { "$ref": "#/$defs/stringList" },
+              "successors": { "$ref": "#/$defs/stringList" },
+              "predecessors": { "$ref": "#/$defs/stringList" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "history": {
+          "type": "object",
+          "required": ["links"],
+          "properties": {
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["from", "to", "fromPath", "toPath", "provenance", "effect"],
+                "properties": {
+                  "from": { "type": "string" },
+                  "to": { "type": "string" },
+                  "fromPath": { "type": "string" },
+                  "toPath": { "type": "string" },
+                  "provenance": { "enum": ["edge", "metadata", "both"] },
+                  "effect": { "enum": ["effective", "pending"] }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ruleJustification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule", "mandatory", "linkedBy", "result"],
+            "properties": {
+              "rule": { "type": "string" },
+              "mandatory": { "type": "boolean" },
+              "linkedBy": { "$ref": "#/$defs/stringList" },
+              "result": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "category", "raised", "raisedBy", "satisfiedBy", "result"],
+            "properties": {
+              "id": { "type": "string" },
+              "category": { "type": "string" },
+              "raised": { "type": "boolean" },
+              "raisedBy": { "$ref": "#/$defs/stringList" },
+              "satisfiedBy": { "$ref": "#/$defs/stringList" },
+              "result": { "type": "string" },
+              "reason": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind"],
+            "properties": {
+              "kind": { "enum": ["unregistered-decision", "mention", "calm-adrs-entry"] },
+              "id": { "type": "string" },
+              "path": { "type": "string" },
+              "subject": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "findingDecision": {
+      "type": "object",
+      "required": [
+        "id", "title", "status", "statusText", "path", "successors", "predecessors", "governs", "enforcedBy", "candidateSuccessors"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "type": "string" },
+        "statusText": { "type": "string" },
+        "path": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "successors": { "$ref": "#/$defs/stringList" },
+        "predecessors": { "$ref": "#/$defs/stringList" },
+        "governs": { "$ref": "#/$defs/stringList" },
+        "enforcedBy": { "$ref": "#/$defs/stringList" },
+        "candidateSuccessors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "path", "applied"],
+            "properties": {
+              "id": { "type": "string" },
+              "path": { "type": "string" },
+              "applied": { "const": false }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ruleVerdict": { "enum": ["pass", "violation", "unknown", "not-applicable", "error"] },
+    "enforcement": { "enum": ["mandatory", "advisory", "shadow"] },
+    "deploymentGapReason": {
+      "enum": [
+        "coverage-incomplete", "unsupported-family", "capability-regression", "environment-unresolved", "ambiguous-binding",
+        "binding-gap", "evidence-conflict", "selector-property-unknown", "limit-exceeded", "target-not-declared",
+        "trust-anchor-unreadable", "verification-unavailable", "reference-unresolved", "absent",
+        "ambiguous-build-definition", "mutable-tag",
+        "claim-not-enabled", "no-evidence-supplied", "no-evaluator-available", "rendered-evidence-missing",
+        "enforcement-not-declared", "reviewed-mode-not-available"
+      ]
+    },
+    "controlResult": {
+      "description": "The result of one control: the worst verdict of its rules and its checks. A check with no admissible result makes the verdict unknown, and the reasons name the check.",
+      "type": "object",
+      "required": ["controlId", "scope", "verdict", "ruleIds"],
+      "properties": {
+        "controlId": { "type": "string" },
+        "scope": { "type": "object" },
+        "verdict": { "$ref": "#/$defs/ruleVerdict" },
+        "ruleIds": { "$ref": "#/$defs/stringList" },
+        "checkIds": { "$ref": "#/$defs/stringList" },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": { "code": { "type": "string" }, "message": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "deploymentStep": { "enum": ["service", "workload", "container-image", "build-definition", "source-evidence"] },
+    "deploymentStatus": { "enum": ["complete", "partial", "unresolved", "unknown"] },
+    "deploymentResolution": { "enum": ["exact", "explicitly-bound", "inferred", "ambiguous", "unresolved", "unbound"] },
+    "deploymentGap": {
+      "type": "object",
+      "required": ["reason", "detail"],
+      "properties": {
+        "reason": { "$ref": "#/$defs/deploymentGapReason" },
+        "step": { "$ref": "#/$defs/deploymentStep" },
+        "lossModes": { "type": "array", "items": { "type": "string" } },
+        "detail": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "deploymentLimit": {
+      "type": "object",
+      "required": ["id", "detail"],
+      "properties": { "id": { "type": "string" }, "detail": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "deploymentEntity": {
+      "type": "object",
+      "required": ["identity", "kind", "locations", "properties"],
+      "properties": {
+        "identity": { "type": "string" },
+        "kind": { "type": "string" },
+        "locations": { "type": "array", "items": { "$ref": "#/$defs/location" } },
+        "properties": { "type": "object", "additionalProperties": { "type": "string" } },
+        "resolution": { "$ref": "#/$defs/deploymentResolution" },
+        "lineage": { "enum": ["candidate", "unknown", "verified"] },
+        "bindings": { "type": "array", "items": { "type": "string" } },
+        "consumers": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "deploymentStepTrace": {
+      "type": "object",
+      "required": ["step", "role", "resolution", "entities", "gaps", "limits"],
+      "properties": {
+        "step": { "$ref": "#/$defs/deploymentStep" },
+        "role": { "enum": ["declared-intent", "parsed-source-fact", "inferred-association"] },
+        "resolution": { "$ref": "#/$defs/deploymentResolution" },
+        "entities": { "type": "array", "items": { "$ref": "#/$defs/deploymentEntity" } },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/deploymentGap" } },
+        "limits": { "type": "array", "items": { "$ref": "#/$defs/deploymentLimit" } }
+      },
+      "additionalProperties": false
+    },
+    "deploymentSubject": {
+      "type": "object",
+      "required": ["architectureId", "environment", "level", "status", "steps", "gaps", "limits", "rules"],
+      "properties": {
+        "architectureId": { "type": "string" },
+        "environment": { "type": "string" },
+        "level": { "const": "declared" },
+        "status": { "$ref": "#/$defs/deploymentStatus" },
+        "steps": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "$ref": "#/$defs/deploymentStepTrace" } },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/deploymentGap" } },
+        "limits": { "type": "array", "items": { "$ref": "#/$defs/deploymentLimit" } },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ruleId", "obligationId", "verdict"],
+            "properties": {
+              "ruleId": { "type": "string" },
+              "obligationId": { "type": "string" },
+              "verdict": { "$ref": "#/$defs/ruleVerdict" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "evaluated": {
+          "description": "The rendered workloads and the planned resources that a binding maps to the subject, at the level rendered-or-evaluated. Never part of the declared chain; left out when none.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/deploymentEntity" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "deploymentUnbound": {
+      "type": "object",
+      "required": ["workload", "images", "buildDefinitions"],
+      "properties": {
+        "workload": { "$ref": "#/$defs/deploymentEntity" },
+        "images": { "type": "array", "items": { "$ref": "#/$defs/deploymentEntity" } },
+        "buildDefinitions": { "type": "array", "items": { "$ref": "#/$defs/deploymentEntity" } }
+      },
+      "additionalProperties": false
+    },
+    "deploymentEnvironment": {
+      "type": "object",
+      "required": ["name", "coverage", "subjects", "unboundWorkloads", "actions"],
+      "properties": {
+        "name": { "type": "string" },
+        "cluster": { "type": "string" },
+        "coverage": {
+          "type": "object",
+          "required": ["status", "lossModes", "reasons"],
+          "properties": {
+            "status": { "enum": ["complete", "partial", "unsupported", "failed", "unknown"] },
+            "lossModes": { "type": "array", "items": { "type": "string" } },
+            "reasons": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "subjects": { "type": "array", "items": { "$ref": "#/$defs/deploymentSubject" } },
+        "unboundWorkloads": { "type": "array", "items": { "$ref": "#/$defs/deploymentUnbound" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/deploymentEntity" } },
+        "evaluated": {
+          "description": "The level rendered-or-evaluated in this environment: the rendered sources and plans that hold evidence. Left out when the environment has none.",
+          "type": "object",
+          "required": ["level", "status", "sources"],
+          "properties": {
+            "level": { "const": "rendered-or-evaluated" },
+            "status": { "enum": ["evaluated", "not-available"] },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind", "tool", "path", "coverage"],
+                "properties": {
+                  "kind": { "enum": ["render", "plan"] },
+                  "tool": { "type": "string" },
+                  "path": { "type": "string" },
+                  "coverage": { "$ref": "#/$defs/assuranceCoverage" },
+                  "digest": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "deploymentTrace": {
+      "type": "object",
+      "required": ["status", "levels", "environments", "unresolvedEnvironmentWorkloads", "unresolvedEnvironmentActions", "summary"],
+      "properties": {
+        "status": { "enum": ["configured", "not-configured"] },
+        "levels": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": ["level", "status"],
+            "properties": {
+              "level": { "enum": ["declared", "rendered-or-evaluated", "deployment-execution", "runtime-observation"] },
+              "status": { "enum": ["evaluated", "not-available"] }
+            },
+            "additionalProperties": false
+          }
+        },
+        "environments": { "type": "array", "items": { "$ref": "#/$defs/deploymentEnvironment" } },
+        "unresolvedEnvironmentWorkloads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["identity", "kind", "locations"],
+            "properties": {
+              "identity": { "type": "string" },
+              "kind": { "type": "string" },
+              "locations": { "type": "array", "items": { "$ref": "#/$defs/location" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "unresolvedEnvironmentActions": { "type": "array", "items": { "$ref": "#/$defs/deploymentEntity" } },
+        "summary": {
+          "type": "object",
+          "required": ["subjects", "byStatus", "environments"],
+          "properties": {
+            "subjects": { "type": "integer", "minimum": 0 },
+            "environments": { "type": "integer", "minimum": 0 },
+            "byStatus": {
+              "type": "object",
+              "required": ["complete", "partial", "unresolved", "unknown"],
+              "additionalProperties": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "lineageIntegrity": { "enum": ["content-not-verified", "content-verified-by-digest", "producer-authenticated"] },
+    "lineageStatementRef": {
+      "description": "One statement file: its path, the digest of its bytes, the producer whose signature verified, and its integrity.",
+      "type": "object",
+      "required": ["path", "digest", "integrity"],
+      "properties": {
+        "path": { "type": "string" },
+        "digest": { "type": "string" },
+        "producer": { "type": "string" },
+        "integrity": { "$ref": "#/$defs/lineageIntegrity" }
+      },
+      "additionalProperties": false
+    },
+    "lineageRejected": {
+      "description": "A statement that concerns the claim and cannot support it, with every reason.",
+      "type": "object",
+      "required": ["path", "digest", "integrity", "details"],
+      "properties": {
+        "path": { "type": "string" },
+        "digest": { "type": "string" },
+        "producer": { "type": "string" },
+        "integrity": { "$ref": "#/$defs/lineageIntegrity" },
+        "details": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "lineageDigestSource": {
+      "description": "One digest of a drift comparison and where it comes from: the rendered image, a deployment record, or a workload observation.",
+      "type": "object",
+      "required": ["source", "digest"],
+      "properties": {
+        "source": { "enum": ["rendered", "deployment-record", "workload-observation"] },
+        "digest": { "type": "string" },
+        "statement": { "$ref": "#/$defs/lineageStatementRef" }
+      },
+      "additionalProperties": false
+    },
+    "lineageClaim": {
+      "description": "The result of one claim of the deployment evidence of an occurrence.",
+      "type": "object",
+      "required": ["claim", "verdict", "detail"],
+      "properties": {
+        "claim": { "enum": ["deployed-digest", "deployment-succeeded", "runtime-drift"] },
+        "verdict": { "enum": ["pass", "violation", "unknown"] },
+        "reason": { "$ref": "#/$defs/unknownReason" },
+        "detail": { "type": "string" },
+        "statement": { "$ref": "#/$defs/lineageStatementRef" },
+        "digest": { "type": "string" },
+        "level": { "enum": ["deployment-execution", "runtime-observation"] },
+        "time": { "type": "string", "format": "date-time" },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["observed", "expected"],
+            "properties": {
+              "observed": { "$ref": "#/$defs/lineageDigestSource" },
+              "expected": { "$ref": "#/$defs/lineageDigestSource" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "lineageEntry": {
+      "description": "The exact lineage claim for one rendered container occurrence, with the deployment evidence beside it. No SLSA level is derived or shown.",
+      "type": "object",
+      "required": ["environment", "occurrence", "verdict", "missing", "detail", "trustContract", "rejected", "deployment"],
+      "properties": {
+        "environment": { "type": "string" },
+        "occurrence": {
+          "type": "object",
+          "required": ["workload", "container", "kind", "image", "repository"],
+          "properties": {
+            "workload": {
+              "type": "object",
+              "required": ["environment", "kind", "name"],
+              "properties": {
+                "environment": { "type": "string" },
+                "cluster": { "type": "string" },
+                "group": { "type": "string" },
+                "kind": { "type": "string" },
+                "namespace": { "type": "string" },
+                "name": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "container": { "type": "string" },
+            "kind": { "enum": ["container", "init", "ephemeral"] },
+            "image": { "type": "string" },
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "digest": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "verdict": { "enum": ["pass", "violation", "unknown"] },
+        "reason": { "$ref": "#/$defs/unknownReason" },
+        "missing": { "$ref": "#/$defs/stringList" },
+        "detail": { "type": "string" },
+        "builder": { "type": "string" },
+        "source": {
+          "type": "object",
+          "required": ["id", "uri"],
+          "properties": { "id": { "type": "string" }, "uri": { "type": "string" }, "revision": { "type": "string" } },
+          "additionalProperties": false
+        },
+        "statement": { "$ref": "#/$defs/lineageStatementRef" },
+        "trustContract": {
+          "type": "object",
+          "required": ["id", "digest"],
+          "properties": { "id": { "type": "string" }, "digest": { "type": "string" } },
+          "additionalProperties": false
+        },
+        "rejected": { "type": "array", "items": { "$ref": "#/$defs/lineageRejected" } },
+        "deployment": {
+          "type": "object",
+          "required": ["deployedDigest", "deploymentSucceeded", "runtimeDrift", "rejected"],
+          "properties": {
+            "deployedDigest": { "$ref": "#/$defs/lineageClaim" },
+            "deploymentSucceeded": { "$ref": "#/$defs/lineageClaim" },
+            "runtimeDrift": { "$ref": "#/$defs/lineageClaim" },
+            "rejected": { "type": "array", "items": { "$ref": "#/$defs/lineageRejected" } }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "nextAction": {
+      "enum": [
+        "fix implementation", "correct intent", "resolve binding", "supply evidence", "regenerate view", "get review",
+        "fix analysis configuration"
+      ]
+    },
+    "area": {
+      "type": "object",
+      "required": ["verdict", "counts"],
+      "properties": {
+        "verdict": { "enum": ["pass", "violation", "unknown", "not-applicable", "error", "not-configured"] },
+        "counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } }
+      }
+    },
+    "viewLocation": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "viewStrings": { "type": "array", "items": { "type": "string" } },
+    "view": {
+      "type": "object",
+      "required": [
+        "id", "kind", "origin", "owner", "abstraction", "environment", "scope", "severity", "presence", "freshness",
+        "correspondence", "assessmentCurrency", "semanticDigest", "digestContract", "projectionContract", "contractChanged",
+        "depicts", "generatedFrom"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "kind": { "enum": ["system-context", "container", "component", "deployment", "trust", "data-flow"] },
+        "origin": { "enum": ["generated", "authored"] },
+        "owner": { "type": "string" },
+        "abstraction": { "enum": ["system", "container", "component", "deployment"] },
+        "environment": { "type": ["string", "null"] },
+        "scope": { "$ref": "#/$defs/viewStrings" },
+        "severity": { "enum": ["error", "warning", "info"] },
+        "nextAction": { "$ref": "#/$defs/nextAction" },
+        "presence": {
+          "type": "object",
+          "required": ["status", "reasons", "files"],
+          "properties": {
+            "status": { "$ref": "#/$defs/ruleVerdict" },
+            "revision": { "type": "string" },
+            "reasons": { "$ref": "#/$defs/viewStrings" },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "role", "committed"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "role": { "enum": ["source", "output", "export", "manifest"] },
+                  "committed": { "type": "boolean" },
+                  "reason": { "type": "string" },
+                  "detail": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "freshness": {
+          "type": "object",
+          "required": ["status", "reasons", "differingDigests", "manifestDifferences", "artifacts"],
+          "properties": {
+            "status": { "$ref": "#/$defs/ruleVerdict" },
+            "verification": { "const": "regenerated" },
+            "reasons": { "$ref": "#/$defs/viewStrings" },
+            "differingDigests": { "$ref": "#/$defs/viewStrings" },
+            "manifestDifferences": { "$ref": "#/$defs/viewStrings" },
+            "artifacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["path", "format", "status", "reasons"],
+                "properties": {
+                  "path": { "type": "string" },
+                  "format": { "type": "string" },
+                  "digest": { "type": "string" },
+                  "regeneratedDigest": { "type": "string" },
+                  "status": { "$ref": "#/$defs/ruleVerdict" },
+                  "detail": { "type": "string" },
+                  "reasons": { "$ref": "#/$defs/viewStrings" }
+                }
+              }
+            }
+          }
+        },
+        "correspondence": {
+          "type": "object",
+          "required": ["status", "method", "source", "against", "compared", "byConstruction", "differences", "unknown", "lost", "reasons"],
+          "properties": {
+            "status": { "$ref": "#/$defs/ruleVerdict" },
+            "method": { "enum": ["generated-source", "structured-source", "supplemental-mapping", "reviewed", "presence-only"] },
+            "basis": { "enum": ["regenerated-projection", "committed-artifact"] },
+            "nextAction": { "$ref": "#/$defs/nextAction" },
+            "source": { "$ref": "#/$defs/viewLocation" },
+            "section": { "type": "string" },
+            "qualifiedName": { "type": "string" },
+            "against": { "$ref": "#/$defs/viewStrings" },
+            "compared": { "$ref": "#/$defs/viewStrings" },
+            "byConstruction": { "$ref": "#/$defs/viewStrings" },
+            "differences": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind", "subject", "from", "locations"],
+                "properties": {
+                  "kind": { "enum": ["missing", "extra", "incorrect", "unmapped"] },
+                  "subject": { "enum": ["element", "relationship"] },
+                  "basis": { "enum": ["declared", "observed"] },
+                  "from": { "type": "string" },
+                  "to": { "type": "string" },
+                  "detail": { "type": "string" },
+                  "locations": { "type": "array", "items": { "$ref": "#/$defs/viewLocation" } }
+                }
+              }
+            },
+            "unknown": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["reason", "locations"],
+                "properties": {
+                  "reason": { "type": "string" },
+                  "subject": { "type": "string" },
+                  "candidates": { "$ref": "#/$defs/viewStrings" },
+                  "locations": { "type": "array", "items": { "$ref": "#/$defs/viewLocation" } }
+                }
+              }
+            },
+            "lost": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind", "subject"],
+                "properties": { "kind": { "type": "string" }, "subject": { "type": "string" } }
+              }
+            },
+            "reasons": { "$ref": "#/$defs/viewStrings" }
+          }
+        },
+        "assessmentCurrency": {
+          "description": "The assessments that cover the depicted subject. not-evaluated lists none; otherwise the state is the most severe state of the listed assessments.",
+          "type": "object",
+          "required": ["state"],
+          "properties": {
+            "state": { "enum": ["not-evaluated", "current", "unknown", "review-required", "expired", "revoked"] },
+            "assessments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "version", "type", "state", "reasons"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "version": { "type": "integer" },
+                  "type": { "enum": ["security", "quality"] },
+                  "state": { "enum": ["current", "unknown", "review-required", "expired", "revoked"] },
+                  "reasons": { "type": "array", "items": { "type": "string" } },
+                  "approval": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "semanticDigest": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+        "digestContract": { "type": "string" },
+        "projectionContract": { "type": "string" },
+        "contractChanged": { "type": "boolean" },
+        "depicts": {
+          "type": "object",
+          "required": ["elements", "relationships"],
+          "properties": {
+            "elements": { "$ref": "#/$defs/viewStrings" },
+            "relationships": { "$ref": "#/$defs/viewStrings" }
+          }
+        },
+        "generatedFrom": {
+          "description": "The GENERATED_FROM link of a generated artifact; null for an authored view.",
+          "type": ["object", "null"],
+          "required": ["artifactPath", "manifestPath"],
+          "properties": {
+            "artifactPath": { "type": "string" },
+            "artifactDigest": { "type": "string" },
+            "semanticDigest": { "type": "string" },
+            "manifestPath": { "type": "string" }
+          }
+        }
+      }
+    },
+    "cbmProfile": {
+      "type": "object",
+      "required": ["applies"],
+      "properties": {
+        "applies": { "type": "boolean" },
+        "id": { "type": "string" },
+        "digest": { "type": "string" }
+      }
+    },
+    "location": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "fingerprint", "ruleId", "severity", "kind", "message", "disposition", "dispositionRef", "owner", "source", "target",
+        "evidencePath", "relatedLocations", "expected", "observed", "delta", "providerLimits", "related", "area", "nextAction",
+        "enforcement"
+      ],
+      "properties": {
+        "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "obligationId": { "type": "string" },
+        "ruleId": { "type": "string", "minLength": 1 },
+        "subject": { "type": "string" },
+        "environment": { "type": "string" },
+        "result": { "enum": ["violation", "unknown"] },
+        "reason": { "type": "string" },
+        "severity": { "enum": ["error", "warning", "info"] },
+        "kind": { "type": "string", "minLength": 1 },
+        "message": { "type": "string" },
+        "disposition": { "enum": ["active", "baselined", "waived", "expired-waiver"] },
+        "dispositionRef": { "type": ["string", "null"] },
+        "owner": { "type": ["string", "null"] },
+        "expected": { "type": "string", "minLength": 1 },
+        "observed": { "type": "string", "minLength": 1 },
+        "location": { "$ref": "#/$defs/location" },
+        "relatedLocations": { "type": "array", "items": { "$ref": "#/$defs/location" } },
+        "evidencePath": { "type": "array" },
+        "delta": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["class", "from", "to", "observedKinds"],
+              "properties": {
+                "class": { "enum": ["undeclared", "unobserved", "contradiction", "unknown"] },
+                "from": { "type": "string" },
+                "to": { "type": "string" },
+                "relationshipId": { "type": "string" },
+                "observedKinds": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          ]
+        },
+        "providerLimits": {
+          "type": "object",
+          "required": ["profile", "families"],
+          "properties": {
+            "profile": { "$ref": "#/$defs/cbmProfile" },
+            "families": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["family", "level", "maturity", "lossModes"],
+                "properties": {
+                  "family": { "type": "string" },
+                  "level": { "type": "string" },
+                  "maturity": { "type": "string" },
+                  "lossModes": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "id"],
+            "properties": {
+              "kind": { "enum": ["decision", "view", "assessment"] },
+              "id": { "type": "string" }
+            }
+          }
+        },
+        "area": { "enum": ["conformance", "deploymentTrace", "adrGovernance", "diagramCurrency", "assessmentCurrency", "qualityEvaluation"] },
+        "nextAction": { "$ref": "#/$defs/nextAction" },
+        "enforcement": { "$ref": "#/$defs/enforcement" },
+        "occurrence": { "type": "string" },
+        "decision": { "$ref": "#/$defs/findingDecision" }
+      }
+    }
+  }
+}

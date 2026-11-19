@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": 5
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "x"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "r"
+            },
+            "relationship-type": {
+              "const": {
+                "x": 5,
+                "y": "x"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

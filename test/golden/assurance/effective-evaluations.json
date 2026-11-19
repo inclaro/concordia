@@ -1,0 +1,82 @@
+[
+  {
+    "assumptions": [
+      "network-policy-enforced"
+    ],
+    "declaredAssumptions": [
+      "network-policy-enforced"
+    ],
+    "environment": "production",
+    "evaluator": "network-policy",
+    "evaluatorVersion": "1.0.0",
+    "gaps": [],
+    "inputDigest": "sha256:62ce1d9c2ea1a891da0e516b626c351188e3f104e2fd625b4717ad3cf3f4b8df",
+    "kind": "network-policy",
+    "limits": [
+      "CNI-specific policy kinds (CiliumNetworkPolicy, CalicoNetworkPolicy, AdminNetworkPolicy) are not evaluated",
+      "enforcement by the cluster's network plugin is assumed, not observed",
+      "host-network pods, node traffic, service address translation, and ingress controllers are not modeled",
+      "an ipBlock is evaluated only for addresses outside the pod network",
+      "service mesh and application-layer authorization are not evaluated"
+    ],
+    "policies": [
+      "NetworkPolicy shop/db-allow-web (ingress)",
+      "NetworkPolicy shop/default-deny (ingress)"
+    ],
+    "query": "tcp/22 from shop/web to shop/db",
+    "verdict": "denied"
+  },
+  {
+    "assumptions": [
+      "network-policy-enforced"
+    ],
+    "declaredAssumptions": [
+      "network-policy-enforced"
+    ],
+    "environment": "production",
+    "evaluator": "network-policy",
+    "evaluatorVersion": "1.0.0",
+    "gaps": [],
+    "inputDigest": "sha256:62ce1d9c2ea1a891da0e516b626c351188e3f104e2fd625b4717ad3cf3f4b8df",
+    "kind": "network-policy",
+    "limits": [
+      "CNI-specific policy kinds (CiliumNetworkPolicy, CalicoNetworkPolicy, AdminNetworkPolicy) are not evaluated",
+      "enforcement by the cluster's network plugin is assumed, not observed",
+      "host-network pods, node traffic, service address translation, and ingress controllers are not modeled",
+      "an ipBlock is evaluated only for addresses outside the pod network",
+      "service mesh and application-layer authorization are not evaluated"
+    ],
+    "policies": [
+      "NetworkPolicy shop/db-allow-web (ingress)",
+      "NetworkPolicy shop/default-deny (ingress)"
+    ],
+    "query": "tcp/8080 from shop/api to shop/db",
+    "verdict": "denied"
+  },
+  {
+    "assumptions": [
+      "network-policy-enforced"
+    ],
+    "declaredAssumptions": [
+      "network-policy-enforced"
+    ],
+    "environment": "production",
+    "evaluator": "network-policy",
+    "evaluatorVersion": "1.0.0",
+    "gaps": [],
+    "inputDigest": "sha256:62ce1d9c2ea1a891da0e516b626c351188e3f104e2fd625b4717ad3cf3f4b8df",
+    "kind": "network-policy",
+    "limits": [
+      "CNI-specific policy kinds (CiliumNetworkPolicy, CalicoNetworkPolicy, AdminNetworkPolicy) are not evaluated",
+      "enforcement by the cluster's network plugin is assumed, not observed",
+      "host-network pods, node traffic, service address translation, and ingress controllers are not modeled",
+      "an ipBlock is evaluated only for addresses outside the pod network",
+      "service mesh and application-layer authorization are not evaluated"
+    ],
+    "policies": [
+      "NetworkPolicy shop/db-allow-web (ingress)"
+    ],
+    "query": "tcp/8080 from shop/web to shop/db",
+    "verdict": "allowed"
+  }
+]

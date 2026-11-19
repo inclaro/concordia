@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "node1"
+            },
+            "interfaces": {
+              "prefixItems": [
+                {
+                  "properties": {
+                    "unique-id": {
+                      "const": "intf1"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "node2"
+            }
+          }
+        }
+      ]
+    },
+    "relationships": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "rel1"
+            }
+          }
+        },
+        {
+          "properties": {
+            "unique-id": {
+              "const": "rel2"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

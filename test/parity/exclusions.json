@@ -1,0 +1,36 @@
+{
+  "excludedReleases": [
+    {"release": "1.0", "reason": "Concordia supports CALM 1.2 and later"},
+    {"release": "1.0-rc1", "reason": "Concordia supports CALM 1.2 and later"},
+    {"release": "1.0-rc2", "reason": "Concordia supports CALM 1.2 and later"},
+    {"release": "1.1", "reason": "Concordia supports CALM 1.2 and later"},
+    {"release": "draft/2025-03", "reason": "Concordia supports CALM releases 1.2 and later, not drafts"},
+    {"release": "draft/2026-03", "reason": "Concordia supports CALM releases 1.2 and later, not drafts"}
+  ],
+  "runs": [
+    {
+      "case": "upstream/shared__test_fixtures__command",
+      "run": "generate__expected-output__conference-signup.arch",
+      "kind": "needs-network",
+      "reason": "The $schema pattern https://calm.finos.org/workshop/conference-signup.pattern.json has no URL mapping; the CALM CLI fetches it."
+    },
+    {
+      "case": "upstream/shared__test_fixtures__command",
+      "run": "generate__expected-output__conference-secure-signup.arch",
+      "kind": "needs-network",
+      "reason": "The $schema pattern https://calm.finos.org/workshop/conference-secure-signup.pattern.json has no URL mapping; the CALM CLI fetches it."
+    },
+    {
+      "case": "upstream/shared__test_fixtures__template",
+      "run": "data__conference-secure-signup.amended.arch",
+      "kind": "needs-network",
+      "reason": "The $schema pattern https://calm.finos.org/workshop/conference-secure-signup.pattern.json has no URL mapping; the CALM CLI fetches it."
+    },
+    {
+      "case": "upstream/shared__test_fixtures__template",
+      "run": "data__document-system-with-controls",
+      "kind": "needs-network",
+      "reason": "The requirement-url and config-url values are https://calm.finos.org/controls/ URLs without a URL mapping; the CALM CLI tries to fetch them."
+    }
+  ]
+}

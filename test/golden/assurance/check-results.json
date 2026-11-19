@@ -1,0 +1,77 @@
+[
+  {
+    "admissible": true,
+    "check": "unit-tests",
+    "covers": [
+      "api-service"
+    ],
+    "environment": "production",
+    "evaluator": "go-test",
+    "evaluatorVersion": "1.0.0",
+    "integrity": "producer-authenticated",
+    "outcome": "passed",
+    "path": "build/results/unit.json",
+    "producer": "ci",
+    "reasons": [],
+    "revision": "bc335f5b5ed689a4882e8b6870490d0fc6193e52",
+    "statementDigest": "sha256:afec49b6a3078cc0013a0baa724ceba5797972441b4def07fa83dec840c778ec",
+    "time": "2026-10-31T11:00:00Z"
+  },
+  {
+    "admissible": false,
+    "check": "unit-tests",
+    "covers": [
+      "api-service"
+    ],
+    "environment": "production",
+    "evaluator": "go-test",
+    "evaluatorVersion": "1.0.0",
+    "integrity": "content-not-verified",
+    "outcome": "failed",
+    "path": "build/results/untrusted.json",
+    "reasons": [
+      "integrity-failure"
+    ],
+    "revision": "bc335f5b5ed689a4882e8b6870490d0fc6193e52",
+    "statementDigest": "sha256:818ab72e7c8482b5ef431109a31babcd1fdf9c1297569b5cbe58c2bb9ed44f24",
+    "time": "2026-10-31T11:00:00Z"
+  },
+  {
+    "admissible": false,
+    "check": "unit-tests",
+    "covers": [
+      "api-service"
+    ],
+    "environment": "production",
+    "evaluator": "go-test",
+    "evaluatorVersion": "1.0.0",
+    "integrity": "producer-authenticated",
+    "outcome": "passed",
+    "path": "build/results/other-revision.json",
+    "producer": "ci",
+    "reasons": [
+      "different-revision"
+    ],
+    "revision": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "statementDigest": "sha256:4c783069086a6179b26484fc1d8af481da95cff22f7ed58648c80d28746feac7",
+    "time": "2026-10-31T11:00:00Z"
+  },
+  {
+    "admissible": true,
+    "check": "unit-tests",
+    "covers": [
+      "api-service"
+    ],
+    "environment": "staging",
+    "evaluator": "go-test",
+    "evaluatorVersion": "1.0.0",
+    "integrity": "producer-authenticated",
+    "outcome": "passed",
+    "path": "build/results/staging.json",
+    "producer": "ci",
+    "reasons": [],
+    "revision": "bc335f5b5ed689a4882e8b6870490d0fc6193e52",
+    "statementDigest": "sha256:592de619301506795694e9f5331d56013ab1a9e16e5beff2c1c7bf0b4c353d41",
+    "time": "2026-10-31T11:00:00Z"
+  }
+]

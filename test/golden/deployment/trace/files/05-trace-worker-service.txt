@@ -1,0 +1,48 @@
+Deployment trace: worker-service in production (cluster prod-eu): unresolved
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of production: complete
+1. service [declared intent, exact]
+   worker-service
+2. workload [parsed source fact, unresolved]
+   nothing found
+   gap: no workload is bound to worker-service in production, and the workload set of production is complete (absent)
+3. container image [parsed source fact, unresolved]
+   nothing found
+4. build definition [inferred association, unresolved]
+   nothing found
+5. source evidence [inferred association, unresolved]
+   nothing found
+   gap: no sourceRoot or package binding names source paths for worker-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 violation
+  INFRA-PLC-002 pass
+  INFRA-TRC-001 violation
+  INFRA-TRC-002 unknown
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 unknown
+
+Deployment trace: worker-service in staging: partial
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of staging: complete
+1. service [declared intent, exact]
+   worker-service
+2. workload [parsed source fact, explicitly bound]
+   Deployment payments/worker  at k8s/staging/worker.yaml:1  (bound by bind-worker-workload)
+   namespace payments
+3. container image [parsed source fact, exact]
+   container worker: registry.example.com/payments/worker@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef  at k8s/staging/worker.yaml:1
+4. build definition [inferred association, unresolved]
+   image registry.example.com/payments/worker: no build definition names it, lineage unknown  at k8s/staging/worker.yaml:1
+   gap: no build command names the image repository registry.example.com/payments/worker (build-link-needs-build-command)
+5. source evidence [inferred association, unresolved]
+   Deployment worker  at k8s/staging/worker.yaml:1
+   gap: no sourceRoot or package binding names source paths for worker-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 unknown
+  INFRA-PLC-002 unknown
+  INFRA-TRC-001 pass
+  INFRA-TRC-002 pass
+  INFRA-TRC-003 not-applicable
+  INFRA-TRC-004 unknown

@@ -1,0 +1,124 @@
+{
+  "runs": {
+    "STEP-1__conference-signup.arch": {
+      "findings": [
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/conference-website/interfaces/conference-website-url/url",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/host",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "must be equal to constant",
+          "path": "/relationships/attendees-attendees-store/controls/security/requirements/0/control-id",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "STEP-3__conference-signup-with-flow.arch": {
+      "findings": [
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "Numerical placeholder (-1) detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/port",
+          "rule": "architecture-has-no-placeholder-properties-numerical",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees-store/interfaces/database-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/attendees/interfaces/attendees-image/image",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/conference-website/interfaces/conference-website-url/url",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "String placeholder detected in architecture.",
+          "path": "/nodes/load-balancer/interfaces/load-balancer-host-port/host",
+          "rule": "architecture-has-no-placeholder-properties-string",
+          "severity": "warning"
+        },
+        {
+          "message": "must be equal to constant",
+          "path": "/relationships/attendees-attendees-store/controls/security/requirements/0/control-id",
+          "rule": "control-requirement-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "conference-signup.pattern": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

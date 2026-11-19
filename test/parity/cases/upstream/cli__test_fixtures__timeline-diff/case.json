@@ -1,0 +1,20 @@
+{
+  "origin": "upstream:cli/test_fixtures/timeline-diff",
+  "runs": [
+    {
+      "architecture": "arch-v1.json",
+      "mode": "architecture",
+      "name": "arch-v1"
+    },
+    {
+      "architecture": "arch-v2.json",
+      "mode": "architecture",
+      "name": "arch-v2"
+    },
+    {
+      "mode": "timeline",
+      "name": "timeline",
+      "timeline": "timeline.json"
+    }
+  ]
+}

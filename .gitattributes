@@ -1,0 +1,5 @@
+# Check out text files with LF on every platform. gofumpt, gci, golden
+# files and recordings expect LF; core.autocrlf on Windows would break them.
+* text=auto eol=lf
+
+*.png binary

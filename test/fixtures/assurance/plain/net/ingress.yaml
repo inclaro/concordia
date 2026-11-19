@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+  namespace: payments
+spec:
+  tls:
+    - hosts: [api.example.com]
+      secretName: api-tls
+    - hosts: [legacy.example.com]
+      secretName: missing-tls
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80

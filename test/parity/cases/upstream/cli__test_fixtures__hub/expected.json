@@ -1,0 +1,19 @@
+{
+  "runs": {
+    "sample-architecture": {
+      "findings": [
+        {
+          "message": "Node with ID 'node-1' is not referenced by any relationships.",
+          "path": "/nodes/node-1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        }
+      ],
+      "hasErrors": false,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}

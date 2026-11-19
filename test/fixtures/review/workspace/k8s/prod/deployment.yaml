@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: payments
+  labels:
+    app: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      serviceAccountName: api-sa
+      containers:
+        - name: app
+          image: registry.example.com/payments/api:1.2.0
+          env:
+            - name: DB_PASSWORD
+              value: CONCORDIA-SEED-env-value-5d1e
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: token
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - configMapRef:
+                name: missing-config
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/api
+            - name: scratch
+              mountPath: /var/scratch
+        - name: sidecar
+          image: registry.example.com/payments/api:1.3.0
+          args: ["--sidecar"]
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: api-data
+        - name: scratch
+          persistentVolumeClaim:
+            claimName: missing-pvc

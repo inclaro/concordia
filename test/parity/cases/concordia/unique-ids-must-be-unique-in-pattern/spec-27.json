@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": [
+        {
+          "properties": {
+            "unique-id": {
+              "const": "webapp"
+            }
+          }
+        }
+      ],
+      "items": {
+        "oneOf": [
+          {
+            "properties": {
+              "unique-id": {
+                "const": "dup"
+              }
+            }
+          },
+          {
+            "properties": {
+              "unique-id": {
+                "const": "dup"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "prefixItems": []
+    }
+  }
+}

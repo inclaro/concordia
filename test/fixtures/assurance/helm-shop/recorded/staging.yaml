@@ -1,0 +1,79 @@
+---
+# Source: shop/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: shop-default-deny
+  namespace: shop
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+
+---
+# Source: shop/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shop-credentials
+  namespace: shop
+type: Opaque
+stringData:
+  password: "ASSURANCE-SEED-helm-password-6d2f"
+
+---
+# Source: shop/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api
+  namespace: shop
+spec:
+  selector:
+    app: shop-api
+  ports:
+    - port: 80
+      targetPort: http
+
+---
+# Source: shop/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+  namespace: shop
+  labels:
+    app: shop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+        - name: api
+          image: "registry.example.com/shop/api:1.4.1-rc1"
+          ports:
+            - name: http
+              containerPort: 8080
+---
+# Source: shop/templates/hook-migrate.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shop-migrate
+  namespace: shop
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: "registry.example.com/shop/api-migrate:1.4.1-rc1"
+

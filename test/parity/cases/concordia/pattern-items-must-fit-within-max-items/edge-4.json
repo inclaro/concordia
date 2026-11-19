@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "prefixItems": {
+        "a": 1
+      },
+      "maxItems": 0,
+      "items": {
+        "oneOf": [
+          {}
+        ]
+      }
+    },
+    "relationships": {
+      "prefixItems": []
+    }
+  }
+}

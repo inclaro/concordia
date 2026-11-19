@@ -1,0 +1,44 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: assurance
+  version: 1.0.0
+# Assurance rules. Each rule requires one claim of the claim registry (`require.claim`) and Concordia evaluates it for
+# every subject of the claim: an environment for ASR-REN-001, a container occurrence for ASR-PRV-001 and ASR-PRV-002.
+# They read the evidence that the workspace key `assurance` declares (rendered environments, provenance statements,
+# deployment records and observations), not the code graph. Without that key, or when no loaded contract enables the
+# claim, a rule is `unknown` and the finding says which input is missing. The pack is opt-in: list it under
+# `policies.packs` (`use: builtin:assurance`). No rule declares `subject`, and no rule declares `enforcement`: the rules
+# are advisory by default. Until the assurance families are stable, `check.enforcement` (family `assurance`) can set
+# them to `advisory` or `shadow` only: a `mandatory` mode is refused with CO-POL-018.
+# Never reuse or renumber a rule ID: baselines and waivers key on it.
+rules:
+  - id: ASR-REN-001
+    name: Each environment has complete rendered evidence
+    severity: warning
+    family: assurance
+    rationale: Static manifests, charts, and overlays show what an author wrote, not what the cluster receives. A rendered or evaluated resource set that is partial or missing leaves every rule that reads it unable to tell a pass from a gap.
+    remediation: Declare a rendering source for the environment under `assurance.rendering.sources` and pin the renderer, or fix the render error that left the resource set partial. A rule that stays unknown names the environment and the missing evidence.
+    require:
+      claim:
+        id: complete-resource-set
+
+  - id: ASR-PRV-001
+    name: Each container occurrence has exact lineage from source to deployed image
+    severity: warning
+    family: assurance
+    rationale: A tag or a static link from an image to a Dockerfile only suggests where an image came from. Exact lineage needs an admissible chain of statements from the source revision to the digest that runs, or the deployed image cannot be traced to the code that was reviewed.
+    remediation: Supply a build provenance statement from a trusted producer that binds the image digest to the source revision, pin the image by digest, and record the deployment. A tag-only occurrence stays unknown until its digest is known.
+    require:
+      claim:
+        id: exact-lineage
+
+  - id: ASR-PRV-002
+    name: The deployed digest of each container occurrence matches the observed digest
+    severity: warning
+    family: assurance
+    rationale: When the digest that a cluster runs differs from the digest that the deployment record says was rolled out, the deployed software is not the software that was reviewed and traced.
+    remediation: Roll out the recorded digest again, or record the new deployment and its lineage. When the observation is missing or not admissible, supply a current observation of the environment.
+    require:
+      claim:
+        id: runtime-drift

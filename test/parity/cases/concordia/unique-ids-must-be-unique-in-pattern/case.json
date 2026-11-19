@@ -1,0 +1,195 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "pattern",
+      "pattern": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "pattern",
+      "pattern": "pass.json"
+    },
+    {
+      "name": "spec-1",
+      "mode": "pattern",
+      "pattern": "spec-1.json"
+    },
+    {
+      "name": "spec-2",
+      "mode": "pattern",
+      "pattern": "spec-2.json"
+    },
+    {
+      "name": "spec-3",
+      "mode": "pattern",
+      "pattern": "spec-3.json"
+    },
+    {
+      "name": "spec-4",
+      "mode": "pattern",
+      "pattern": "spec-4.json"
+    },
+    {
+      "name": "spec-5",
+      "mode": "pattern",
+      "pattern": "spec-5.json"
+    },
+    {
+      "name": "spec-6",
+      "mode": "pattern",
+      "pattern": "spec-6.json"
+    },
+    {
+      "name": "spec-7",
+      "mode": "pattern",
+      "pattern": "spec-7.json"
+    },
+    {
+      "name": "spec-8",
+      "mode": "pattern",
+      "pattern": "spec-8.json"
+    },
+    {
+      "name": "spec-9",
+      "mode": "pattern",
+      "pattern": "spec-9.json"
+    },
+    {
+      "name": "spec-10",
+      "mode": "pattern",
+      "pattern": "spec-10.json"
+    },
+    {
+      "name": "spec-11",
+      "mode": "pattern",
+      "pattern": "spec-11.json"
+    },
+    {
+      "name": "spec-12",
+      "mode": "pattern",
+      "pattern": "spec-12.json"
+    },
+    {
+      "name": "spec-13",
+      "mode": "pattern",
+      "pattern": "spec-13.json"
+    },
+    {
+      "name": "spec-14",
+      "mode": "pattern",
+      "pattern": "spec-14.json"
+    },
+    {
+      "name": "spec-15",
+      "mode": "pattern",
+      "pattern": "spec-15.json"
+    },
+    {
+      "name": "spec-16",
+      "mode": "pattern",
+      "pattern": "spec-16.json"
+    },
+    {
+      "name": "spec-17",
+      "mode": "pattern",
+      "pattern": "spec-17.json"
+    },
+    {
+      "name": "spec-18",
+      "mode": "pattern",
+      "pattern": "spec-18.json"
+    },
+    {
+      "name": "spec-19",
+      "mode": "pattern",
+      "pattern": "spec-19.json"
+    },
+    {
+      "name": "spec-20",
+      "mode": "pattern",
+      "pattern": "spec-20.json"
+    },
+    {
+      "name": "spec-21",
+      "mode": "pattern",
+      "pattern": "spec-21.json"
+    },
+    {
+      "name": "spec-22",
+      "mode": "pattern",
+      "pattern": "spec-22.json"
+    },
+    {
+      "name": "spec-23",
+      "mode": "pattern",
+      "pattern": "spec-23.json"
+    },
+    {
+      "name": "spec-24",
+      "mode": "pattern",
+      "pattern": "spec-24.json"
+    },
+    {
+      "name": "spec-25",
+      "mode": "pattern",
+      "pattern": "spec-25.json"
+    },
+    {
+      "name": "spec-26",
+      "mode": "pattern",
+      "pattern": "spec-26.json"
+    },
+    {
+      "name": "spec-27",
+      "mode": "pattern",
+      "pattern": "spec-27.json"
+    },
+    {
+      "name": "spec-28",
+      "mode": "pattern",
+      "pattern": "spec-28.json"
+    },
+    {
+      "name": "edge-1",
+      "mode": "pattern",
+      "pattern": "edge-1.json"
+    },
+    {
+      "name": "edge-2",
+      "mode": "pattern",
+      "pattern": "edge-2.json"
+    },
+    {
+      "name": "edge-3",
+      "mode": "pattern",
+      "pattern": "edge-3.json"
+    },
+    {
+      "name": "edge-4",
+      "mode": "pattern",
+      "pattern": "edge-4.json"
+    },
+    {
+      "name": "edge-5",
+      "mode": "pattern",
+      "pattern": "edge-5.json"
+    },
+    {
+      "name": "edge-6",
+      "mode": "pattern",
+      "pattern": "edge-6.json"
+    },
+    {
+      "name": "edge-7",
+      "mode": "pattern",
+      "pattern": "edge-7.json"
+    },
+    {
+      "name": "edge-8",
+      "mode": "pattern",
+      "pattern": "edge-8.json"
+    }
+  ]
+}

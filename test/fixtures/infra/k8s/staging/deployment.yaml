@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: payments-staging
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      serviceAccountName: staging-sa
+      containers:
+        - name: app
+          image: registry.example.com/payments/api:1.3.0-rc1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: payments-staging
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 80
+      targetPort: 8080

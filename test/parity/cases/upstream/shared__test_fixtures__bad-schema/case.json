@@ -1,0 +1,10 @@
+{
+  "origin": "upstream:shared/test_fixtures/bad-schema",
+  "runs": [
+    {
+      "mode": "pattern",
+      "name": "bad-json-schema",
+      "pattern": "bad-json-schema.json"
+    }
+  ]
+}

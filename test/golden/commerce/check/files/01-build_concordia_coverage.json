@@ -1,0 +1,34 @@
+{
+  "bytes": {
+    "covered": 1152,
+    "ratio": 0.9042386185243328,
+    "total": 1274
+  },
+  "excluded": [
+    "services/legacy/src/Legacy.kt"
+  ],
+  "files": {
+    "covered": 6,
+    "languages": {
+      ".kt": {
+        "covered": 0,
+        "total": 1
+      },
+      ".py": {
+        "covered": 2,
+        "total": 2
+      },
+      ".ts": {
+        "covered": 4,
+        "total": 4
+      }
+    },
+    "ratio": 0.8571428571428571,
+    "total": 7
+  },
+  "graphGeneration": "cbm:golden-check:b4dbb6af2d5c99c6",
+  "project": "golden-check",
+  "sourceRevision": "1ea64a7f82a6515e2269b25894b34bb0b9b50dc8",
+  "stale": [],
+  "unindexed": []
+}

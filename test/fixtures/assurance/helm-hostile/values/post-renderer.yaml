@@ -1,0 +1,3 @@
+# A request for a post-renderer program. Concordia never starts one.
+postRenderer:
+  exec: ./evil.sh

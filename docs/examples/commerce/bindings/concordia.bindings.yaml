@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  - id: bind-billing
+    architectureRef: calm:node:billing-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/billing/**
+  - id: bind-fulfillment
+    architectureRef: calm:node:fulfillment-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/fulfillment/**
+        - sourceRoot: packages/fulfillment-contract/**
+  - id: bind-ledger
+    architectureRef: calm:node:ledger-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/ledger/**
+  - id: bind-legacy
+    architectureRef: calm:node:legacy-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/legacy/**

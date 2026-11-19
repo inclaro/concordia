@@ -1,0 +1,22 @@
+# An informal "reviewed" flag and a note are not an approval: only a verified approval record is.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-FLAG
+version: 1
+type: security
+title: Flagged as reviewed
+notes: reviewed by security on 2026-10-01
+reviewed: true
+scope:
+  calmNodes: [api-service]
+environment: production
+subject:
+  summary: The identity that the API service runs under in production
+  dependencies:
+    - kind: runtime-identity
+      selector:
+        calmNodes: [api-service]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

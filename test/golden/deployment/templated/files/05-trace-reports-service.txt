@@ -1,0 +1,49 @@
+Deployment trace: reports-service in production (cluster prod-eu): partial
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of production: partial
+1. service [declared intent, exact]
+   reports-service
+2. workload [parsed source fact, explicitly bound]
+   Deployment payments/reports  at k8s/prod/reports.yaml:1  (bound by bind-reports-workload)
+   namespace payments  at k8s/prod/namespace.yaml:1
+3. container image [parsed source fact, exact]
+   container reports: registry.example.com/payments/reports:2.0.0  at k8s/prod/reports.yaml:1
+   gap: container reports uses registry.example.com/payments/reports:2.0.0: the tag can point to other content later, and no immutable digest is known (mutable-tag)
+4. build definition [inferred association, unresolved]
+   image registry.example.com/payments/reports: no build definition names it, lineage unknown  at k8s/prod/reports.yaml:1
+   gap: no build command names the image repository registry.example.com/payments/reports (build-link-needs-build-command)
+5. source evidence [inferred association, unresolved]
+   Deployment reports  at k8s/prod/reports.yaml:1
+   gap: no sourceRoot or package binding names source paths for reports-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 pass
+  INFRA-PLC-002 unknown
+  INFRA-TRC-001 pass
+  INFRA-TRC-002 pass
+  INFRA-TRC-003 unknown
+  INFRA-TRC-004 unknown
+
+Deployment trace: reports-service in staging: unresolved
+Evidence: declared configuration only. Not traced: deployment execution and runtime.
+Workloads of staging: complete
+1. service [declared intent, exact]
+   reports-service
+2. workload [parsed source fact, unresolved]
+   nothing found
+   gap: no workload is bound to reports-service in staging, and the workload set of staging is complete (absent)
+3. container image [parsed source fact, unresolved]
+   nothing found
+4. build definition [inferred association, unresolved]
+   nothing found
+5. source evidence [inferred association, unresolved]
+   nothing found
+   gap: no sourceRoot or package binding names source paths for reports-service (binding-gap)
+Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Rules:
+  INFRA-PLC-001 violation
+  INFRA-PLC-002 pass
+  INFRA-TRC-001 violation
+  INFRA-TRC-002 violation
+  INFRA-TRC-003 unknown
+  INFRA-TRC-004 violation

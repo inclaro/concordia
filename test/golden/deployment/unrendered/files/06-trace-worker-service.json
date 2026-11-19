@@ -1,0 +1,335 @@
+{
+  "architectureId": "worker-service",
+  "levels": [
+    {
+      "level": "declared",
+      "status": "evaluated"
+    },
+    {
+      "level": "rendered-or-evaluated",
+      "status": "not-available"
+    },
+    {
+      "level": "deployment-execution",
+      "status": "not-available"
+    },
+    {
+      "level": "runtime-observation",
+      "status": "not-available"
+    }
+  ],
+  "schemaVersion": "1.1",
+  "traces": [
+    {
+      "architectureId": "worker-service",
+      "cluster": "prod-eu",
+      "environment": "production",
+      "gaps": [
+        {
+          "detail": "the workload set of production is partial: parse-partial, unrendered-template",
+          "lossModes": [
+            "parse-partial",
+            "unrendered-template"
+          ],
+          "reason": "coverage-incomplete",
+          "step": "workload"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for worker-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "9980214b0d72bf5a",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "288117f755a42195",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "9ca7b71188d87e43",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "93087d835e786352",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "unknown"
+        },
+        {
+          "obligationId": "5f2c49cbe809767f",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "068884c6b5844631",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "unknown"
+        }
+      ],
+      "status": "unknown",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "worker-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Worker service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "the workload set of production is partial: parse-partial, unrendered-template",
+              "lossModes": [
+                "parse-partial",
+                "unrendered-template"
+              ],
+              "reason": "coverage-incomplete"
+            }
+          ],
+          "limits": [],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for worker-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    },
+    {
+      "architectureId": "worker-service",
+      "environment": "staging",
+      "gaps": [
+        {
+          "detail": "no workload is bound to worker-service in staging, and the workload set of staging is complete",
+          "reason": "absent",
+          "step": "workload"
+        },
+        {
+          "detail": "no sourceRoot or package binding names source paths for worker-service",
+          "reason": "binding-gap",
+          "step": "source-evidence"
+        }
+      ],
+      "level": "declared",
+      "limits": [
+        {
+          "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+          "id": "declared-level-only"
+        },
+        {
+          "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+          "id": "provider-may-merge-occurrences"
+        },
+        {
+          "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+          "id": "image-provenance-unverified"
+        },
+        {
+          "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+          "id": "source-provenance-unverified"
+        }
+      ],
+      "rules": [
+        {
+          "obligationId": "a2f2034569baef50",
+          "ruleId": "INFRA-PLC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "26123cf53e063010",
+          "ruleId": "INFRA-PLC-002",
+          "verdict": "pass"
+        },
+        {
+          "obligationId": "96e336aaa533c624",
+          "ruleId": "INFRA-TRC-001",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "cb3e96c415caf5ed",
+          "ruleId": "INFRA-TRC-002",
+          "verdict": "violation"
+        },
+        {
+          "obligationId": "2fc82fa3c8e53c1d",
+          "ruleId": "INFRA-TRC-003",
+          "verdict": "not-applicable"
+        },
+        {
+          "obligationId": "d7509c555619ab3a",
+          "ruleId": "INFRA-TRC-004",
+          "verdict": "violation"
+        }
+      ],
+      "status": "unresolved",
+      "steps": [
+        {
+          "entities": [
+            {
+              "identity": "worker-service",
+              "kind": "service",
+              "locations": [],
+              "properties": {
+                "name": "Worker service",
+                "nodeType": "service"
+              },
+              "resolution": "exact"
+            }
+          ],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The trace shows the configuration as it is declared in manifests and Dockerfiles. It does not show rendered output, how a deployment was carried out, or the state of a cluster.",
+              "id": "declared-level-only"
+            }
+          ],
+          "resolution": "exact",
+          "role": "declared-intent",
+          "step": "service"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no workload is bound to worker-service in staging, and the workload set of staging is complete",
+              "reason": "absent"
+            }
+          ],
+          "limits": [],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "workload"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "The provider keeps one image reference for each workload and image repository, so containers that share a repository may be merged without a signal.",
+              "id": "provider-may-merge-occurrences"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "parsed-source-fact",
+          "step": "container-image"
+        },
+        {
+          "entities": [],
+          "gaps": [],
+          "limits": [
+            {
+              "detail": "No verified link ties the image that the manifest names to the Dockerfile. The link comes from a build command that names the image repository, and the tag is ignored.",
+              "id": "image-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "build-definition"
+        },
+        {
+          "entities": [],
+          "gaps": [
+            {
+              "detail": "no sourceRoot or package binding names source paths for worker-service",
+              "reason": "binding-gap"
+            }
+          ],
+          "limits": [
+            {
+              "detail": "No provenance links the image that the manifest names to these source paths. The paths are the ones bound to the service.",
+              "id": "source-provenance-unverified"
+            }
+          ],
+          "resolution": "unresolved",
+          "role": "inferred-association",
+          "step": "source-evidence"
+        }
+      ]
+    }
+  ]
+}

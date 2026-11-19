@@ -1,0 +1,170 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - bidichk
+    - decorder
+    - containedctx
+    - contextcheck
+    - dogsled
+    - dupl
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - copyloopvar
+    - exhaustive
+    - goconst
+    - godot
+    - gocritic
+    - mnd
+    - goprintffuncname
+    - gosec
+    - staticcheck
+    - govet
+    - ireturn
+    - ineffassign
+    - misspell
+    - nestif
+    - nilerr
+    - nilnil
+    - nakedret
+    - nolintlint
+    - prealloc
+    - predeclared
+    - rowserrcheck
+    - sqlclosecheck
+    - thelper
+    - tagliatelle
+    - tparallel
+    - testpackage
+    - unused
+    - usetesting
+    - unconvert
+    - usestdlibvars
+    - unparam
+    - varnamelen
+    - whitespace
+    - wsl_v5
+    - durationcheck
+    - makezero
+    - noctx
+    - wastedassign
+    - sloglint
+    - testifylint
+    - musttag
+    - gocognit
+    - interfacebloat
+    - perfsprint
+    - protogetter
+  settings:
+    errcheck:
+      check-type-assertions: true
+    goconst:
+      min-len: 2
+      min-occurrences: 3
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    mnd:
+      ignored-numbers:
+        - "0"
+        - "1"
+        - "2"
+      ignored-functions:
+        - make
+    govet:
+      enable:
+        - fieldalignment
+        - unusedwrite
+    nestif:
+      min-complexity: 15
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    tagliatelle:
+      case:
+        rules:
+          json: camel
+          yaml: camel
+    varnamelen:
+      max-distance: 10
+      ignore-decls:
+        - t testing.T
+        - i int
+        - j int
+    testifylint:
+      enable-all: true
+      disable:
+        - suite-dont-use-pkg
+    sloglint:
+      no-mixed-args: true
+      kv-only: true
+    gocognit:
+      min-complexity: 20
+  exclusions:
+    rules:
+      - path: internal/intent/
+        linters:
+          - tagliatelle
+      - path: internal/observation/
+        linters:
+          - tagliatelle
+      - path: _test\.go
+        linters:
+          - gocognit
+          - gosec
+          - dupl
+          - varnamelen
+          - goconst
+      - linters:
+          - gosec
+        text: "weak cryptographic primitive"
+      - linters:
+          - staticcheck
+        text: "error strings should not be capitalized"
+      - path: ^vendor/
+        linters:
+          - "*"
+      - path: \.pb\.go$
+        linters:
+          - govet
+        text: "fieldalignment"
+run:
+  timeout: 5m
+  concurrency: 0
+  tests: true
+  issues-exit-code: 1
+  allow-parallel-runners: true
+issues:
+  fix: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofmt
+    - goimports
+    - gci
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/inclaro/concordia
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/inclaro/concordia)
+output:
+  formats:
+    text:
+      print-issued-lines: true
+      print-linter-name: true
+  sort-order:
+    - linter
+    - file

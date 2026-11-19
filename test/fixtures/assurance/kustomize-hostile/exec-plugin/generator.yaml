@@ -1,0 +1,4 @@
+apiVersion: team.example.com/v1
+kind: SecretFromVault
+metadata:
+  name: vault-secret

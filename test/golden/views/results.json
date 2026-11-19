@@ -1,0 +1,1885 @@
+{
+  "areas": {
+    "adrGovernance": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "assessmentCurrency": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "conformance": {
+      "counts": {
+        "error": 0,
+        "findings": 0,
+        "notApplicable": 0,
+        "pass": 0,
+        "unknown": 0,
+        "violation": 0
+      },
+      "verdict": "not-applicable"
+    },
+    "deploymentTrace": {
+      "counts": {},
+      "verdict": "not-configured"
+    },
+    "diagramCurrency": {
+      "counts": {
+        "error": 0,
+        "findings": 2,
+        "notApplicable": 4,
+        "pass": 12,
+        "unknown": 1,
+        "views": 6,
+        "violation": 1
+      },
+      "verdict": "violation"
+    },
+    "qualityEvaluation": {
+      "counts": {},
+      "verdict": "not-configured"
+    }
+  },
+  "controls": [],
+  "coverage": {
+    "crossCheck": {
+      "environments": [],
+      "filesChecked": 0,
+      "filesSkipped": []
+    },
+    "indexResults": [
+      {
+        "available": false,
+        "project": "concordia-fixture-viewcurrency",
+        "reason": "no index result recorded (run `concordia index`)"
+      }
+    ],
+    "limits": {
+      "breaches": [],
+      "configured": {
+        "evidence": {
+          "maxFacts": 20000000
+        },
+        "graph": {
+          "maxEdges": 20000000,
+          "maxNodes": 5000000
+        },
+        "traversal": {
+          "maxVisited": 10000000
+        }
+      }
+    },
+    "predicates": [
+      {
+        "lossModes": [],
+        "predicate": "ambiguous-usage",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "base-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-applies-to-principal",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "binding-refers-to-role",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "built-from",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-graphql",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-grpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-service",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "calls-trpc",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configured-connection",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-access",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-read",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-env-set",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-helm-values",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "configures-key-symbol",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "constructs",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "merged-occurrences"
+          }
+        ],
+        "predicate": "container-occurrence-versions",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "contains",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "build-link-needs-build-command"
+          }
+        ],
+        "predicate": "copies-from-image",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "data-flows",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "defines",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deployment-workload-set",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "deploys-artifact",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-arrow",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "diagram-identity",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dispatches-async",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "disruption-policy-target",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "dockerfile-set",
+        "reasons": [
+          "index result unavailable"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unknown",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "documentation-metadata",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "emits-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "file-changes-with",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "handles-route",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "implements",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "imports",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "includes-infrastructure",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "default-excluded-directory"
+          },
+          {
+            "id": "parse-partial"
+          },
+          {
+            "id": "raster-not-indexed"
+          }
+        ],
+        "predicate": "index-result",
+        "reasons": [
+          "family is partial in the capability profile",
+          "index result unavailable"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unknown",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "infrastructure-dependency",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "inherits",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "launches",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "listens-event",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "mentions",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "override-unsignalled"
+          }
+        ],
+        "predicate": "overrides",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "placed-in",
+        "reasons": [],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "target-not-declared"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "policy-selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "reads",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-callable",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-certificate-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-configuration",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-secret",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "references-storage",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "unrendered-template"
+          }
+        ],
+        "predicate": "rendered-templates",
+        "reasons": [
+          "family is partial in the capability profile"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "route-attaches-to-gateway",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "route-identity-unscoped"
+          }
+        ],
+        "predicate": "routes-to",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "scaling-target",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [
+          {
+            "id": "empty-selector"
+          },
+          {
+            "id": "selector-join-directory-scoped"
+          },
+          {
+            "id": "selector-join-one-of-competing"
+          },
+          {
+            "id": "unsupported-selector-expression"
+          }
+        ],
+        "predicate": "selects-workload",
+        "reasons": [
+          "family is partial in the capability profile",
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "semantically-related",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "similar-to",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "partial",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "supersedes",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "tests-file",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-image",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-runtime-identity",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "uses-type",
+        "reasons": [
+          "family unsupported by the provider build"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "unsupported",
+        "unresolved": 0
+      },
+      {
+        "lossModes": [],
+        "predicate": "writes",
+        "reasons": [
+          "no native edge of this family in the graph"
+        ],
+        "scope": {
+          "project": "concordia-fixture-viewcurrency"
+        },
+        "status": "complete",
+        "unresolved": 0
+      }
+    ],
+    "scopeFailures": [],
+    "skipReasons": {
+      "unbound": "an endpoint has no binding to a CALM element (resolve the binding)",
+      "unsupported": "the fact kind is not mapped by the provider profile (kept as evidence, not evaluated)"
+    },
+    "skipped": {
+      "endpointMissing": 0,
+      "outOfScope": 0,
+      "unbound": 6,
+      "unsupported": 1
+    }
+  },
+  "deploymentTrace": {
+    "environments": [],
+    "levels": [
+      {
+        "level": "declared",
+        "status": "evaluated"
+      },
+      {
+        "level": "rendered-or-evaluated",
+        "status": "not-available"
+      },
+      {
+        "level": "deployment-execution",
+        "status": "not-available"
+      },
+      {
+        "level": "runtime-observation",
+        "status": "not-available"
+      }
+    ],
+    "status": "not-configured",
+    "summary": {
+      "byStatus": {
+        "complete": 0,
+        "partial": 0,
+        "unknown": 0,
+        "unresolved": 0
+      },
+      "environments": 0,
+      "subjects": 0
+    },
+    "unresolvedEnvironmentActions": [],
+    "unresolvedEnvironmentWorkloads": []
+  },
+  "diagnostics": [
+    {
+      "code": "CO-OBS-016",
+      "message": "native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)",
+      "severity": "warning"
+    }
+  ],
+  "exceptions": {
+    "orphanedWaivers": [],
+    "resolvedBaselineEntries": [],
+    "waivers": []
+  },
+  "findings": [
+    {
+      "area": "diagramCurrency",
+      "delta": null,
+      "disposition": "active",
+      "dispositionRef": null,
+      "enforcement": "mandatory",
+      "evidencePath": [],
+      "expected": "the diagram shows the elements and relationships of the declared and observed architecture",
+      "fingerprint": "sha256:ced38bfe0389bd5c031baa3cdf8fd28ebc5a752c4f56efff58ae71b8ea8233da",
+      "kind": "view-drift",
+      "location": {
+        "path": "docs/context.png"
+      },
+      "message": "view shop-context-image: correspondence is unknown: raster image without supplemental mapping (docs/context.png)",
+      "nextAction": "supply evidence",
+      "observed": "correspondence is unknown: raster image without supplemental mapping (docs/context.png)",
+      "owner": "team-shop",
+      "providerLimits": {
+        "families": [],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [
+        {
+          "id": "shop-context-image",
+          "kind": "view"
+        }
+      ],
+      "relatedLocations": [],
+      "result": "unknown",
+      "ruleId": "VIEW-CORR-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "shop-context-image"
+      },
+      "target": {
+        "architectureId": "docs/context.png"
+      }
+    },
+    {
+      "area": "diagramCurrency",
+      "delta": null,
+      "disposition": "active",
+      "dispositionRef": null,
+      "enforcement": "mandatory",
+      "evidencePath": [],
+      "expected": "the source docs/drafts/context.md is in revision 073fb910369f4b4822b7ebbd65ae2448e01105b4 and names the view",
+      "fingerprint": "sha256:e8dd617896fe45a779aa634e359044dca6c8602d2588804a840b3f9c1a36f349",
+      "kind": "view-absent",
+      "location": {
+        "path": "docs/drafts/context.md"
+      },
+      "message": "view shop-draft: source docs/drafts/context.md: not committed (the repository listing of revision 073fb910369f4b4822b7ebbd65ae2448e01105b4 is complete and does not contain docs/drafts/context.md)",
+      "nextAction": "supply evidence",
+      "observed": "source docs/drafts/context.md: not committed (the repository listing of revision 073fb910369f4b4822b7ebbd65ae2448e01105b4 is complete and does not contain docs/drafts/context.md)",
+      "owner": "team-shop",
+      "providerLimits": {
+        "families": [],
+        "profile": {
+          "applies": true,
+          "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+          "id": "cbm-0.12.1"
+        }
+      },
+      "related": [
+        {
+          "id": "shop-draft",
+          "kind": "view"
+        }
+      ],
+      "relatedLocations": [],
+      "result": "violation",
+      "ruleId": "VIEW-PRES-001",
+      "severity": "error",
+      "source": {
+        "architectureId": "shop-draft"
+      },
+      "target": {
+        "architectureId": "source"
+      }
+    }
+  ],
+  "inputs": {
+    "architecture": {
+      "digest": "sha256:d79476902f773f13821a21fd018201a530cb74d235b13d0fd7252707522b57c3",
+      "path": "architecture/shop.calm.json"
+    },
+    "bindings": [
+      {
+        "digest": "sha256:6fa887ac37559ad3f763db5239068a34010f27965c9e69fa434d39cbba720308",
+        "path": "bindings/concordia.bindings.yaml"
+      }
+    ],
+    "decorators": [],
+    "environments": {
+      "digest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "excluded": [],
+      "selected": []
+    },
+    "indexResults": [],
+    "patterns": [],
+    "policies": [],
+    "queryPlanDigest": "281077a97f4d590bd63c80e11f5a62f4966ede6bea7420791edecb4284ab6d30",
+    "workspace": {
+      "digest": "sha256:fc55bfffac43f5a2d0ac47ac1397418af5243ac6f6e05960694dae597d28f41c",
+      "path": "concordia.yaml"
+    }
+  },
+  "observability": {
+    "cacheHits": 0,
+    "conflicts": 0,
+    "coverageGaps": 20,
+    "ingestedFacts": 77,
+    "normalizedFacts": 76,
+    "stageFailures": 0,
+    "unresolvedFacts": 6,
+    "unsupportedFacts": 1
+  },
+  "reconciliation": [
+    {
+      "classification": "unobserved",
+      "edgeCount": 0,
+      "from": "customer",
+      "observedKinds": [],
+      "relationshipId": "customer-uses-web",
+      "to": "web-app"
+    },
+    {
+      "classification": "conforming",
+      "edgeCount": 3,
+      "from": "orders-service",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "relationshipId": "orders-to-billing",
+      "to": "billing-service"
+    },
+    {
+      "classification": "unobserved",
+      "edgeCount": 0,
+      "from": "orders-service",
+      "observedKinds": [],
+      "relationshipId": "orders-to-db",
+      "to": "orders-db"
+    },
+    {
+      "classification": "conforming",
+      "edgeCount": 2,
+      "from": "web-app",
+      "observedKinds": [
+        "calls",
+        "imports"
+      ],
+      "relationshipId": "web-to-orders",
+      "to": "orders-service"
+    }
+  ],
+  "rules": [
+    {
+      "enforcement": "mandatory",
+      "family": "view-currency",
+      "findingCount": 1,
+      "name": "A view corresponds to the architecture and the implementation",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "",
+          "minimumCoverage": 0,
+          "onUnknown": "fail"
+        },
+        "family": "view-currency",
+        "name": "A view corresponds to the architecture and the implementation",
+        "pack": {
+          "id": "views",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "view-currency"
+        },
+        "ruleId": "VIEW-CORR-001",
+        "severity": "error",
+        "subjects": [
+          "shop-containers",
+          "shop-containers-diagram",
+          "shop-context",
+          "shop-context-depicted",
+          "shop-context-image",
+          "shop-draft"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [],
+          "maximumDepth": 0,
+          "minimumDepth": 0
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "views",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "raster-image-without-supplemental-mapping",
+          "message": "shop-context-image: raster image without supplemental mapping"
+        }
+      ],
+      "ruleId": "VIEW-CORR-001",
+      "severity": "error",
+      "subjects": [
+        "shop-containers",
+        "shop-containers-diagram",
+        "shop-context",
+        "shop-context-depicted",
+        "shop-context-image",
+        "shop-draft"
+      ],
+      "targets": [],
+      "verdict": "unknown"
+    },
+    {
+      "enforcement": "mandatory",
+      "family": "view-currency",
+      "findingCount": 0,
+      "name": "A generated view is regenerated from its current inputs",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "",
+          "minimumCoverage": 0,
+          "onUnknown": "fail"
+        },
+        "family": "view-currency",
+        "name": "A generated view is regenerated from its current inputs",
+        "pack": {
+          "id": "views",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "view-currency"
+        },
+        "ruleId": "VIEW-FRESH-001",
+        "severity": "error",
+        "subjects": [
+          "shop-containers",
+          "shop-context"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [],
+          "maximumDepth": 0,
+          "minimumDepth": 0
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "views",
+        "version": "1.0.0"
+      },
+      "reasons": [],
+      "ruleId": "VIEW-FRESH-001",
+      "severity": "error",
+      "subjects": [
+        "shop-containers",
+        "shop-context"
+      ],
+      "targets": [],
+      "verdict": "pass"
+    },
+    {
+      "enforcement": "mandatory",
+      "family": "view-currency",
+      "findingCount": 1,
+      "name": "A declared view is committed in the tracked revision",
+      "plan": {
+        "aggregation": "edge",
+        "evidenceRequirements": {
+          "minimumConfidence": "",
+          "minimumCoverage": 0,
+          "onUnknown": "fail"
+        },
+        "family": "view-currency",
+        "name": "A declared view is committed in the tracked revision",
+        "pack": {
+          "id": "views",
+          "version": "1.0.0"
+        },
+        "predicate": {
+          "family": "view-currency"
+        },
+        "ruleId": "VIEW-PRES-001",
+        "severity": "error",
+        "subjects": [
+          "shop-containers",
+          "shop-containers-diagram",
+          "shop-context",
+          "shop-context-depicted",
+          "shop-context-image",
+          "shop-draft"
+        ],
+        "targets": [],
+        "traversal": {
+          "direction": "outbound",
+          "edgeKinds": [],
+          "maximumDepth": 0,
+          "minimumDepth": 0
+        },
+        "unsupportedEdgeKinds": []
+      },
+      "policy": {
+        "id": "views",
+        "version": "1.0.0"
+      },
+      "reasons": [
+        {
+          "code": "not-committed",
+          "message": "shop-draft: not committed"
+        }
+      ],
+      "ruleId": "VIEW-PRES-001",
+      "severity": "error",
+      "subjects": [
+        "shop-containers",
+        "shop-containers-diagram",
+        "shop-context",
+        "shop-context-depicted",
+        "shop-context-image",
+        "shop-draft"
+      ],
+      "targets": [],
+      "verdict": "violation"
+    }
+  ],
+  "run": {
+    "dirtyTreeDigest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "graphGeneration": "cbm:concordia-fixture-viewcurrency:c4b8723343e4ea51",
+    "project": "concordia-fixture-viewcurrency",
+    "sourceRevision": "073fb910369f4b4822b7ebbd65ae2448e01105b4"
+  },
+  "schemaVersion": "1.1",
+  "summary": {
+    "active": 2,
+    "baselined": 0,
+    "exitCode": 1,
+    "expiredWaiver": 0,
+    "failOn": "error",
+    "resultDigest": "sha256:c9f3225bd49d995fb2f03409fe8a56fb8c079afb08f3595052edab5039c1849f",
+    "rules": {
+      "error": 0,
+      "notApplicable": 0,
+      "pass": 1,
+      "unknown": 1,
+      "violation": 1
+    },
+    "unknownPolicy": "fail",
+    "unknownRules": 1,
+    "verdict": "violation",
+    "waived": 0
+  },
+  "toolchain": {
+    "calmSchema": "1.2",
+    "cbm": {
+      "adapterSchema": "concordia-cbm/v2",
+      "executableVersion": "0.12.1",
+      "profile": {
+        "applies": true,
+        "digest": "sha256:86fd92f588a5b2c26402226a41578b04cea3b156101a0d357af3217c3117a6d4",
+        "id": "cbm-0.12.1"
+      }
+    },
+    "concordia": "test"
+  },
+  "views": [
+    {
+      "abstraction": "container",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "basis": "committed-artifact",
+        "byConstruction": [
+          "declared"
+        ],
+        "compared": [
+          "declared",
+          "observed"
+        ],
+        "differences": [],
+        "lost": [],
+        "method": "generated-source",
+        "reasons": [],
+        "source": {
+          "path": "docs/architecture/views/shop-containers.dsl"
+        },
+        "status": "pass",
+        "unknown": []
+      },
+      "depicts": {
+        "elements": [
+          "billing-service",
+          "customer",
+          "orders-db",
+          "orders-service",
+          "web-app"
+        ],
+        "relationships": [
+          "customer-uses-web",
+          "orders-to-billing",
+          "orders-to-db",
+          "web-to-orders"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "digest": "sha256:17bf8250f435e55104cd773f202b58131d816699051a81142204ad6c5f617562",
+            "format": "dsl",
+            "path": "docs/architecture/views/shop-containers.dsl",
+            "reasons": [],
+            "regeneratedDigest": "sha256:17bf8250f435e55104cd773f202b58131d816699051a81142204ad6c5f617562",
+            "status": "pass"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "pass",
+        "verification": "regenerated"
+      },
+      "generatedFrom": {
+        "artifactDigest": "sha256:17bf8250f435e55104cd773f202b58131d816699051a81142204ad6c5f617562",
+        "artifactPath": "docs/architecture/views/shop-containers.dsl",
+        "manifestPath": "docs/architecture/views/shop-containers.dsl.manifest.json",
+        "semanticDigest": "sha256:81a6e994ca927070a9def77c868aeab5b1c72b142ef7e6dc7cb6d3be0e79945d"
+      },
+      "id": "shop-containers",
+      "kind": "container",
+      "origin": "generated",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": true,
+            "path": "docs/architecture/views/shop-containers.dsl",
+            "role": "output"
+          },
+          {
+            "committed": true,
+            "path": "docs/architecture/views/shop-containers.dsl.manifest.json",
+            "role": "manifest"
+          }
+        ],
+        "reasons": [],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "pass"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:81a6e994ca927070a9def77c868aeab5b1c72b142ef7e6dc7cb6d3be0e79945d",
+      "severity": "error"
+    },
+    {
+      "abstraction": "container",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "byConstruction": [],
+        "compared": [
+          "declared",
+          "observed"
+        ],
+        "differences": [],
+        "lost": [],
+        "method": "structured-source",
+        "qualifiedName": "docs.architecture.Shop-containers#diagram-2",
+        "reasons": [],
+        "section": "Shop-containers",
+        "source": {
+          "path": "docs/architecture.md"
+        },
+        "status": "pass",
+        "unknown": []
+      },
+      "depicts": {
+        "elements": [
+          "billing-service",
+          "customer",
+          "orders-db",
+          "orders-service",
+          "web-app"
+        ],
+        "relationships": [
+          "customer-uses-web",
+          "orders-to-billing",
+          "orders-to-db",
+          "web-to-orders"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "digest": "sha256:71f038fe1fd1794e930ddb83fc6dd74c87ef6e82d135fa7df093e1aef238e77e",
+            "format": "mermaid",
+            "path": "docs/architecture.md",
+            "reasons": [],
+            "status": "not-applicable"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "not-applicable"
+      },
+      "generatedFrom": null,
+      "id": "shop-containers-diagram",
+      "kind": "container",
+      "origin": "authored",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": true,
+            "path": "docs/architecture.md",
+            "role": "source"
+          }
+        ],
+        "reasons": [],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "pass"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:0a957bd0b7ebfa11fcf8b86fe24e8564125eb27df878646597e950da04ad69bf",
+      "severity": "error"
+    },
+    {
+      "abstraction": "system",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "basis": "committed-artifact",
+        "byConstruction": [
+          "declared"
+        ],
+        "compared": [
+          "declared",
+          "observed"
+        ],
+        "differences": [],
+        "lost": [],
+        "method": "generated-source",
+        "reasons": [],
+        "source": {
+          "path": "docs/architecture/views/shop-context.dsl"
+        },
+        "status": "pass",
+        "unknown": []
+      },
+      "depicts": {
+        "elements": [
+          "customer",
+          "shop-system"
+        ],
+        "relationships": [
+          "customer-uses-web"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "digest": "sha256:908a387b637f0d5b643ab2cd73242364180d9956fde070ba8fd48c802e2096c8",
+            "format": "dsl",
+            "path": "docs/architecture/views/shop-context.dsl",
+            "reasons": [],
+            "regeneratedDigest": "sha256:908a387b637f0d5b643ab2cd73242364180d9956fde070ba8fd48c802e2096c8",
+            "status": "pass"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "pass",
+        "verification": "regenerated"
+      },
+      "generatedFrom": {
+        "artifactDigest": "sha256:908a387b637f0d5b643ab2cd73242364180d9956fde070ba8fd48c802e2096c8",
+        "artifactPath": "docs/architecture/views/shop-context.dsl",
+        "manifestPath": "docs/architecture/views/shop-context.dsl.manifest.json",
+        "semanticDigest": "sha256:43dedf3c265a2eb803d3d0ecbaa75b72a94a781d9c339674e877cd1291d0b52c"
+      },
+      "id": "shop-context",
+      "kind": "system-context",
+      "origin": "generated",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": true,
+            "path": "docs/architecture/views/shop-context.dsl",
+            "role": "output"
+          },
+          {
+            "committed": true,
+            "path": "docs/architecture/views/shop-context.dsl.manifest.json",
+            "role": "manifest"
+          }
+        ],
+        "reasons": [],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "pass"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:43dedf3c265a2eb803d3d0ecbaa75b72a94a781d9c339674e877cd1291d0b52c",
+      "severity": "error"
+    },
+    {
+      "abstraction": "system",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "byConstruction": [],
+        "compared": [
+          "declared",
+          "observed"
+        ],
+        "differences": [],
+        "lost": [],
+        "method": "supplemental-mapping",
+        "reasons": [],
+        "source": {
+          "path": "docs/context-depicted.png"
+        },
+        "status": "pass",
+        "unknown": []
+      },
+      "depicts": {
+        "elements": [
+          "customer",
+          "shop-system"
+        ],
+        "relationships": [
+          "customer-uses-web"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "digest": "sha256:d3748985cf800f6a065299816d8da8ee2e45923500c49a5d6bae74541842bece",
+            "format": "png",
+            "path": "docs/context-depicted.png",
+            "reasons": [],
+            "status": "not-applicable"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "not-applicable"
+      },
+      "generatedFrom": null,
+      "id": "shop-context-depicted",
+      "kind": "system-context",
+      "origin": "authored",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": true,
+            "path": "docs/context-depicted.png",
+            "role": "source"
+          }
+        ],
+        "reasons": [],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "pass"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:92eb35b12ce4482437191dffef0347f789b66b447e636e3b8a8880e2b84f11d4",
+      "severity": "error"
+    },
+    {
+      "abstraction": "system",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "byConstruction": [],
+        "compared": [],
+        "differences": [],
+        "lost": [],
+        "method": "presence-only",
+        "nextAction": "supply evidence",
+        "reasons": [
+          "raster image without supplemental mapping"
+        ],
+        "source": {
+          "path": "docs/context.png"
+        },
+        "status": "unknown",
+        "unknown": [
+          {
+            "locations": [],
+            "reason": "raster image without supplemental mapping",
+            "subject": "docs/context.png"
+          }
+        ]
+      },
+      "depicts": {
+        "elements": [
+          "customer",
+          "shop-system"
+        ],
+        "relationships": [
+          "customer-uses-web"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "digest": "sha256:985ad62a56bea546be523ba205cc4786b3b4c6dfc16c928e0e4a5fadab13e79e",
+            "format": "png",
+            "path": "docs/context.png",
+            "reasons": [],
+            "status": "not-applicable"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "not-applicable"
+      },
+      "generatedFrom": null,
+      "id": "shop-context-image",
+      "kind": "system-context",
+      "nextAction": "supply evidence",
+      "origin": "authored",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": true,
+            "path": "docs/context.png",
+            "role": "source"
+          }
+        ],
+        "reasons": [],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "pass"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:d89f029132638ccadc351520ab0e5eef4a2a76e95878f50c52fe33940a4eb235",
+      "severity": "error"
+    },
+    {
+      "abstraction": "system",
+      "assessmentCurrency": {
+        "state": "not-evaluated"
+      },
+      "contractChanged": false,
+      "correspondence": {
+        "against": [
+          "declared",
+          "observed"
+        ],
+        "byConstruction": [],
+        "compared": [
+          "declared",
+          "observed"
+        ],
+        "differences": [],
+        "lost": [],
+        "method": "structured-source",
+        "qualifiedName": "docs.drafts.context.Draft-context#diagram-1",
+        "reasons": [],
+        "section": "Draft-context",
+        "source": {
+          "path": "docs/drafts/context.md"
+        },
+        "status": "pass",
+        "unknown": []
+      },
+      "depicts": {
+        "elements": [
+          "customer",
+          "shop-system"
+        ],
+        "relationships": [
+          "customer-uses-web"
+        ]
+      },
+      "digestContract": "concordia-view-semantic/1",
+      "environment": null,
+      "freshness": {
+        "artifacts": [
+          {
+            "format": "mermaid",
+            "path": "docs/drafts/context.md",
+            "reasons": [],
+            "status": "not-applicable"
+          }
+        ],
+        "differingDigests": [],
+        "manifestDifferences": [],
+        "reasons": [],
+        "status": "not-applicable"
+      },
+      "generatedFrom": null,
+      "id": "shop-draft",
+      "kind": "system-context",
+      "nextAction": "supply evidence",
+      "origin": "authored",
+      "owner": "team-shop",
+      "presence": {
+        "files": [
+          {
+            "committed": false,
+            "detail": "the repository listing of revision 073fb910369f4b4822b7ebbd65ae2448e01105b4 is complete and does not contain docs/drafts/context.md",
+            "path": "docs/drafts/context.md",
+            "reason": "not committed",
+            "role": "source"
+          }
+        ],
+        "reasons": [
+          "not committed"
+        ],
+        "revision": "073fb910369f4b4822b7ebbd65ae2448e01105b4",
+        "status": "violation"
+      },
+      "projectionContract": "concordia-view-projection/1",
+      "scope": [
+        "shop-system"
+      ],
+      "semanticDigest": "sha256:1c7e4971c8b66a97445bba44491e8d9cb1838196025019bfc5a7b5261f2e458b",
+      "severity": "error"
+    }
+  ]
+}
+

@@ -1,0 +1,10 @@
+{
+  "origin": "upstream:cli/test_fixtures/timeline",
+  "runs": [
+    {
+      "mode": "timeline",
+      "name": "timeline-no-schema",
+      "timeline": "timeline-no-schema.json"
+    }
+  ]
+}

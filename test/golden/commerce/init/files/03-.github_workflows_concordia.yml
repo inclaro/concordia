@@ -1,0 +1,31 @@
+name: concordia
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  concordia:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      # Install codebase-memory-mcp 0.12.x (see https://github.com/DeusData/codebase-memory-mcp for the upstream install command).
+      - run: npx concordia index
+      - run: npx concordia check --format sarif --output build/concordia/results.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: build/concordia/results.sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: concordia-results
+          path: build/concordia/results.json

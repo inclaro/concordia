@@ -1,0 +1,15 @@
+apiVersion: concordia.io/v1alpha1
+kind: DecisionRegister
+decisions:
+  - id: ADR-0003
+    path: docs/adr/0003-orders-own-database.md
+    categories: [system-boundaries]
+    governs:
+      - ref: calm:node:orders-db
+      - ref: calm:relationship:orders-to-db
+      - ref: calm:interface:orders-db/sql
+      - select: {tags: [orders-data]}
+    enforcement: required
+    enforcedBy:
+      - rule: CORE-DB-001
+        pack: {id: core, version: 1.0.0}

@@ -1,0 +1,14 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+  - id: QS-FREE-TEXT
+    area: modifiability
+    qualityAttribute: modifiability
+    stimulusSource: developer
+    stimulus: a developer adds a feature
+    environment: development
+    expectedResponse: the change stays inside the boundary
+    owner: orders-team
+    scope: [orders-service]
+    mode: structural
+    criterion: the boundary holds

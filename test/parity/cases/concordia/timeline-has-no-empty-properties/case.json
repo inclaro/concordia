@@ -1,0 +1,15 @@
+{
+  "origin": "concordia",
+  "runs": [
+    {
+      "name": "fail",
+      "mode": "timeline",
+      "timeline": "fail.json"
+    },
+    {
+      "name": "pass",
+      "mode": "timeline",
+      "timeline": "pass.json"
+    }
+  ]
+}

@@ -1,0 +1,1109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://concordia.io/schemas/v1alpha1/workspace.schema.json",
+  "title": "Concordia workspace",
+  "type": "object",
+  "required": ["observation"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "const": "concordia.io/v1alpha1"
+    },
+    "kind": {
+      "const": "Workspace"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "architecture": {
+      "$ref": "#/$defs/architecture"
+    },
+    "observation": {
+      "$ref": "#/$defs/observation"
+    },
+    "environments": {
+      "$ref": "#/$defs/environments"
+    },
+    "limits": {
+      "$ref": "#/$defs/limits"
+    },
+    "bindings": {
+      "$ref": "#/$defs/bindings"
+    },
+    "policies": {
+      "$ref": "#/$defs/policies"
+    },
+    "exceptions": {
+      "$ref": "#/$defs/exceptions"
+    },
+    "projection": {
+      "$ref": "#/$defs/projection"
+    },
+    "views": {
+      "$ref": "#/$defs/views"
+    },
+    "adr": {
+      "$ref": "#/$defs/adr"
+    },
+    "trust": {
+      "$ref": "#/$defs/trust"
+    },
+    "assessments": {
+      "$ref": "#/$defs/assessments"
+    },
+    "assurance": {
+      "$ref": "#/$defs/assurance"
+    },
+    "check": {
+      "$ref": "#/$defs/check"
+    },
+    "report": {
+      "$ref": "#/$defs/report"
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/profile"
+      }
+    }
+  },
+  "$defs": {
+    "adr": {
+      "description": "ADR governance: the decision register files, the lifecycle profile and the scope triggers.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "active": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "statusMap": {
+              "type": "object",
+              "additionalProperties": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "category": { "type": "string" },
+              "paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "architecture": {
+                "type": "array",
+                "items": {
+                  "enum": ["node-added", "node-removed", "relationship-added", "relationship-removed"]
+                }
+              },
+              "nodeTypes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "tags": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        }
+      }
+    },
+    "trust": {
+      "description": "Trust context: the authority dimensions that a team declares beyond the built-in ones, and the data classification list.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dimensions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" }
+        },
+        "classifications": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "assessments": {
+      "description": "Security and quality assessments: the document paths, the trust anchor, the approval authorities, the required assessments and the traversal limits.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "trustAnchor": {
+          "type": "object",
+          "required": ["ref"],
+          "additionalProperties": false,
+          "properties": {
+            "ref": { "type": "string", "minLength": 1 }
+          }
+        },
+        "authorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "role"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "role": { "enum": ["reviewer", "exception", "governance"] },
+              "mechanism": { "enum": ["protected-review", "signed"] },
+              "reviewers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "paths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+              "signers": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": ["identity", "issuer"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "identity": { "type": "string", "minLength": 1 },
+                        "issuer": { "type": "string", "minLength": 1 }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["publicKey"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "publicKey": { "type": "string", "minLength": 1 }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "assessment", "type", "environment", "authority"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "assessment": { "type": "string", "minLength": 1 },
+              "type": { "enum": ["security", "quality"] },
+              "scope": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "calmNodes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                  "nodeTypes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                  "tags": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+                }
+              },
+              "environment": { "type": "string", "minLength": 1 },
+              "authority": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "analysisLimits": {
+          "description": "Limits of the change-impact traversal. They are separate from the top-level run `limits`.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxDepth": { "type": "integer", "minimum": 1 },
+            "maxVisited": { "type": "integer", "minimum": 1 },
+            "maxSeconds": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "assurance": {
+      "description": "Assurance evidence adapters: rendered sources, plans, trusted producers, provenance, deployment records, effective-policy evaluators, verification results and quality scenarios. Every `environment` is an id of `environments`; every path or glob is workspace-relative and stays inside the workspace root.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rendering": {
+          "type": "object",
+          "required": ["sources"],
+          "additionalProperties": false,
+          "properties": {
+            "requireOsSandbox": { "type": "boolean" },
+            "limits": {
+              "description": "Limits of one render. Defaults: 120 seconds, 67108864 bytes (64 MiB), 20000 resources.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "timeoutSeconds": { "type": "integer", "minimum": 1 },
+                "maxOutputBytes": { "type": "integer", "minimum": 1 },
+                "maxResources": { "type": "integer", "minimum": 1 }
+              }
+            },
+            "sources": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["environment", "tool", "path"],
+                "additionalProperties": false,
+                "properties": {
+                  "environment": { "type": "string", "minLength": 1 },
+                  "tool": { "enum": ["helm", "kustomize", "plain"] },
+                  "path": { "type": "string", "minLength": 1 },
+                  "valuesFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+                  "release": { "type": "string", "minLength": 1 },
+                  "namespace": { "type": "string", "minLength": 1 }
+                },
+                "if": {
+                  "properties": { "tool": { "enum": ["kustomize", "plain"] } },
+                  "required": ["tool"]
+                },
+                "then": {
+                  "properties": {
+                    "valuesFiles": false,
+                    "release": false,
+                    "namespace": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["environment", "tool", "file"],
+            "additionalProperties": false,
+            "properties": {
+              "environment": { "type": "string", "minLength": 1 },
+              "tool": { "enum": ["terraform", "opentofu"] },
+              "file": { "type": "string", "minLength": 1 },
+              "statement": { "type": "string", "minLength": 1 },
+              "maxAgeDays": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "producers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "claims", "authentication"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "claims": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "enum": ["build-provenance", "check-result", "measurement", "plan", "deployment-record", "workload-observation"]
+                }
+              },
+              "authentication": {
+                "description": "`cosign-key` needs `key` (a workspace-relative public key file, or a KMS or `env://` reference); `cosign-keyless` needs `issuer` and `identity`.",
+                "type": "object",
+                "required": ["method"],
+                "additionalProperties": false,
+                "properties": {
+                  "method": { "enum": ["cosign-key", "cosign-keyless"] },
+                  "key": { "type": "string", "minLength": 1 },
+                  "issuer": { "type": "string", "minLength": 1 },
+                  "identity": { "type": "string", "minLength": 1 }
+                },
+                "allOf": [
+                  {
+                    "if": { "properties": { "method": { "const": "cosign-key" } }, "required": ["method"] },
+                    "then": { "required": ["key"], "properties": { "issuer": false, "identity": false } }
+                  },
+                  {
+                    "if": { "properties": { "method": { "const": "cosign-keyless" } }, "required": ["method"] },
+                    "then": { "required": ["issuer", "identity"], "properties": { "key": false } }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["statements"],
+          "additionalProperties": false,
+          "properties": {
+            "statements": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "builders": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "sourceRepositories": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "maxAgeDays": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "records": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "deployments": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "observations": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "maxAgeDays": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "evaluators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["environment", "kinds"],
+            "additionalProperties": false,
+            "properties": {
+              "environment": { "type": "string", "minLength": 1 },
+              "kinds": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "enum": ["network-policy", "rbac"] }
+              },
+              "assumes": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "enum": ["network-policy-enforced", "rbac-authorizer-enabled"] }
+              }
+            }
+          }
+        },
+        "verification": {
+          "type": "object",
+          "required": ["results"],
+          "additionalProperties": false,
+          "properties": {
+            "results": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "maxAgeDays": { "type": "integer", "minimum": 1 },
+            "trustedRoot": {
+              "description": "Workspace-relative Sigstore trusted_root.json. With it, statement verification runs offline.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "required": ["scenarios"],
+          "additionalProperties": false,
+          "properties": {
+            "scenarios": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "measurements": { "$ref": "#/$defs/nonEmptyGlobList" },
+            "requiredAreas": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "nonEmptyGlobList": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "profile": {
+      "description": "Part of a workspace. Merged into the root values (objects deep, arrays replaced).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        },
+        "architecture": {
+          "$ref": "#/$defs/architecture"
+        },
+        "observation": {
+          "$ref": "#/$defs/observationPartial"
+        },
+        "bindings": {
+          "$ref": "#/$defs/bindings"
+        },
+        "policies": {
+          "$ref": "#/$defs/policies"
+        },
+        "exceptions": {
+          "$ref": "#/$defs/exceptions"
+        },
+        "projection": {
+          "$ref": "#/$defs/projection"
+        },
+        "adr": {
+          "$ref": "#/$defs/adr"
+        },
+        "trust": {
+          "$ref": "#/$defs/trust"
+        },
+        "assessments": {
+          "$ref": "#/$defs/assessments"
+        },
+        "assurance": {
+          "$ref": "#/$defs/assurance"
+        },
+        "check": {
+          "$ref": "#/$defs/check"
+        },
+        "report": {
+          "$ref": "#/$defs/report"
+        }
+      }
+    },
+    "limits": {
+      "description": "Resource limits of a run. A run above a limit reports the limit, the configured value and the observed value; dependent results are unknown and no evidence is cut.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "graph": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxNodes": { "type": "integer", "minimum": 1 },
+            "maxEdges": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "traversal": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxVisited": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxFacts": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "environments": {
+      "description": "Deployment environments. Sources attribute infrastructure files to an environment.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "sources"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "sources": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "cluster": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "globList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "decorators": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "urlMapping": {
+          "description": "Path to a JSON file {url: relativePath}. Same format as the CALM CLI option -u.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "root": {
+          "type": "string",
+          "minLength": 1,
+          "default": "."
+        },
+        "include": {
+          "$ref": "#/$defs/globList"
+        },
+        "exclude": {
+          "$ref": "#/$defs/globList"
+        }
+      }
+    },
+    "runtime": {
+      "description": "Runtime-trace evidence: OTLP/JSON trace files, one export request per line.",
+      "type": "object",
+      "required": ["traces"],
+      "additionalProperties": false,
+      "properties": {
+        "traces": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxAgeDays": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": ["projects"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "const": "codebase-memory-mcp"
+        },
+        "executable": {
+          "type": "string",
+          "minLength": 1,
+          "default": "codebase-memory-mcp"
+        },
+        "timeoutSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 300
+        },
+        "indexTimeoutSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1800
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 1
+        },
+        "indexMode": {
+          "enum": ["fast", "moderate", "full"],
+          "default": "moderate"
+        },
+        "projects": {
+          "description": "The first project is the primary project. Its paths have no prefix; paths of other projects have the prefix @<name>/.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/project"
+          }
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        }
+      }
+    },
+    "observationPartial": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "const": "codebase-memory-mcp"
+        },
+        "executable": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timeoutSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "indexTimeoutSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "indexMode": {
+          "enum": ["fast", "moderate", "full"]
+        },
+        "projects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/project"
+          }
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "$ref": "#/$defs/globList"
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "$ref": "#/$defs/globList"
+        },
+        "packs": {
+          "description": "Policy packs to use: built-in (builtin:<name>) or vendored files pinned by sha256. Profiles replace the whole list.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/policyPackUse"
+          }
+        }
+      }
+    },
+    "policyPackUse": {
+      "type": "object",
+      "required": ["use"],
+      "additionalProperties": false,
+      "properties": {
+        "use": {
+          "description": "builtin:<name>, or a workspace-relative path of a vendored pack file.",
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "description": "Digest of the pack file. Required for a file pack. Not allowed for a built-in pack.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "rules": {
+          "description": "Overrides, keyed by rule ID of the pack.",
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)+$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/ruleOverride"
+          }
+        }
+      }
+    },
+    "ruleOverride": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": ["error", "warning", "info"]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "minimumConfidence": {
+              "enum": ["unknown", "heuristic", "syntactic", "runtime", "resolved"]
+            },
+            "minimumCoverage": {
+              "$ref": "#/$defs/coverageRatio"
+            },
+            "onUnknown": {
+              "enum": ["fail", "warn", "ignore"]
+            },
+            "edgeKinds": {
+              "type": "object",
+              "additionalProperties": {
+                "enum": ["unknown", "heuristic", "syntactic", "runtime", "resolved"]
+              }
+            },
+            "coverage": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "files": {
+                  "$ref": "#/$defs/coverageRatio"
+                },
+                "bytes": {
+                  "$ref": "#/$defs/coverageRatio"
+                },
+                "supportedLanguages": {
+                  "$ref": "#/$defs/coverageRatio"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverageRatio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "exceptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "waivers": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maxExpiryDays": {
+          "description": "Longest duration of a scoped waiver, in days.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "const": "structurizr"
+        },
+        "output": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowIncludes": {
+          "description": "Workspace-relative repository paths that the Structurizr DSL of a rendering may include.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "views": {
+      "description": "Architecture views that must exist. A top-level key: profiles cannot overlay it.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/view"
+      }
+    },
+    "idList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": ["id", "kind", "origin", "owner", "scope", "abstraction"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "kind": {
+          "enum": ["system-context", "container", "component", "deployment", "trust", "data-flow"]
+        },
+        "origin": {
+          "enum": ["generated", "authored"]
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "abstraction": {
+          "enum": ["system", "container", "component", "deployment"]
+        },
+        "environment": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "elements": {
+              "$ref": "#/$defs/idList"
+            },
+            "relationships": {
+              "$ref": "#/$defs/idList"
+            }
+          }
+        },
+        "source": {
+          "description": "The authored diagram. The selector names a diagram block by title or anchor, never by index or ordinal.",
+          "type": "object",
+          "required": ["path", "format"],
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "format": {
+              "enum": ["mermaid", "plantuml", "dsl", "png", "jpeg", "gif"]
+            },
+            "selector": {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "maxProperties": 1,
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "anchor": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "output": {
+          "description": "The committed generated view and its exports.",
+          "type": "object",
+          "required": ["path"],
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["format", "path"],
+                "additionalProperties": false,
+                "properties": {
+                  "format": {
+                    "enum": ["json", "mermaid", "plantuml", "dot", "static"]
+                  },
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "projection": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "merge": {
+              "enum": ["binding"]
+            },
+            "edgeKinds": {
+              "$ref": "#/$defs/idList"
+            },
+            "selfEdges": {
+              "enum": ["omit", "keep"]
+            },
+            "parallelEdges": {
+              "enum": ["merge", "separate"]
+            },
+            "semantic": {
+              "$ref": "#/$defs/idList"
+            }
+          }
+        },
+        "mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "elements": {
+              "description": "Diagram element identifier (the Mermaid node ID) to CALM node ID.",
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "depicts": {
+              "type": "object",
+              "required": ["digest"],
+              "additionalProperties": false,
+              "properties": {
+                "digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "elements": {
+                  "$ref": "#/$defs/idList"
+                },
+                "relationships": {
+                  "$ref": "#/$defs/idList"
+                }
+              }
+            }
+          }
+        },
+        "comparison": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "against": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": ["declared", "observed"]
+              }
+            },
+            "minimumConfidence": {
+              "enum": ["unknown", "heuristic", "syntactic", "runtime", "resolved"]
+            },
+            "severity": {
+              "enum": ["error", "warning", "info"]
+            }
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minimumCoverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unknown": {
+          "enum": ["fail", "warn", "ignore"]
+        },
+        "failOn": {
+          "enum": ["error", "warning", "info"]
+        },
+        "enforcement": {
+          "description": "Enforcement mode by rule family, pack, or rule IDs, and optionally by environment. The first entry that matches a rule and an environment wins; then the rule's own `enforcement`; then the default (mandatory for the code families, advisory for typed rules).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["mode"],
+            "additionalProperties": false,
+            "anyOf": [
+              { "required": ["family"] },
+              { "required": ["pack"] },
+              { "required": ["rules"] }
+            ],
+            "properties": {
+              "family": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "pack": { "type": "string", "minLength": 1 },
+              "rules": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "environment": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              "mode": { "enum": ["mandatory", "advisory", "shadow"] }
+            }
+          }
+        },
+        "rollback": {
+          "description": "While active, rules that use typed obligations run as shadow. An expired rollback fails the check.",
+          "type": "object",
+          "required": ["reason", "authorizedBy", "expires"],
+          "additionalProperties": false,
+          "properties": {
+            "reason": { "type": "string", "minLength": 1 },
+            "authorizedBy": { "type": "string", "minLength": 1 },
+            "expires": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }
+          }
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["format", "path"],
+            "additionalProperties": false,
+            "properties": {
+              "format": {
+                "enum": ["json", "junit", "sarif", "pretty"]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

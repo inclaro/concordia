@@ -1,0 +1,79 @@
+{
+  "runs": {
+    "fail": {
+      "findings": [
+        {
+          "message": "Could not load detailed-architecture 'details/missing.json': ENOENT: no such file or directory, open '<case>/details/missing.json'",
+          "path": "/nodes/api/details/detailed-architecture",
+          "rule": "node-details-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "nested-rules": {
+      "findings": [
+        {
+          "message": "All properties must be set to a nonempty value.",
+          "path": "/nodes/api/details/detailed-architecture/nodes/1/description",
+          "rule": "architecture-has-no-empty-string-properties",
+          "severity": "error"
+        },
+        {
+          "message": "Node with ID 'api-core' is not referenced by any relationships.",
+          "path": "/nodes/api/details/detailed-architecture/nodes/1/unique-id",
+          "rule": "architecture-nodes-must-be-referenced",
+          "severity": "warning"
+        },
+        {
+          "message": "'ghost' does not refer to the unique-id of an existing node.",
+          "path": "/nodes/api/details/detailed-architecture/relationships/0/relationship-type/connects/destination/node",
+          "rule": "connects-relationship-references-existing-nodes-in-architecture",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": true,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "pass": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "twice": {
+      "findings": [],
+      "hasErrors": false,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    },
+    "twice-missing": {
+      "findings": [
+        {
+          "message": "Could not load detailed-architecture 'details/missing.json': ENOENT: no such file or directory, open '<case>/details/missing.json'",
+          "path": "/nodes/api/details/detailed-architecture",
+          "rule": "node-details-validation",
+          "severity": "error"
+        },
+        {
+          "message": "Could not load detailed-architecture 'details/missing.json': ENOENT: no such file or directory, open '<case>/details/missing.json'",
+          "path": "/nodes/web/details/detailed-architecture",
+          "rule": "node-details-validation",
+          "severity": "error"
+        }
+      ],
+      "hasErrors": true,
+      "hasWarnings": false,
+      "jsonSchema": false,
+      "loadError": false
+    }
+  },
+  "tag": "cli-v1.70.0"
+}
