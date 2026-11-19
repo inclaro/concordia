@@ -176,7 +176,7 @@ A rule ID that two packs (or a pack and a policy file) declare gives `CO-POL-003
 
 | Code | Severity | Exit code | Message template |
 |---|---|---|---|
-| `CO-PRJ-001` | error | 5 | Structurizr CLI missing for the requested format: {format} |
+| `CO-PRJ-001` | error | 5 | Structurizr CLI not available; it is needed for {format} |
 | `CO-PRJ-002` | error | 3 | Structurizr validate or export failed: {detail} |
 | `CO-PRJ-005` | error | 2 | C4 level mapping not valid: {detail} |
 | `CO-PRJ-006` | info | none | element not projected: {id} ({detail}) |

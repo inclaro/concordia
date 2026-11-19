@@ -149,7 +149,7 @@ func checkRenderOptions(app *Context, opts *renderOptions) (format, cli string, 
 		return format, "", nil
 	}
 
-	if cli, err = projection.RequireCLI(format, app.IO.Getenv); err != nil {
+	if cli, err = projection.RequireCLI("--format "+format, app.IO.Getenv); err != nil {
 		return "", "", err //nolint:wrapcheck // a *diag.Error that the caller reports.
 	}
 

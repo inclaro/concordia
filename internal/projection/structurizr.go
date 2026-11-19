@@ -102,12 +102,12 @@ func FindCLI(getenv func(string) string) (string, bool) {
 	return "", false
 }
 
-// RequireCLI finds the Structurizr CLI or gives CO-PRJ-001 (exit 5). format is
-// the format that needs the CLI.
-func RequireCLI(format string, getenv func(string) string) (string, error) {
+// RequireCLI finds the Structurizr CLI or gives CO-PRJ-001 (exit 5). need names
+// what needs the CLI, for the message.
+func RequireCLI(need string, getenv func(string) string) (string, error) {
 	cli, ok := FindCLI(getenv)
 	if !ok {
-		return "", diag.Fail(diag.PRJ001, diag.Params{"format": format})
+		return "", diag.Fail(diag.PRJ001, diag.Params{"format": need})
 	}
 
 	return cli, nil
@@ -177,6 +177,9 @@ func Export(ctx context.Context, cli, dslPath string, format ExportFormat, outDi
 // testdata/exports and the export canonicalization rule must be reviewed.
 const PinnedStructurizrCLI = "2025.11.09"
 
+// NeedViewExports names the exports of declared views in a CO-PRJ-001 message.
+const NeedViewExports = "the exports of declared views"
+
 // cliVersionLine matches the line of `structurizr version` that names the CLI.
 var cliVersionLine = regexp.MustCompile(`(?m)^\s*structurizr-cli:\s*(\S+)\s*$`)
 
@@ -219,7 +222,7 @@ func VerifyPinned(ctx context.Context, cli string, getenv func(string) string) (
 
 	switch {
 	case errors.As(err, &spawn):
-		return "", diag.Fail(diag.PRJ001, diag.Params{"format": "export"})
+		return "", diag.Fail(diag.PRJ001, diag.Params{"format": NeedViewExports})
 	case err != nil:
 		return "", fmt.Errorf("run %s: %w", cli, err)
 	case res.Code != 0:

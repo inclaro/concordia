@@ -270,7 +270,7 @@ var entries = []Entry{
 	{Code: EXC009, Severity: SeverityWarning, ExitCode: NoExit, Message: "scoped waiver not applied: {detail}"},
 	{Code: EXC010, Severity: SeverityWarning, ExitCode: NoExit, Message: "scoped waiver matches no current finding: {detail}"},
 	{Code: EXC011, Severity: SeverityWarning, ExitCode: NoExit, Message: "compensating evidence unresolved or digest differs: {detail}"},
-	{Code: PRJ001, Severity: SeverityError, ExitCode: Toolchain, Message: "Structurizr CLI missing for the requested format: {format}", Suggestion: "install the Structurizr CLI or set STRUCTURIZR_CLI; the dsl format needs no other tool"},
+	{Code: PRJ001, Severity: SeverityError, ExitCode: Toolchain, Message: "Structurizr CLI not available; it is needed for {format}", Suggestion: "install the Structurizr CLI (https://docs.structurizr.com/cli) and put structurizr-cli, structurizr.sh or structurizr on the PATH, or set STRUCTURIZR_CLI to its path; only the DSL output works without it"},
 	{Code: PRJ002, Severity: SeverityError, ExitCode: AdapterFailure, Message: "Structurizr validate or export failed: {detail}"},
 	{Code: PRJ005, Severity: SeverityError, ExitCode: InvalidInput, Message: "C4 level mapping not valid: {detail}"},
 	{Code: PRJ006, Severity: SeverityInfo, ExitCode: NoExit, Message: "element not projected: {id} ({detail})"},

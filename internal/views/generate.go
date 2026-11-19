@@ -222,7 +222,7 @@ func RenderExports(ctx context.Context, generated *Generated, tools *Tools) Expo
 
 	cli, ok := projection.FindCLI(orProcessEnv(getenv))
 	if !ok {
-		return failAll(diag.Fail(diag.PRJ001, diag.Params{"format": "export"}))
+		return failAll(diag.Fail(diag.PRJ001, diag.Params{"format": projection.NeedViewExports}))
 	}
 
 	version, err := projection.VerifyPinned(ctx, cli, getenv)
