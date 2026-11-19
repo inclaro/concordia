@@ -1071,6 +1071,7 @@ exit 1
 
 [tasks."bench:build"]
 description = "Build the bench Docker images: base, repository, adopted and stage images."
+depends = ["tools:cbm"]
 usage = 'flag "--repo <id>" help "build only this repository of bench/repos.json"'
 run = '''
 set -euo pipefail
@@ -1100,6 +1101,7 @@ exit 1
 
 [tasks."bench:smoke"]
 description = "Run the oracle on every bench task; every task must score 1.0 (no LLM)."
+depends = ["tools:cbm"]
 dir = "{{config_root}}/bench"
 usage = 'flag "--repo <id>" help "run only the tasks of this repository of bench/tasks.json"'
 run = '''
