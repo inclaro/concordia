@@ -6,7 +6,7 @@ body:
     id: concordia-version
     attributes:
       label: Concordia version
-      description: Output of `concordia version`.
+      description: Output of `concordia --version`.
     validations:
       required: true
   - type: input
