@@ -40,8 +40,8 @@ var skipDirs = map[string]bool{".git": true, "node_modules": true, ".concordia":
 // GitPort is the git state of the workspace root. Paths are relative to the
 // workspace root and use "/".
 type GitPort interface {
-	// Revision is the HEAD commit. It gives "" when the directory is not in a git repository or has no commit.
-	// It gives a CO-WRK-012 error when git is missing or fails.
+	// Revision is the HEAD commit. It gives "" for a plain directory: not in a git repository, or in one without
+	// a commit. It gives a CO-WRK-012 error when git fails.
 	Revision(ctx context.Context) (string, error)
 	// DirtyFiles gives changed, staged and untracked files, sorted.
 	DirtyFiles(ctx context.Context) ([]string, error)
@@ -135,8 +135,22 @@ func gitFailed(args []string, res procexec.Result) error {
 
 // Revision implements GitPort.
 func (g *CliGit) Revision(ctx context.Context) (string, error) {
-	repo, err := g.isRepo(ctx)
-	if err != nil || !repo {
+	return g.headCommit(ctx)
+}
+
+// isRepo says whether the directory is in a git work tree with at least one commit. A plain directory, a
+// directory without a git executable and a repository without a commit are all read as a plain directory: "no".
+func (g *CliGit) isRepo(ctx context.Context) (bool, error) {
+	sha, err := g.headCommit(ctx)
+
+	return sha != "", err
+}
+
+// headCommit gives the HEAD commit, or "" when the directory is not in a git work tree or the repository has no
+// commit.
+func (g *CliGit) headCommit(ctx context.Context) (string, error) {
+	inTree, err := g.inWorkTree(ctx)
+	if err != nil || !inTree {
 		return "", err
 	}
 
@@ -164,10 +178,10 @@ func (g *CliGit) Revision(ctx context.Context) (string, error) {
 	return "", gitFailed(args, res)
 }
 
-// isRepo says whether the directory is inside a git work tree. Without a git executable, or when git
-// answers "not a git repository", it is a plain directory: "no". Any other failure (for example unsafe
-// ownership) is a CO-WRK-012 error.
-func (g *CliGit) isRepo(ctx context.Context) (bool, error) {
+// inWorkTree says whether the directory is inside a git work tree. Without a git executable, or when git
+// answers "not a git repository", it is not. Any other failure (for example unsafe ownership) is a CO-WRK-012
+// error.
+func (g *CliGit) inWorkTree(ctx context.Context) (bool, error) {
 	args := []string{revParse, "--is-inside-work-tree"}
 
 	res, err := g.exec(ctx, 0, args)
@@ -314,7 +328,7 @@ func (g *CliGit) ListFiles(ctx context.Context) ([]string, error) {
 	return sortedKeys(seen), nil
 }
 
-// refCheck rejects an option-like reference and a directory outside a repository.
+// refCheck rejects an option-like reference and a directory outside a repository with a commit.
 func (g *CliGit) refCheck(ctx context.Context, ref string) error {
 	if strings.HasPrefix(ref, "-") {
 		return diag.Fail(diag.WRK015, diag.Detail("'"+ref+"' is not a git reference"))
@@ -326,7 +340,7 @@ func (g *CliGit) refCheck(ctx context.Context, ref string) error {
 	}
 
 	if !repo {
-		return diag.Fail(diag.WRK015, diag.Detail("the workspace is not in a git repository"))
+		return diag.Fail(diag.WRK015, diag.Detail("the workspace is not in a git repository with a commit"))
 	}
 
 	return nil
@@ -392,16 +406,7 @@ func (g *CliGit) ChangedFiles(ctx context.Context, ref string) (ChangeSet, error
 // changeBase gives the commit that ChangedFiles compares with.
 func (g *CliGit) changeBase(ctx context.Context, ref string) (string, error) {
 	if ref == gitHead {
-		if err := g.refCheck(ctx, ref); err != nil {
-			return "", err
-		}
-
-		sha, err := g.ResolveRef(ctx, ref)
-		if err != nil {
-			return "", diag.Fail(diag.WRK015, diag.Detail("the repository has no commit"))
-		}
-
-		return sha, nil
+		return g.ResolveRef(ctx, ref)
 	}
 
 	sha, err := g.ResolveRef(ctx, ref)

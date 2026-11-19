@@ -10,7 +10,6 @@ const (
 	WRK010 = "CO-WRK-010"
 	WRK011 = "CO-WRK-011"
 	WRK012 = "CO-WRK-012"
-	WRK013 = "CO-WRK-013"
 	WRK014 = "CO-WRK-014"
 	WRK015 = "CO-WRK-015"
 	WRK016 = "CO-WRK-016"
@@ -183,7 +182,6 @@ var entries = []Entry{
 	{Code: WRK010, Severity: SeverityError, ExitCode: InvalidInput, Message: "usage error: {detail}"},
 	{Code: WRK011, Severity: SeverityError, ExitCode: InvalidInput, Message: "destructive action needs confirmation: {detail}", Suggestion: "pass --yes to confirm"},
 	{Code: WRK012, Severity: SeverityError, ExitCode: Toolchain, Message: "git not available or git command failed: {detail}", Suggestion: "install git, and make sure that `git status` works in the workspace"},
-	{Code: WRK013, Severity: SeverityWarning, ExitCode: NoExit, Message: "no git revision for project {project}: the project root is not in a git repository or has no commit", Suggestion: "run Concordia in a git repository with at least one commit"},
 	{Code: WRK014, Severity: SeverityError, ExitCode: Toolchain, Message: "cosign not available: {detail}", Suggestion: "install cosign, or set COSIGN to the path of cosign"},
 	{Code: WRK015, Severity: SeverityError, ExitCode: InvalidInput, Message: "git reference not valid: {detail}"},
 	{Code: WRK016, Severity: SeverityError, ExitCode: Network, Message: "cosign needs network access, and --offline is set: {detail}", Suggestion: "remove --offline; to verify a signature offline, give --trusted-root with a Sigstore trusted root file"},

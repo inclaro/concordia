@@ -79,16 +79,16 @@ func TestCliGitOutsideRepositoryWithTranslatedGit(t *testing.T) {
 	equalList(t, files, []string{"src/x.ts"})
 }
 
-func TestCliGitRepositoryWithoutCommit(t *testing.T) {
+// A repository without a commit is read as a plain directory: no revision, every file (also the ones that
+// .gitignore names), no dirty file.
+func TestCliGitRepositoryWithoutCommitIsAPlainDirectory(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
 	testutil.Git(t, dir, "init", "-q")
+	testutil.WriteTree(t, dir, map[string]string{".gitignore": "out/\n", "src/a/b.go": "x", "out/gen.go": "y"})
 
-	rev, err := workspace.NewCliGit(dir).Revision(t.Context())
-	if err != nil || rev != "" {
-		t.Fatalf("revision %q, err %v", rev, err)
-	}
+	assertPlainDirectory(t, workspace.NewCliGit(dir), []string{".gitignore", "out/gen.go", "src/a/b.go"})
 }
 
 func TestCliGitOutsideRepository(t *testing.T) {

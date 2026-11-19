@@ -248,10 +248,6 @@ func (c *checker) freezeSource(ctx context.Context, wspace *workspace.Workspace,
 
 	proj.dirty = proj.prefixed(dirty)
 
-	if revision == "" {
-		c.diags = append(c.diags, diag.New(diag.WRK013, diag.Params{"project": proj.project.Name}))
-	}
-
 	return nil
 }
 

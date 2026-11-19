@@ -116,7 +116,7 @@ mise run install
    | `workspace` | `concordia.yaml` loads and `build/` or the workspace root is writable | yes |
    | `calm-schema` | CALM schema versions (1.2, 1.3) | yes |
    | `cbm` | CBM version, whether it is the pinned build, and whether the workspace project is indexed | yes |
-   | `git` | git is on the `PATH`. Without git, or outside a git repository, Concordia reads the workspace as a plain directory: all files below it except `.git`, `node_modules`, and `.concordia`, with no revision and no dirty files. Commands that compare git revisions (for example a review against a reference, or approvals at a trust anchor) still need a repository | no |
+   | `git` | git is on the `PATH`. Without git, outside a git repository, or in a repository without a commit, Concordia reads the workspace as a plain directory: all files below it except `.git`, `node_modules`, and `.concordia`, with no revision, no dirty files, and no warning. Commands that compare git revisions (for example a review against a reference, or approvals at a trust anchor) still need a repository with a commit | no |
    | `java` | Java is on the `PATH` | no |
    | `structurizr` | Structurizr CLI found (`STRUCTURIZR_CLI`, `structurizr-cli`, `structurizr.sh`, or `structurizr`) | no |
    | `cosign` | cosign found (`COSIGN` or `cosign` on the `PATH`) | no |
