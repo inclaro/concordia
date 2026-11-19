@@ -1,0 +1,100 @@
+repo: nushell
+checks:
+- id: environment
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=ci].id
+    equals: ci
+  - path: assurance.quality.requiredAreas
+    contains: modifiability
+  - path: assurance.quality.requiredAreas
+    contains: availability
+  - path: assurance.verification.results
+    contains: build/results/*.json
+- id: scenarios-file
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: quality/nushell.yaml
+  select:
+  - path: kind
+    equals: QualityScenarioSet
+  - path: scenarios[id=QS-NU-LAYERING].area
+    equals: modifiability
+  - path: scenarios[id=QS-NU-LAYERING].mode
+    equals: structural
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: NU-VER-001
+    predicate: require.checkResult
+    severity: warning
+- id: control
+  type: command
+  dimension: workspace
+  weight: 1
+  argv:
+  - concordia
+  - model
+  - validate
+  expectExit: 0
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv:
+  - concordia
+  - assurance
+  - validate
+  expectExit: 0
+  stdoutContains:
+  - not-authenticated
+- id: verification-unknown
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules:
+    NU-VER-001: unknown
+  findings:
+  - ruleId: NU-VER-001
+    kind: obligation-unknown
+    disposition: active
+  absent:
+  - ruleId: NU-VER-001
+    kind: obligation-violation
+  select:
+  - path: rules[ruleId=NU-VER-001].reasons[0].code
+    equals: no-evidence-supplied
+  - path: assurance.checkResults[check=unit-tests].admissible
+    equals: false
+  - path: assurance.checkResults[check=unit-tests].reasons
+    contains: not-authenticated
+- id: required-area-without-scenario
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  areas:
+    qualityEvaluation: violation
+  findings:
+  - ruleId: quality:area:availability
+    area: qualityEvaluation
+    kind: obligation-violation
+- id: area-scenario-added
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations:
+  - availability-scenario-added
+  expectExit: 0
+  absent:
+  - ruleId: quality:area:availability
+  select:
+  - path: rules[ruleId=quality:QS-NU-PLUGIN-ISOLATION].ruleId
+    equals: quality:QS-NU-PLUGIN-ISOLATION

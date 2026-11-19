@@ -1,0 +1,212 @@
+repo: gitea
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: gitea-cmd
+    nodeType: service
+  - id: gitea-routers
+    nodeType: service
+  - id: gitea-services
+    nodeType: service
+  - id: gitea-models
+    nodeType: service
+  - id: gitea-db
+    nodeType: database
+  - id: gitea-modelmigration
+    nodeType: service
+  - id: gitea-modules
+    nodeType: service
+    tags:
+    - shared
+    - migration-safe
+  - id: gitea-setting
+    nodeType: service
+    tags:
+    - shared
+    - migration-safe
+  - id: gitea-web
+    nodeType: webclient
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - gitea-web
+    - gitea-routers
+  - - gitea-cmd
+    - gitea-routers
+  - - gitea-cmd
+    - gitea-services
+  - - gitea-routers
+    - gitea-services
+  - - gitea-routers
+    - gitea-models
+  - - gitea-routers
+    - gitea-modules
+  - - gitea-routers
+    - gitea-setting
+  - - gitea-services
+    - gitea-models
+  - - gitea-services
+    - gitea-modules
+  - - gitea-services
+    - gitea-setting
+  - - gitea-services
+    - gitea-db
+  - - gitea-models
+    - gitea-modules
+  - - gitea-models
+    - gitea-setting
+  - - gitea-models
+    - gitea-db
+  - - gitea-modelmigration
+    - gitea-modules
+  - - gitea-modelmigration
+    - gitea-setting
+  - - gitea-modelmigration
+    - gitea-db
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - gitea-cmd
+  - gitea-routers
+  - gitea-services
+  - gitea-models
+  - gitea-db
+  - gitea-modelmigration
+  - gitea-modules
+  - gitea-setting
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: GITEA-LYR-001
+    predicate: layerOrder
+    severity: error
+  - id: GITEA-MIG-001
+    predicate: forbid
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-layer-inversion
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - models-call-services
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-LYR-001
+    location.path: models/user/bench_layer.go
+    kind: layer-violation
+    disposition: active
+- id: detects-migration-model-import
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - migration-imports-user
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-MIG-001
+    location.path: modelmigration/base/bench_user.go
+    kind: forbidden-dependency
+    disposition: active
+- id: allows-migration-safe-tag
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - migration-imports-log
+  absent:
+  - location.path: modelmigration/base/bench_log.go
+    disposition: active
+- id: allows-migration-safe-tag-exit0
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - migration-imports-log
+  absent:
+  - location.path: modelmigration/base/bench_log.go
+    disposition: active
+  expectExit: 0
+  xfail: "D6: CBM index state differs between the first full index and any incremental
+    re-index, so an unrelated heuristic CALLS edge (e.g. services/mailer -> routers.web.repo.actions.ViewJob.Duration)
+    becomes an active finding after any Go file change"
+- id: allows-migration-db-node
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - migration-imports-db
+  absent:
+  - location.path: modelmigration/base/bench_db.go
+    disposition: active
+- id: allows-migration-db-node-exit0
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - migration-imports-db
+  absent:
+  - location.path: modelmigration/base/bench_db.go
+    disposition: active
+  expectExit: 0
+  xfail: "D6: CBM index state differs between the first full index and any incremental
+    re-index, so an unrelated heuristic CALLS edge (e.g. services/mailer -> routers.web.repo.actions.ViewJob.Duration)
+    becomes an active finding after any Go file change"
+- id: allows-service-uses-model
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - services-call-models
+  absent:
+  - location.path: services/mailer/bench_allowed.go
+    disposition: active
+- id: allows-service-uses-model-exit0
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - services-call-models
+  absent:
+  - location.path: services/mailer/bench_allowed.go
+    disposition: active
+  expectExit: 0
+  xfail: "D6: CBM index state differs between the first full index and any incremental
+    re-index, so an unrelated heuristic CALLS edge (e.g. services/mailer -> routers.web.repo.actions.ViewJob.Duration)
+    becomes an active finding after any Go file change"
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

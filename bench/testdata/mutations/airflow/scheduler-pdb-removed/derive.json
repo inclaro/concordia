@@ -1,0 +1,8 @@
+[
+  {
+    "path": "bench-env/prod-hydrated/airflow.yaml",
+    "base_sha256": "e264b8c9df0f897368ec8381bd2423515b5c28530b191b0c5c19e4c257357fc7",
+    "edit": "edits/bench-env/prod-hydrated/airflow.yaml.ed",
+    "sha256": "24d097f6e374afde356eca3182b8f88f92aa415579e2561c4f932d7d1965a28d"
+  }
+]

@@ -1,0 +1,73 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-nu-cli
+  architectureRef: calm:node:nu-cli
+  match:
+    any:
+    - sourceRoot: crates/nu-cli/**
+- id: bind-nu-command
+  architectureRef: calm:node:nu-command
+  match:
+    any:
+    - sourceRoot: crates/nu-command/**
+- id: bind-nu-cmd-lang
+  architectureRef: calm:node:nu-cmd-lang
+  match:
+    any:
+    - sourceRoot: crates/nu-cmd-lang/**
+- id: bind-nu-cmd-base
+  architectureRef: calm:node:nu-cmd-base
+  match:
+    any:
+    - sourceRoot: crates/nu-cmd-base/**
+- id: bind-nu-cmd-plugin
+  architectureRef: calm:node:nu-cmd-plugin
+  match:
+    any:
+    - sourceRoot: crates/nu-cmd-plugin/**
+- id: bind-nu-parser
+  architectureRef: calm:node:nu-parser
+  match:
+    any:
+    - sourceRoot: crates/nu-parser/**
+- id: bind-nu-plugin-engine
+  architectureRef: calm:node:nu-plugin-engine
+  match:
+    any:
+    - sourceRoot: crates/nu-plugin-engine/**
+- id: bind-nu-plugin
+  architectureRef: calm:node:nu-plugin
+  match:
+    any:
+    - sourceRoot: crates/nu-plugin/**
+- id: bind-nu-engine
+  architectureRef: calm:node:nu-engine
+  match:
+    any:
+    - sourceRoot: crates/nu-engine/**
+- id: bind-nu-plugin-core
+  architectureRef: calm:node:nu-plugin-core
+  match:
+    any:
+    - sourceRoot: crates/nu-plugin-core/**
+- id: bind-nu-plugin-protocol
+  architectureRef: calm:node:nu-plugin-protocol
+  match:
+    any:
+    - sourceRoot: crates/nu-plugin-protocol/**
+- id: bind-nu-protocol
+  architectureRef: calm:node:nu-protocol
+  match:
+    any:
+    - sourceRoot: crates/nu-protocol/**
+- id: bind-nu-config
+  architectureRef: calm:node:nu-config
+  match:
+    any:
+    - sourceRoot: crates/nu-config/**
+- id: bind-nu-utils
+  architectureRef: calm:node:nu-utils
+  match:
+    any:
+    - sourceRoot: crates/nu-utils/**

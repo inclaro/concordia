@@ -1,0 +1,8 @@
+[
+  {
+    "path": "browser_use/llm/__init__.py",
+    "base_sha256": "00db5b75c94f38a6dd4fb0344fa76cba2f7f96e58b0b25c1a95fd352f9ec8fa9",
+    "edit": "edits/browser_use/llm/__init__.py.ed",
+    "sha256": "d19357a6521d6cbf219af70d801ea56bcbc6a5ae5b51fd86f6874f49326520d9"
+  }
+]

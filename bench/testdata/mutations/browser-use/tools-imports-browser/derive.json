@@ -1,0 +1,8 @@
+[
+  {
+    "path": "browser_use/search.py",
+    "base_sha256": "dce393f54395eb9b2b426d488a7f47cc8f3bc58c8763ffd0f74aae356716819f",
+    "edit": "edits/browser_use/search.py.ed",
+    "sha256": "b3b1eca6081b64c270de23e63760ccbbabf4721899c576b491e39dab94077223"
+  }
+]

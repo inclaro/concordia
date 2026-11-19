@@ -1,0 +1,1 @@
+feat: llm adapter reads browser

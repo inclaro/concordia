@@ -1,0 +1,65 @@
+repo: volcano
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: VC-DNY-001
+    predicate: denyPath
+    severity: error
+  - id: VC-BUD-001
+    predicate: budget
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 1
+  - path: summary.rules.error
+    equals: 0
+  rules:
+    VC-DNY-001: violation
+    VC-BUD-001: unknown
+- id: detects-admission-reaches-gang
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - admission-reaches-gang
+  expectExit: 1
+  findings:
+  - ruleId: VC-DNY-001
+    kind: forbidden-path
+    location.path: pkg/webhooks/util/bench_path.go
+    disposition: active
+- id: detects-admission-imports-framework
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - admission-imports-framework
+  expectExit: 1
+  findings:
+  - ruleId: VC-BUD-001
+    kind: budget-exceeded
+    disposition: active
+  counts:
+  - match:
+      ruleId: VC-BUD-001
+      kind: budget-exceeded
+      disposition: active
+    equals: 1
+- id: allows-admission-imports-shared
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - admission-imports-shared
+  expectExit: 0
+  absent:
+  - location.path: pkg/webhooks/util/bench_shared.go
+    disposition: active

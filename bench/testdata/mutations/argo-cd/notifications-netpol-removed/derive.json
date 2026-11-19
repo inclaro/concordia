@@ -1,0 +1,8 @@
+[
+  {
+    "path": "bench-env/non-ha-hydrated/install.yaml",
+    "base_sha256": "5af346e3c6094c31a5cb10fab35a4967a7980d9f8a613623c9e2801ecf24315f",
+    "edit": "edits/bench-env/non-ha-hydrated/install.yaml.ed",
+    "sha256": "2055f8772cdea1ff4f2947a5f49f54ebf4007c185dccc467ba7e7ffdeb723def"
+  }
+]

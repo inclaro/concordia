@@ -1,0 +1,215 @@
+repo: nushell
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: nu-cli
+    nodeType: service
+  - id: nu-command
+    nodeType: service
+  - id: nu-cmd-lang
+    nodeType: service
+  - id: nu-cmd-base
+    nodeType: service
+  - id: nu-cmd-plugin
+    nodeType: service
+  - id: nu-parser
+    nodeType: service
+  - id: nu-plugin-engine
+    nodeType: service
+  - id: nu-plugin
+    nodeType: service
+  - id: nu-engine
+    nodeType: service
+  - id: nu-plugin-core
+    nodeType: service
+  - id: nu-plugin-protocol
+    nodeType: service
+  - id: nu-protocol
+    nodeType: service
+  - id: nu-config
+    nodeType: service
+  - id: nu-utils
+    nodeType: service
+    tags:
+    - shared
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - nu-cli
+    - nu-command
+  - - nu-cli
+    - nu-cmd-base
+  - - nu-cli
+    - nu-engine
+  - - nu-cli
+    - nu-parser
+  - - nu-cli
+    - nu-plugin-engine
+  - - nu-cli
+    - nu-protocol
+  - - nu-cli
+    - nu-config
+  - - nu-cli
+    - nu-utils
+  - - nu-command
+    - nu-cmd-base
+  - - nu-command
+    - nu-engine
+  - - nu-command
+    - nu-parser
+  - - nu-command
+    - nu-protocol
+  - - nu-command
+    - nu-config
+  - - nu-command
+    - nu-utils
+  - - nu-cmd-lang
+    - nu-cmd-base
+  - - nu-cmd-lang
+    - nu-engine
+  - - nu-cmd-lang
+    - nu-parser
+  - - nu-cmd-lang
+    - nu-protocol
+  - - nu-cmd-lang
+    - nu-utils
+  - - nu-cmd-base
+    - nu-engine
+  - - nu-cmd-base
+    - nu-parser
+  - - nu-cmd-base
+    - nu-protocol
+  - - nu-cmd-plugin
+    - nu-engine
+  - - nu-cmd-plugin
+    - nu-protocol
+  - - nu-cmd-plugin
+    - nu-plugin-engine
+  - - nu-parser
+    - nu-engine
+  - - nu-parser
+    - nu-plugin-engine
+  - - nu-parser
+    - nu-protocol
+  - - nu-parser
+    - nu-utils
+  - - nu-plugin-engine
+    - nu-engine
+  - - nu-plugin-engine
+    - nu-protocol
+  - - nu-plugin-engine
+    - nu-plugin-core
+  - - nu-plugin-engine
+    - nu-plugin-protocol
+  - - nu-plugin-engine
+    - nu-utils
+  - - nu-plugin
+    - nu-engine
+  - - nu-plugin
+    - nu-protocol
+  - - nu-plugin
+    - nu-plugin-core
+  - - nu-plugin
+    - nu-plugin-protocol
+  - - nu-plugin
+    - nu-utils
+  - - nu-engine
+    - nu-protocol
+  - - nu-engine
+    - nu-utils
+  - - nu-plugin-core
+    - nu-protocol
+  - - nu-plugin-core
+    - nu-plugin-protocol
+  - - nu-plugin-core
+    - nu-utils
+  - - nu-plugin-protocol
+    - nu-protocol
+  - - nu-plugin-protocol
+    - nu-utils
+  - - nu-protocol
+    - nu-config
+  - - nu-protocol
+    - nu-utils
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - nu-cli
+  - nu-command
+  - nu-cmd-lang
+  - nu-cmd-base
+  - nu-cmd-plugin
+  - nu-parser
+  - nu-plugin-engine
+  - nu-plugin
+  - nu-engine
+  - nu-plugin-core
+  - nu-plugin-protocol
+  - nu-protocol
+  - nu-config
+  - nu-utils
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: NU-LYR-001
+    predicate: layerOrder
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-protocol-uses-engine
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - protocol-uses-engine
+  expectExit: 1
+  findings:
+  - ruleId: NU-LYR-001
+    kind: layer-violation
+    location.path: crates/nu-protocol/src/bench_engine.rs
+    disposition: active
+- id: allows-command-uses-protocol
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - command-uses-protocol
+  expectExit: 0
+  absent:
+  - location.path: crates/nu-command/src/bench_ok.rs
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

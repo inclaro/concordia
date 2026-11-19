@@ -1,0 +1,8 @@
+[
+  {
+    "path": "deploy/hydrated/strimzi.yaml",
+    "run": "for d in cluster-operator topic-operator user-operator access-operator; do for f in install/$d/*.yaml; do grep -q \"^kind: CustomResourceDefinition\" \"$f\" || { printf \"\\n---\\n\"; cat \"$f\"; }; done; done | /opt/venv/bin/python /opt/concordia-bench/bin/hydrate-namespace.py /dev/stdin /dev/stdout strimzi",
+    "base_sha256": "d42def83728dd5d294bcf93bb08b3b1753c6bbaa3ee2415e96d12d97f595b932",
+    "sha256": "d42def83728dd5d294bcf93bb08b3b1753c6bbaa3ee2415e96d12d97f595b932"
+  }
+]

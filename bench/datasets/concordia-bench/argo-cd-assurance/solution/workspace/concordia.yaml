@@ -1,0 +1,35 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata: {name: argo-cd}
+architecture: {source: architecture/argo-cd.calm.json}
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: argo-cd
+    root: .
+    include: [cmd/**/*.go, server/**/*.go, controller/**/*.go, reposerver/**/*.go, applicationset/**/*.go, cmpserver/**/*.go, commitserver/**/*.go, notification_controller/**/*.go, pkg/**/*.go, util/**/*.go, common/**/*.go, manifests/namespace-install.yaml, gitops/**]
+environments:
+- id: non-ha
+  sources: [manifests/namespace-install.yaml]
+- id: staging
+  sources: [manifests/namespace-install.yaml]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+  packs:
+  - {use: 'builtin:assurance'}
+exceptions: {baseline: exceptions/concordia.baseline.json, waivers: exceptions/waivers.yaml}
+assurance:
+  rendering:
+    sources:
+    - {environment: non-ha, tool: kustomize, path: gitops/production}
+    - {environment: staging, tool: kustomize, path: gitops/production}
+  evaluators:
+  - environment: non-ha
+    kinds: [network-policy, rbac]
+    assumes: [network-policy-enforced, rbac-authorizer-enabled]
+  - environment: staging
+    kinds: [network-policy, rbac]
+check: {minimumCoverage: 0.9, unknown: fail, failOn: error}

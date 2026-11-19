@@ -1,0 +1,15 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+- id: QS-NU-PLUGIN-ISOLATION
+  area: availability
+  qualityAttribute: availability
+  stimulusSource: plugin
+  stimulus: a plugin process crashes while a script runs
+  environment: development
+  expectedResponse: the engine stays up because plugin code is reached only through the plugin engine
+  owner: team-nushell
+  scope: [nu-plugin-engine, nu-engine]
+  mode: structural
+  criterion:
+    rules: [NU-LYR-001]

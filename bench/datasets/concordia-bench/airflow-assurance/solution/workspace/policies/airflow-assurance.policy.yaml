@@ -1,0 +1,32 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: airflow-assurance
+  version: 1.0.0
+rules:
+- id: AF-NET-001
+  name: Workers have no network path to the connection pool
+  severity: error
+  owner: team-airflow
+  rationale: AIP-72 keeps workers away from the metadata database, so an open network path from workers to PgBouncer is a trust-boundary bypass.
+  remediation: Restrict the ingress of the PgBouncer network policy to the core components.
+  require:
+    effectiveAccess:
+      dimension: network
+      from: {calmNodes: [af-worker]}
+      to: {calmNodes: [af-pgbouncer]}
+      expect: denied
+      ports: [6543]
+- id: AF-NET-002
+  name: The scheduler can reach the connection pool
+  severity: error
+  owner: team-airflow
+  rationale: A network policy that blocks the scheduler from the metadata database pool breaks the control plane, a reliability regression.
+  remediation: Allow the scheduler in the ingress of the PgBouncer network policy.
+  require:
+    effectiveAccess:
+      dimension: network
+      from: {calmNodes: [af-scheduler]}
+      to: {calmNodes: [af-pgbouncer]}
+      expect: allowed
+      ports: [6543]

@@ -1,0 +1,36 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: hoppscotch-adopt
+  version: 1.0.0
+selectors:
+  frontends:
+    nodeTypes: [webclient]
+  runtimes:
+    calmNodes: [hopp-js-sandbox, hopp-kernel]
+  clients:
+    ref: frontends
+rules:
+- id: HOP-DEC-001
+  name: Package dependencies are declared
+  severity: error
+  owner: team-hoppscotch
+  rationale: Architecture drift - the CALM model is the reviewed list of package dependencies, so an undeclared or contradicted import is an unreviewed dependency.
+  remediation: Add the relationship (with the right edge kinds) to the CALM model if the dependency is intended, or remove the import.
+  subject:
+    nodeTypes: [service, webclient]
+  declaredOnly:
+    edges: [IMPORTS]
+- id: HOP-OBS-001
+  name: Required package dependencies are observed
+  severity: error
+  owner: team-hoppscotch
+  rationale: Architecture drift - a dependency that the model marks as required but the code no longer shows means the model or the code is wrong.
+  remediation: Restore the dependency in code, or drop the required flag and the relationship from the model.
+  subject:
+    nodeTypes: [service, webclient]
+  observedRequired: {}
+  evidence:
+    minimumCoverage: 0.85
+    coverage:
+      supportedLanguages: 0.4

@@ -1,0 +1,27 @@
+apiVersion: concordia.io/v1alpha1
+kind: DecisionRegister
+decisions:
+- id: ADR-0001
+  path: docs/adr/0001-frozen-migrations.md
+  categories: [data-model]
+  governs:
+  - ref: calm:node:gitea-modelmigration
+  enforcement: required
+  enforcedBy:
+  - rule: GITEA-MIG-001
+    pack: {id: gitea-adopt, version: 1.0.0}
+- id: ADR-0002
+  path: docs/adr/0002-layered-architecture.md
+  categories: [system-boundaries]
+  governs:
+  - ref: calm:node:gitea-cmd
+  - ref: calm:node:gitea-routers
+  - ref: calm:node:gitea-services
+  - ref: calm:node:gitea-models
+  enforcement: required
+- id: ADR-0003
+  path: docs/adr/0003-database-ownership.md
+  categories: [system-boundaries]
+  governs:
+  - ref: calm:node:gitea-db
+  enforcement: none

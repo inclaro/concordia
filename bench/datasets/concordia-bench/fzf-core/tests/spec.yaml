@@ -1,0 +1,85 @@
+repo: fzf
+checks:
+- id: core-pack-used
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs: [builtin:core]
+- id: tags
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - {id: fzf-tui, nodeType: service, tags: [presentation]}
+  - {id: fzf-core, nodeType: service, tags: [application]}
+  - {id: fzf-algo, nodeType: service, tags: [domain]}
+  - {id: fzf-protector, nodeType: service, tags: [infrastructure]}
+  - {id: fzf-util, nodeType: service, tags: [shared, shared-kernel]}
+- id: overrides
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - {path: "policies.packs[0].use", equals: "builtin:core"}
+  - {path: "policies.packs[0].rules.CORE-LYR-003.severity", equals: error}
+  - {path: "policies.packs[0].rules.CORE-LYR-002.evidence.minimumConfidence", equals: heuristic}
+  - {path: "policies.packs[0].rules.CORE-DECL-001.enabled", equals: false}
+  - {path: "policies.packs[0].rules.CORE-SEC-001.enabled", equals: false}
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules:
+    CORE-DB-001: not-applicable
+  select:
+  - {path: summary.rules.unknown, equals: 0}
+  - {path: "rules[ruleId=CORE-DECL-001]", exists: false}
+  - {path: "rules[ruleId=CORE-SEC-001]", exists: false}
+  - {path: "rules[ruleId=CORE-LYR-003]", exists: true}
+- id: shared-leaf-raised-to-error
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [util-imports-core]
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-003
+    severity: error
+    location.path: src/util/bench_core.go
+    disposition: active
+- id: disabled-rule-is-silent
+  type: results
+  dimension: conformance
+  weight: 2
+  mutations: [util-imports-core]
+  expectExit: 1
+  absent:
+  - {ruleId: CORE-DECL-001}
+  - {ruleId: CORE-SEC-001}
+- id: domain-depends-on-presentation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [algo-imports-tui]
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-002
+    location.path: src/algo/bench_tui.go
+    disposition: active
+  - ruleId: CORE-LYR-001
+    location.path: src/algo/bench_tui.go
+    disposition: active
+  - ruleId: CORE-BND-001
+    location.path: src/algo/bench_tui.go
+    disposition: active
+- id: allows-tui-imports-util
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [tui-imports-util]
+  expectExit: 0
+  absent:
+  - location.path: src/tui/bench_util.go
+    disposition: active

@@ -1,0 +1,69 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: nushell-structure
+  version: 1.0.0
+rules:
+- id: NU-BUD-001
+  name: The plugin wire protocol stays free of the engine
+  severity: error
+  owner: team-nushell
+  rationale: Hub-like dependency - the plugin wire protocol is a ratchet that must not grow a dependency on the engine, the plugin engine or the parser.
+  remediation: Move the shared item into nu-protocol, or keep the engine-specific code in nu-plugin-engine.
+  subject:
+    calmNodes: [nu-plugin-protocol]
+  budget:
+    measure: forbidden-edges
+    target:
+      calmNodes: [nu-engine, nu-plugin-engine, nu-parser]
+    edges: [IMPORTS]
+    max: 0
+- id: NU-EDG-001
+  name: Plugin commands build on the protocol crate
+  severity: error
+  owner: team-nushell
+  rationale: Contract erosion - every command crate keeps its dependency on the shared protocol types.
+  remediation: Restore the nu-protocol import in nu-cmd-plugin.
+  subject:
+    calmNodes: [nu-cmd-plugin]
+  require:
+    edge:
+      target:
+        calmNodes: [nu-protocol]
+      edges: [IMPORTS]
+- id: NU-COV-001
+  name: The foundation crate does not depend on the plugin command crate
+  severity: error
+  owner: team-nushell
+  rationale: Modularity - nu-utils is the lowest layer and must stay a leaf; the rule needs high file coverage to be judged.
+  remediation: Remove the import of the higher crate from nu-utils.
+  evidence:
+    minimumCoverage: 0.95
+    coverage:
+      supportedLanguages: 0.95
+    onUnknown: fail
+  subject:
+    calmNodes: [nu-utils]
+  forbid:
+    target:
+      calmNodes: [nu-cmd-plugin]
+    edges: [IMPORTS]
+    traversal: direct
+- id: NU-COV-002
+  name: The config crate does not depend on the plugin command crate
+  severity: error
+  owner: team-nushell
+  rationale: Modularity - nu-config is a leaf below nu-protocol; a coverage shortfall only warns.
+  remediation: Remove the import of the higher crate from nu-config.
+  evidence:
+    minimumCoverage: 0.95
+    coverage:
+      supportedLanguages: 0.95
+    onUnknown: warn
+  subject:
+    calmNodes: [nu-config]
+  forbid:
+    target:
+      calmNodes: [nu-cmd-plugin]
+    edges: [IMPORTS]
+    traversal: direct

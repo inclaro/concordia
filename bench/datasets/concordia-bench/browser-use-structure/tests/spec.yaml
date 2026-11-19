@@ -1,0 +1,81 @@
+repo: browser-use
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 1
+  paths:
+  - concordia.yaml
+  - policies
+  - exceptions
+  branch: main
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: BU-IND-001
+    predicate: independent
+    severity: error
+  - id: BU-FBD-001
+    predicate: [forbid, publicApiOnly]
+    severity: error
+  - id: BU-OWN-001
+    predicate: [ownership, forbid]
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  rules:
+    BU-IND-001: pass
+    BU-FBD-001: pass
+- id: detects-peer-dependency
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - llm-imports-browser
+  expectExit: 1
+  findings:
+  - ruleId: BU-IND-001
+    kind: peer-dependency
+    location.path: browser_use/llm/bench_browser.py
+    disposition: active
+- id: detects-browser-internal
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - repl-imports-browser-internal
+  expectExit: 1
+  findings:
+  - ruleId: BU-FBD-001
+    kind: [forbidden-dependency, non-public-api]
+    location.path: browser_use/repl/bench_local.py
+    disposition: active
+- id: allows-browser-facade
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - repl-imports-browser-facade
+  absent:
+  - ruleId: BU-FBD-001
+    location.path: browser_use/repl/bench_facade.py
+- id: detects-credentials-ownership
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - telemetry-reads-credentials
+  expectExit: 1
+  findings:
+  - ruleId: BU-OWN-001
+    kind: [ownership-violation, forbidden-dependency]
+    location.path: browser_use/telemetry/bench_auth.py
+    disposition: active

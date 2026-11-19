@@ -1,0 +1,105 @@
+repo: argo-cd
+checks:
+- id: deprecated-independence-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/deprecate-independence-decision
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-002, kind: adr-inactive, disposition: active, subject: ADR-2}
+  - {ruleId: GOV-ADR-003, kind: adr-rule-unjustified, disposition: active, subject: ARGO-IND-001}
+- id: deprecated-independence-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/deprecate-independence-decision
+  expectVerdict: fail
+  expectViolations:
+  - {ruleId: GOV-ADR-002, path: docs/adr/0002-independent-components.md}
+  - {ruleId: GOV-ADR-003, path: docs/adr/decisions.yaml}
+  expectErrors: []
+- id: superseded-grpc-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/supersede-grpc-decision
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-005, kind: adr-contradictory-status, disposition: active}
+- id: superseded-grpc-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/supersede-grpc-decision
+  expectVerdict: fail
+  expectViolations:
+  - {ruleId: GOV-ADR-002, path: docs/adr/0001-grpc-client-packages.md}
+  - {ruleId: GOV-ADR-003, path: docs/adr/decisions.yaml}
+  - {ruleId: GOV-ADR-004, path: docs/adr/0001-grpc-client-packages.md}
+  - {ruleId: GOV-ADR-005, path: docs/adr/0001-grpc-client-packages.md}
+  expectErrors: []
+- id: unlinked-grpc-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/drop-grpc-decision-enforcement
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-004, kind: adr-enforcement-gap, disposition: active, subject: ADR-1}
+- id: unlinked-grpc-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/drop-grpc-decision-enforcement
+  expectVerdict: fail
+  expectViolations:
+  - {ruleId: GOV-ADR-004, path: docs/adr/0001-grpc-client-packages.md}
+  expectErrors: []
+- id: supersession-cycle-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/decisions-supersede-each-other
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-005, kind: adr-cycle, disposition: active}
+- id: supersession-cycle-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/decisions-supersede-each-other
+  expectVerdict: fail
+  expectViolations:
+  - {ruleId: GOV-ADR-002, path: docs/adr/0001-grpc-client-packages.md}
+  - {ruleId: GOV-ADR-002, path: docs/adr/0002-independent-components.md}
+  - {ruleId: GOV-ADR-003, path: docs/adr/decisions.yaml}
+  - {ruleId: GOV-ADR-004, path: docs/adr/0001-grpc-client-packages.md}
+  - {ruleId: GOV-ADR-004, path: docs/adr/0002-independent-components.md}
+  - {ruleId: GOV-ADR-005, path: docs/adr/0001-grpc-client-packages.md}
+  expectErrors: []
+- id: client-package-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/server-uses-repo-server-client
+  expectExit: 0
+  absent:
+  - {location.path: server/bench_ok.go, disposition: active}
+- id: client-package-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/server-uses-repo-server-client
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

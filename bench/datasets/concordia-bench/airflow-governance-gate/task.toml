@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/airflow-governance-gate"
+version = "1.0.0"
+description = "Review pull requests that change the architecture decisions, using Concordia."
+keywords = ["concordia", "calm", "python", "airflow", "governance", "gate"]
+
+[metadata]
+difficulty = "hard"
+category = "gate"
+tags = ["airflow", "python", "governance", "gate"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 12288
+storage_mb = 20480
+build_timeout_sec = 600.0

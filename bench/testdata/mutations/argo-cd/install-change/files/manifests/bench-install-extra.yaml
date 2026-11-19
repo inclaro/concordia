@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-bench-extra
+data:
+  bench: "1"

@@ -1,0 +1,34 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: volcano-assurance
+  version: 1.0.0
+rules:
+- id: VC-AUTH-001
+  name: Admission can read the scheduler configuration
+  severity: error
+  owner: team-volcano
+  rationale: Reliability - the admission webhooks validate jobs against the scheduler configuration, so their service account must be granted access to it.
+  remediation: Grant the admission cluster role read access to configmaps.
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [vc-admission]
+      to:
+        calmNodes: [vc-scheduler-config]
+      expect: granted
+- id: VC-AUTH-002
+  name: The scheduler has no API access to its configuration
+  severity: error
+  owner: team-volcano
+  rationale: Least privilege - the scheduler reads its configuration from a mounted file, so its service account needs no API access to configmaps.
+  remediation: Remove the configmap permission from the scheduler role.
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [vc-scheduler]
+      to:
+        calmNodes: [vc-scheduler-config]
+      expect: not-granted

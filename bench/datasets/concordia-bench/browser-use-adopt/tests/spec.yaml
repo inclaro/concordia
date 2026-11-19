@@ -1,0 +1,153 @@
+repo: browser-use
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: bu-cli
+    nodeType: service
+  - id: bu-mcp
+    nodeType: service
+  - id: bu-agent
+    nodeType: service
+  - id: bu-tools
+    nodeType: service
+  - id: bu-repl
+    nodeType: service
+  - id: bu-skills
+    nodeType: service
+  - id: bu-browser
+    nodeType: service
+  - id: bu-llm
+    nodeType: service
+  - id: bu-telemetry
+    nodeType: service
+  - id: bu-credentials
+    nodeType: service
+  - id: bu-shared
+    nodeType: service
+    tags:
+    - shared
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - bu-agent
+    - bu-browser
+  - - bu-agent
+    - bu-llm
+  - - bu-agent
+    - bu-tools
+  - - bu-agent
+    - bu-repl
+  - - bu-agent
+    - bu-telemetry
+  - - bu-agent
+    - bu-credentials
+  - - bu-agent
+    - bu-shared
+  - - bu-llm
+    - bu-credentials
+  - - bu-llm
+    - bu-shared
+  - - bu-tools
+    - bu-shared
+  - - bu-credentials
+    - bu-shared
+  - - bu-cli
+    - bu-credentials
+  - - bu-cli
+    - bu-shared
+  - - bu-cli
+    - bu-telemetry
+  - - bu-skills
+    - bu-shared
+  - - bu-repl
+    - bu-shared
+  - - bu-browser
+    - bu-shared
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - bu-cli
+  - bu-mcp
+  - bu-agent
+  - bu-tools
+  - bu-repl
+  - bu-skills
+  - bu-browser
+  - bu-llm
+  - bu-telemetry
+  - bu-credentials
+  - bu-shared
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: BU-DEC-001
+    predicate: declaredOnly
+    severity: error
+  - id: BU-ALW-001
+    predicate: [allowOnly, forbid]
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  - path: summary.rules.notApplicable
+    equals: 0
+- id: detects-agent-imports-skills
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - agent-imports-skills
+  expectExit: 1
+  findings:
+  - ruleId: BU-ALW-001
+    kind: [disallowed-dependency, forbidden-dependency]
+    location.path: browser_use/agent/bench_skills.py
+    disposition: active
+  - ruleId: BU-DEC-001
+    kind: undeclared
+    location.path: browser_use/agent/bench_skills.py
+    disposition: active
+- id: allows-agent-imports-tools
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - agent-imports-tools
+  expectExit: 0
+  absent:
+  - location.path: browser_use/agent/bench_ok.py
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

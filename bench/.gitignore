@@ -1,0 +1,8 @@
+.venv/
+jobs/
+.build/
+__pycache__/
+.pytest_cache/
+.env
+# Reference check results that tasks commit (the root .gitignore ignores build/).
+!/datasets/concordia-bench/*/solution/workspace/build/

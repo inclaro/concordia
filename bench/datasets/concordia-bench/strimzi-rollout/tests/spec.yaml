@@ -1,0 +1,98 @@
+repo: strimzi
+checks:
+- id: enforcement-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: check.enforcement
+    contains: {family: deployment-security, environment: install, mode: shadow}
+  - path: check.enforcement
+    contains: {family: deployment-security, mode: advisory}
+  - path: check.enforcement
+    contains: {family: deployment-placement, mode: advisory}
+  - path: check.enforcement
+    contains: {family: deployment-trace, mode: advisory}
+  - path: check.rollback.authorizedBy
+    equals: platform-lead@bench.invalid
+  - path: check.rollback.reason
+    equals: roll out the Strimzi deployment obligations gradually
+  - path: check.rollback.expires
+    oneOf: ["2099-12-31"]
+- id: rollback-head
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  findings:
+  - ruleId: STZ-SEC-003
+    subject: stz-cluster-operator
+    environment: install
+    result: unknown
+    enforcement: shadow
+  - ruleId: INFRA-PLC-001
+    subject: stz-cluster-operator
+    environment: install
+    result: unknown
+    enforcement: shadow
+  - ruleId: INFRA-TRC-004
+    subject: stz-cluster-operator
+    environment: install-hydrated
+    result: unknown
+    enforcement: shadow
+  absent:
+  - enforcement: advisory
+  select:
+  - path: summary.rollback.authorizedBy
+    equals: platform-lead@bench.invalid
+  - path: summary.rollback.expires
+    equals: "2099-12-31"
+- id: config-map-unmounted
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [co-config-removed]
+  expectExit: 0
+  findings:
+  - ruleId: STZ-SEC-001
+    subject: stz-cluster-operator
+    environment: install-hydrated
+    result: violation
+    enforcement: shadow
+  absent:
+  - ruleId: STZ-SEC-001
+    enforcement: mandatory
+- id: rollout-report
+  type: command
+  dimension: reporting
+  weight: 2
+  argv:
+  - bash
+  - -c
+  - concordia index >/dev/null && concordia check --rollout-report
+  expectExit: 0
+  stderrContains:
+  - rollout report (build/concordia/rollout-report.json)
+  - "deployment-security / install: shadow"
+  files:
+  - path: build/concordia/rollout-report.json
+    json:
+    - path: failOn
+      equals: error
+    - path: rollback.authorizedBy
+      equals: platform-lead@bench.invalid
+    - path: rollback.expires
+      equals: "2099-12-31"
+    - path: families
+      countWhere: {family: deployment-security, environment: install, enforcement: shadow}
+      equals: 1
+    - path: families
+      countWhere: {family: deployment-security, environment: install-hydrated, enforcement: shadow}
+      equals: 1
+    - path: families
+      countWhere: {family: deployment-placement, environment: install, enforcement: shadow}
+      equals: 1
+    - path: families
+      countWhere: {family: deployment-trace, environment: install-hydrated, enforcement: shadow}
+      equals: 1

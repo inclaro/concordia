@@ -1,0 +1,88 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-assurance, version: 1.0.0}
+rules:
+- id: ARGO-NET-001
+  name: The identity provider has no network path to Redis
+  severity: error
+  owner: team-argo-cd
+  rationale: Zero-trust networking - a compromised identity provider must not reach the cache.
+  remediation: Adjust the NetworkPolicy of the destination workload.
+  require:
+    effectiveAccess:
+      dimension: network
+      from:
+        calmNodes: [argo-dex]
+      to:
+        calmNodes: [argo-redis]
+      expect: denied
+      ports: [6379]
+- id: ARGO-NET-002
+  name: The API server reaches the repo server on its gRPC port
+  severity: error
+  owner: team-argo-cd
+  rationale: Availability - the API server cannot render applications without the repo server.
+  remediation: Adjust the NetworkPolicy of the destination workload.
+  require:
+    effectiveAccess:
+      dimension: network
+      from:
+        calmNodes: [argo-server]
+      to:
+        calmNodes: [argo-repo-server]
+      expect: allowed
+      ports: [8081]
+- id: ARGO-NET-003
+  name: The notifications controller has no network path to Redis
+  severity: error
+  owner: team-argo-cd
+  rationale: Zero-trust networking - the notifications controller has no use for the cache.
+  remediation: Adjust the NetworkPolicy of the destination workload.
+  require:
+    effectiveAccess:
+      dimension: network
+      from:
+        calmNodes: [argo-notifications]
+      to:
+        calmNodes: [argo-redis]
+      expect: denied
+      ports: [6379]
+- id: ARGO-AUTH-001
+  name: The API server can read the Argo CD settings secret
+  severity: error
+  owner: team-argo-cd
+  rationale: Availability - the API server needs the settings secret to authenticate users.
+  remediation: Adjust the roles that are bound to the service account.
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [argo-server]
+      to:
+        calmNodes: [argo-secret]
+      expect: granted
+- id: ARGO-AUTH-002
+  name: The identity provider cannot read the Argo CD settings secret
+  severity: error
+  owner: team-argo-cd
+  rationale: 'Least privilege - secret sprawl: the identity provider holds no right on the settings secret.'
+  remediation: Adjust the roles that are bound to the service account.
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [argo-dex]
+      to:
+        calmNodes: [argo-secret]
+      expect: not-granted
+- id: ARGO-CLM-001
+  name: Every container image version in the non-HA install is resolved
+  severity: warning
+  family: assurance
+  owner: team-argo-cd
+  rationale: Supply-chain integrity - the rendered install must expose a complete, resolved version for every container.
+  remediation: Fix the overlay so that it renders completely with a version on every container image.
+  require:
+    claim:
+      id: container-occurrence-versions
+      environment: non-ha

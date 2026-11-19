@@ -1,0 +1,1 @@
+bench: pin a Helm renderer digest that does not match

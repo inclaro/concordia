@@ -1,0 +1,7 @@
+services:
+  backend:
+    image: ghcr.io/hoppscotch/bench-backend:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend

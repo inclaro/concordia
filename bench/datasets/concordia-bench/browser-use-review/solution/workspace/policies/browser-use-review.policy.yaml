@@ -1,0 +1,13 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: browser-use-review
+  version: 1.0.0
+rules:
+- id: BU-ASM-001
+  name: The LLM egress assessment has a current verified approval
+  severity: error
+  owner: team-browser-use
+  rationale: Security - a change to what the LLM adapters send out must be re-reviewed before the approval counts as current.
+  remediation: Re-examine the assessment subject of ASM-LLM-EGRESS and have the security reviewer approve the new version.
+  assessmentCurrency: approval

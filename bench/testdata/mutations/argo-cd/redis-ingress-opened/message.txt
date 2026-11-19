@@ -1,0 +1,1 @@
+bench: an engineer opens the Redis network policy to every client

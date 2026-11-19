@@ -1,0 +1,108 @@
+repo: gitea
+checks:
+- id: core-pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs:
+  - builtin:core
+- id: tags
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: gitea-routers
+    nodeType: service
+    tags:
+    - presentation
+  - id: gitea-services
+    nodeType: service
+    tags:
+    - application
+  - id: gitea-models
+    nodeType: service
+    tags:
+    - domain
+  - id: gitea-modelmigration
+    nodeType: service
+    tags:
+    - infrastructure
+  - id: gitea-modules
+    nodeType: service
+    tags:
+    - shared
+    - migration-safe
+  - id: gitea-setting
+    nodeType: service
+    tags:
+    - shared
+    - migration-safe
+- id: overrides
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - path: policies.packs[0].rules.CORE-LYR-003.severity
+    equals: error
+  - path: policies.packs[0].rules.CORE-SEC-001.enabled
+    equals: false
+  - path: policies.packs[0].rules.CORE-DECL-001.evidence.minimumConfidence
+    equals: syntactic
+  - path: policies.packs[0].rules.CORE-OBS-001.evidence.onUnknown
+    equals: warn
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 1
+- id: rule-set
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules:
+    CORE-DB-001: pass
+    CORE-OBS-001: unknown
+  select:
+  - path: rules[ruleId=CORE-SEC-001]
+    exists: false
+- id: detects-layer-inversion
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - services-import-routers
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-001
+    location.path: services/benchlyr/bench.go
+    kind: layer-violation
+    disposition: active
+- id: detects-domain-to-presentation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - models-call-routers
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-002
+    location.path: models/user/bench_domain.go
+    kind: forbidden-dependency
+    disposition: active
+- id: override-raises-shared-leaf-to-error
+  type: results
+  dimension: conformance
+  weight: 2
+  mutations:
+  - modules-use-models
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-003
+    location.path: modules/benchshared/bench.go
+    severity: error
+    disposition: active

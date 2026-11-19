@@ -1,0 +1,1 @@
+bench: a new install manifest without a decision

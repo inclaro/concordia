@@ -1,0 +1,49 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: browser-use
+architecture:
+  source: architecture/browser-use.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: browser-use
+    root: .
+    include: [browser_use/**/*.py]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/browser-use-adopt.policy.yaml, policies/browser-use-review.policy.yaml]
+  packs:
+  - use: builtin:review-currency
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+environments:
+- id: library
+  sources: [pyproject.toml]
+trust:
+  classifications: [public, internal, secret]
+assessments:
+  paths: [assessments]
+  trustAnchor:
+    ref: main
+  authorities:
+  - id: security-review
+    role: reviewer
+    mechanism: protected-review
+    reviewers: [secops@bench.invalid, attacker@bench.invalid]
+    paths: [assessments/approvals/**, assessments/revocations/**]
+  required:
+  - id: llm-egress
+    assessment: ASM-LLM-EGRESS
+    type: security
+    scope:
+      calmNodes: [bu-llm]
+    environment: library
+    authority: security-review
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

@@ -1,0 +1,73 @@
+repo: gitea
+checks:
+- id: review-report
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-MIG-001
+    path: modelmigration/base/bench_user.go
+  - ruleId: GITEA-LYR-001
+    path: models/user/bench_layer.go
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 1
+  paths:
+  - exceptions
+  branch: feature/bench-change
+- id: waived-migration
+  type: waived
+  dimension: conformance
+  weight: 3
+  ruleId: GITEA-MIG-001
+  path: modelmigration/base/bench_user.go
+  owner: team-gitea
+  issue: GITEA-BENCH-1
+  expires: '2099-12-31'
+  branch: feature/bench-change
+  args:
+  - --changed
+  - main
+  expectExit: 1
+- id: dispositions-on-branch
+  type: results
+  dimension: detection
+  weight: 3
+  branch: feature/bench-change
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-LYR-001
+    location.path: models/user/bench_layer.go
+    disposition: active
+  - ruleId: GITEA-MIG-001
+    location.path: modelmigration/base/bench_user.go
+    disposition: waived
+  absent:
+  - location.path: modelmigration/base/bench_log.go
+    disposition: active
+  - ruleId: GITEA-MIG-001
+    disposition: active
+- id: waiver-orphaned
+  type: results
+  dimension: governance
+  weight: 2
+  branch: feature/bench-change
+  mutations:
+  - migration-file-removed
+  args:
+  - --changed
+  - main
+  select:
+  - path: exceptions.orphanedWaivers
+    contains: WV-1
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

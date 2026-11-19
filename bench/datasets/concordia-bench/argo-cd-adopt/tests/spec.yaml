@@ -1,0 +1,105 @@
+repo: argo-cd
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths: [concordia.yaml, architecture, bindings, policies, exceptions]
+  branch: main
+- {id: model-valid, type: model_valid, dimension: workspace, weight: 2}
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - {id: argo-server, nodeType: service}
+  - {id: argo-repo-server, nodeType: service}
+  - {id: argo-app-controller, nodeType: service}
+  - {id: argo-appset-controller, nodeType: service}
+  - {id: argo-notifications, nodeType: service}
+  - {id: argo-cmp-server, nodeType: service}
+  - {id: argo-commit-server, nodeType: service}
+  - id: argo-apis
+    nodeType: service
+    tags: [contract]
+  - id: argo-db
+    nodeType: service
+    tags: [restricted]
+  - id: argo-util
+    nodeType: service
+    tags: [shared]
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - [argo-server, argo-repo-server]
+  - [argo-server, argo-apis]
+  - [argo-server, argo-db]
+  - [argo-server, argo-util]
+  - [argo-app-controller, argo-repo-server]
+  - [argo-app-controller, argo-commit-server]
+  - [argo-app-controller, argo-apis]
+  - [argo-app-controller, argo-db]
+  - [argo-app-controller, argo-util]
+  - [argo-appset-controller, argo-repo-server]
+  - [argo-appset-controller, argo-apis]
+  - [argo-appset-controller, argo-db]
+  - [argo-appset-controller, argo-util]
+  - [argo-notifications, argo-apis]
+  - [argo-notifications, argo-util]
+  - [argo-repo-server, argo-apis]
+  - [argo-repo-server, argo-util]
+  - [argo-cmp-server, argo-apis]
+  - [argo-cmp-server, argo-util]
+  - [argo-commit-server, argo-apis]
+  - [argo-commit-server, argo-util]
+  - [argo-db, argo-apis]
+  - [argo-db, argo-util]
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids: [argo-server, argo-repo-server, argo-app-controller, argo-appset-controller, argo-notifications, argo-cmp-server, argo-commit-server, argo-apis, argo-db, argo-util]
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - {id: ARGO-API-001, predicate: [publicApiOnly, forbid], severity: error}
+  - {id: ARGO-IND-001, predicate: independent, severity: error}
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  absent:
+  - {ruleId: ARGO-API-001, kind: [non-public-api, forbidden-dependency], disposition: active}
+  - {ruleId: ARGO-IND-001, kind: peer-dependency, disposition: active}
+  select:
+  - {path: summary.rules.unknown, equals: 0}
+- id: detects-server-imports-reposerver-internal
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [server-imports-reposerver-internal]
+  expectExit: 1
+  findings:
+  - {ruleId: ARGO-API-001, kind: [non-public-api, forbidden-dependency], location.path: server/bench_repo.go, disposition: active}
+- id: detects-controller-imports-server
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [controller-imports-server]
+  expectExit: 1
+  findings:
+  - {ruleId: ARGO-IND-001, kind: peer-dependency, location.path: controller/bench_server.go, disposition: active}
+- id: allows-server-imports-reposerver-client
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [server-imports-reposerver-client]
+  expectExit: 0
+  absent:
+  - {location.path: server/bench_ok.go, disposition: active}
+- {id: deterministic, type: deterministic, dimension: determinism, weight: 1}

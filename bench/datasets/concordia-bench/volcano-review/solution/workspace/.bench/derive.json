@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/dev/volcano-admission-extra.yaml",
+    "from": "installer/helm/chart/volcano/templates/hypernode_controller.yaml",
+    "base_sha256": "4e69f9c5072e7bf957f2d825893902cba2264478021a4d00adfc1f98b5201cb0",
+    "edit": "edits/bench-env/dev/volcano-admission-extra.yaml.ed",
+    "sha256": "e2c34ce273c2bad2ed1b3314647084c0472c107952f0e3a30517fd5b3a809478"
+  }
+]

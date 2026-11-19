@@ -1,0 +1,25 @@
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-LLM-EGRESS
+version: 1
+type: security
+title: LLM adapter egress
+scope:
+  calmNodes: [bu-llm]
+environment: library
+subject:
+  summary: How the LLM adapters are bound to code and which trust zone and data classification they carry
+  dependencies:
+  - kind: binding
+    selector:
+      calmNodes: [bu-llm]
+  - kind: trust-context
+    selector:
+      calmNodes: [bu-llm]
+  - kind: data-classification
+    selector:
+      calmNodes: [bu-llm]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

@@ -1,0 +1,106 @@
+repo: fzf
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: FZF-DNY-001
+    predicate: denyPath
+    severity: error
+  - id: FZF-API-001
+    predicate: [publicApiOnly, forbid]
+    severity: error
+  - id: FZF-ENT-001
+    predicate: require.entity
+    severity: error
+  - id: FZF-AGG-001
+    predicate: forbid
+    severity: error
+  - id: FZF-WRN-001
+    predicate: forbid
+    severity: warning
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-deny-path
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [algo-imports-core]
+  expectExit: 1
+  findings:
+  - ruleId: FZF-DNY-001
+    kind: forbidden-path
+    location.path: src/algo/bench_core.go
+    disposition: active
+- id: detects-non-public-api
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [tui-calls-util-internal]
+  expectExit: 1
+  findings:
+  - ruleId: FZF-API-001
+    kind: [non-public-api, forbidden-dependency]
+    location.path: src/tui/bench_internal.go
+    disposition: active
+- id: detects-missing-entity
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [protector-removed]
+  expectExit: 1
+  findings:
+  - ruleId: FZF-ENT-001
+    kind: missing-entity
+    disposition: active
+- id: aggregates-by-file
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [tui-uses-algo-twice]
+  expectExit: 1
+  findings:
+  - ruleId: FZF-AGG-001
+    location.path: src/tui/bench_algo.go
+    disposition: active
+  counts:
+  - match: {ruleId: FZF-AGG-001, location.path: src/tui/bench_algo.go}
+    equals: 1
+- id: warning-does-not-fail
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [protector-imports-util]
+  expectExit: 0
+  findings:
+  - ruleId: FZF-WRN-001
+    severity: warning
+    location.path: src/protector/bench_util.go
+    disposition: active
+- id: warning-fails-with-fail-on
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [protector-imports-util]
+  args: [--fail-on, warning]
+  expectExit: 1
+  findings:
+  - ruleId: FZF-WRN-001
+    location.path: src/protector/bench_util.go
+    disposition: active
+- id: allows-tui-imports-util
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [tui-imports-util]
+  expectExit: 0
+  absent:
+  - location.path: src/tui/bench_util.go
+    disposition: active

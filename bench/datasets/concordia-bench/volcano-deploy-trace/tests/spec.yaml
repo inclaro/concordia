@@ -1,0 +1,176 @@
+repo: volcano
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=dev].sources
+    contains: installer/volcano-development.yaml
+  - path: environments[id=dev].sources
+    contains: installer/volcano-agent-development.yaml
+  - path: environments[id=dev].sources
+    contains: bench-env/dev/**
+  - path: environments[id=monitoring].sources
+    contains: installer/volcano-monitoring.yaml
+  - path: policies.packs
+    contains:
+      use: builtin:infrastructure
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: vc-scheduler
+    nodeType: service
+    tags: [deployable]
+  - id: vc-controllers
+    nodeType: service
+    tags: [deployable]
+  - id: vc-admission
+    nodeType: service
+    tags: [deployable]
+  - id: vc-agent
+    nodeType: service
+    tags: [deployable]
+  - id: vc-system-ns
+    nodeType: system
+  - id: vc-monitoring-ns
+    nodeType: system
+  - id: vc-monitoring
+    nodeType: service
+    tags: [deployable]
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - vc-scheduler
+  - vc-controllers
+  - vc-admission
+  - vc-agent
+  - vc-monitoring
+  - vc-system-ns
+  - vc-monitoring-ns
+- id: head-trace
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  findings:
+  - ruleId: INFRA-PLC-001
+    kind: obligation-absent
+    result: violation
+    environment: dev
+    subject: vc-monitoring
+    disposition: active
+  - ruleId: INFRA-TRC-001
+    kind: obligation-absent
+    result: violation
+    environment: dev
+    subject: vc-monitoring
+    disposition: active
+  - ruleId: INFRA-TRC-003
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: dev
+    subject: vc-scheduler
+    observed: "unknown (coverage-incomplete): built-from is partial in dev (build-link-needs-build-command)"
+    disposition: active
+  - ruleId: INFRA-PLC-001
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: monitoring
+    subject: vc-controllers
+    observed: "unknown (coverage-incomplete): placed-in is partial in monitoring (unrendered-template)"
+    disposition: active
+  absent:
+  - ruleId: [INFRA-PLC-001, INFRA-PLC-002, INFRA-TRC-001, INFRA-TRC-002, INFRA-TRC-004]
+    environment: dev
+    subject: [vc-scheduler, vc-controllers, vc-admission]
+    reason: evidence-conflict
+  - ruleId: [INFRA-PLC-001, INFRA-TRC-001]
+    environment: monitoring
+    result: pass
+  rules:
+    INFRA-PLC-001: violation
+    INFRA-TRC-001: violation
+    INFRA-TRC-003: unknown
+- id: trace-monitoring
+  type: command
+  dimension: reporting
+  weight: 2
+  argv: [concordia, trace, vc-monitoring, --format, json]
+  expectExit: 0
+  stdoutJson:
+  - path: traces[environment=monitoring].status
+    equals: partial
+  - path: traces[environment=monitoring].gaps[reason=mutable-tag].step
+    equals: container-image
+  - path: traces[environment=monitoring].gaps[step=build-definition].lossModes
+    contains: build-link-needs-build-command
+  - path: traces[environment=dev].gaps[step=workload].reason
+    equals: absent
+- id: trace-scheduler
+  type: command
+  dimension: reporting
+  weight: 2
+  argv: [concordia, trace, vc-scheduler, --format, json]
+  expectExit: 0
+  stdoutJson:
+  - path: traces[environment=dev].steps
+    length: 5
+  - path: traces[environment=dev].gaps[reason=mutable-tag].step
+    equals: container-image
+  - path: traces[environment=monitoring].gaps[step=workload].lossModes
+    contains: unrendered-template
+- id: detects-scheduler-declared-twice
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - scheduler-declared-twice
+  expectExit: 0
+  diagnostics: [CO-OBS-021]
+  findings:
+  - ruleId: INFRA-PLC-001
+    kind: obligation-unknown
+    result: unknown
+    reason: evidence-conflict
+    environment: dev
+    subject: vc-scheduler
+    disposition: active
+- id: detects-scheduler-in-monitoring-namespace
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - scheduler-in-monitoring-namespace
+  expectExit: 0
+  findings:
+  - ruleId: INFRA-PLC-002
+    kind: obligation-violation
+    result: violation
+    environment: dev
+    subject: vc-scheduler
+    disposition: active
+  - ruleId: INFRA-PLC-001
+    kind: obligation-absent
+    result: violation
+    environment: dev
+    subject: vc-scheduler
+    disposition: active

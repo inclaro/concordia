@@ -1,0 +1,1 @@
+bench: add a plain dag-processor manifest to the chart templates

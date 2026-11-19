@@ -1,0 +1,61 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: fzf
+architecture:
+  source: architecture/fzf.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: full
+  projects:
+  - name: fzf
+    root: .
+    include: [main.go, src/**, docs/architecture/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error
+views:
+- id: fzf-container
+  kind: container
+  origin: generated
+  owner: team-fzf
+  scope: [fzf]
+  abstraction: container
+  output:
+    path: docs/architecture/fzf-container.dsl
+    exports:
+    - format: mermaid
+      path: docs/architecture/fzf-container.mmd
+    - format: json
+      path: docs/architecture/fzf-container.json
+  comparison:
+    against: [declared]
+- id: fzf-components
+  kind: container
+  origin: authored
+  owner: team-fzf
+  scope: [fzf]
+  abstraction: container
+  source:
+    path: docs/architecture/components.md
+    format: mermaid
+    selector:
+      title: fzf components
+  comparison:
+    against: [declared]
+  mapping:
+    elements:
+      cli: fzf-cli
+      core: fzf-core
+      tui: fzf-tui
+      algo: fzf-algo
+      protector: fzf-protector
+      util: fzf-util

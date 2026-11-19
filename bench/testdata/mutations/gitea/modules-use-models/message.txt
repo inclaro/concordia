@@ -1,0 +1,1 @@
+bench: shared module uses a model

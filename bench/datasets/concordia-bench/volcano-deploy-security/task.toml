@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/volcano-deploy-security"
+version = "1.0.0"
+description = "Add typed security and supply-chain obligations to the Volcano deployment model."
+keywords = ["concordia", "calm", "architecture", "go", "volcano", "deploy-security"]
+
+[metadata]
+difficulty = "medium"
+category = "deploy-security"
+tags = ["volcano", "go", "deploy-security"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

@@ -1,0 +1,44 @@
+repo: argo-cd
+checks:
+- id: enforcement
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: 'check.enforcement[environment=ha].mode', equals: shadow}
+  - {path: 'check.enforcement[environment=ha].family', equals: deployment-security}
+  - {path: 'check.enforcement[family=deployment-security].mode', equals: shadow}
+  - {path: 'check.enforcement[mode=advisory].family', exists: true}
+  - {path: check.rollback, exists: false}
+- id: enforcement-per-environment
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-SEC-002, environment: ha, result: unknown, enforcement: shadow}
+  - {ruleId: ARGO-SEC-002, environment: non-ha, result: unknown, enforcement: advisory}
+  - {ruleId: INFRA-PLC-001, environment: ha, result: unknown, enforcement: advisory}
+  absent:
+  - {ruleId: ARGO-SEC-002, environment: ha, enforcement: advisory}
+- id: violation-stays-advisory
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [dex-reads-redis-secret]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-SEC-001, environment: non-ha-hydrated, subject: argo-dex, result: violation, enforcement: advisory}
+- id: rollout-report
+  type: command
+  dimension: reporting
+  weight: 2
+  argv: [bash, -c, concordia index >/dev/null 2>&1; concordia check --no-color --rollout-report >/dev/null 2>&1; true]
+  expectExit: 0
+  files:
+  - path: build/concordia/rollout-report.json
+    json:
+    - {path: 'families[family=deployment-security].enforcement', equals: shadow}
+    - {path: families, length: 10}

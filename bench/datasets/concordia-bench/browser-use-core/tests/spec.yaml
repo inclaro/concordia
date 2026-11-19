@@ -1,0 +1,178 @@
+repo: browser-use
+checks:
+- id: packs
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules: []
+  packs:
+  - builtin:core
+- id: tags
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: bu-cli
+    tags:
+    - presentation
+    nodeType: service
+  - id: bu-mcp
+    tags:
+    - presentation
+    nodeType: service
+  - id: bu-agent
+    tags:
+    - application
+    nodeType: service
+  - id: bu-tools
+    tags:
+    - domain
+    nodeType: service
+  - id: bu-browser
+    tags:
+    - infrastructure
+    nodeType: service
+  - id: bu-llm
+    tags:
+    - infrastructure
+    nodeType: service
+  - id: bu-telemetry
+    tags:
+    - infrastructure
+    - external
+    nodeType: service
+  - id: bu-credentials
+    tags:
+    - restricted
+    nodeType: service
+  - id: bu-shared
+    tags:
+    - shared
+    nodeType: service
+- id: overrides
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - path: policies.packs[0].use
+    equals: builtin:core
+  - path: policies.packs[0].rules.CORE-DECL-001.severity
+    equals: warning
+  - path: policies.packs[0].rules.CORE-LYR-001.owner
+    equals: team-agent-platform
+  - path: trust.classifications
+    contains: secret
+  - path: policies.packs[0].rules.CORE-DECL-001.evidence.onUnknown
+    equals: warn
+  - path: policies.packs[0].rules.CORE-SEC-001.evidence.onUnknown
+    equals: warn
+- id: trust-crossings
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 1
+  - path: trust.crossings
+    countWhere:
+      flow: bu-agent-uses-bu-telemetry
+      dimension: zone
+      state: crossing
+      classification: internal
+    equals: 1
+  - path: trust.crossings
+    countWhere:
+      flow: bu-agent-uses-bu-credentials
+      dimension: zone
+      state: same
+      classification: secret
+    equals: 1
+  rules:
+    CORE-DECL-001: violation
+    CORE-SEC-001: unknown
+  findings:
+  - ruleId: CORE-DECL-001
+    kind: binding-gap
+  - ruleId: CORE-SEC-001
+    kind: binding-gap
+- id: sec-001
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - telemetry-reads-credentials
+  expectExit: 1
+  findings:
+  - ruleId: CORE-SEC-001
+    location.path: browser_use/telemetry/bench_auth.py
+    kind: forbidden-dependency
+    disposition: active
+- id: lyr-001
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - tools-imports-agent
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-001
+    location.path: browser_use/search.py
+    kind: layer-violation
+    disposition: active
+    owner: team-agent-platform
+- id: lyr-002
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - tools-imports-browser
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-002
+    location.path: browser_use/search.py
+    kind: forbidden-dependency
+    disposition: active
+- id: lyr-003-cyc-001
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - shared-imports-agent
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-003
+    location.path: browser_use/bench_shared.py
+    kind: forbidden-dependency
+    disposition: active
+    severity: warning
+- id: cyc-001
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - browser-imports-agent
+  expectExit: 1
+  findings:
+  - ruleId: CORE-CYC-001
+    kind: cycle
+    disposition: active
+- id: decl-001-warning
+  type: results
+  dimension: conformance
+  weight: 2
+  mutations:
+  - agent-imports-skills
+  expectExit: 1
+  findings:
+  - ruleId: CORE-DECL-001
+    location.path: browser_use/agent/bench_skills.py
+    kind: undeclared
+    disposition: active
+    severity: warning
+  - ruleId: BU-DEC-001
+    location.path: browser_use/agent/bench_skills.py
+    kind: undeclared
+    disposition: active
+    severity: error

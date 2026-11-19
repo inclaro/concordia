@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/dev-hydrated/bench-controllers-canary.yaml",
+    "from": "installer/volcano-development.yaml",
+    "base_sha256": "9aa62e15541f5e955d73353da9321ab233a2cbe0f8fbac4b4a4d38ba497303ee",
+    "edit": "edits/bench-env/dev-hydrated/bench-controllers-canary.yaml.ed",
+    "sha256": "45e7fb8cee277a59c3c2312cc435011f210e8ba0c59d3ce91e06b741b926ee15"
+  }
+]

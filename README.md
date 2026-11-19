@@ -79,6 +79,7 @@ Development uses [mise](https://mise.jdx.dev/). Run `mise trust mise.toml` and `
 | `mise run test-e2e` | Run the end-to-end tests with the pinned `codebase-memory-mcp` from `.bin/` |
 | `mise run record-cbm` | Record the CBM calls of the commerce and infra fixtures again (uses the pinned `codebase-memory-mcp`) |
 | `mise run docs-verify` | Verify the tutorials with `showboat` (uses the pinned `codebase-memory-mcp`; needs `showboat`) |
+| `mise run bench:smoke [--repo <id>]` | Run the reference solutions of the [concordia-bench](bench/README.md) tasks on ten real repositories (needs Docker; Linux and macOS) |
 | `mise run ci` | Run all ordinary CI checks without release secrets |
 | `mise run release:check` | Validate GoReleaser configuration |
 | `mise run snapshot` | Build unpublished release artifacts locally |

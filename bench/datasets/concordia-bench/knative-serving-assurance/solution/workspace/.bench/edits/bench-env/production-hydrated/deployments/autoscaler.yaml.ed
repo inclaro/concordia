@@ -1,0 +1,3 @@
+57c
+        image: gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler:v1.24.0
+.

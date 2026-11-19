@@ -1,0 +1,102 @@
+repo: strimzi
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: STZ-SEC-001
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: STZ-SEC-002
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: STZ-SEC-003
+    predicate: obligation
+    severity: error
+    family: deployment-security
+- id: security-head
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  rules:
+    STZ-SEC-001: pass
+  findings:
+  - ruleId: STZ-SEC-002
+    subject: stz-cluster-bindings
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: STZ-SEC-003
+    subject: stz-cluster-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: STZ-SEC-003
+    subject: stz-topic-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: STZ-SEC-003
+    subject: stz-user-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: STZ-SEC-003
+    subject: stz-access-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId: STZ-SEC-001
+  - ruleId: STZ-SEC-002
+    environment: install-hydrated
+  - ruleId: STZ-SEC-003
+    environment: install-hydrated
+  - ruleId: STZ-SEC-002
+    result: violation
+  select:
+  - path: rules[ruleId=STZ-SEC-003].obligations
+    countWhere:
+      environment: install-hydrated
+      verdict: pass
+    equals: 4
+  - path: rules[ruleId=STZ-SEC-002].obligations
+    countWhere:
+      environment: install-hydrated
+      verdict: pass
+    equals: 1
+- id: detects-config-removed
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - co-config-removed
+  expectExit: 0
+  findings:
+  - ruleId: STZ-SEC-001
+    subject: stz-cluster-operator
+    environment: install-hydrated
+    result: violation
+  rules:
+    STZ-SEC-001: violation
+- id: detects-cluster-admin
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - cluster-admin-binding
+  expectExit: 0
+  findings:
+  - ruleId: STZ-SEC-002
+    subject: stz-cluster-bindings
+    environment: install
+    result: violation
+  rules:
+    STZ-SEC-002: violation
+  absent:
+  - ruleId: STZ-SEC-002
+    environment: install-hydrated

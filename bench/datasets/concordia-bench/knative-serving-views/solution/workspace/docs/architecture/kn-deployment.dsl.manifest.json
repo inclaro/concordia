@@ -1,0 +1,67 @@
+{
+  "dirtyTree": {
+    "digest": "sha256:f15694b1e99d1e4acea6a570c9e577729060287f959c080fdb9edf778da8e8e6"
+  },
+  "generator": {
+    "dslContract": "concordia-dsl/1",
+    "name": "concordia",
+    "structurizr": {
+      "confinement": "scrubbed-env",
+      "version": "2025.11.09"
+    },
+    "version": "bench-35bad7f"
+  },
+  "inputs": {
+    "bindings": "sha256:13ed7862629f0ca3bd684b460af5a81af7ed5d09a47a5b30e99dc9924f2961d7",
+    "controls": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "digestContract": "concordia-view-semantic/1",
+    "modelProjection": "sha256:b6ac91cac7b586e982f649921bbb2396ca68e556412c12981f3c72baae443474",
+    "normalizationVersion": "2.1",
+    "observedProjection": null,
+    "policies": "sha256:bc3eaac1ab0887aaa1428e29a0b8348dd05fd012b4150db8d9b511b7062b9b45",
+    "projectionContract": "concordia-view-projection/1"
+  },
+  "outputs": [
+    {
+      "canonicalization": "none",
+      "digest": "sha256:b79376e3cfe92ffce61851751d0b066be67c936b6869f769b90fa851aa11867c",
+      "format": "dsl",
+      "path": "docs/architecture/kn-deployment.dsl"
+    },
+    {
+      "canonicalization": "structurizr-text/1",
+      "digest": "sha256:eb25b437b153342cac76ecf456371a48a5c154facab9070dfff8a4fafb69ec24",
+      "format": "plantuml",
+      "path": "docs/architecture/kn-deployment.puml"
+    },
+    {
+      "canonicalization": "structurizr-text/1",
+      "digest": "sha256:4566674cdebe5af1b383ba9363500ebdf71a5312624714abf4d99d23d0827278",
+      "format": "dot",
+      "path": "docs/architecture/kn-deployment.dot"
+    }
+  ],
+  "revisions": [
+    {
+      "repository": "knative-serving",
+      "revision": "a03ed563bda295b8f22039e79af9249269a90d3d"
+    }
+  ],
+  "schema": "concordia-view-manifest/1",
+  "semanticDigest": "sha256:ebc0ff4df9c368b190d2b867266784930ab2a4415206febea3b17681257975f2",
+  "sources": [],
+  "view": {
+    "definitionDigest": "sha256:dcc8d48d29235b600d79e83ff61967e74530713b44f0bd1680d7494b42b641e5",
+    "definitionVersion": "concordia-view-definition/1",
+    "environment": "production",
+    "id": "kn-deployment",
+    "kind": "deployment",
+    "scope": [
+      "kn-activator",
+      "kn-autoscaler",
+      "kn-controller",
+      "kn-ns",
+      "kn-webhook"
+    ]
+  }
+}

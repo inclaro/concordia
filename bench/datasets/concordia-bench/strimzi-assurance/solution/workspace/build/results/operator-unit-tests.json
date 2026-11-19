@@ -1,0 +1,26 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "strimzi",
+      "digest": {
+        "gitCommit": "0000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "predicateType": "https://concordia.io/evidence/check-result/v1",
+  "predicate": {
+    "check": "operator-unit-tests",
+    "outcome": "passed",
+    "revision": "0000000000000000000000000000000000000000",
+    "environment": "install",
+    "evaluator": {
+      "name": "mvn-test",
+      "version": "1"
+    },
+    "covers": [
+      "stz-cluster-operator"
+    ],
+    "time": "2026-01-01T00:00:00Z"
+  }
+}

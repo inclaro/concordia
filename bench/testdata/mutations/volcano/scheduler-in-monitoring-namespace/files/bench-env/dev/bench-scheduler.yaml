@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volcano-scheduler
+  namespace: volcano-monitoring
+  labels:
+    app: volcano-scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: volcano-scheduler
+  template:
+    metadata:
+      labels:
+        app: volcano-scheduler
+    spec:
+      serviceAccountName: volcano-scheduler
+      containers:
+        - name: volcano-scheduler
+          image: docker.io/volcanosh/vc-scheduler:v1.16.0

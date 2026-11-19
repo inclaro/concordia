@@ -1,0 +1,277 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "stz-cluster-operator",
+      "node-type": "service",
+      "name": "Cluster Operator",
+      "description": "Operator that manages Kafka clusters.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-topic-operator",
+      "node-type": "service",
+      "name": "Topic Operator",
+      "description": "Operator that manages Kafka topics.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-user-operator",
+      "node-type": "service",
+      "name": "User Operator",
+      "description": "Operator that manages Kafka users.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-operator-common",
+      "node-type": "service",
+      "name": "Operator Common",
+      "description": "Code shared by the operators.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-certificate-issuer",
+      "node-type": "service",
+      "name": "Certificate Issuer",
+      "description": "Certificate generation helpers."
+    },
+    {
+      "unique-id": "stz-config-model",
+      "node-type": "service",
+      "name": "Config Model",
+      "description": "Kafka configuration model."
+    },
+    {
+      "unique-id": "stz-api",
+      "node-type": "service",
+      "name": "Api",
+      "description": "Custom resource model of Strimzi.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-access-operator",
+      "node-type": "service",
+      "name": "Access Operator",
+      "description": "Operator that manages Kafka access (deployed from its own repository image).",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "stz-strimzi-ns",
+      "node-type": "system",
+      "name": "Strimzi Namespace",
+      "description": "Namespace that hosts the Kafka operators."
+    },
+    {
+      "unique-id": "stz-access-ns",
+      "node-type": "system",
+      "name": "Access Operator Namespace",
+      "description": "Namespace that hosts the access operator."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "stz-cluster-operator-uses-stz-api",
+      "description": "Cluster Operator uses Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-cluster-operator"
+          },
+          "destination": {
+            "node": "stz-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-cluster-operator-uses-stz-operator-common",
+      "description": "Cluster Operator uses Operator Common.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-cluster-operator"
+          },
+          "destination": {
+            "node": "stz-operator-common"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-cluster-operator-uses-stz-certificate-issuer",
+      "description": "Cluster Operator uses Certificate Issuer.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-cluster-operator"
+          },
+          "destination": {
+            "node": "stz-certificate-issuer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-cluster-operator-uses-stz-config-model",
+      "description": "Cluster Operator uses Config Model.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-cluster-operator"
+          },
+          "destination": {
+            "node": "stz-config-model"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-topic-operator-uses-stz-operator-common",
+      "description": "Topic Operator uses Operator Common.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-topic-operator"
+          },
+          "destination": {
+            "node": "stz-operator-common"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-topic-operator-uses-stz-api",
+      "description": "Topic Operator uses Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-topic-operator"
+          },
+          "destination": {
+            "node": "stz-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-user-operator-uses-stz-operator-common",
+      "description": "User Operator uses Operator Common.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-user-operator"
+          },
+          "destination": {
+            "node": "stz-operator-common"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-user-operator-uses-stz-api",
+      "description": "User Operator uses Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-user-operator"
+          },
+          "destination": {
+            "node": "stz-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-user-operator-uses-stz-certificate-issuer",
+      "description": "User Operator uses Certificate Issuer.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-user-operator"
+          },
+          "destination": {
+            "node": "stz-certificate-issuer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-operator-common-uses-stz-api",
+      "description": "Operator Common uses Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-operator-common"
+          },
+          "destination": {
+            "node": "stz-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-operator-common-uses-stz-certificate-issuer",
+      "description": "Operator Common uses Certificate Issuer.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "stz-operator-common"
+          },
+          "destination": {
+            "node": "stz-certificate-issuer"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "stz-operators-in-strimzi-ns",
+      "description": "The three operators are deployed in the Strimzi namespace.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "stz-strimzi-ns",
+          "nodes": [
+            "stz-cluster-operator",
+            "stz-topic-operator",
+            "stz-user-operator"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "stz-access-in-access-ns",
+      "description": "The access operator is deployed in its own namespace.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "stz-access-ns",
+          "nodes": [
+            "stz-access-operator"
+          ]
+        }
+      }
+    }
+  ]
+}

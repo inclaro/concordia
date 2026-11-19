@@ -1,0 +1,1 @@
+bench: add a second copy of the scheduler manifest

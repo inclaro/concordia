@@ -1,0 +1,12 @@
+52a
+        volumeMounts:
+        - name: serving-certs
+          mountPath: /var/run/serving-certs
+          readOnly: true
+.
+47a
+      volumes:
+      - name: serving-certs
+        secret:
+          secretName: webhook-certs
+.

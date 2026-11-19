@@ -1,0 +1,40 @@
+repo: strimzi
+checks:
+- id: typo-check-id-branch
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/rename-unit-test-check
+  expectExit: 2
+  diagnostics: [CO-POL-005]
+- id: allowed-branch
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/user-operator-uses-api-model
+  expectExit: 0
+  absent:
+  - location.path: user-operator/src/main/java/io/strimzi/operator/user/BenchOk.java
+    disposition: active
+- id: review-rename-unit-test-check
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/rename-unit-test-check
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors: [CO-POL-005]
+- id: review-user-operator-uses-api-model
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/user-operator-uses-api-model
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

@@ -1,0 +1,199 @@
+repo: strimzi
+checks:
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=install].sources
+    contains: install/access-operator/**
+  - path: environments[id=install-hydrated].sources
+    contains: deploy/hydrated/**
+  - path: check.enforcement
+    length: 2
+- id: packs
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules: []
+  packs:
+  - builtin:infrastructure
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: stz-cluster-operator
+    nodeType: service
+    tags:
+    - deployable
+  - id: stz-topic-operator
+    nodeType: service
+    tags:
+    - deployable
+  - id: stz-user-operator
+    nodeType: service
+    tags:
+    - deployable
+  - id: stz-access-operator
+    nodeType: service
+    tags:
+    - deployable
+  - id: stz-strimzi-ns
+    nodeType: system
+  - id: stz-access-ns
+    nodeType: system
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - stz-cluster-operator
+  - stz-topic-operator
+  - stz-user-operator
+  - stz-access-operator
+  - stz-strimzi-ns
+  - stz-access-ns
+- id: trace-head
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  areas:
+    deploymentTrace: unknown
+  rules:
+    INFRA-TRC-002: pass
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: stz-cluster-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-001
+    subject: stz-topic-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-001
+    subject: stz-user-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-001
+    subject: stz-cluster-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-001
+    subject: stz-topic-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-001
+    subject: stz-user-operator
+    environment: install
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-003
+    subject: stz-cluster-operator
+    environment: install-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId: INFRA-PLC-001
+    environment: install-hydrated
+  - ruleId: INFRA-PLC-001
+    subject: stz-access-operator
+  - ruleId: INFRA-PLC-001
+    result: violation
+  - ruleId: INFRA-PLC-002
+    result: violation
+  select:
+  - path: rules[ruleId=INFRA-PLC-001].obligations
+    countWhere:
+      environment: install-hydrated
+      verdict: pass
+    equals: 4
+  - path: rules[ruleId=INFRA-PLC-001].obligations
+    countWhere:
+      environment: install
+      verdict: pass
+    equals: 1
+  - path: rules[ruleId=INFRA-PLC-001].obligations
+    countWhere:
+      environment: install
+      verdict: unknown
+    equals: 3
+  - path: rules[ruleId=INFRA-TRC-001].obligations
+    countWhere:
+      environment: install-hydrated
+      verdict: pass
+    equals: 4
+- id: detects-packaging-conflict
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - access-operator-declared-twice
+  expectExit: 0
+  diagnostics:
+  - CO-OBS-021
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: stz-access-operator
+    environment: install
+    result: unknown
+    reason: evidence-conflict
+  absent:
+  - ruleId: INFRA-PLC-001
+    result: pass
+    subject: stz-access-operator
+    environment: install
+- id: detects-cbmignore-dropped
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - cbmignore-dropped
+  expectExit: 0
+  diagnostics:
+  - CO-OBS-020
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: stz-cluster-operator
+    environment: install-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-001
+    subject: stz-topic-operator
+    environment: install-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-001
+    subject: stz-user-operator
+    environment: install-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  rules:
+    INFRA-TRC-002: unknown
+- id: trace-access-operator
+  type: command
+  dimension: reporting
+  weight: 2
+  argv:
+  - concordia
+  - trace
+  - stz-access-operator
+  - --format
+  - json
+  expectExit: 0
+  stdoutJson:
+  - path: traces[environment=install].steps
+    length: 5
+  - path: traces[environment=install-hydrated].steps
+    length: 5
+  - path: traces[environment=install].gaps
+    countWhere:
+      reason: mutable-tag
+    equals: 1

@@ -1,0 +1,14 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: gitea-governance
+  version: 1.0.0
+rules:
+- id: GITEA-DEC-101
+  name: Layering decisions that require enforcement stay linked to a rule
+  severity: error
+  owner: team-gitea
+  rationale: 'Maintainability: an architecture decision that requires enforcement but links no mandatory rule decays into undocumented folklore.'
+  remediation: 'Link the enforcing rule of the decision in the register, or set the decision enforcement to none.'
+  decisions:
+    obligation: enforcement

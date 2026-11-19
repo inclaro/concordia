@@ -1,0 +1,26 @@
+# The security review of the admission webhooks: the identity they run as, their role bindings and the flows from admission code.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-ADMISSION
+version: 1
+type: security
+title: Volcano admission security
+scope:
+  calmNodes: [vc-admission]
+environment: dev
+subject:
+  summary: Identity, role bindings and outgoing flows of the admission component
+  dependencies:
+    - kind: runtime-identity
+      selector:
+        calmNodes: [vc-admission]
+    - kind: role-binding
+      selector:
+        calmNodes: [vc-admission]
+    - kind: binding
+      selector:
+        calmNodes: [vc-admission]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

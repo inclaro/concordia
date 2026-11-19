@@ -1,0 +1,24 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: browser-use
+architecture:
+  source: architecture/browser-use.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: browser-use
+    root: .
+    include: [browser_use/**/*.py]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/browser-use-adopt.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

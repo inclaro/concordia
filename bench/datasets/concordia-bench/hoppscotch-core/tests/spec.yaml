@@ -1,0 +1,97 @@
+repo: hoppscotch
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 1
+  paths: [concordia.yaml, architecture]
+  branch: main
+- id: core-pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs: [builtin:core]
+  rules:
+  - {id: HOP-DEC-001, predicate: declaredOnly}
+- id: tags
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - {id: hopp-selfhost-web, nodeType: webclient, tags: [presentation, client]}
+  - {id: hopp-sh-admin, nodeType: webclient, tags: [presentation, client]}
+  - {id: hopp-backend, nodeType: service, tags: [application]}
+  - {id: hopp-common, nodeType: service, tags: [application]}
+  - {id: hopp-data, nodeType: service, tags: [shared-kernel, domain, shared]}
+  - {id: hopp-kernel, nodeType: service, tags: [infrastructure]}
+- id: overrides
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - {path: "policies.packs[0].use", equals: "builtin:core"}
+  - {path: "policies.packs[0].rules.CORE-DECL-001.severity", equals: warning}
+  - {path: "policies.packs[0].rules.CORE-OBS-001.enabled", equals: false}
+  - {path: "policies.packs[0].rules.CORE-CYC-001.severity", equals: warning}
+  - {path: "policies.packs[0].rules.CORE-DB-001.evidence.onUnknown", equals: warn}
+  - {path: "policies.packs[0].rules.CORE-LYR-002.evidence.onUnknown", equals: warn}
+- id: head-effect-of-overrides
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules: {CORE-DB-001: unknown, CORE-LYR-002: unknown, CORE-SEC-001: not-applicable}
+  findings:
+  - {ruleId: CORE-DB-001, kind: binding-gap, disposition: active}
+  - {ruleId: CORE-LYR-002, kind: binding-gap, disposition: active}
+  select:
+  - {path: "rules[ruleId=CORE-OBS-001]", exists: false}
+  - {path: "rules[ruleId=CORE-DECL-001].verdict", oneOf: [violation, pass]}
+- id: override-severity
+  type: results
+  dimension: conformance
+  weight: 2
+  mutations: [backend-imports-frontends]
+  findings:
+  - {ruleId: CORE-DECL-001, kind: undeclared, severity: warning, location.path: packages/hoppscotch-backend/src/bench-fe-a.ts, disposition: active}
+  - {ruleId: HOP-DEC-001, kind: undeclared, severity: error, location.path: packages/hoppscotch-backend/src/bench-fe-a.ts, disposition: active}
+- id: detects-service-import
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [backend-imports-common]
+  expectExit: 1
+  findings:
+  - {ruleId: CORE-BND-001, kind: forbidden-dependency, severity: error, location.path: packages/hoppscotch-backend/src/bench-common.ts, disposition: active}
+- id: allows-shared-kernel
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [backend-imports-data]
+  absent:
+  - {ruleId: CORE-BND-001, location.path: packages/hoppscotch-backend/src/bench-data.ts}
+  findings:
+  - {ruleId: CORE-DECL-001, kind: undeclared, location.path: packages/hoppscotch-backend/src/bench-data.ts, disposition: active}
+- id: detects-layer-violation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [backend-imports-frontends]
+  expectExit: 1
+  findings:
+  - {ruleId: CORE-LYR-001, kind: layer-violation, severity: error, location.path: packages/hoppscotch-backend/src/bench-fe-a.ts, disposition: active}
+- id: detects-domain-and-shared
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [data-imports-kernel]
+  expectExit: 1
+  findings:
+  - {ruleId: CORE-LYR-002, kind: forbidden-dependency, severity: error, location.path: packages/hoppscotch-data/src/bench-kernel.ts, disposition: active}
+  - {ruleId: CORE-LYR-003, kind: forbidden-dependency, severity: warning, location.path: packages/hoppscotch-data/src/bench-kernel.ts, disposition: active}
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

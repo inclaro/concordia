@@ -1,0 +1,24 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: gitea
+architecture:
+  source: architecture/gitea.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: gitea
+    root: .
+    include: [main.go, cmd/**, routers/**, services/**, models/**, modelmigration/**, modules/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/gitea-adopt.policy.yaml, policies/gitea-structure.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

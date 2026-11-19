@@ -1,0 +1,527 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "bu-cli",
+      "node-type": "service",
+      "name": "Bu Cli",
+      "description": "Command-line entry point.",
+      "concordia": {
+        "tags": [
+          "presentation"
+        ]
+      }
+    },
+    {
+      "unique-id": "bu-mcp",
+      "node-type": "service",
+      "name": "Bu Mcp",
+      "description": "MCP server and client.",
+      "concordia": {
+        "tags": [
+          "presentation"
+        ]
+      }
+    },
+    {
+      "unique-id": "bu-agent",
+      "node-type": "service",
+      "name": "Bu Agent",
+      "description": "Agent loop and prompts.",
+      "concordia": {
+        "tags": [
+          "application"
+        ],
+        "trust": {
+          "dimensions": {
+            "zone": "core"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-tools",
+      "node-type": "service",
+      "name": "Bu Tools",
+      "description": "Tool registry and actions.",
+      "concordia": {
+        "tags": [
+          "domain"
+        ]
+      }
+    },
+    {
+      "unique-id": "bu-repl",
+      "node-type": "service",
+      "name": "Bu Repl",
+      "description": "Interactive REPL."
+    },
+    {
+      "unique-id": "bu-skills",
+      "node-type": "service",
+      "name": "Bu Skills",
+      "description": "Reusable skills."
+    },
+    {
+      "unique-id": "bu-browser",
+      "node-type": "service",
+      "name": "Bu Browser",
+      "description": "Browser session and DOM control.",
+      "concordia": {
+        "tags": [
+          "infrastructure"
+        ]
+      }
+    },
+    {
+      "unique-id": "bu-llm",
+      "node-type": "service",
+      "name": "Bu Llm",
+      "description": "LLM provider adapters.",
+      "concordia": {
+        "tags": [
+          "infrastructure"
+        ],
+        "trust": {
+          "classification": "top-secret"
+        }
+      }
+    },
+    {
+      "unique-id": "bu-telemetry",
+      "node-type": "service",
+      "name": "Bu Telemetry",
+      "description": "Product telemetry.",
+      "concordia": {
+        "tags": [
+          "infrastructure",
+          "external"
+        ],
+        "trust": {
+          "dimensions": {
+            "zone": "egress"
+          },
+          "classification": "internal"
+        }
+      }
+    },
+    {
+      "unique-id": "bu-credentials",
+      "node-type": "service",
+      "name": "Bu Credentials",
+      "description": "Credential store and API keys.",
+      "concordia": {
+        "tags": [
+          "restricted"
+        ],
+        "trust": {
+          "dimensions": {
+            "zone": "core"
+          },
+          "classification": "secret"
+        }
+      }
+    },
+    {
+      "unique-id": "bu-shared",
+      "node-type": "service",
+      "name": "Bu Shared",
+      "description": "Shared configuration and utilities.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "bu-agent-uses-bu-browser",
+      "description": "Bu Agent uses Bu Browser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-browser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-llm",
+      "description": "Bu Agent uses Bu Llm.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-llm"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-tools",
+      "description": "Bu Agent uses Bu Tools.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-tools"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-repl",
+      "description": "Bu Agent uses Bu Repl.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-repl"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-telemetry",
+      "description": "Bu Agent uses Bu Telemetry.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-telemetry"
+          }
+        }
+      },
+      "concordia": {
+        "trust": {
+          "classification": "internal"
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-credentials",
+      "description": "Bu Agent uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      },
+      "concordia": {
+        "trust": {
+          "classification": "secret"
+        }
+      }
+    },
+    {
+      "unique-id": "bu-agent-uses-bu-shared",
+      "description": "Bu Agent uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-agent"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-llm-uses-bu-credentials",
+      "description": "Bu Llm uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-llm"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-llm-uses-bu-shared",
+      "description": "Bu Llm uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-llm"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-tools-uses-bu-shared",
+      "description": "Bu Tools uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-tools"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-credentials-uses-bu-shared",
+      "description": "Bu Credentials uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-credentials"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-cli-uses-bu-credentials",
+      "description": "Bu Cli uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-cli"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-cli-uses-bu-shared",
+      "description": "Bu Cli uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-cli"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-cli-uses-bu-telemetry",
+      "description": "Bu Cli uses Bu Telemetry.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-cli"
+          },
+          "destination": {
+            "node": "bu-telemetry"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-skills-uses-bu-shared",
+      "description": "Bu Skills uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-skills"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-repl-uses-bu-shared",
+      "description": "Bu Repl uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-repl"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-browser-uses-bu-shared",
+      "description": "Bu Browser uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-browser"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-telemetry-uses-bu-shared",
+      "description": "Bu Telemetry uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-telemetry"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-repl-uses-bu-telemetry",
+      "description": "Bu Repl uses Bu Telemetry.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-repl"
+          },
+          "destination": {
+            "node": "bu-telemetry"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-telemetry",
+      "description": "Bu Mcp uses Bu Telemetry.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-telemetry"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-shared",
+      "description": "Bu Mcp uses Bu Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-repl",
+      "description": "Bu Mcp uses Bu Repl.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-repl"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-credentials",
+      "description": "Bu Mcp uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-browser",
+      "description": "Bu Mcp uses Bu Browser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-browser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-mcp-uses-bu-cli",
+      "description": "Bu Mcp uses Bu Cli.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-mcp"
+          },
+          "destination": {
+            "node": "bu-cli"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-shared-uses-bu-credentials",
+      "description": "Bu Shared uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-shared"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "bu-browser-uses-bu-credentials",
+      "description": "Bu Browser uses Bu Credentials.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "bu-browser"
+          },
+          "destination": {
+            "node": "bu-credentials"
+          }
+        }
+      }
+    }
+  ]
+}

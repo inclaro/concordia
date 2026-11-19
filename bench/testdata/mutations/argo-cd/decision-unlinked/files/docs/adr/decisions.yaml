@@ -1,0 +1,36 @@
+apiVersion: concordia.io/v1alpha1
+kind: DecisionRegister
+decisions:
+- id: ADR-0001
+  path: docs/adr/0001-grpc-client-packages.md
+  expect: active
+  categories: [system-boundaries]
+  governs:
+  - {ref: 'calm:node:argo-repo-server'}
+  - {ref: 'calm:node:argo-commit-server'}
+  - {ref: 'calm:node:argo-cmp-server'}
+  enforcement: required
+- id: ADR-0002
+  path: docs/adr/0002-independent-components.md
+  expect: active
+  categories: [system-boundaries]
+  governs:
+  - {ref: 'calm:node:argo-server'}
+  - {ref: 'calm:node:argo-app-controller'}
+  - {ref: 'calm:node:argo-appset-controller'}
+  - {ref: 'calm:node:argo-notifications'}
+  enforcement: required
+  enforcedBy:
+  - rule: ARGO-IND-001
+    pack: {id: argo-cd-adopt, version: 1.0.0}
+- id: ADR-0003
+  path: docs/adr/0003-install-variants.md
+  expect: active
+  categories: [deployment-strategy]
+  governs:
+  - {ref: 'calm:node:argo-server'}
+  - {ref: 'calm:node:argo-repo-server'}
+  - {ref: 'calm:node:argo-app-controller'}
+  - {ref: 'calm:node:argo-appset-controller'}
+  - {ref: 'calm:node:argo-notifications'}
+  enforcement: none

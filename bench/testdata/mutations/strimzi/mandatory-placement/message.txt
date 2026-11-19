@@ -1,0 +1,1 @@
+chore: make the placement family mandatory in install

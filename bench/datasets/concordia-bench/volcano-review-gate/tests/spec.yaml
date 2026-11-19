@@ -1,0 +1,76 @@
+repo: volcano
+checks:
+- id: review-track-canary
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/track-admission-canary
+  expectVerdict: pass
+  expectViolations:
+  - {ruleId: REV-APR-001, path: assessments/ASM-ADMISSION/v1.yaml}
+- id: review-stop-tracking-init-job
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/stop-tracking-admission-init-job
+  expectVerdict: pass
+  expectViolations:
+  - {ruleId: REV-APR-001, path: assessments/ASM-ADMISSION/v1.yaml}
+  - {ruleId: REV-DSP-001, path: assessments/ASM-ADMISSION/v1.yaml}
+- id: review-add-reviewer
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/add-security-reviewer
+  expectVerdict: pass
+  expectViolations:
+  - {ruleId: REV-GOV-001, path: ""}
+- id: review-detect-cgroup-driver
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/detect-cgroup-driver-in-admission
+  expectVerdict: pass
+  expectViolations: []
+- id: binding-widened
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/track-admission-canary
+  findings:
+  - {ruleId: REV-APR-001, kind: assessment-review-required, disposition: active}
+  rules: {REV-APR-001: violation}
+  areas: {assessmentCurrency: violation}
+- id: job-unbound
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/stop-tracking-admission-init-job
+  findings:
+  - {ruleId: REV-APR-001, kind: assessment-review-required, disposition: active}
+  - {ruleId: REV-DSP-001, kind: assessment-undisposed-removal, disposition: active}
+  rules: {REV-APR-001: violation, REV-DSP-001: violation}
+- id: reviewer-added
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/add-security-reviewer
+  findings:
+  - {ruleId: REV-GOV-001, kind: assessment-relaxation, disposition: active}
+  rules: {REV-GOV-001: violation}
+- id: code-import-not-reviewed
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/detect-cgroup-driver-in-admission
+  absent:
+  - ruleId: [REV-APR-001, REV-DSP-001]
+  rules: {REV-APR-001: pass, REV-DSP-001: pass}
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

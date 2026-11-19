@@ -1,0 +1,41 @@
+repo: browser-use
+checks:
+- id: classification-refused
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/classify-llm-adapters-top-secret
+  expectExit: 2
+  diagnostics:
+  - CO-SEC-001
+- id: review-classification
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/classify-llm-adapters-top-secret
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors:
+  - CO-SEC-001
+- id: shared-import-passes
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/agent-reuses-shared-utilities
+  expectExit: 0
+  absent:
+  - location.path: browser_use/agent/bench_utils.py
+    disposition: active
+- id: review-shared-import
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/agent-reuses-shared-utilities
+  expectVerdict: pass
+  expectViolations: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

@@ -1,0 +1,174 @@
+repo: knative-serving
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: kn-activator
+    nodeType: service
+    tags:
+    - public
+  - id: kn-autoscaler
+    nodeType: service
+  - id: kn-controller
+    nodeType: service
+  - id: kn-webhook
+    nodeType: service
+  - id: kn-queue
+    nodeType: service
+  - id: kn-apis
+    nodeType: service
+    tags:
+    - contract
+  - id: kn-client
+    nodeType: service
+    tags:
+    - contract
+  - id: kn-shared
+    nodeType: service
+    tags:
+    - shared
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - kn-activator
+    - kn-apis
+  - - kn-activator
+    - kn-autoscaler
+  - - kn-activator
+    - kn-client
+  - - kn-activator
+    - kn-controller
+  - - kn-activator
+    - kn-queue
+  - - kn-activator
+    - kn-shared
+  - - kn-autoscaler
+    - kn-apis
+  - - kn-autoscaler
+    - kn-controller
+  - - kn-autoscaler
+    - kn-shared
+  - - kn-client
+    - kn-apis
+  - - kn-controller
+    - kn-activator
+  - - kn-controller
+    - kn-apis
+  - - kn-controller
+    - kn-autoscaler
+  - - kn-controller
+    - kn-client
+  - - kn-controller
+    - kn-queue
+  - - kn-controller
+    - kn-shared
+  - - kn-queue
+    - kn-activator
+  - - kn-queue
+    - kn-autoscaler
+  - - kn-queue
+    - kn-shared
+  - - kn-shared
+    - kn-apis
+  - - kn-webhook
+    - kn-apis
+  - - kn-webhook
+    - kn-autoscaler
+  - - kn-webhook
+    - kn-controller
+  - - kn-webhook
+    - kn-shared
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - kn-activator
+  - kn-autoscaler
+  - kn-controller
+  - kn-webhook
+  - kn-queue
+  - kn-apis
+  - kn-client
+  - kn-shared
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: KN-LYR-001
+    predicate: layerOrder
+    severity: error
+  - id: KN-CYC-001
+    predicate: require.graphProperty
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  rules:
+    KN-LYR-001: violation
+    KN-CYC-001: violation
+- id: detects-apis-imports-reconciler
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - apis-imports-reconciler
+  expectExit: 1
+  findings:
+  - ruleId: KN-LYR-001
+    kind: layer-violation
+    location.path: pkg/apis/serving/bench_rec.go
+    disposition: active
+- id: detects-apis-calls-webhook
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - apis-calls-webhook
+  expectExit: 1
+  findings:
+  - ruleId: KN-LYR-001
+    location.path: pkg/apis/serving/bench_wh.go
+    disposition: active
+  - ruleId: KN-CYC-001
+    kind: cycle
+    disposition: active
+- id: allows-controller-imports-apis
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - controller-imports-apis
+  expectExit: 0
+  absent:
+  - location.path: pkg/reconciler/route/bench_ok.go
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1

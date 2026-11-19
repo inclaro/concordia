@@ -1,0 +1,58 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-hopp-backend-compose
+  architectureRef: calm:node:hopp-backend
+  match:
+    any:
+    - kind: composeService
+      file: docker-compose.yml
+      service: hoppscotch-backend
+- id: bind-hopp-selfhost-web-compose
+  architectureRef: calm:node:hopp-selfhost-web
+  match:
+    any:
+    - kind: composeService
+      file: docker-compose.yml
+      service: hoppscotch-app
+- id: bind-hopp-sh-admin-compose
+  architectureRef: calm:node:hopp-sh-admin
+  match:
+    any:
+    - kind: composeService
+      file: docker-compose.yml
+      service: hoppscotch-sh-admin
+- id: bind-hopp-db-compose
+  architectureRef: calm:node:hopp-db
+  match:
+    any:
+    - kind: composeService
+      file: docker-compose.yml
+      service: hoppscotch-db
+- id: bind-hopp-db-image
+  architectureRef: calm:node:hopp-db
+  required: false
+  match:
+    any:
+    - kind: image
+      repository: postgres
+- id: bind-hopp-backend-compose-hydrated
+  architectureRef: calm:node:hopp-backend
+  match:
+    any:
+    - kind: composeService
+      file: bench-env/selfhost-hydrated/docker-compose.yml
+      service: backend
+- id: bind-hopp-backend-image
+  architectureRef: calm:node:hopp-backend
+  required: false
+  match:
+    any:
+    - kind: image
+      repository: ghcr.io/hoppscotch/bench-backend
+- id: bind-hopp-backend-dockerfile-hydrated
+  architectureRef: calm:node:hopp-backend
+  required: false
+  match:
+    any:
+    - sourceRoot: bench-env/selfhost-hydrated/Dockerfile

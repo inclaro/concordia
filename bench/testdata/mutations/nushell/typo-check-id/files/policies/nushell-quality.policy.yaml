@@ -1,0 +1,18 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: nushell-quality
+  version: 1.0.0
+rules:
+- id: NU-VER-001
+  name: The unit tests of the engine pass in CI
+  severity: warning
+  owner: team-nushell
+  rationale: Testability - the engine claims a passing unit-test run only with an admissible check result for the CI environment.
+  remediation: Publish an authenticated check result for the unit-tests check of the CI environment.
+  require:
+    checkResult:
+      check: unit-tset
+      environment: ci
+  evidence:
+    onUnknown: warn

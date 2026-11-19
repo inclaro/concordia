@@ -1,0 +1,92 @@
+repo: argo-cd
+checks:
+- id: assurance-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: 'assurance.rendering.sources[environment=non-ha].tool', equals: kustomize}
+  - {path: 'assurance.rendering.sources[environment=non-ha].path', equals: gitops/production}
+  - {path: 'assurance.evaluators[environment=non-ha].kinds', contains: network-policy}
+  - {path: 'assurance.evaluators[environment=non-ha].kinds', contains: rbac}
+  - {path: 'assurance.evaluators[environment=non-ha].assumes', contains: network-policy-enforced}
+  - {path: 'assurance.evaluators[environment=non-ha].assumes', contains: rbac-authorizer-enabled}
+  - {path: 'assurance.rendering.sources[environment=staging].tool', equals: kustomize}
+  - {path: 'assurance.rendering.sources[environment=staging].path', equals: gitops/production}
+  - {path: 'assurance.evaluators[environment=staging].kinds', contains: network-policy}
+  - {path: 'assurance.evaluators[environment=staging].kinds', contains: rbac}
+- id: overlay
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: gitops/production/kustomization.yaml
+  select:
+  - {path: namespace, equals: argocd}
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs: ['builtin:assurance']
+  rules:
+  - {id: ARGO-NET-001, predicate: require.effectiveAccess, severity: error}
+  - {id: ARGO-NET-002, predicate: require.effectiveAccess, severity: error}
+  - {id: ARGO-NET-003, predicate: require.effectiveAccess, severity: error}
+  - {id: ARGO-AUTH-001, predicate: require.effectiveAccess, severity: error}
+  - {id: ARGO-AUTH-002, predicate: require.effectiveAccess, severity: error}
+  - {id: ARGO-CLM-001, predicate: require.claim, severity: warning}
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv: [concordia, assurance, validate]
+  expectExit: 0
+  stdoutContains: [kustomize, 'non-ha: complete', 'staging: complete']
+- id: evaluations
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules: {ARGO-NET-002: pass, ASR-REN-001: pass}
+  select:
+  - {path: assurance.evaluations, exists: true}
+  - {path: 'rules[ruleId=ARGO-NET-001].obligations[environment=non-ha].verdict', equals: pass}
+  - {path: 'rules[ruleId=ARGO-NET-003].obligations[environment=non-ha].verdict', equals: pass}
+- id: detects-redis-ingress-opened
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [redis-ingress-opened]
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-NET-001, environment: non-ha, result: violation}
+  - {ruleId: ARGO-NET-003, environment: non-ha, result: violation}
+  rules: {ARGO-NET-001: violation, ARGO-NET-002: pass}
+- id: staging-assumption-undeclared
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-NET-001, environment: staging, result: unknown, reason: enforcement-not-declared}
+  - {ruleId: ARGO-NET-003, environment: staging, result: unknown, reason: enforcement-not-declared}
+  absent:
+  - {ruleId: ARGO-NET-001, environment: staging, result: pass}
+  - {ruleId: ARGO-NET-001, environment: non-ha, result: [unknown, violation]}
+  select:
+  - {path: 'rules[ruleId=ARGO-NET-001].obligations[environment=staging].verdict', equals: unknown}
+  - {path: 'rules[ruleId=ARGO-NET-001].obligations[environment=non-ha].verdict', equals: pass}
+- id: authorization-evaluations
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules: {ARGO-AUTH-001: pass, ARGO-AUTH-002: violation}
+  findings:
+  - {ruleId: ARGO-AUTH-002, environment: non-ha, subject: argo-dex, result: violation}
+- id: claim-versions-head
+  type: results
+  dimension: assurance
+  weight: 2
+  expectExit: 0
+  rules: {ARGO-CLM-001: pass}

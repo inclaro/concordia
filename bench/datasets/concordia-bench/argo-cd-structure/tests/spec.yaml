@@ -1,0 +1,45 @@
+repo: argo-cd
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - {id: ARGO-OWN-001, predicate: [ownership, forbid], severity: error}
+  - {id: ARGO-CYC-001, predicate: require.graphProperty, severity: error}
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules: {ARGO-CYC-001: unknown, ARGO-OWN-001: violation}
+  findings:
+  - {ruleId: ARGO-CYC-001, kind: binding-gap, result: unknown}
+  absent:
+  - {ruleId: ARGO-OWN-001, kind: [ownership-violation, forbidden-dependency], disposition: active}
+  - {ruleId: ARGO-CYC-001, kind: cycle}
+  diagnostics: [CO-BND-005]
+- id: detects-notifications-imports-db
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [notifications-imports-db]
+  expectExit: 1
+  findings:
+  - {ruleId: ARGO-OWN-001, kind: [ownership-violation, forbidden-dependency], location.path: notification_controller/controller/bench_db.go, disposition: active}
+- id: detects-repo-server-imports-appset
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [repo-server-imports-appset]
+  expectExit: 1
+  findings:
+  - {ruleId: ARGO-CYC-001, kind: cycle, disposition: active}
+- id: allows-server-imports-db
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [server-imports-db]
+  expectExit: 0
+  absent:
+  - {location.path: server/bench_db.go, disposition: active}

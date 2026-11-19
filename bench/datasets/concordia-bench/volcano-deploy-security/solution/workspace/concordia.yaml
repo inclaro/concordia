@@ -1,0 +1,69 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: volcano
+architecture:
+  source: architecture/volcano.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: volcano
+    root: .
+    include:
+    - cmd/scheduler/**
+    - cmd/controller-manager/**
+    - cmd/webhook-manager/**
+    - cmd/agent/**
+    - pkg/scheduler/**
+    - pkg/controllers/**
+    - pkg/webhooks/**
+    - pkg/agent/**
+    - pkg/util/**
+    - pkg/kube/**
+    - pkg/features/**
+    - pkg/config/**
+    - pkg/signals/**
+    - pkg/version/**
+    - pkg/filewatcher/**
+    - installer/volcano-development.yaml
+    - installer/volcano-agent-development.yaml
+    - installer/volcano-monitoring.yaml
+    - bench-env/dev/**
+    - bench-env/dev-hydrated/**
+environments:
+- id: dev
+  sources:
+  - installer/volcano-development.yaml
+  - installer/volcano-agent-development.yaml
+  - bench-env/dev/**
+- id: monitoring
+  sources:
+  - installer/volcano-monitoring.yaml
+- id: dev-hydrated
+  sources:
+  - bench-env/dev-hydrated/**
+bindings:
+  files:
+  - bindings/concordia.bindings.yaml
+  - bindings/volcano.deploy.bindings.yaml
+  - bindings/volcano.security.bindings.yaml
+policies:
+  files:
+  - policies/*.policy.yaml
+  packs:
+  - use: builtin:infrastructure
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error
+  enforcement:
+  - family: deployment-placement
+    mode: advisory
+  - family: deployment-trace
+    mode: advisory
+  - family: deployment-security
+    mode: advisory

@@ -1,0 +1,40 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: gitea-adopt
+  version: 1.0.0
+rules:
+- id: GITEA-LYR-001
+  name: Gitea layers depend downward only
+  severity: error
+  owner: team-gitea
+  rationale: 'Modularity: a lower layer that reaches up into routers or services is a layer inversion that creates import cycles and ties the data layer to business logic.'
+  remediation: 'Move the logic up into services, or pass the dependency in from the caller.'
+  layerOrder:
+    layers:
+    - calmNodes: [gitea-cmd]
+    - calmNodes: [gitea-routers]
+    - calmNodes: [gitea-services]
+    - calmNodes: [gitea-models]
+    - calmNodes: [gitea-db]
+    - calmNodes: [gitea-modules, gitea-setting]
+    edges: [IMPORTS, CALLS]
+- id: GITEA-MIG-001
+  name: Migrations are frozen against current code
+  severity: warning
+  owner: team-gitea
+  rationale: 'Modularity (frozen migrations): a migration that imports current application code changes whenever that code changes, so old migrations stop being reproducible.'
+  remediation: 'Copy the struct definition into the migration, or depend only on the database layer and the migration-safe shared modules.'
+  subject:
+    calmNodes: [gitea-modelmigration]
+  forbid:
+    target:
+      nodeTypes: [service, database]
+    edges: [IMPORTS, CALLS]
+    traversal: direct
+  allow:
+    when:
+      any:
+      - targetTag: migration-safe
+    target:
+      calmNodes: [gitea-db]

@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: volcano-adopt
+  version: 1.0.0
+rules:
+- id: VC-IND-001
+  name: Volcano scheduler plugins are independent
+  severity: error
+  owner: team-volcano
+  rationale: Distributed monolith - plugins that import each other can no longer be enabled, tested or replaced one by one.
+  remediation: Compose plugins through the scheduler framework, or move the shared code into the plugin utilities.
+  subject:
+    calmNodes: [vc-plugin-gang, vc-plugin-drf, vc-plugin-proportion, vc-plugin-binpack, vc-plugin-predicates, vc-plugin-capacity]
+  independent:
+    edges: [IMPORTS, CALLS]
+- id: VC-ALW-001
+  name: Volcano plugins use only the framework, shared code and plugin utilities
+  severity: error
+  owner: team-volcano
+  rationale: Missing anti-corruption layer - a plugin that reaches into the controllers, the agent or admission couples the scheduling policy to unrelated components.
+  remediation: Reach the data through the framework session, or add it to the framework API.
+  subject:
+    calmNodes: [vc-plugin-gang, vc-plugin-drf, vc-plugin-proportion, vc-plugin-binpack, vc-plugin-predicates, vc-plugin-capacity]
+  allowOnly:
+    targets:
+      calmNodes: [vc-framework, vc-shared, vc-plugins-other]
+    edges: [IMPORTS, CALLS]

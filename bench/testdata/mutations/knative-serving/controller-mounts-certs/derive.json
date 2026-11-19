@@ -1,0 +1,8 @@
+[
+  {
+    "path": "bench-env/production-hydrated/deployments/controller.yaml",
+    "base_sha256": "f9dd9677cddf59903fee4c9631264c5665de24bc8e931128667ba52d502ca5b2",
+    "edit": "edits/bench-env/production-hydrated/deployments/controller.yaml.ed",
+    "sha256": "606becf82477703a18ee3e4ac3a80c33345ae83fd00ea0237d65a3a80bb15eba"
+  }
+]

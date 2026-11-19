@@ -1,0 +1,133 @@
+repo: argo-cd
+checks:
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: 'environments[id=non-ha].sources', contains: manifests/namespace-install.yaml}
+  - {path: 'environments[id=ha].sources', contains: manifests/ha/namespace-install.yaml}
+  - {path: 'environments[id=non-ha-hydrated].sources', contains: bench-env/non-ha-hydrated/**}
+  - {path: environments, length: 3}
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: argo-server
+    nodeType: service
+    tags: [deployable, public]
+  - id: argo-repo-server
+    nodeType: service
+    tags: [deployable]
+  - id: argo-app-controller
+    nodeType: service
+    tags: [deployable]
+  - id: argo-appset-controller
+    nodeType: service
+    tags: [deployable]
+  - id: argo-notifications
+    nodeType: service
+    tags: [deployable]
+  - id: argo-dex
+    nodeType: service
+    tags: [deployable, external]
+  - id: argo-redis
+    nodeType: database
+    tags: [restricted]
+  - {id: argo-ns, nodeType: system}
+  - {id: argo-default-ns, nodeType: system}
+- id: deployed-in
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: architecture/argo-cd.calm.json
+  select:
+  - {path: 'relationships[*].relationship-type.deployed-in.container', contains: argo-ns}
+  - {path: 'relationships[*].relationship-type.deployed-in.nodes', exists: true}
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids: [argo-server, argo-repo-server, argo-app-controller, argo-appset-controller, argo-notifications, argo-cmp-server, argo-commit-server, argo-apis, argo-db, argo-util, argo-dex, argo-redis, argo-ns, argo-default-ns]
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs: ['builtin:infrastructure']
+  rules:
+  - {id: ARGO-TRC-101, predicate: obligation, severity: error, family: deployment-trace}
+- id: non-ha-honest-unknown
+  type: results
+  dimension: deployment
+  weight: 3
+  args: [--environment, non-ha]
+  expectExit: 0
+  rules: {INFRA-PLC-001: unknown, INFRA-PLC-002: unknown, INFRA-TRC-001: unknown}
+  findings:
+  - {ruleId: INFRA-PLC-001, environment: non-ha, subject: argo-server, result: unknown, reason: coverage-incomplete, disposition: active}
+  - {ruleId: INFRA-PLC-001, environment: non-ha, subject: argo-redis, result: unknown, reason: coverage-incomplete, disposition: active}
+  - {ruleId: INFRA-TRC-001, environment: non-ha, subject: argo-app-controller, result: unknown, reason: coverage-incomplete, disposition: active}
+  absent:
+  - {ruleId: INFRA-PLC-001, environment: non-ha, result: pass}
+  - {ruleId: INFRA-TRC-001, environment: non-ha, result: pass}
+  areas: {deploymentTrace: unknown}
+- id: ha-honest-unknown
+  type: results
+  dimension: deployment
+  weight: 3
+  args: [--environment, ha]
+  expectExit: 0
+  rules: {INFRA-PLC-001: unknown, INFRA-TRC-001: unknown, ARGO-TRC-101: pass}
+  findings:
+  - {ruleId: INFRA-PLC-001, environment: ha, subject: argo-dex, result: unknown, reason: coverage-incomplete, disposition: active}
+  - {ruleId: INFRA-TRC-001, environment: ha, subject: argo-server, result: unknown, reason: coverage-incomplete, disposition: active}
+  absent:
+  - {ruleId: INFRA-PLC-001, environment: ha, result: pass}
+  - {ruleId: ARGO-TRC-101, result: violation}
+- id: hydrated-placement-passes
+  type: results
+  dimension: deployment
+  weight: 3
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  rules: {INFRA-PLC-001: pass, INFRA-PLC-002: pass, INFRA-TRC-001: pass, INFRA-TRC-002: pass, INFRA-TRC-004: unknown}
+  absent:
+  - ruleId: INFRA-PLC-001
+    environment: non-ha-hydrated
+    result: [violation, unknown]
+- id: detects-server-in-default-namespace
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [server-in-default-namespace]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  findings:
+  - {ruleId: INFRA-PLC-002, environment: non-ha-hydrated, subject: argo-server, result: violation, disposition: active}
+  - {ruleId: INFRA-PLC-001, environment: non-ha-hydrated, subject: argo-server, result: violation, disposition: active}
+  rules: {INFRA-PLC-002: violation}
+- id: detects-server-declared-twice
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [server-declared-twice]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  diagnostics: [CO-OBS-021]
+  findings:
+  - {ruleId: INFRA-PLC-001, environment: non-ha-hydrated, subject: argo-server, result: unknown, reason: evidence-conflict}
+  rules: {INFRA-PLC-001: unknown}
+- id: trace-server
+  type: command
+  dimension: reporting
+  weight: 2
+  argv: [bash, -c, concordia index >/dev/null 2>&1; concordia check --no-color >/dev/null 2>&1; concordia trace argo-server --format json]
+  expectExit: 0
+  stdoutJson:
+  - {path: 'traces[environment=ha].gaps[step=workload].reason', equals: coverage-incomplete}
+  - {path: 'traces[environment=ha].gaps[step=workload].lossModes', contains: unrendered-template}
+  - {path: 'traces[environment=non-ha].gaps[step=workload].reason', equals: coverage-incomplete}
+  - {path: 'traces[environment=non-ha-hydrated].gaps[step=workload]', exists: false}
+  - {path: 'traces[environment=non-ha-hydrated].steps', length: 5}

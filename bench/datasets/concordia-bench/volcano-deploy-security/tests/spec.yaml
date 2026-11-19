@@ -1,0 +1,137 @@
+repo: volcano
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: VC-SEC-001
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: VC-SEC-002
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: VC-IMG-001
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  packs:
+  - builtin:infrastructure
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - path: environments[id=dev-hydrated]
+    exists: true
+  - path: environments[id=dev-hydrated].sources
+    contains: bench-env/dev-hydrated/**
+- id: policy-verify
+  type: command
+  dimension: reporting
+  weight: 1
+  argv: [concordia, policy, verify]
+  expectExit: 0
+  stdoutContains: [VC-SEC-001, VC-SEC-002, VC-IMG-001]
+- id: head-obligations
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  findings:
+  - ruleId: VC-SEC-001
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: dev
+    subject: vc-cluster-rolebindings
+    disposition: active
+  - ruleId: VC-SEC-001
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: monitoring
+    subject: vc-cluster-rolebindings
+    disposition: active
+  - ruleId: VC-SEC-002
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: dev
+    subject: vc-scheduler
+    disposition: active
+  - ruleId: VC-IMG-001
+    kind: obligation-unknown
+    result: unknown
+    reason: coverage-incomplete
+    environment: dev
+    subject: vc-scheduler
+    disposition: active
+  - ruleId: VC-IMG-001
+    kind: obligation-violation
+    result: violation
+    environment: monitoring
+    subject: vc-monitoring
+    disposition: active
+  absent:
+  - ruleId: [VC-SEC-001, VC-SEC-002, VC-IMG-001]
+    environment: dev-hydrated
+  - ruleId: [VC-SEC-001, VC-SEC-002, VC-IMG-001]
+    result: pass
+- id: detects-scheduler-canary-without-config
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - scheduler-canary-without-config
+  expectExit: 0
+  findings:
+  - ruleId: VC-SEC-002
+    kind: obligation-absent
+    result: violation
+    environment: dev-hydrated
+    subject: vc-scheduler
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId: [VC-SEC-001, VC-IMG-001]
+    environment: dev-hydrated
+- id: detects-foreign-controllers-image
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - foreign-controllers-image
+  expectExit: 0
+  findings:
+  - ruleId: VC-IMG-001
+    kind: obligation-violation
+    result: violation
+    environment: dev-hydrated
+    subject: vc-controllers
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId: [VC-SEC-001, VC-SEC-002]
+    environment: dev-hydrated
+- id: detects-default-sa-bound
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - default-sa-bound
+  expectExit: 0
+  findings:
+  - ruleId: VC-SEC-001
+    kind: obligation-violation
+    result: violation
+    environment: dev-hydrated
+    subject: vc-cluster-rolebindings
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId: [VC-SEC-002, VC-IMG-001]
+    environment: dev-hydrated

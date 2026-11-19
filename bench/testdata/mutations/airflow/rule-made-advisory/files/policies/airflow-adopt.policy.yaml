@@ -1,0 +1,29 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: airflow-adopt
+  version: 1.0.0
+rules:
+- id: AF-ISO-001
+  name: The Task SDK and task runner never import the core models, the metadata database or the scheduler
+  severity: warning
+  owner: team-airflow
+  rationale: AIP-72 isolates task execution from the metadata database, so shared-database coupling between workers and the core breaks data ownership.
+  remediation: Call the Execution API through the SDK API client instead of importing core modules.
+  subject:
+    calmNodes: [af-task-sdk, af-task-runner]
+  forbid:
+    target:
+      calmNodes: [af-models, af-metadata-db, af-scheduler]
+    edges: [IMPORTS, CALLS]
+    traversal: direct
+- id: AF-DEC-001
+  name: Every dependency between components is declared in the architecture
+  severity: error
+  owner: team-airflow
+  rationale: Undeclared and contradicted dependencies are architecture drift between the model and the code.
+  remediation: Declare the relationship in the CALM model, or remove the dependency.
+  subject:
+    nodeTypes: [service, database]
+  declaredOnly:
+    edges: [IMPORTS]

@@ -1,0 +1,1 @@
+feat: search reuses the agent history type

@@ -1,0 +1,70 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: fzf-structure
+  version: 1.0.0
+rules:
+- id: FZF-DNY-001
+  name: The matcher never reaches the renderer
+  severity: error
+  owner: team-fzf
+  rationale: Transitive coupling - a path from the matching algorithm to terminal rendering through any intermediate package is a skipped layer that direct import rules do not see.
+  remediation: Break the path by passing the needed data in as arguments instead of importing through the intermediate package.
+  subject:
+    calmNodes: [fzf-algo]
+  denyPath:
+    target:
+      calmNodes: [fzf-tui]
+    edges: [IMPORTS, CALLS]
+    maxDepth: 3
+- id: FZF-API-001
+  name: Utilities are used through their public API
+  severity: error
+  owner: team-fzf
+  rationale: Leaky abstraction - callers that reach into util internals outside util.go and chars.go freeze those internals.
+  remediation: Add the needed function to the public API files of the util package or use an existing exported function from them.
+  subject:
+    calmNodes: [fzf-core, fzf-tui, fzf-algo]
+  publicApiOnly:
+    target:
+      calmNodes: [fzf-util]
+    api:
+      sourceRoots: [src/util/util.go, src/util/chars.go]
+    edges: [CALLS]
+- id: FZF-ENT-001
+  name: The protector entry point exists
+  severity: error
+  owner: team-fzf
+  rationale: Operability - the sandbox entry point Protect must exist, otherwise the program starts without its OS protections.
+  remediation: Restore the Protect function in the protector package.
+  subject:
+    calmNodes: [fzf-protector]
+  require:
+    entity:
+      labels: [Function]
+      namePattern: 'Protect$'
+- id: FZF-AGG-001
+  name: The renderer does not use the matcher
+  severity: error
+  owner: team-fzf
+  rationale: Modularity - the renderer depends on the matching algorithm only through the finder core, and one offending file is one finding however many imports and calls it has.
+  remediation: Move the code that needs the matcher into the finder core.
+  aggregation: file
+  subject:
+    calmNodes: [fzf-tui]
+  forbid:
+    target:
+      calmNodes: [fzf-algo]
+    edges: [IMPORTS, CALLS]
+- id: FZF-WRN-001
+  name: The sandbox package avoids the utilities
+  severity: warning
+  owner: team-fzf
+  rationale: Modularity - the protector stays free of other packages so that it can be reviewed alone; a breach warns first.
+  remediation: Inline the needed code in the protector package.
+  subject:
+    calmNodes: [fzf-protector]
+  forbid:
+    target:
+      calmNodes: [fzf-util]
+    edges: [IMPORTS, CALLS]

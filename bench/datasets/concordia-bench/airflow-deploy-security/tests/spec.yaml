@@ -1,0 +1,135 @@
+repo: airflow
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - bench-values
+  - bench-env
+  branch: main
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=prod-hydrated].sources
+    contains: bench-env/prod-hydrated/**
+  - path: observation.projects[0].include
+    contains: bench-env/**
+  - path: policies.packs[*].use
+    contains: builtin:infrastructure
+  - path: policies.files
+    contains: policies/airflow-deploy-security.policy.yaml
+  - path: check.enforcement[family=deployment-security].mode
+    equals: advisory
+  - path: check.enforcement[family=deployment-availability].mode
+    equals: advisory
+- id: values-file
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: bench-values/prod.yaml
+  select:
+  - path: executor
+    equals: CeleryExecutor
+  - path: networkPolicies.enabled
+    equals: true
+  - path: pgbouncer.enabled
+    equals: true
+  - path: scheduler.podDisruptionBudget.enabled
+    equals: true
+  - path: apiServer.podDisruptionBudget.enabled
+    equals: true
+- id: security-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: af-worker
+    nodeType: service
+  - id: af-metadata-secret
+    nodeType: data-asset
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - af-worker
+  - af-metadata-secret
+  - af-api-server
+  - af-scheduler
+  - af-dag-processing
+  - af-namespace
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: AF-SEC-001
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: AF-REL-001
+    predicate: obligation
+    severity: error
+    family: deployment-availability
+- id: worker-references-metadata-secret
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  rules:
+    AF-SEC-001: violation
+    AF-REL-001: pass
+  findings:
+  - ruleId: AF-SEC-001
+    subject: af-worker
+    environment: prod-hydrated
+    result: violation
+    kind: obligation-violation
+    enforcement: advisory
+    disposition: active
+  - ruleId: AF-SEC-001
+    subject: af-worker
+    environment: prod-hydrated
+    result: unknown
+    reason: binding-gap
+    kind: binding-gap
+- id: availability-at-head
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  absent:
+  - ruleId: AF-REL-001
+  rules:
+    AF-REL-001: pass
+- id: detects-duplicate-scheduler-manifest
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - scheduler-declared-twice
+  expectExit: 0
+  diagnostics:
+  - CO-OBS-021
+  rules:
+    AF-REL-001: unknown
+  findings:
+  - ruleId: AF-REL-001
+    subject: af-scheduler
+    environment: prod-hydrated
+    result: unknown
+    reason: evidence-conflict
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId: AF-REL-001
+    subject: af-scheduler
+    result: pass

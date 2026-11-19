@@ -1,0 +1,8 @@
+[
+  {
+    "path": "manifests/base/redis/argocd-redis-network-policy.yaml",
+    "base_sha256": "285c3f2f7ab5fd9ca4e742692955a50b2f81e117e520f6d89a01a07386dad527",
+    "edit": "edits/manifests/base/redis/argocd-redis-network-policy.yaml.ed",
+    "sha256": "30a7280a814cfca4d32e2ea798f496c08cd77fbb5bcda0f1ad2e31837d762af7"
+  }
+]

@@ -1,0 +1,9 @@
+airflow-core/adr/lang-sdk/*
+!airflow-core/adr/lang-sdk/0002-workload-execution.md
+!airflow-core/adr/lang-sdk/0004-dag-parsing.md
+dev/breeze/doc/adr/*
+!dev/breeze/doc/adr/0001-record-architecture-decisions.md
+go-sdk/adr/
+java-sdk/adr/
+ts-sdk/adr/
+providers/common/sql/src/airflow/providers/common/sql/doc/adr/

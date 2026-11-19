@@ -1,0 +1,1 @@
+bench: notifications controller reads the credential store

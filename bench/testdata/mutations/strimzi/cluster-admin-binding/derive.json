@@ -1,0 +1,8 @@
+[
+  {
+    "path": "install/cluster-operator/033-ClusterRoleBinding-strimzi-cluster-operator-kafka-client-delegation.yaml",
+    "base_sha256": "b16b05adb731af3e8ab9ac181a3189bdaf5f6b34b8680e41d7b6e48b7ffe5908",
+    "edit": "edits/install/cluster-operator/033-ClusterRoleBinding-strimzi-cluster-operator-kafka-client-delegation.yaml.ed",
+    "sha256": "e59ed9629363e36973aacf345cc5999968efcb126ba2492ff311153f5cd88237"
+  }
+]

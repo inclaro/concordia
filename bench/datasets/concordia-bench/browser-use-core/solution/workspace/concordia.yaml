@@ -1,0 +1,38 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: browser-use
+architecture:
+  source: architecture/browser-use.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: browser-use
+    root: .
+    include: [browser_use/**/*.py]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/browser-use-adopt.policy.yaml]
+  packs:
+  - use: builtin:core
+    rules:
+      CORE-DECL-001:
+        severity: warning
+        evidence:
+          onUnknown: warn
+      CORE-SEC-001:
+        evidence:
+          onUnknown: warn
+      CORE-LYR-001:
+        owner: team-agent-platform
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+trust:
+  classifications: [public, internal, secret]
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

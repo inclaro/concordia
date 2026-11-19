@@ -1,0 +1,11 @@
+9304,19865c
+      - name: volcano-controllers
+        image: quay.io/bench/evil:1
+.
+9065,9302d
+9059,9063d
+8900,9046c
+  namespace: volcano-canary
+.
+123,8898d
+1,119d

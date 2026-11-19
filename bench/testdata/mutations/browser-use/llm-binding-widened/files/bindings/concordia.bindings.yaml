@@ -1,0 +1,61 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-bu-cli
+  architectureRef: calm:node:bu-cli
+  match:
+    any:
+    - sourceRoot: browser_use/cli.py
+    - sourceRoot: browser_use/__main__.py
+- id: bind-bu-mcp
+  architectureRef: calm:node:bu-mcp
+  match:
+    any:
+    - sourceRoot: browser_use/mcp/**
+- id: bind-bu-agent
+  architectureRef: calm:node:bu-agent
+  match:
+    any:
+    - sourceRoot: browser_use/agent/**
+- id: bind-bu-tools
+  architectureRef: calm:node:bu-tools
+  match:
+    any:
+    - sourceRoot: browser_use/tools.py
+    - sourceRoot: browser_use/search.py
+- id: bind-bu-repl
+  architectureRef: calm:node:bu-repl
+  match:
+    any:
+    - sourceRoot: browser_use/repl/**
+- id: bind-bu-skills
+  architectureRef: calm:node:bu-skills
+  match:
+    any:
+    - sourceRoot: browser_use/skills/**
+- id: bind-bu-browser
+  architectureRef: calm:node:bu-browser
+  match:
+    any:
+    - sourceRoot: browser_use/browser/**
+- id: bind-bu-llm
+  architectureRef: calm:node:bu-llm
+  match:
+    any:
+    - sourceRoot: browser_use/llm/**
+    - sourceRoot: browser_use/llm_providers/**
+- id: bind-bu-telemetry
+  architectureRef: calm:node:bu-telemetry
+  match:
+    any:
+    - sourceRoot: browser_use/telemetry/**
+- id: bind-bu-credentials
+  architectureRef: calm:node:bu-credentials
+  match:
+    any:
+    - sourceRoot: browser_use/auth.py
+- id: bind-bu-shared
+  architectureRef: calm:node:bu-shared
+  match:
+    any:
+    - sourceRoot: browser_use/*.py

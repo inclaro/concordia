@@ -1,0 +1,52 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: knative-serving-assurance
+  version: 1.0.0
+rules:
+- id: KN-AUTH-001
+  name: The activator cannot read the webhook certificates
+  severity: error
+  owner: team-knative-serving
+  rationale: Least privilege - the request-path component must not hold read access to the admission serving certificates.
+  remediation: Remove the secrets permission from the role that the activator uses.
+  family: effective-access
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [kn-activator]
+      to:
+        calmNodes: [kn-webhook-certs]
+      expect: not-granted
+- id: KN-AUTH-002
+  name: The controller can manage the webhook certificates
+  severity: error
+  owner: team-knative-serving
+  rationale: Operability - the controller rotates the certificates, so it needs access; losing it breaks admission.
+  remediation: Restore the permission on secrets for the controller service account.
+  family: effective-access
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from:
+        calmNodes: [kn-controller]
+      to:
+        calmNodes: [kn-webhook-certs]
+      expect: granted
+- id: KN-NET-001
+  name: The activator has no network path to the autoscaler on the metrics port
+  severity: error
+  owner: team-knative-serving
+  rationale: Zero-trust networking - without a policy every workload can reach every other one.
+  remediation: Add a network policy that denies the traffic.
+  family: effective-access
+  require:
+    effectiveAccess:
+      dimension: network
+      from:
+        calmNodes: [kn-activator]
+      to:
+        calmNodes: [kn-autoscaler]
+      expect: denied
+      ports: [8080]

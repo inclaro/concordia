@@ -1,0 +1,31 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-vc-scheduler-assurance
+  architectureRef: calm:node:vc-scheduler
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-scheduler
+- id: bind-vc-admission-assurance
+  architectureRef: calm:node:vc-admission
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-admission
+- id: bind-vc-scheduler-config
+  architectureRef: calm:node:vc-scheduler-config
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: ConfigMap
+      namespace: volcano-system
+      name: volcano-scheduler-configmap

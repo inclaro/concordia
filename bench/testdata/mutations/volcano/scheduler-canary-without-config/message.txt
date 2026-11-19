@@ -1,0 +1,1 @@
+feat(bench): canary scheduler without the configuration volume

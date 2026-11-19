@@ -1,0 +1,246 @@
+repo: airflow
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - bench-values
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: af-namespace
+    nodeType: system
+  - id: af-worker
+    nodeType: service
+  - id: af-pgbouncer
+    nodeType: service
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - af-api-server
+  - af-scheduler
+  - af-dag-processing
+  - af-namespace
+  - af-worker
+  - af-pgbouncer
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs:
+  - builtin:assurance
+  rules:
+  - id: AF-NET-001
+    predicate: require.effectiveAccess
+    severity: error
+  - id: AF-NET-002
+    predicate: require.effectiveAccess
+    severity: error
+- id: assurance-declared
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=prod].sources
+    contains: chart/templates/**
+  - path: observation.projects[name=airflow].include
+    contains: chart/templates/**
+  - path: assurance.rendering.sources[environment=prod].tool
+    equals: helm
+  - path: assurance.rendering.sources[environment=prod].path
+    equals: chart
+  - path: assurance.rendering.sources[environment=prod].release
+    equals: airflow
+  - path: assurance.rendering.sources[environment=prod].namespace
+    equals: airflow
+  - path: assurance.rendering.sources[environment=prod].valuesFiles
+    contains: bench-values/prod.yaml
+  - path: assurance.evaluators[environment=prod].kinds
+    contains: network-policy
+  - path: assurance.evaluators[environment=prod].kinds
+    contains: rbac
+  - path: assurance.evaluators[environment=prod].assumes
+    contains: network-policy-enforced
+  - path: environments[id=staging].sources
+    contains: chart/templates/**
+  - path: assurance.rendering.sources[environment=staging].tool
+    equals: helm
+  - path: assurance.rendering.sources[environment=staging].valuesFiles
+    contains: bench-values/staging.yaml
+  - path: assurance.evaluators[environment=staging].kinds
+    contains: network-policy
+  - path: assurance.evaluators[environment=prod].assumes
+    contains: rbac-authorizer-enabled
+  - path: policies.packs[*].use
+    contains: builtin:assurance
+- id: values-file
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: bench-values/prod.yaml
+  select:
+  - path: executor
+    equals: CeleryExecutor
+  - path: networkPolicies.enabled
+    equals: true
+  - path: pgbouncer.enabled
+    equals: true
+- id: staging-values-file
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: bench-values/staging.yaml
+  select:
+  - path: ports.pgbouncer
+    equals: 6544
+  - path: networkPolicies.enabled
+    equals: true
+- id: renderer-pinned
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: .concordia.lock
+  select:
+  - path: resolved.renderers.helm.sha256
+    exists: true
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv:
+  - concordia
+  - assurance
+  - validate
+  expectExit: 0
+- id: head-evaluations
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules:
+    AF-NET-001: violation
+    AF-NET-002: unknown
+    ASR-REN-001: pass
+    ASR-PRV-001: unknown
+    ASR-PRV-002: unknown
+  findings:
+  - ruleId: AF-NET-001
+    kind: obligation-violation
+    subject: af-worker
+    environment: prod
+    result: violation
+    disposition: active
+  - ruleId: ASR-PRV-001
+    kind: obligation-unknown
+    result: unknown
+    reason: claim-not-enabled
+    disposition: active
+  absent:
+  - ruleId: AF-NET-002
+    environment: prod
+  - ruleId: ASR-REN-001
+  select:
+  - path: assurance.rendered[tool=helm].coverage
+    equals: complete
+  - path: assurance.rendered[tool=helm].environment
+    equals: prod
+  - path: assurance.evaluations
+    countWhere:
+      kind: network-policy
+      verdict: allowed
+      environment: prod
+    equals: 2
+  - path: assurance.evaluations[kind=network-policy].declaredAssumptions
+    contains: network-policy-enforced
+- id: unknown-without-enforcement-assumption
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  findings:
+  - ruleId: AF-NET-001
+    kind: obligation-unknown
+    subject: af-worker
+    environment: staging
+    result: unknown
+    reason: enforcement-not-declared
+    disposition: active
+  - ruleId: AF-NET-002
+    kind: obligation-unknown
+    subject: af-scheduler
+    environment: staging
+    result: unknown
+    reason: enforcement-not-declared
+    disposition: active
+  absent:
+  - ruleId: AF-NET-002
+    environment: staging
+    result: violation
+  select:
+  - path: assurance.evaluations[environment=staging].declaredAssumptions
+    equals: []
+  - path: assurance.evaluations[environment=prod].declaredAssumptions
+    contains: network-policy-enforced
+- id: render-failure-is-unknown
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations:
+  - assurance-broken-template
+  expectExit: 0
+  diagnostics:
+  - CO-PRV-005
+  rules:
+    AF-NET-001: unknown
+    AF-NET-002: unknown
+    ASR-REN-001: unknown
+  findings:
+  - ruleId: ASR-REN-001
+    kind: obligation-unknown
+    result: unknown
+    reason: rendered-evidence-missing
+    disposition: active
+  - ruleId: AF-NET-001
+    kind: obligation-unknown
+    subject: af-worker
+    result: unknown
+    reason: rendered-evidence-missing
+    disposition: active
+  - ruleId: AF-NET-002
+    kind: obligation-unknown
+    subject: af-scheduler
+    result: unknown
+    reason: rendered-evidence-missing
+    disposition: active
+  select:
+  - path: assurance.rendered[tool=helm].coverage
+    equals: failed
+- id: renderer-pin-mismatch
+  type: results
+  dimension: assurance
+  weight: 2
+  mutations:
+  - assurance-helm-pin-mismatch
+  expectExit: 5
+  diagnostics:
+  - CO-PRV-003
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

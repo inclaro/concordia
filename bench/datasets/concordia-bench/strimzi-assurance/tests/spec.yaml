@@ -1,0 +1,114 @@
+repo: strimzi
+checks:
+- id: assurance-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=install].sources
+    contains: packaging/helm-charts/helm3/strimzi-kafka-operator/**
+  - path: assurance.rendering.sources[environment=install].tool
+    equals: helm
+  - path: assurance.rendering.sources[environment=install].release
+    equals: strimzi
+  - path: assurance.rendering.sources[environment=install].namespace
+    equals: strimzi
+  - path: assurance.evaluators[environment=install].kinds
+    contains: rbac
+  - path: assurance.evaluators[environment=install].assumes
+    contains: rbac-authorizer-enabled
+  - path: environments[id=edge].sources
+    contains: packaging/helm-charts/helm3/strimzi-kafka-operator/**
+  - path: assurance.rendering.sources[environment=edge].tool
+    equals: helm
+  - path: assurance.verification.results
+    contains: build/results/*.json
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: STZ-AUTH-001
+    predicate: require.effectiveAccess
+    severity: error
+  - id: STZ-VER-001
+    predicate: require.checkResult
+    severity: error
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv: [concordia, assurance, validate]
+  expectExit: 0
+- id: effective-access-head
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: assurance.evaluations[kind=rbac].environment
+    equals: install
+  - path: assurance.evaluations[kind=rbac].verdict
+    equals: granted
+  absent:
+  - ruleId: STZ-AUTH-001
+    environment: install
+    disposition: active
+- id: no-evaluator-environment-head
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules:
+    STZ-AUTH-001: unknown
+  findings:
+  - ruleId: STZ-AUTH-001
+    environment: edge
+    result: unknown
+    reason: no-evaluator-available
+  absent:
+  - ruleId: STZ-AUTH-001
+    environment: edge
+    result: pass
+- id: check-result-unsigned-head
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules:
+    STZ-VER-001: unknown
+  findings:
+  - ruleId: STZ-VER-001
+    environment: install
+    result: unknown
+    reason: no-evidence-supplied
+    enforcement: advisory
+  absent:
+  - ruleId: STZ-VER-001
+    result: pass
+  - ruleId: STZ-VER-001
+    result: violation
+  diagnostics: [CO-PRV-010]
+  select:
+  - path: assurance.checkResults[check=operator-unit-tests].admissible
+    equals: false
+  - path: assurance.checkResults[check=operator-unit-tests].reasons
+    contains: not-authenticated
+- id: chart-template-broken
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [chart-template-broken]
+  expectExit: 0
+  rules:
+    STZ-AUTH-001: unknown
+  findings:
+  - ruleId: STZ-AUTH-001
+    environment: install
+    result: unknown
+    reason: rendered-evidence-missing
+  absent:
+  - ruleId: STZ-AUTH-001
+    result: pass
+  diagnostics: [CO-PRV-005]

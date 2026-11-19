@@ -1,0 +1,95 @@
+repo: nushell
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: NU-BUD-001
+    predicate: budget
+    severity: error
+  - id: NU-EDG-001
+    predicate: require.edge
+    severity: error
+  - id: NU-COV-001
+    predicate: forbid
+    severity: error
+  - id: NU-COV-002
+    predicate: forbid
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules:
+    NU-BUD-001: pass
+    NU-EDG-001: pass
+    NU-COV-001: pass
+    NU-COV-002: pass
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: budget-exceeded
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - plugin-protocol-uses-engine
+  expectExit: 1
+  findings:
+  - ruleId: NU-BUD-001
+    kind: budget-exceeded
+    location.path: crates/nu-plugin-protocol/src/bench_engine.rs
+    disposition: active
+  counts:
+  - match:
+      ruleId: NU-BUD-001
+    equals: 1
+- id: required-edge-missing
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - cmd-plugin-drops-protocol
+  expectExit: 1
+  findings:
+  - ruleId: NU-EDG-001
+    kind: missing-edge
+    disposition: active
+- id: coverage-shortfall-fails
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - utils-gains-script-assets
+  expectExit: 4
+  rules:
+    NU-COV-001: unknown
+    NU-COV-002: pass
+  select:
+  - path: rules[ruleId=NU-COV-001].reasons[0].code
+    equals: CO-CON-021
+- id: coverage-shortfall-warns
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - config-gains-script-assets
+  expectExit: 0
+  rules:
+    NU-COV-002: unknown
+    NU-COV-001: pass
+  select:
+  - path: rules[ruleId=NU-COV-002].reasons[0].code
+    equals: CO-CON-021
+- id: allows-command-uses-protocol
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - command-uses-protocol
+  expectExit: 0
+  absent:
+  - location.path: crates/nu-command/src/bench_ok.rs
+    disposition: active

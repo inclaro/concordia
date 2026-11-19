@@ -1,0 +1,115 @@
+repo: knative-serving
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - policies/knative-serving-deploy-security.policy.yaml
+  - bench-env/production-hydrated
+  - bindings
+  - architecture
+  branch: main
+- id: hydrated-environment
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=production-hydrated].sources
+    contains: bench-env/production-hydrated/**
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - kn-sa-controller
+  - kn-webhook-certs
+  - kn-ns
+  - kn-activator
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: KN-SEC-001
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: KN-SEC-002
+    predicate: obligation
+    severity: error
+    family: deployment-security
+  - id: KN-REL-001
+    predicate: obligation
+    severity: error
+    family: deployment-reliability
+  - id: KN-REL-002
+    predicate: obligation
+    severity: error
+    family: deployment-reliability
+- id: head-reliability
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  findings:
+  - ruleId: KN-REL-001
+    subject: kn-autoscaler
+    environment: production-hydrated
+    result: unknown
+    reason: coverage-incomplete
+    enforcement: advisory
+  - ruleId: KN-REL-001
+    subject: kn-controller
+    environment: production-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: KN-SEC-001
+    subject: kn-autoscaler
+    environment: production
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId: KN-REL-001
+    subject: kn-activator
+    environment: production-hydrated
+  - ruleId: KN-REL-001
+    subject: kn-webhook
+    environment: production-hydrated
+  - ruleId: KN-REL-002
+    environment: production-hydrated
+- id: head-autoscaler-shares-identity
+  type: results
+  dimension: deployment
+  weight: 2
+  expectExit: 0
+  xfail: "D5: CBM 0.12.1 emits no USAGE edge for serviceAccountName or secret volumes of Deployment pod templates, yet uses-runtime-identity and references-secret coverage is reported complete, so forbidden rules pass instead of reporting the violation or an unknown"
+  findings:
+  - ruleId: KN-SEC-001
+    subject: kn-autoscaler
+    environment: production-hydrated
+    result: violation
+  - ruleId: KN-SEC-001
+    subject: kn-webhook
+    environment: production-hydrated
+    result: violation
+- id: detects-activator-hpa-removed
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - activator-hpa-removed
+  expectExit: 0
+  rules:
+    KN-REL-002: violation
+  findings:
+  - ruleId: KN-REL-002
+    subject: kn-activator
+    environment: production-hydrated
+    result: violation
+    enforcement: advisory
+  absent:
+  - ruleId: KN-REL-002
+    subject: kn-webhook
+    environment: production-hydrated

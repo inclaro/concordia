@@ -1,0 +1,1 @@
+bench: resolve the conflict with an explicit precedence

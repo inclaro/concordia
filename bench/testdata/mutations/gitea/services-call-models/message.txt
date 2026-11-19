@@ -1,0 +1,1 @@
+bench: service uses a model

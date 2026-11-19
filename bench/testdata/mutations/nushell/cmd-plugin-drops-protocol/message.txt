@@ -1,0 +1,1 @@
+refactor: stop importing nu_protocol in nu-cmd-plugin

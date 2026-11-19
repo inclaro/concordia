@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="concordia">
+  <testsuite name="fzf-architecture@1.0.0">
+    <testcase classname="fzf-architecture" name="FZF-BND-001 Algo is independent"/>
+    <testcase classname="fzf-architecture" name="FZF-LYR-001 Layers point downwards">
+      <failure type="violation">sha256:abc src/util/bench_violation.go:3</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

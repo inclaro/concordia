@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/chart/volcano/templates/admission.yaml",
+    "from": "installer/helm/chart/volcano/templates/admission.yaml",
+    "base_sha256": "a184c3e391871a813a1f36da3ce466c81909d8d2cdf3ea96eff04dd6b781b467",
+    "edit": "edits/bench-env/chart/volcano/templates/admission.yaml.ed",
+    "sha256": "3358d5d504ca8bc427ad30d26765169c75f33d27e3d756ac28f7b131512fe3c0"
+  }
+]

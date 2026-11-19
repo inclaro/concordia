@@ -1,0 +1,262 @@
+repo: gitea
+checks:
+- id: gate-deprecate-layering
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/deprecate-layering-decision
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-002
+    kind: adr-inactive
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+  - ruleId: GOV-ADR-003
+    kind: adr-rule-unjustified
+    location.path: docs/adr/decisions.yaml
+    disposition: active
+- id: gate-retire-migration
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/retire-migration-decision
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DEC-101
+    kind: adr-contradictory-status
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-002
+    kind: adr-contradictory-status
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-003
+    kind: adr-rule-unjustified
+    location.path: docs/adr/decisions.yaml
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-contradictory-status
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-005
+    kind: adr-contradictory-status
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+- id: gate-decisions-cycle
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/decisions-replace-each-other
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DEC-101
+    kind: adr-cycle
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GITEA-DEC-101
+    kind: adr-cycle
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+  - ruleId: GOV-ADR-002
+    kind: adr-cycle
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-002
+    kind: adr-cycle
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+  - ruleId: GOV-ADR-003
+    kind: adr-rule-unjustified
+    location.path: docs/adr/decisions.yaml
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-cycle
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-cycle
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+  - ruleId: GOV-ADR-005
+    kind: adr-cycle
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+- id: gate-unlink-migration
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/unlink-migration-decision-rule
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DEC-101
+    kind: adr-enforcement-gap
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-enforcement-gap
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+- id: gate-unlink-layering
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/unlink-layering-decision-rule
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DEC-101
+    kind: adr-enforcement-gap
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-enforcement-gap
+    location.path: docs/adr/0002-layered-architecture.md
+    disposition: active
+- id: gate-downgrade-migration
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/downgrade-migration-rule
+  args:
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DEC-101
+    kind: adr-advisory-only
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+  - ruleId: GOV-ADR-004
+    kind: adr-advisory-only
+    location.path: docs/adr/0001-frozen-migrations.md
+    disposition: active
+- id: gate-note-and-comments
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/migration-note-and-comment-fixes
+  args:
+  - --changed
+  - main
+  expectExit: 0
+  rules:
+    GOV-ADR-006: pass
+  absent:
+  - disposition: active
+    severity: error
+- id: review-deprecate-layering
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/deprecate-layering-decision
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GOV-ADR-002
+    path: docs/adr/0002-layered-architecture.md
+  - ruleId: GOV-ADR-003
+    path: docs/adr/decisions.yaml
+- id: review-retire-migration
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/retire-migration-decision
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-002
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-005
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-003
+    path: docs/adr/decisions.yaml
+- id: review-decisions-cycle
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/decisions-replace-each-other
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-002
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-005
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0002-layered-architecture.md
+  - ruleId: GOV-ADR-002
+    path: docs/adr/0002-layered-architecture.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0002-layered-architecture.md
+  - ruleId: GOV-ADR-003
+    path: docs/adr/decisions.yaml
+- id: review-unlink-migration
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/unlink-migration-decision-rule
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0001-frozen-migrations.md
+- id: review-unlink-layering
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/unlink-layering-decision-rule
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0002-layered-architecture.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0002-layered-architecture.md
+- id: review-downgrade-migration
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/downgrade-migration-rule
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: GITEA-DEC-101
+    path: docs/adr/0001-frozen-migrations.md
+  - ruleId: GOV-ADR-004
+    path: docs/adr/0001-frozen-migrations.md
+- id: review-note-and-comments
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/migration-note-and-comment-fixes
+  expectVerdict: pass
+  expectViolations: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

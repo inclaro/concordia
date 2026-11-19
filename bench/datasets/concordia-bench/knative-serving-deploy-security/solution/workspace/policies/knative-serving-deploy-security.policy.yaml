@@ -1,0 +1,78 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: knative-serving-deploy-security
+  version: 1.0.0
+rules:
+- id: KN-SEC-001
+  name: The autoscaler and the webhook do not share the controller identity
+  severity: error
+  owner: team-knative-serving
+  rationale: Excessive privilege - a shared service account gives the autoscaler and the webhook every permission of the controller.
+  remediation: Give each component its own service account with only the permissions it needs.
+  family: deployment-security
+  subject:
+    calmNodes: [kn-autoscaler, kn-webhook]
+  obligation:
+    type: forbidden
+    relation:
+      kind: uses-runtime-identity
+      direction: from-workload
+      target:
+        calmNodes: [kn-sa-controller]
+    scope:
+      environments: [production, production-hydrated]
+- id: KN-SEC-002
+  name: Only the webhook mounts or reads its serving certificates
+  severity: error
+  owner: team-knative-serving
+  rationale: Secret sprawl - every extra reader of the webhook certificate secret widens the blast radius of a key leak.
+  remediation: Remove the secret reference from the workload or give it its own secret.
+  family: deployment-security
+  subject:
+    calmNodes: [kn-activator, kn-autoscaler, kn-controller]
+  obligation:
+    type: forbidden
+    relation:
+      kind: references-secret
+      direction: from-workload
+      target:
+        calmNodes: [kn-webhook-certs]
+    scope:
+      environments: [production, production-hydrated]
+- id: KN-REL-001
+  name: Every control-plane Deployment has a disruption budget
+  severity: error
+  owner: team-knative-serving
+  rationale: Single point of failure - without a disruption budget a node drain can evict every replica of a component at once.
+  remediation: Add a PodDisruptionBudget that selects the Deployment.
+  family: deployment-reliability
+  subject:
+    calmNodes: [kn-activator, kn-autoscaler, kn-controller, kn-webhook]
+  obligation:
+    type: required
+    relation:
+      kind: disruption-policy-target
+      direction: to-workload
+    scope:
+      environments: [production, production-hydrated]
+  evidence:
+    completeness: complete
+    passCompleteness: any
+- id: KN-REL-002
+  name: The activator and the webhook scale horizontally
+  severity: error
+  owner: team-knative-serving
+  rationale: Reliability - a fixed replica count cannot absorb load on the request path and the admission path.
+  remediation: Add a HorizontalPodAutoscaler that targets the Deployment.
+  family: deployment-reliability
+  subject:
+    calmNodes: [kn-activator, kn-webhook]
+  obligation:
+    type: required
+    multiplicity: exists
+    relation:
+      kind: scaling-target
+      direction: to-workload
+    scope:
+      environments: [production, production-hydrated]

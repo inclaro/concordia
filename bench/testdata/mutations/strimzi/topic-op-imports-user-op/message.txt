@@ -1,0 +1,1 @@
+feat: topic operator reuses the user operator config

@@ -1,0 +1,43 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-hopp-backend
+  architectureRef: calm:node:hopp-backend
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-backend/**
+- id: bind-hopp-cli
+  architectureRef: calm:node:hopp-cli
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-cli/**
+- id: bind-hopp-selfhost-web
+  architectureRef: calm:node:hopp-selfhost-web
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-selfhost-web/**
+- id: bind-hopp-sh-admin
+  architectureRef: calm:node:hopp-sh-admin
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-sh-admin/**
+- id: bind-hopp-common
+  architectureRef: calm:node:hopp-common
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-common/**
+- id: bind-hopp-js-sandbox
+  architectureRef: calm:node:hopp-js-sandbox
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-js-sandbox/**
+- id: bind-hopp-kernel
+  architectureRef: calm:node:hopp-kernel
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-kernel/**
+- id: bind-hopp-data
+  architectureRef: calm:node:hopp-data
+  match:
+    any:
+    - sourceRoot: packages/hoppscotch-data/**

@@ -1,0 +1,58 @@
+repo: knative-serving
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - docs/architecture
+  branch: main
+- id: views-declared
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: views[id=kn-deployment].kind
+    equals: deployment
+  - path: views[id=kn-deployment].environment
+    equals: production
+  - path: views[id=kn-deployment].output.exports[*].format
+    contains: plantuml
+  - path: views[id=kn-deployment].output.exports[*].format
+    contains: dot
+  - path: views[id=kn-container].output.exports[*].format
+    contains: json
+  - path: views[id=kn-container].origin
+    equals: generated
+- id: render-views
+  type: command
+  dimension: governance
+  weight: 2
+  argv:
+  - concordia
+  - render
+  - --views
+  expectExit: 0
+- id: views-clean
+  type: results
+  dimension: governance
+  weight: 2
+  expectExit: 0
+  rules:
+    VIEW-PRES-001: pass
+    VIEW-FRESH-001: pass
+  areas:
+    diagramCurrency: pass
+- id: detects-view-deleted
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - kn-view-deleted
+  findings:
+  - ruleId: VIEW-PRES-001
+    kind: view-absent

@@ -1,0 +1,1 @@
+feat: ship Nushell helper scripts next to the nu-utils sources

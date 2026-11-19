@@ -1,0 +1,78 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-kn-activator
+  architectureRef: calm:node:kn-activator
+  match:
+    any:
+    - sourceRoot: cmd/activator/**
+    - sourceRoot: pkg/activator/**
+    - {kind: workload, environment: production, resourceKind: Deployment, name: activator}
+    - {kind: workload, environment: edge, resourceKind: Deployment, name: activator}
+- id: bind-kn-autoscaler
+  architectureRef: calm:node:kn-autoscaler
+  match:
+    any:
+    - sourceRoot: cmd/autoscaler/**
+    - sourceRoot: pkg/autoscaler/**
+    - {kind: workload, environment: production, resourceKind: Deployment, name: autoscaler}
+    - {kind: workload, environment: edge, resourceKind: Deployment, name: autoscaler}
+- id: bind-kn-controller
+  architectureRef: calm:node:kn-controller
+  match:
+    any:
+    - sourceRoot: cmd/controller/**
+    - sourceRoot: pkg/reconciler/**
+    - {kind: workload, environment: production, resourceKind: Deployment, name: controller}
+    - {kind: workload, environment: edge, resourceKind: Deployment, name: controller}
+- id: bind-kn-webhook
+  architectureRef: calm:node:kn-webhook
+  match:
+    any:
+    - sourceRoot: cmd/webhook/**
+    - sourceRoot: pkg/webhook/**
+    - {kind: workload, environment: production, resourceKind: Deployment, name: webhook}
+    - {kind: workload, environment: edge, resourceKind: Deployment, name: webhook}
+- id: bind-kn-queue
+  architectureRef: calm:node:kn-queue
+  match:
+    any:
+    - sourceRoot: cmd/queue/**
+    - sourceRoot: pkg/queue/**
+- id: bind-kn-apis
+  architectureRef: calm:node:kn-apis
+  match:
+    any:
+    - sourceRoot: pkg/apis/**
+- id: bind-kn-client
+  architectureRef: calm:node:kn-client
+  match:
+    any:
+    - sourceRoot: pkg/client/**
+- id: bind-kn-shared
+  architectureRef: calm:node:kn-shared
+  match:
+    any:
+    - sourceRoot: pkg/http/**
+    - sourceRoot: pkg/logging/**
+    - sourceRoot: pkg/metrics/**
+    - sourceRoot: pkg/networking/**
+    - sourceRoot: pkg/observability/**
+    - sourceRoot: pkg/resources/**
+    - sourceRoot: pkg/deployment/**
+    - sourceRoot: pkg/gc/**
+    - sourceRoot: pkg/leaderelection/**
+    - sourceRoot: pkg/cleanup/**
+- id: bind-kn-ns
+  architectureRef: calm:node:kn-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: production, address: core/Namespace/_/knative-serving}
+    - {kind: infraResource, environment: edge, address: core/Namespace/_/knative-serving}
+- id: bind-kn-testing-ns
+  architectureRef: calm:node:kn-testing-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: production, address: core/Namespace/_/knative-testing}

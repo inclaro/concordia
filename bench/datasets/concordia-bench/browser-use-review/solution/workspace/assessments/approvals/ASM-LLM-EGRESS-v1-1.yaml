@@ -1,0 +1,39 @@
+apiVersion: concordia.io/v1alpha1
+assessment:
+    digest: sha256:01364c0511f0c1cd98ecd91e22234459c1029c68f56a4e696f40689bc31c984b
+    id: ASM-LLM-EGRESS
+    version: 1
+assumptions: []
+capabilityProfile: cbm-0.12.1
+contractVersion: review-digest/1
+decidedAt: "2026-11-16T01:05:01Z"
+decision: approved
+environment: library
+evidence: []
+id: ASM-LLM-EGRESS-v1-1
+kind: AssessmentApproval
+producedUnder:
+    authorityDigest: sha256:0b223fe9a17ada6c0c3802e58f589efd93833f8920194150fcb28a5ad2597501
+    evaluatorVersions:
+        adapterSchema: concordia-cbm/v2
+        provider: 0.12.1
+    normalizationVersion: "2.1"
+    policyDigest: sha256:bd189aea59c7c2c612714c75f0e3f44272fb4f4acec1d07f4fb3d27aaf53bcb5
+reviewer:
+    authority: security-review
+    identity: secops@bench.invalid
+scope:
+    calmNodes:
+        - bu-llm
+subject:
+    dependencies:
+        - digest: sha256:8b1207dc85c59dc8d1a203290297552844044879bb2f1f9e09dc0cb262478cc4
+          identity: binding:bind-bu-llm
+          kind: binding
+        - digest: sha256:7b633b4f0f779fc68e65ed7fd38484db6eac346f74c139e3349619f6ddfed2a8
+          identity: calm:node:bu-llm#classification
+          kind: data-classification
+        - digest: sha256:743313d6c1ba4bb332033e789bfea0d9bd71b8d6d4d863a5ba47ff8f357f5eb7
+          identity: calm:node:bu-llm#trust
+          kind: trust-context
+    digest: sha256:6e4e1abf8c4512c170d64944291665ee93c1df48288234278c0de21adcc4a078

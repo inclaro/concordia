@@ -1,0 +1,218 @@
+repo: airflow
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: af-api-server
+    nodeType: service
+    tags:
+    - presentation
+  - id: af-execution-api
+    nodeType: service
+    tags:
+    - contract
+  - id: af-scheduler
+    nodeType: service
+  - id: af-dag-processing
+    nodeType: service
+  - id: af-executors
+    nodeType: service
+  - id: af-models
+    nodeType: service
+    tags:
+    - domain
+  - id: af-metadata-db
+    nodeType: database
+  - id: af-task-sdk
+    nodeType: service
+    tags:
+    - contract
+  - id: af-task-runner
+    nodeType: service
+  - id: af-provider-standard
+    nodeType: service
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - af-api-server
+    - af-dag-processing
+  - - af-api-server
+    - af-execution-api
+  - - af-api-server
+    - af-metadata-db
+  - - af-api-server
+    - af-models
+  - - af-api-server
+    - af-scheduler
+  - - af-dag-processing
+    - af-execution-api
+  - - af-dag-processing
+    - af-executors
+  - - af-dag-processing
+    - af-metadata-db
+  - - af-dag-processing
+    - af-models
+  - - af-dag-processing
+    - af-task-runner
+  - - af-dag-processing
+    - af-task-sdk
+  - - af-execution-api
+    - af-api-server
+  - - af-execution-api
+    - af-metadata-db
+  - - af-execution-api
+    - af-models
+  - - af-executors
+    - af-execution-api
+  - - af-executors
+    - af-models
+  - - af-models
+    - af-dag-processing
+  - - af-models
+    - af-execution-api
+  - - af-models
+    - af-executors
+  - - af-models
+    - af-metadata-db
+  - - af-models
+    - af-task-sdk
+  - - af-provider-standard
+    - af-executors
+  - - af-provider-standard
+    - af-metadata-db
+  - - af-provider-standard
+    - af-models
+  - - af-provider-standard
+    - af-task-runner
+  - - af-provider-standard
+    - af-task-sdk
+  - - af-scheduler
+    - af-dag-processing
+  - - af-scheduler
+    - af-execution-api
+  - - af-scheduler
+    - af-executors
+  - - af-scheduler
+    - af-metadata-db
+  - - af-scheduler
+    - af-models
+  - - af-scheduler
+    - af-task-runner
+  - - af-scheduler
+    - af-task-sdk
+  - - af-task-runner
+    - af-dag-processing
+  - - af-task-runner
+    - af-task-sdk
+  - - af-task-sdk
+    - af-dag-processing
+  - - af-task-sdk
+    - af-provider-standard
+  - - af-task-sdk
+    - af-task-runner
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - af-api-server
+  - af-execution-api
+  - af-scheduler
+  - af-dag-processing
+  - af-executors
+  - af-models
+  - af-metadata-db
+  - af-task-sdk
+  - af-task-runner
+  - af-provider-standard
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: AF-ISO-001
+    predicate: forbid
+    severity: error
+  - id: AF-DEC-001
+    predicate: declaredOnly
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  - path: summary.rules.error
+    equals: 0
+- id: detects-sdk-imports-models
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - sdk-imports-models
+  expectExit: 1
+  findings:
+  - ruleId: AF-ISO-001
+    kind: forbidden-dependency
+    location.path: task-sdk/src/airflow/sdk/bench_models.py
+    disposition: active
+- id: detects-undeclared
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - models-imports-provider
+  expectExit: 1
+  findings:
+  - ruleId: AF-DEC-001
+    kind: undeclared
+    location.path: airflow-core/src/airflow/models/bench_provider.py
+    disposition: active
+- id: detects-contradiction
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - provider-imports-executors
+  expectExit: 1
+  findings:
+  - ruleId: AF-DEC-001
+    kind: contradiction
+    location.path: providers/standard/src/airflow/providers/standard/bench_executors.py
+    disposition: active
+- id: allows-sdk-imports-sdk
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - sdk-imports-sdk
+  expectExit: 0
+  absent:
+  - location.path: task-sdk/src/airflow/sdk/bench_ok.py
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: browser-use-adopt
+  version: 1.0.0
+rules:
+- id: BU-DEC-001
+  name: Module dependencies are declared in the architecture
+  severity: error
+  owner: team-browser-use
+  rationale: Architecture drift - an import between modules that the model does not declare means the model no longer describes the system.
+  remediation: Declare the dependency in the architecture model if it is intended, otherwise remove the import.
+  subject:
+    nodeTypes: [service]
+  declaredOnly:
+    edges: [IMPORTS]
+- id: BU-ALW-001
+  name: The agent loop uses only its adapters and shared code
+  severity: error
+  owner: team-browser-use
+  rationale: Missing anti-corruption layer - the agent loop must reach skills and entry points only through adapters, or the adapters stop being replaceable.
+  remediation: Move the shared logic into a shared module or an adapter that the agent is allowed to use.
+  subject:
+    calmNodes: [bu-agent]
+  allowOnly:
+    targets:
+      calmNodes: [bu-browser, bu-llm, bu-tools, bu-repl, bu-telemetry, bu-credentials, bu-shared]
+    edges: [IMPORTS]

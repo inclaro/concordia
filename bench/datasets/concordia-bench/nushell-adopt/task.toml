@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/nushell-adopt"
+version = "1.0.0"
+description = "Adopt Concordia on Nushell: crate model, bindings, layer rule and a baseline."
+keywords = ["concordia", "calm", "architecture", "rust", "nushell", "adopt"]
+
+[metadata]
+difficulty = "hard"
+category = "adopt"
+tags = ["nushell", "rust", "adopt"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

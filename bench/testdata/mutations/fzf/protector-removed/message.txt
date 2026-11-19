@@ -1,0 +1,1 @@
+refactor(protector): rename the sandbox hook

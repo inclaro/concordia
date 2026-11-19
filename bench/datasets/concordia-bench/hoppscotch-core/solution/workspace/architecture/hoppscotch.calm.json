@@ -1,0 +1,370 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "hopp-backend",
+      "node-type": "service",
+      "name": "Hopp Backend",
+      "description": "NestJS GraphQL backend.",
+      "concordia": {
+        "tags": [
+          "application"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-cli",
+      "node-type": "service",
+      "name": "Hopp Cli",
+      "description": "Command-line test runner."
+    },
+    {
+      "unique-id": "hopp-selfhost-web",
+      "node-type": "webclient",
+      "name": "Hopp Selfhost Web",
+      "description": "Self-hosted web app.",
+      "concordia": {
+        "tags": [
+          "presentation",
+          "client"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-sh-admin",
+      "node-type": "webclient",
+      "name": "Hopp Sh Admin",
+      "description": "Self-hosted admin dashboard.",
+      "concordia": {
+        "tags": [
+          "presentation",
+          "client"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-common",
+      "node-type": "service",
+      "name": "Hopp Common",
+      "description": "Shared front-end application code.",
+      "concordia": {
+        "tags": [
+          "application"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-js-sandbox",
+      "node-type": "service",
+      "name": "Hopp Js Sandbox",
+      "description": "Sandbox for pre-request and test scripts."
+    },
+    {
+      "unique-id": "hopp-kernel",
+      "node-type": "service",
+      "name": "Hopp Kernel",
+      "description": "Platform kernel for I/O and relay.",
+      "concordia": {
+        "tags": [
+          "infrastructure"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-data",
+      "node-type": "service",
+      "name": "Hopp Data",
+      "description": "Shared data types and schemas.",
+      "concordia": {
+        "tags": [
+          "shared-kernel",
+          "domain",
+          "shared"
+        ]
+      }
+    },
+    {
+      "unique-id": "hopp-db",
+      "node-type": "database",
+      "name": "Hopp Db",
+      "description": "PostgreSQL database."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "hopp-selfhost-web-uses-hopp-common",
+      "description": "Hopp Selfhost Web uses Hopp Common.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-selfhost-web"
+          },
+          "destination": {
+            "node": "hopp-common"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-selfhost-web-uses-hopp-data",
+      "description": "Hopp Selfhost Web uses Hopp Data.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-selfhost-web"
+          },
+          "destination": {
+            "node": "hopp-data"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-selfhost-web-uses-hopp-kernel",
+      "description": "Hopp Selfhost Web uses Hopp Kernel.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-selfhost-web"
+          },
+          "destination": {
+            "node": "hopp-kernel"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "CALLS"
+          ],
+          "required": true,
+          "minimum-confidence": "heuristic"
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-selfhost-web-uses-hopp-backend",
+      "description": "Hopp Selfhost Web uses Hopp Backend.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-selfhost-web"
+          },
+          "destination": {
+            "node": "hopp-backend"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-sh-admin-uses-hopp-backend",
+      "description": "Hopp Sh Admin uses Hopp Backend.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-sh-admin"
+          },
+          "destination": {
+            "node": "hopp-backend"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-common-uses-hopp-data",
+      "description": "Hopp Common uses Hopp Data.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-common"
+          },
+          "destination": {
+            "node": "hopp-data"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-common-uses-hopp-js-sandbox",
+      "description": "Hopp Common uses Hopp Js Sandbox.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-common"
+          },
+          "destination": {
+            "node": "hopp-js-sandbox"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-common-uses-hopp-kernel",
+      "description": "Hopp Common uses Hopp Kernel.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-common"
+          },
+          "destination": {
+            "node": "hopp-kernel"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-cli-uses-hopp-data",
+      "description": "Hopp Cli uses Hopp Data.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-cli"
+          },
+          "destination": {
+            "node": "hopp-data"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-cli-uses-hopp-js-sandbox",
+      "description": "Hopp Cli uses Hopp Js Sandbox.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-cli"
+          },
+          "destination": {
+            "node": "hopp-js-sandbox"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-js-sandbox-uses-hopp-data",
+      "description": "Hopp Js Sandbox uses Hopp Data.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-js-sandbox"
+          },
+          "destination": {
+            "node": "hopp-data"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-backend-uses-hopp-db",
+      "description": "Hopp Backend uses Hopp Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-backend"
+          },
+          "destination": {
+            "node": "hopp-db"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "IMPORTS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "hopp-kernel-uses-hopp-data",
+      "description": "Hopp Kernel uses Hopp Data.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "hopp-kernel"
+          },
+          "destination": {
+            "node": "hopp-data"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "CALLS"
+          ]
+        }
+      }
+    }
+  ]
+}

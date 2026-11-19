@@ -1,0 +1,43 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: strimzi-structure
+  version: 1.0.0
+rules:
+- id: STZ-IND-001
+  name: "The three operators are independent"
+  severity: error
+  owner: team-strimzi
+  rationale: "Distributed monolith: operators are deployed and released separately, so a compile-time dependency between them couples their release cycles."
+  remediation: "Move shared behaviour into operator-common instead of importing another operator."
+  aggregation: architecture-pair
+  subject:
+    calmNodes: [stz-cluster-operator, stz-topic-operator, stz-user-operator]
+  independent:
+    edges: [IMPORTS]
+- id: STZ-CYC-001
+  name: "No import cycles between the small Strimzi modules"
+  severity: error
+  owner: team-strimzi
+  rationale: "Modularity: cyclic dependencies between modules (acyclic dependencies principle) make them impossible to build, test or release alone."
+  remediation: "Break the cycle by moving the shared code into the lower module."
+  subject:
+    calmNodes: [stz-topic-operator, stz-user-operator, stz-certificate-issuer, stz-config-model]
+  require:
+    graphProperty: acyclic
+    edges: [IMPORTS]
+    collapseBy: architectureBinding
+- id: STZ-BUD-001
+  name: "Topic and user operators do not grow towards the cluster operator"
+  severity: error
+  owner: team-strimzi
+  rationale: "Hub-like dependency: the cluster operator is the largest module, and every new import of it from the smaller operators is a ratchet violation."
+  remediation: "Extract the needed class into operator-common."
+  subject:
+    calmNodes: [stz-topic-operator, stz-user-operator]
+  budget:
+    measure: forbidden-edges
+    max: 11
+    target:
+      calmNodes: [stz-cluster-operator]
+    edges: [IMPORTS]

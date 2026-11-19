@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bench-sidecar
+  namespace: knative-serving
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bench-sidecar
+  template:
+    metadata:
+      labels:
+        app: bench-sidecar
+    spec:
+      serviceAccountName: controller
+      containers:
+      - name: bench-sidecar
+        image: ko://knative.dev/serving/cmd/activator

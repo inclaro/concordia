@@ -1,0 +1,1 @@
+bench: downgrade the migration rule to a warning

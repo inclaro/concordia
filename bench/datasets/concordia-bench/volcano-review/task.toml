@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/volcano-review"
+version = "1.0.0"
+description = "Require a security assessment of Volcano admission and keep its approval current."
+keywords = ["concordia", "calm", "architecture", "go", "volcano", "review"]
+
+[metadata]
+difficulty = "medium"
+category = "review"
+tags = ["volcano", "go", "review"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

@@ -24,7 +24,6 @@ mise.local.toml
 
 # Not published: kept only in inclaro/concordia-internal
 /openspec
-/bench
 /record-cbm
 /calm-parity
 /concordia

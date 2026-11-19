@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/chart/volcano/templates/bench-scheduler-configmaps.yaml",
+    "from": "installer/helm/chart/volcano/templates/scheduler.yaml",
+    "base_sha256": "cc70a780c384ef92f2bcf920fd736365fa0e553fccdf6561148ab6e4bcf3db4b",
+    "edit": "edits/bench-env/chart/volcano/templates/bench-scheduler-configmaps.yaml.ed",
+    "sha256": "bb359b201c54e3aa3cd0b7b34ff3d7f732d63d1a56f9db9d99ea43590176db33"
+  }
+]

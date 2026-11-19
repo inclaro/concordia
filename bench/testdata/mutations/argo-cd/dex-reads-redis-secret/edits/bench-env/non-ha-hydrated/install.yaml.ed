@@ -1,0 +1,16 @@
+3153a
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-redis
+  namespace: argocd
+type: Opaque
+.
+1213a
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: argocd-redis
+              key: auth
+.

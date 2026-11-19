@@ -1,0 +1,79 @@
+repo: argo-cd
+checks:
+- id: adr-validate
+  type: command
+  dimension: governance
+  weight: 2
+  argv: [concordia, adr, validate]
+  expectExit: 0
+- id: adr-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: adr.files, contains: docs/adr/decisions.yaml}
+  - {path: adr.lifecycle.statusMap.Approved, equals: accepted}
+  - {path: 'adr.triggers[id=TRG-INSTALL].paths', contains: manifests/**}
+  - {path: 'adr.triggers[id=TRG-INSTALL].category', equals: deployment-strategy}
+  - {path: observation.indexMode, equals: full}
+- id: register
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: docs/adr/decisions.yaml
+  select:
+  - {path: 'decisions[id=ADR-0001].enforcedBy[*].rule', contains: ARGO-API-001}
+  - {path: 'decisions[id=ADR-0002].enforcedBy[*].rule', contains: ARGO-IND-001}
+  - {path: 'decisions[id=ADR-0003].categories', contains: deployment-strategy}
+  - {path: decisions, length: 3}
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 1
+  packs: ['builtin:adr-governance']
+- id: governance-clean
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 0
+  rules: {GOV-ADR-001: pass, GOV-ADR-002: pass, GOV-ADR-003: pass, GOV-ADR-004: pass, GOV-ADR-005: pass, GOV-ADR-006: not-applicable}
+  areas: {adrGovernance: pass}
+  diagnostics: [CO-ADR-009]
+  select:
+  - {path: 'decisionSummary.decisions[id=ADR-1].applicability.state', equals: active}
+- id: adr-file-deleted
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-001, kind: adr-absent, disposition: active, subject: ADR-2}
+  mutations: [adr-file-deleted]
+- id: rule-made-advisory
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 1
+  findings:
+  - {ruleId: GOV-ADR-004, kind: adr-advisory-only, disposition: active, subject: ADR-1}
+  mutations: [rule-made-advisory]
+- id: install-change-without-decision
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 4
+  findings:
+  - {ruleId: GOV-ADR-006, kind: adr-trigger-unsatisfied, disposition: active, subject: TRG-INSTALL}
+  mutations: [install-change]
+  args: [--changed, HEAD~1]
+- id: install-change-not-evaluated-without-changed
+  type: results
+  dimension: governance
+  weight: 2
+  mutations: [install-change]
+  expectExit: 0
+  rules: {GOV-ADR-006: not-applicable}
+  diagnostics: [CO-ADR-009]
+  absent:
+  - {ruleId: GOV-ADR-006, disposition: active}

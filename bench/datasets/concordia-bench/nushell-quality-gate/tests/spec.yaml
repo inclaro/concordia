@@ -1,0 +1,61 @@
+repo: nushell
+checks:
+- id: security-area-detected
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/require-security-quality-area
+  expectExit: 1
+  findings:
+  - ruleId: quality:area:security
+    area: qualityEvaluation
+    disposition: active
+- id: security-area-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/require-security-quality-area
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: quality:area:security
+    path: ''
+- id: renamed-check-refused
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/rename-unit-tests-check
+  expectExit: 2
+  stderrContains:
+  - CO-POL-005
+- id: renamed-check-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/rename-unit-tests-check
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors:
+  - CO-POL-005
+- id: protocol-use-allowed
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/use-protocol-in-commands
+  expectExit: 0
+  absent:
+  - location.path: crates/nu-command/src/bench_ok.rs
+    disposition: active
+- id: protocol-use-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/use-protocol-in-commands
+  expectVerdict: pass
+  expectViolations: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

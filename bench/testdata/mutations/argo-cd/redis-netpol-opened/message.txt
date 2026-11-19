@@ -1,0 +1,1 @@
+bench: the Redis network policy admits every client

@@ -1,0 +1,43 @@
+# agent.yaml: terminus-2 agent evaluation of the concordia-bench task corpus.
+#
+# Purpose: end-to-end acceptance test of Concordia through a real agent harness.
+#          The agent configures Concordia on real repositories from the task
+#          ticket and Concordia's docs and `--help` only; the verifier checks
+#          that Concordia then behaves as documented. Most trials should score
+#          1.0. Triage every trial below 1.0 (see bench/README.md).
+# Usage:   put OPENROUTER_API_KEY=... in bench/.env (or export it), then
+#          cd bench && harbor run -c configs/agent.yaml --env-file .env
+#          (or `mise run bench:run`, which builds the images first)
+#
+# terminus-2 calls the LLM from the host process, not from the container, so
+# the key must be in the host environment or in the --env-file; a key in
+# bench/.env overrides an exported one. To use another
+# model, copy this file and change model_name and model_info: harbor 0.25.0
+# ignores `-m` when the config lists agents, and model_info must match the
+# model's token limits.
+
+jobs_dir: jobs
+
+datasets:
+  - path: ./datasets/concordia-bench
+
+n_attempts: 3
+
+n_concurrent_trials: 2
+
+environment:
+  type: docker
+  force_build: false
+  delete: true
+
+agents:
+  # OpenRouter. The model's context is 1048576 tokens (OpenRouter model list);
+  # input and output share it, so output is capped at 65536 and input gets the rest.
+  - name: terminus-2
+    model_name: openrouter/deepseek/deepseek-v4.1-flash-1017
+    kwargs:
+      record_terminal_session: false
+      reasoning_effort: low
+      model_info:
+        max_input_tokens: 983040
+        max_output_tokens: 65536

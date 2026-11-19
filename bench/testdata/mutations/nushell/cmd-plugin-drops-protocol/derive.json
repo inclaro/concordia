@@ -1,0 +1,44 @@
+[
+  {
+    "path": "crates/nu-cmd-plugin/src/commands/plugin/add.rs",
+    "base_sha256": "ca4235da8800e76fca98599b53a11c85ecf4690056ddb1385ca0e0ae8a146137",
+    "edit": "edits/crates/nu-cmd-plugin/src/commands/plugin/add.rs.ed",
+    "sha256": "b291298c7d760cacd83e4f5f3307168245f927b7953de5c675d451aaedbcd145"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/commands/plugin/list.rs",
+    "base_sha256": "72d8829e827a1580b74128253f2122d2a370b2f85e01b206558f3ad61a0ec427",
+    "edit": "edits/crates/nu-cmd-plugin/src/commands/plugin/list.rs.ed",
+    "sha256": "beb9d28d364477472016f937e7bfcd6a417df6516fdd4a81e51508c61deda69c"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/commands/plugin/rm.rs",
+    "base_sha256": "3d79e83237fc4cf3247675512a3730f0228e3e5a0f878a2962bd1bbe2f12c003",
+    "edit": "edits/crates/nu-cmd-plugin/src/commands/plugin/rm.rs.ed",
+    "sha256": "5da4c4d04e44560d4ed84917bd0b1c24d4bae536507660a278857b1b888af052"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/commands/plugin/stop.rs",
+    "base_sha256": "dc0a0f3e3889840e08d7706c2715af2dad88d7035b86093052341b6715f4f133",
+    "edit": "edits/crates/nu-cmd-plugin/src/commands/plugin/stop.rs.ed",
+    "sha256": "d353356b833c34152aa14ac0940c9a7a87a9dbb5e3308b0bdef781325911738f"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/commands/plugin/use_.rs",
+    "base_sha256": "7080fcea9ad3e1ba6e1120b16f95608b223c6bae08ef64ba5ba584c265e5c569",
+    "edit": "edits/crates/nu-cmd-plugin/src/commands/plugin/use_.rs.ed",
+    "sha256": "a18cd13745a533457f08a398ea162fdc26dc289475d0015b61359d924d5b0ed0"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/default_context.rs",
+    "base_sha256": "9b52c3f9c76a96f9105f02ebfc60cd721927740859f5c3301f771bf283e9fcdd",
+    "edit": "edits/crates/nu-cmd-plugin/src/default_context.rs.ed",
+    "sha256": "1ac8271e6aacbd258d56478f36673efaa745a3ebc7f746086adaf9a837d30438"
+  },
+  {
+    "path": "crates/nu-cmd-plugin/src/util.rs",
+    "base_sha256": "55a5d026198a2c5809eae9239307156b8285c5aadabee40a8afee3be224328d0",
+    "edit": "edits/crates/nu-cmd-plugin/src/util.rs.ed",
+    "sha256": "57b9041615b8167839deb7a92732debaab86ad75cdb036801602418dfc93efb0"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {"driver": {"name": "Concordia"}},
+      "results": [
+        {
+          "ruleId": "FZF-LYR-001",
+          "level": "error",
+          "locations": [
+            {"physicalLocation": {"artifactLocation": {"uri": "src/util/bench_violation.go", "uriBaseId": "SRCROOT"}, "region": {"startLine": 3}}}
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: hoppscotch
+architecture:
+  source: architecture/hoppscotch.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: hoppscotch
+    root: .
+    include:
+    - packages/hoppscotch-backend/src/**
+    - packages/hoppscotch-cli/src/*.ts
+    - packages/hoppscotch-cli/src/commands/**
+    - packages/hoppscotch-cli/src/handlers/**
+    - packages/hoppscotch-cli/src/interfaces/**
+    - packages/hoppscotch-cli/src/options/**
+    - packages/hoppscotch-cli/src/types/**
+    - packages/hoppscotch-cli/src/utils/**
+    - packages/hoppscotch-common/src/**
+    - packages/hoppscotch-data/src/**
+    - packages/hoppscotch-js-sandbox/src/*.ts
+    - packages/hoppscotch-js-sandbox/src/bootstrap-code/**
+    - packages/hoppscotch-js-sandbox/src/cage-modules/**
+    - packages/hoppscotch-js-sandbox/src/constants/**
+    - packages/hoppscotch-js-sandbox/src/node/**
+    - packages/hoppscotch-js-sandbox/src/types/**
+    - packages/hoppscotch-js-sandbox/src/utils/**
+    - packages/hoppscotch-js-sandbox/src/web/**
+    - packages/hoppscotch-kernel/src/**
+    - packages/hoppscotch-selfhost-web/src/**
+    - packages/hoppscotch-sh-admin/src/**
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/hoppscotch-adopt.policy.yaml, policies/hoppscotch-structure.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.85
+  unknown: fail
+  failOn: error

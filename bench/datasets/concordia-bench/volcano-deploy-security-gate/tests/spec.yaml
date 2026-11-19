@@ -1,0 +1,39 @@
+repo: volcano
+checks:
+- id: review-drop-precedence-list
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/drop-precedence-list
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors: [CO-POL-017]
+- id: review-use-shared-helpers
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/use-shared-helpers-in-admission
+  expectVerdict: pass
+  expectViolations: []
+- id: precedence-required
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/drop-precedence-list
+  expectExit: 2
+  diagnostics: [CO-POL-017]
+- id: shared-helpers-allowed
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/use-shared-helpers-in-admission
+  expectExit: 0
+  absent:
+  - location.path: pkg/webhooks/util/bench_shared.go
+    disposition: active
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

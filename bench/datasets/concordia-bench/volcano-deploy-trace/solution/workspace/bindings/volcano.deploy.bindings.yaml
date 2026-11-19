@@ -1,0 +1,84 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-vc-scheduler-deploy
+  architectureRef: calm:node:vc-scheduler
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-scheduler
+    - kind: image
+      repository: docker.io/volcanosh/vc-scheduler
+- id: bind-vc-controllers-deploy
+  architectureRef: calm:node:vc-controllers
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-controllers
+    - kind: image
+      repository: docker.io/volcanosh/vc-controller-manager
+- id: bind-vc-admission-deploy
+  architectureRef: calm:node:vc-admission
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-admission
+    - kind: workload
+      environment: dev
+      resourceKind: Job
+      name: volcano-admission-init
+    - kind: image
+      repository: docker.io/volcanosh/vc-webhook-manager
+- id: bind-vc-agent-deploy
+  architectureRef: calm:node:vc-agent
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: DaemonSet
+      name: volcano-agent
+    - kind: image
+      repository: docker.io/volcanosh/vc-agent
+- id: bind-vc-monitoring-deploy
+  architectureRef: calm:node:vc-monitoring
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: monitoring
+      resourceKind: Deployment
+      name: prometheus-deployment
+    - kind: image
+      repository: prom/prometheus
+- id: bind-vc-system-ns
+  architectureRef: calm:node:vc-system-ns
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/Namespace/_/volcano-system
+    - kind: infraResource
+      environment: monitoring
+      address: core/Namespace/_/volcano-system
+- id: bind-vc-monitoring-ns
+  architectureRef: calm:node:vc-monitoring-ns
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/Namespace/_/volcano-monitoring
+    - kind: infraResource
+      environment: monitoring
+      address: core/Namespace/_/volcano-monitoring

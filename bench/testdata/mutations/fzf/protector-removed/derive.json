@@ -1,0 +1,8 @@
+[
+  {
+    "path": "src/protector/protector.go",
+    "base_sha256": "955dbaa50e31edfb6789bd9b18248e9562b8512b8d341c2879414d1d05af9fd4",
+    "edit": "edits/src/protector/protector.go.ed",
+    "sha256": "377f77d60ca116310c3ff93127d1b58c5a795409810c55dcd884a3cea57cb86f"
+  }
+]

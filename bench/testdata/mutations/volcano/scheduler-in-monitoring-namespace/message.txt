@@ -1,0 +1,1 @@
+feat(bench): run a second scheduler in the monitoring namespace

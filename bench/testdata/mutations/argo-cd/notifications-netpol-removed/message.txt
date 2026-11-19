@@ -1,0 +1,1 @@
+bench: the notifications controller loses its network policy

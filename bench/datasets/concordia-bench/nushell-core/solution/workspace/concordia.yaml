@@ -1,0 +1,32 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: nushell
+architecture:
+  source: architecture/nushell.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: nushell
+    root: .
+    include: ['crates/*/src/**']
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/nushell-adopt.policy.yaml]
+  packs:
+  - use: builtin:core
+    rules:
+      CORE-CYC-001:
+        evidence:
+          minimumCoverage: 0.9
+      CORE-LYR-003:
+        severity: error
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

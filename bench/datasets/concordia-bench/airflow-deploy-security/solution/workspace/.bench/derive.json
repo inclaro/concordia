@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/prod-hydrated/airflow.yaml",
+    "run": "helm template airflow chart/ --namespace airflow -f bench-values/prod.yaml --set-string fernetKey=SGRTaGdmVWh4YVJNc29oVUEwcmRMbmRBR1BUd0Rmdlo=,apiSecretKey=tUM9EiPDJN9d9XIiXANWCLWZOWA5kkci,jwtSecret=SIbQxwZUMZrmt9kI8LCyGhxonEUYnum6ptlTjYJgXzbJ16C2QPEjH3vj3oUa0TbiOAYAIgmm9LfKgrzTFTgO9L1po4ZOoWeKpjUdzaEUpFYGqXO2o08Zy1069pZvgW8j,redis.password=ICtF9xWbA6 | /opt/venv/bin/python /opt/concordia-bench/bin/hydrate-namespace.py /dev/stdin /dev/stdout airflow",
+    "base_sha256": "5480d0612325a72c9ded8f8dca4e951c80cdd583c0ebc3e03f513afd33f2184a",
+    "edit": "edits/bench-env/prod-hydrated/airflow.yaml.ed",
+    "sha256": "e264b8c9df0f897368ec8381bd2423515b5c28530b191b0c5c19e4c257357fc7"
+  }
+]

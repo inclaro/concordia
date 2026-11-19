@@ -1,0 +1,1 @@
+feat(bench): canary controller with a community image

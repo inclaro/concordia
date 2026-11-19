@@ -1,0 +1,20 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-vc-admission-deploy
+  architectureRef: calm:node:vc-admission
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-admission
+    - kind: workload
+      environment: dev
+      resourceKind: Job
+      name: volcano-admission-init
+    - kind: workload
+      environment: dev
+      resourceKind: Deployment
+      name: volcano-admission-canary

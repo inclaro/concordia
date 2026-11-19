@@ -1,0 +1,87 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-vc-scheduler
+  architectureRef: calm:node:vc-scheduler
+  match:
+    any:
+    - sourceRoot: cmd/scheduler/**
+    - sourceRoot: pkg/scheduler/*.go
+    - sourceRoot: pkg/scheduler/actions/**
+    - sourceRoot: pkg/scheduler/cache/**
+    - sourceRoot: pkg/scheduler/conf/**
+    - sourceRoot: pkg/scheduler/util/**
+    - sourceRoot: pkg/scheduler/metrics/**
+    - sourceRoot: pkg/scheduler/gate/**
+    - sourceRoot: pkg/scheduler/unschedulable/**
+    - sourceRoot: pkg/scheduler/uthelper/**
+- id: bind-vc-framework
+  architectureRef: calm:node:vc-framework
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/framework/**
+    - sourceRoot: pkg/scheduler/api/**
+- id: bind-vc-plugin-gang
+  architectureRef: calm:node:vc-plugin-gang
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/gang/**
+- id: bind-vc-plugin-drf
+  architectureRef: calm:node:vc-plugin-drf
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/drf/**
+- id: bind-vc-plugin-proportion
+  architectureRef: calm:node:vc-plugin-proportion
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/proportion/**
+- id: bind-vc-plugin-binpack
+  architectureRef: calm:node:vc-plugin-binpack
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/binpack/**
+- id: bind-vc-plugin-predicates
+  architectureRef: calm:node:vc-plugin-predicates
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/predicates/**
+- id: bind-vc-plugin-capacity
+  architectureRef: calm:node:vc-plugin-capacity
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/capacity/**
+- id: bind-vc-plugins-other
+  architectureRef: calm:node:vc-plugins-other
+  match:
+    any:
+    - sourceRoot: pkg/scheduler/plugins/**
+- id: bind-vc-controllers
+  architectureRef: calm:node:vc-controllers
+  match:
+    any:
+    - sourceRoot: cmd/controller-manager/**
+    - sourceRoot: pkg/controllers/**
+- id: bind-vc-admission
+  architectureRef: calm:node:vc-admission
+  match:
+    any:
+    - sourceRoot: cmd/webhook-manager/**
+    - sourceRoot: pkg/webhooks/**
+- id: bind-vc-agent
+  architectureRef: calm:node:vc-agent
+  match:
+    any:
+    - sourceRoot: cmd/agent/**
+    - sourceRoot: pkg/agent/**
+- id: bind-vc-shared
+  architectureRef: calm:node:vc-shared
+  match:
+    any:
+    - sourceRoot: pkg/util/**
+    - sourceRoot: pkg/kube/**
+    - sourceRoot: pkg/features/**
+    - sourceRoot: pkg/config/**
+    - sourceRoot: pkg/signals/**
+    - sourceRoot: pkg/version/**
+    - sourceRoot: pkg/filewatcher/**

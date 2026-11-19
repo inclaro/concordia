@@ -1,0 +1,63 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: volcano-deploy-security
+  version: 1.0.0
+rules:
+- id: VC-SEC-001
+  name: No cluster role binding grants the default service account
+  severity: error
+  owner: team-volcano
+  family: deployment-security
+  rationale: Excessive privilege - a cluster role granted to the default service account of a namespace gives it to every pod of that namespace that names no account.
+  remediation: Create a dedicated service account for the workload and bind the cluster role to it.
+  subject:
+    calmNodes: [vc-cluster-rolebindings]
+  obligation:
+    type: forbidden
+    relation:
+      kind: binding-applies-to-principal
+      direction: from-subject
+      target:
+        calmNodes: [vc-default-sa]
+    scope:
+      environments: [dev, monitoring, dev-hydrated]
+- id: VC-SEC-002
+  name: The scheduler workload mounts its configuration
+  severity: error
+  owner: team-volcano
+  family: deployment-security
+  rationale: Configuration drift - a scheduler that does not reference its configuration map runs with built-in defaults instead of the reviewed plugin set.
+  remediation: Mount the volcano-scheduler-configmap configuration map in the scheduler deployment.
+  subject:
+    calmNodes: [vc-scheduler]
+  obligation:
+    type: required
+    multiplicity: forAll
+    relation:
+      kind: references-configuration
+      direction: from-workload
+      target:
+        calmNodes: [vc-scheduler-config]
+    scope:
+      environments: [dev, dev-hydrated]
+- id: VC-IMG-001
+  name: Deployable components run first-party images only
+  severity: error
+  owner: team-volcano
+  family: deployment-security
+  rationale: Supply chain - an image that the project does not build cannot be traced to a reviewed source.
+  remediation: Use an image that the Volcano release builds, or record the third-party image as an exception.
+  subject:
+    tags: [deployable]
+  obligation:
+    type: forbidden
+    relation:
+      kind: uses-image
+      direction: from-workload
+    applies:
+      not:
+        container:
+          image: [docker.io/volcanosh/vc-scheduler:v1.16.0, docker.io/volcanosh/vc-controller-manager:v1.16.0, docker.io/volcanosh/vc-webhook-manager:v1.16.0, docker.io/volcanosh/vc-agent:v1.16.0]
+    scope:
+      environments: [dev, monitoring, dev-hydrated]

@@ -1,0 +1,1 @@
+bench: shared module reaches a service through a model helper

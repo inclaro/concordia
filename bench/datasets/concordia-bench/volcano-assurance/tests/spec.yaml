@@ -1,0 +1,99 @@
+repo: volcano
+checks:
+- id: assurance-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: 'environments[id=dev].sources', contains: installer/volcano-development.yaml}
+  - {path: 'assurance.rendering.sources[environment=dev].tool', equals: helm}
+  - {path: 'assurance.rendering.sources[environment=dev].path', equals: bench-env/chart/volcano}
+  - {path: 'assurance.rendering.sources[environment=dev].release', equals: volcano}
+  - {path: 'assurance.rendering.sources[environment=dev].namespace', equals: volcano-system}
+  - {path: 'assurance.rendering.sources[environment=dev].valuesFiles', contains: bench-values/dev.yaml}
+  - {path: 'assurance.evaluators[environment=dev].kinds', contains: rbac}
+  - {path: 'assurance.evaluators[environment=dev].assumes', contains: rbac-authorizer-enabled}
+- id: renderer-pinned
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: .concordia.lock
+  select:
+  - {path: resolved.renderers.helm.version, exists: true}
+  - {path: resolved.renderers.helm.sha256, exists: true}
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs: ['builtin:assurance']
+  rules:
+  - {id: VC-AUTH-001, predicate: require.effectiveAccess, severity: error}
+  - {id: VC-AUTH-002, predicate: require.effectiveAccess, severity: error}
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv: [concordia, assurance, validate]
+  expectExit: 0
+  stdoutContains: ['rendering dev bench-env/chart/volcano', 'dev: complete', helm]
+- id: evaluations
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  rules: {ASR-REN-001: pass, VC-AUTH-001: pass, VC-AUTH-002: violation}
+  findings:
+  - {ruleId: VC-AUTH-002, environment: dev, subject: vc-scheduler, kind: obligation-violation, result: violation}
+  absent:
+  - {ruleId: ASR-REN-001, disposition: active}
+  - {ruleId: VC-AUTH-001, disposition: active}
+- id: scheduler-config-removed
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [assurance-scheduler-config-removed]
+  expectExit: 0
+  rules: {VC-AUTH-001: pass, VC-AUTH-002: pass}
+  absent:
+  - {ruleId: VC-AUTH-002, disposition: active}
+- id: admission-loses-config
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [assurance-admission-loses-config]
+  expectExit: 0
+  rules: {VC-AUTH-001: violation}
+  findings:
+  - {ruleId: VC-AUTH-001, environment: dev, subject: vc-admission, kind: obligation-violation, result: violation}
+- id: scheduler-reads-config
+  type: results
+  dimension: assurance
+  weight: 2
+  mutations: [assurance-scheduler-reads-config]
+  expectExit: 0
+  rules: {VC-AUTH-001: pass, VC-AUTH-002: violation}
+- id: template-broken
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [assurance-template-broken]
+  expectExit: 0
+  rules: {ASR-REN-001: unknown, VC-AUTH-001: unknown, VC-AUTH-002: unknown}
+  findings:
+  - {ruleId: ASR-REN-001, environment: dev, result: unknown, reason: rendered-evidence-missing}
+  - {ruleId: VC-AUTH-001, environment: dev, result: unknown, reason: rendered-evidence-missing}
+  absent:
+  - {ruleId: VC-AUTH-001, result: pass}
+  diagnostics: [CO-PRV-005]
+- id: pin-mismatch
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations: [assurance-pin-mismatch]
+  expectExit: 5
+  diagnostics: [CO-PRV-003]
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1

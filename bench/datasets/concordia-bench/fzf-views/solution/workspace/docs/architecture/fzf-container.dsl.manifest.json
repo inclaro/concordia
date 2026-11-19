@@ -1,0 +1,63 @@
+{
+  "dirtyTree": {
+    "digest": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "generator": {
+    "dslContract": "concordia-dsl/1",
+    "name": "concordia",
+    "structurizr": {
+      "confinement": "scrubbed-env",
+      "version": "2025.11.09"
+    },
+    "version": "bench-78dc095"
+  },
+  "inputs": {
+    "bindings": "sha256:9cd976e03af96025ad9ca45a684cb093e953ba2dc6ce908451429ff1529c3a2d",
+    "controls": "sha256:37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "digestContract": "concordia-view-semantic/1",
+    "modelProjection": "sha256:839ec070b287eb52ead1e68fc6a6a71437c14d477d8c1ac86183f98b9dacd798",
+    "normalizationVersion": "2.1",
+    "observedProjection": null,
+    "policies": "sha256:e77fedddbc3c0e1eb4b08ad48a19b24706b07477a6ed04750b606e478150c7ed",
+    "projectionContract": "concordia-view-projection/1"
+  },
+  "outputs": [
+    {
+      "canonicalization": "none",
+      "digest": "sha256:3baf062ad071927d47c20539e839f7435dfd2caed5342964e0c12d25917713f9",
+      "format": "dsl",
+      "path": "docs/architecture/fzf-container.dsl"
+    },
+    {
+      "canonicalization": "structurizr-text/1",
+      "digest": "sha256:3d6eb8d51793b299e393ba66d25783331db666ed2d1388c8b5da4bda75a13039",
+      "format": "mermaid",
+      "path": "docs/architecture/fzf-container.mmd"
+    },
+    {
+      "canonicalization": "structurizr-json/1",
+      "digest": "sha256:ba3518c3acb6634c97509a0957cea618d03caa15ac86ef572df5f82f8f6d3821",
+      "format": "json",
+      "path": "docs/architecture/fzf-container.json"
+    }
+  ],
+  "revisions": [
+    {
+      "repository": "fzf",
+      "revision": "b41135cdc20590a8aec97b63d589eb9ed3ce2b58"
+    }
+  ],
+  "schema": "concordia-view-manifest/1",
+  "semanticDigest": "sha256:4df3fc9c0c8171bb9676048c5b3e86bd6411132c3a32adde17dc94cbe23a9254",
+  "sources": [],
+  "view": {
+    "definitionDigest": "sha256:44cc7954d18e2d68f9e0cacead15d92fac93f6ff59540cb9604460690e466f3d",
+    "definitionVersion": "concordia-view-definition/1",
+    "environment": null,
+    "id": "fzf-container",
+    "kind": "container",
+    "scope": [
+      "fzf"
+    ]
+  }
+}

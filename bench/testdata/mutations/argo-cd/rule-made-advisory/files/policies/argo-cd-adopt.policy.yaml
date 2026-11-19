@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-adopt, version: 1.0.0}
+rules:
+- id: ARGO-API-001
+  name: Argo CD components reach the gRPC services only through their client packages
+  severity: warning
+  owner: team-argo-cd
+  rationale: Leaky abstraction - reaching into the internals of the repo, commit or plugin server couples every component to its implementation.
+  remediation: Call the service through its apiclient package instead of importing its implementation.
+  subject:
+    calmNodes: [argo-server, argo-repo-server, argo-app-controller, argo-appset-controller, argo-notifications, argo-cmp-server, argo-commit-server]
+  publicApiOnly:
+    target:
+      calmNodes: [argo-repo-server, argo-commit-server, argo-cmp-server]
+    api:
+      sourceRoots: [reposerver/apiclient/**, commitserver/apiclient/**, cmpserver/apiclient/**]
+    edges: [IMPORTS, CALLS]
+- id: ARGO-IND-001
+  name: The Argo CD controllers and the API server do not depend on each other
+  severity: error
+  owner: team-argo-cd
+  rationale: Distributed monolith - peer components that import each other cannot be deployed, scaled or released apart.
+  remediation: Move the shared code into the shared utilities or talk through the API.
+  subject:
+    calmNodes: [argo-server, argo-app-controller, argo-appset-controller, argo-notifications]
+  independent:
+    edges: [IMPORTS, CALLS]

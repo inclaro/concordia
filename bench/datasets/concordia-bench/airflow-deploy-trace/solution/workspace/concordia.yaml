@@ -1,0 +1,53 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: airflow
+architecture:
+  source: architecture/airflow.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: airflow
+    root: .
+    include:
+    - airflow-core/src/airflow/api_fastapi/*.py
+    - airflow-core/src/airflow/api_fastapi/auth/**/*.py
+    - airflow-core/src/airflow/api_fastapi/common/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/datamodels/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/openapi/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/routes/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/routes/ui/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/services/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/services/ui/**/*.py
+    - airflow-core/src/airflow/api_fastapi/execution_api/**/*.py
+    - airflow-core/src/airflow/api_fastapi/logging/**/*.py
+    - airflow-core/src/airflow/jobs/**/*.py
+    - airflow-core/src/airflow/dag_processing/**/*.py
+    - airflow-core/src/airflow/executors/**/*.py
+    - airflow-core/src/airflow/models/**/*.py
+    - airflow-core/src/airflow/utils/session.py
+    - airflow-core/src/airflow/settings.py
+    - task-sdk/src/airflow/sdk/**/*.py
+    - providers/standard/src/**/*.py
+    - chart/templates/**
+environments:
+- id: chart
+  sources: [chart/templates/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/airflow-adopt.policy.yaml]
+  packs:
+  - use: builtin:infrastructure
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error
+  enforcement:
+  - {family: deployment-placement, mode: advisory}
+  - {family: deployment-trace, mode: advisory}

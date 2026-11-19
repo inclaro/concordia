@@ -1,0 +1,657 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "af-api-server",
+      "node-type": "service",
+      "name": "Api Server",
+      "description": "Public REST API server and UI backend.",
+      "concordia": {
+        "tags": [
+          "presentation",
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-execution-api",
+      "node-type": "service",
+      "name": "Execution Api",
+      "description": "Internal Execution API that workers call instead of the database.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-scheduler",
+      "node-type": "service",
+      "name": "Scheduler",
+      "description": "Scheduler, triggerer and job runners.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-dag-processing",
+      "node-type": "service",
+      "name": "Dag Processing",
+      "description": "DAG file parsing and bundle management.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-executors",
+      "node-type": "service",
+      "name": "Executors",
+      "description": "Executors that dispatch workloads to workers."
+    },
+    {
+      "unique-id": "af-models",
+      "node-type": "service",
+      "name": "Models",
+      "description": "ORM models of the metadata database.",
+      "concordia": {
+        "tags": [
+          "domain"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-metadata-db",
+      "node-type": "database",
+      "name": "Metadata Db",
+      "description": "Session and engine access to the metadata database."
+    },
+    {
+      "unique-id": "af-task-sdk",
+      "node-type": "service",
+      "name": "Task Sdk",
+      "description": "Public Task SDK for authoring DAGs and tasks.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "af-task-runner",
+      "node-type": "service",
+      "name": "Task Runner",
+      "description": "Task execution runtime that runs inside workers."
+    },
+    {
+      "unique-id": "af-provider-standard",
+      "node-type": "service",
+      "name": "Provider Standard",
+      "description": "The standard provider with core operators and sensors."
+    },
+    {
+      "unique-id": "af-namespace",
+      "node-type": "system",
+      "name": "Airflow Namespace",
+      "description": "The Kubernetes namespace that hosts the Airflow control plane."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "af-api-server-uses-af-dag-processing",
+      "description": "Api Server uses Dag Processing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-api-server"
+          },
+          "destination": {
+            "node": "af-dag-processing"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-api-server-uses-af-execution-api",
+      "description": "Api Server uses Execution Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-api-server"
+          },
+          "destination": {
+            "node": "af-execution-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-api-server-uses-af-metadata-db",
+      "description": "Api Server uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-api-server"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-api-server-uses-af-models",
+      "description": "Api Server uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-api-server"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-api-server-uses-af-scheduler",
+      "description": "Api Server uses Scheduler.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-api-server"
+          },
+          "destination": {
+            "node": "af-scheduler"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-execution-api",
+      "description": "Dag Processing uses Execution Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-execution-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-executors",
+      "description": "Dag Processing uses Executors.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-executors"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-metadata-db",
+      "description": "Dag Processing uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-models",
+      "description": "Dag Processing uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-task-runner",
+      "description": "Dag Processing uses Task Runner.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-task-runner"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-dag-processing-uses-af-task-sdk",
+      "description": "Dag Processing uses Task Sdk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-dag-processing"
+          },
+          "destination": {
+            "node": "af-task-sdk"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-execution-api-uses-af-api-server",
+      "description": "Execution Api uses Api Server.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-execution-api"
+          },
+          "destination": {
+            "node": "af-api-server"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-execution-api-uses-af-metadata-db",
+      "description": "Execution Api uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-execution-api"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-execution-api-uses-af-models",
+      "description": "Execution Api uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-execution-api"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-executors-uses-af-execution-api",
+      "description": "Executors uses Execution Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-executors"
+          },
+          "destination": {
+            "node": "af-execution-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-executors-uses-af-models",
+      "description": "Executors uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-executors"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-models-uses-af-dag-processing",
+      "description": "Models uses Dag Processing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-models"
+          },
+          "destination": {
+            "node": "af-dag-processing"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-models-uses-af-execution-api",
+      "description": "Models uses Execution Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-models"
+          },
+          "destination": {
+            "node": "af-execution-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-models-uses-af-executors",
+      "description": "Models uses Executors.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-models"
+          },
+          "destination": {
+            "node": "af-executors"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-models-uses-af-metadata-db",
+      "description": "Models uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-models"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-models-uses-af-task-sdk",
+      "description": "Models uses Task Sdk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-models"
+          },
+          "destination": {
+            "node": "af-task-sdk"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-provider-standard-uses-af-executors",
+      "description": "Provider Standard uses Executors.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-provider-standard"
+          },
+          "destination": {
+            "node": "af-executors"
+          }
+        }
+      },
+      "concordia": {
+        "observation": {
+          "allowed-edge-kinds": [
+            "CALLS"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "af-provider-standard-uses-af-metadata-db",
+      "description": "Provider Standard uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-provider-standard"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-provider-standard-uses-af-models",
+      "description": "Provider Standard uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-provider-standard"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-provider-standard-uses-af-task-runner",
+      "description": "Provider Standard uses Task Runner.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-provider-standard"
+          },
+          "destination": {
+            "node": "af-task-runner"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-provider-standard-uses-af-task-sdk",
+      "description": "Provider Standard uses Task Sdk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-provider-standard"
+          },
+          "destination": {
+            "node": "af-task-sdk"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-dag-processing",
+      "description": "Scheduler uses Dag Processing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-dag-processing"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-execution-api",
+      "description": "Scheduler uses Execution Api.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-execution-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-executors",
+      "description": "Scheduler uses Executors.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-executors"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-metadata-db",
+      "description": "Scheduler uses Metadata Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-metadata-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-models",
+      "description": "Scheduler uses Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-task-runner",
+      "description": "Scheduler uses Task Runner.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-task-runner"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-scheduler-uses-af-task-sdk",
+      "description": "Scheduler uses Task Sdk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-scheduler"
+          },
+          "destination": {
+            "node": "af-task-sdk"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-task-runner-uses-af-dag-processing",
+      "description": "Task Runner uses Dag Processing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-task-runner"
+          },
+          "destination": {
+            "node": "af-dag-processing"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-task-runner-uses-af-task-sdk",
+      "description": "Task Runner uses Task Sdk.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-task-runner"
+          },
+          "destination": {
+            "node": "af-task-sdk"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-task-sdk-uses-af-dag-processing",
+      "description": "Task Sdk uses Dag Processing.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-task-sdk"
+          },
+          "destination": {
+            "node": "af-dag-processing"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-task-sdk-uses-af-provider-standard",
+      "description": "Task Sdk uses Provider Standard.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-task-sdk"
+          },
+          "destination": {
+            "node": "af-provider-standard"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "af-task-sdk-uses-af-task-runner",
+      "description": "Task Sdk uses Task Runner.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "af-task-sdk"
+          },
+          "destination": {
+            "node": "af-task-runner"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "airflow-deployed-in-af-namespace",
+      "description": "The Airflow control plane is deployed in the airflow namespace.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "af-namespace",
+          "nodes": [
+            "af-api-server",
+            "af-dag-processing",
+            "af-scheduler"
+          ]
+        }
+      }
+    }
+  ]
+}

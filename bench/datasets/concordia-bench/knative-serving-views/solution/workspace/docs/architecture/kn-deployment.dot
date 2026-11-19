@@ -1,0 +1,22 @@
+digraph {
+  compound=true
+  graph [fontname="Arial", rankdir=TB, ranksep=1.0, nodesep=1.0]
+  node [fontname="Arial", shape=box, margin="0.4,0.3"]
+  edge [fontname="Arial"]
+  label=<<br /><font point-size="34">Deployment View: production</font>>
+
+  subgraph cluster_11 {
+    margin=25
+    label=<<font point-size="24">Kn Ns</font><br /><font point-size="19">[Deployment Node: system]</font>>
+    labelloc=b
+    color="#2e7d32"
+    fontcolor="#444444"
+    fillcolor="#ffffff"
+
+    12 [id=12,shape=rect, label=<<font point-size="34">Kn Activator</font><br /><font point-size="19">[Container: service]</font><br /><br /><font point-size="24">Request buffer and proxy that<br />wakes revisions scaled to<br />zero.</font>>, style=filled, color="#2e7d32", fillcolor="#ffffff", fontcolor="#444444"]
+    13 [id=13,shape=rect, label=<<font point-size="34">Kn Autoscaler</font><br /><font point-size="19">[Container: service]</font><br /><br /><font point-size="24">Autoscaler that decides how<br />many pods each revision needs.</font>>, style=filled, color="#2e7d32", fillcolor="#ffffff", fontcolor="#444444"]
+    14 [id=14,shape=rect, label=<<font point-size="34">Kn Controller</font><br /><font point-size="19">[Container: service]</font><br /><br /><font point-size="24">Reconcilers for services,<br />routes, configurations and<br />revisions.</font>>, style=filled, color="#2e7d32", fillcolor="#ffffff", fontcolor="#444444"]
+    15 [id=15,shape=rect, label=<<font point-size="34">Kn Webhook</font><br /><font point-size="19">[Container: service]</font><br /><br /><font point-size="24">Admission webhook that<br />defaults and validates Serving<br />resources.</font>>, style=filled, color="#2e7d32", fillcolor="#ffffff", fontcolor="#444444"]
+  }
+
+}

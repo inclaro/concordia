@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/volcano-adopt"
+version = "1.0.0"
+description = "Adopt Concordia on Volcano: CALM model, bindings, plugin policy pack and a baseline."
+keywords = ["concordia", "calm", "architecture", "go", "volcano", "adopt"]
+
+[metadata]
+difficulty = "medium"
+category = "adopt"
+tags = ["volcano", "go", "adopt"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

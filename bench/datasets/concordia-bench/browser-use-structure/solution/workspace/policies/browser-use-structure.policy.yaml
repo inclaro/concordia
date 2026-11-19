@@ -1,0 +1,47 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: browser-use-structure
+  version: 1.0.0
+rules:
+- id: BU-IND-001
+  name: Peer adapters do not depend on each other
+  severity: error
+  owner: team-browser-use
+  rationale: Distributed monolith - peer adapters that import each other can no longer be replaced or tested alone.
+  remediation: Route the shared behaviour through the agent or a shared module instead of a peer adapter.
+  subject:
+    calmNodes: [bu-browser, bu-llm, bu-tools, bu-skills, bu-telemetry]
+  independent:
+    edges: [IMPORTS, CALLS]
+  evidence:
+    edgeKinds:
+      CALLS: heuristic
+- id: BU-FBD-001
+  name: The REPL uses the browser only through its facade
+  severity: error
+  owner: team-browser-use
+  rationale: Leaky abstraction - code that imports browser internals breaks when the browser module reorganises its files.
+  remediation: Import the browser facade package instead of its internal modules.
+  subject:
+    calmNodes: [bu-repl]
+  forbid:
+    target:
+      calmNodes: [bu-browser]
+    edges: [IMPORTS]
+    traversal: direct
+  allow:
+    target:
+      sourceRoots: [browser_use/browser/__init__.py, browser_use/browser/browser.py]
+- id: BU-OWN-001
+  name: Only the entry point, the agent and the LLM adapters read credentials
+  severity: error
+  owner: team-browser-use
+  rationale: Data ownership - credential access concentrated in a few owners keeps secrets from leaking into unrelated modules.
+  remediation: Ask an owner module for the value instead of importing the credential store.
+  subject:
+    calmNodes: [bu-credentials]
+  ownership:
+    owners:
+      calmNodes: [bu-cli, bu-agent, bu-llm]
+    edges: [IMPORTS]

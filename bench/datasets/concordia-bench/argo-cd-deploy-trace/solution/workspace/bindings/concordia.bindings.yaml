@@ -1,0 +1,149 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-argo-server
+  architectureRef: calm:node:argo-server
+  match:
+    any:
+    - {sourceRoot: server/**}
+    - {sourceRoot: cmd/argocd-server/**}
+- id: bind-argo-repo-server
+  architectureRef: calm:node:argo-repo-server
+  match:
+    any:
+    - {sourceRoot: reposerver/**}
+    - {sourceRoot: cmd/argocd-repo-server/**}
+- id: bind-argo-app-controller
+  architectureRef: calm:node:argo-app-controller
+  match:
+    any:
+    - {sourceRoot: controller/**}
+    - {sourceRoot: cmd/argocd-application-controller/**}
+- id: bind-argo-appset-controller
+  architectureRef: calm:node:argo-appset-controller
+  match:
+    any:
+    - {sourceRoot: applicationset/**}
+    - {sourceRoot: cmd/argocd-applicationset-controller/**}
+- id: bind-argo-notifications
+  architectureRef: calm:node:argo-notifications
+  match:
+    any:
+    - {sourceRoot: notification_controller/**}
+    - {sourceRoot: cmd/argocd-notification/**}
+- id: bind-argo-cmp-server
+  architectureRef: calm:node:argo-cmp-server
+  match:
+    any:
+    - {sourceRoot: cmpserver/**}
+    - {sourceRoot: cmd/argocd-cmp-server/**}
+- id: bind-argo-commit-server
+  architectureRef: calm:node:argo-commit-server
+  match:
+    any:
+    - {sourceRoot: commitserver/**}
+    - {sourceRoot: cmd/argocd-commit-server/**}
+- id: bind-argo-apis
+  architectureRef: calm:node:argo-apis
+  match:
+    any:
+    - {sourceRoot: pkg/apis/**}
+    - {sourceRoot: pkg/apiclient/**}
+- id: bind-argo-db
+  architectureRef: calm:node:argo-db
+  match:
+    any:
+    - {sourceRoot: util/db/**}
+- id: bind-argo-util
+  architectureRef: calm:node:argo-util
+  match:
+    any:
+    - {sourceRoot: util/**}
+    - {sourceRoot: common/**}
+    - {sourceRoot: pkg/client/**}
+    - {sourceRoot: pkg/ratelimiter/**}
+- id: bind-wl-argo-server
+  architectureRef: calm:node:argo-server
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-server}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-server}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-server}
+- id: bind-wl-argo-repo-server
+  architectureRef: calm:node:argo-repo-server
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-repo-server}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-repo-server}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-repo-server}
+- id: bind-wl-argo-app-controller
+  architectureRef: calm:node:argo-app-controller
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: StatefulSet, name: argocd-application-controller}
+    - {kind: workload, environment: ha, resourceKind: StatefulSet, name: argocd-application-controller}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: StatefulSet, name: argocd-application-controller}
+- id: bind-wl-argo-appset-controller
+  architectureRef: calm:node:argo-appset-controller
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-applicationset-controller}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-applicationset-controller}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-applicationset-controller}
+- id: bind-wl-argo-notifications
+  architectureRef: calm:node:argo-notifications
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-notifications-controller}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-notifications-controller}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-notifications-controller}
+- id: bind-wl-argo-dex
+  architectureRef: calm:node:argo-dex
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-dex-server}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-dex-server}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-dex-server}
+- id: bind-wl-argo-redis
+  architectureRef: calm:node:argo-redis
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: non-ha, resourceKind: Deployment, name: argocd-redis}
+    - {kind: workload, environment: ha, resourceKind: StatefulSet, name: argocd-redis-ha-server}
+    - {kind: workload, environment: ha, resourceKind: Deployment, name: argocd-redis-ha-haproxy}
+    - {kind: workload, environment: non-ha-hydrated, resourceKind: Deployment, name: argocd-redis}
+- id: bind-img-argo-dex
+  architectureRef: calm:node:argo-dex
+  required: false
+  match:
+    any:
+    - {kind: image, repository: ghcr.io/dexidp/dex}
+- id: bind-img-argo-redis
+  architectureRef: calm:node:argo-redis
+  required: false
+  match:
+    any:
+    - {kind: image, repository: public.ecr.aws/docker/library/redis}
+- id: bind-argo-ns
+  architectureRef: calm:node:argo-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: non-ha, address: core/Namespace/_/argocd}
+    - {kind: infraResource, environment: ha, address: core/Namespace/_/argocd}
+    - {kind: infraResource, environment: non-ha-hydrated, address: core/Namespace/_/argocd}
+- id: bind-argo-default-ns
+  architectureRef: calm:node:argo-default-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: non-ha, address: core/Namespace/_/default}
+    - {kind: infraResource, environment: ha, address: core/Namespace/_/default}
+    - {kind: infraResource, environment: non-ha-hydrated, address: core/Namespace/_/default}
