@@ -48,7 +48,7 @@ func TestRenderDSLWritesAWorkspaceAndExportNeedsTheCLI(t *testing.T) {
 	}
 
 	bad := runWith(t, &runConfig{Dir: dir, Env: map[string]string{"PATH": ""}}, "--format", "mermaid", "render", "--results", "results.json")
-	if bad.Code != 5 || !strings.Contains(bad.Stderr, "CO-PRJ-001") {
+	if bad.Code != 5 || !containsEvery(bad.Stderr, "CO-PRJ-001: Structurizr CLI not available; it is needed for --format mermaid", "hint: install the Structurizr CLI") {
 		t.Errorf("mermaid without the CLI: exit code = %d, stderr = %q", bad.Code, bad.Stderr)
 	}
 }

@@ -5,7 +5,7 @@ This guide shows you how to install Concordia and confirm that its toolchain wor
 ## Prerequisites
 
 - Go 1.27.3 or later, to install with `go install`. A release archive does not need Go.
-- git.
+- Optional: git. Without it, or outside a git repository with a commit, Concordia reads each project as a plain directory. A review against a git reference and approvals at a trust anchor need a repository with a commit.
 - [codebase-memory-mcp](https://github.com/DeusData/codebase-memory-mcp) (CBM). Concordia pins one CBM release: `v0.12.1`. On Linux it uses the fully static `-portable` build, as the upstream installer does. The pin, with the digests of the archive and of the binary for each platform, is in `internal/cbmpin/cbm-pin.tsv`. `concordia cbm install` installs the pinned build, and `concordia doctor` shows whether the CBM that it found is the pinned build. If an AI agent already uses CBM, read [If an AI agent already uses CBM](#if-an-ai-agent-already-uses-cbm).
 - Optional: the Structurizr CLI, only to render diagrams other than DSL. See [render diagrams](render-diagrams.md).
 - Optional: [cosign](https://docs.sigstore.dev/cosign/) 3, to verify signed approvals, signed waivers, and in-toto statements, and to sign them. Set `COSIGN` to its path if it is not on the `PATH`. See [review and approve assessments](review-and-approve-assessments.md) and [add stronger evidence](add-stronger-evidence.md).
@@ -116,7 +116,7 @@ mise run install
    | `workspace` | `concordia.yaml` loads and `build/` or the workspace root is writable | yes |
    | `calm-schema` | CALM schema versions (1.2, 1.3) | yes |
    | `cbm` | CBM version, whether it is the pinned build, and whether the workspace project is indexed | yes |
-   | `git` | git is on the `PATH` | yes |
+   | `git` | git is on the `PATH`. Without git, outside a git repository, or in a repository without a commit, Concordia reads the workspace as a plain directory: all files below it except `.git`, `node_modules`, and `.concordia`, with no revision, no dirty files, and no warning. Commands that compare git revisions (for example a review against a reference, or approvals at a trust anchor) still need a repository with a commit | no |
    | `java` | Java is on the `PATH` | no |
    | `structurizr` | Structurizr CLI found (`STRUCTURIZR_CLI`, `structurizr-cli`, `structurizr.sh`, or `structurizr`) | no |
    | `cosign` | cosign found (`COSIGN` or `cosign` on the `PATH`) | no |

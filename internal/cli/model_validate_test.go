@@ -159,6 +159,9 @@ func TestModelValidateViewScenarios(t *testing.T) {
 			})
 			testutil.Git(t, dir, "init", "-q")
 			testutil.Git(t, dir, "add", "-f", "-A")
+			// A repository without a commit is read as a plain directory; the ignore rules apply to a repository
+			// with history.
+			testutil.Git(t, dir, "-c", "commit.gpgsign=false", "commit", "-q", "-m", "init")
 
 			res := runIn(t, dir, "model", "validate")
 			if res.Code != tc.code {

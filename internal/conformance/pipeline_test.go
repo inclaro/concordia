@@ -220,7 +220,8 @@ func TestRunCheckFailsOnRequiredBindingWithoutMatch(t *testing.T) {
 	}
 }
 
-func TestRunCheckWarnsWithoutRevision(t *testing.T) {
+// A project without a revision (a plain directory) runs without one and without a warning about it.
+func TestRunCheckWithoutRevisionRunsWithoutWarning(t *testing.T) {
 	t.Parallel()
 
 	s := newSetup(t, nil, nil)
@@ -233,7 +234,7 @@ func TestRunCheckWarnsWithoutRevision(t *testing.T) {
 		t.Errorf("sourceRevision = %v", *run.Run.SourceRevision)
 	}
 
-	if !slices.ContainsFunc(run.Diagnostics, func(d diag.Diagnostic) bool { return d.Code == "CO-WRK-013" }) {
+	if slices.ContainsFunc(run.Diagnostics, func(d diag.Diagnostic) bool { return d.Code == "CO-WRK-013" }) {
 		t.Errorf("diagnostics %+v", run.Diagnostics)
 	}
 }

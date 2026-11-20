@@ -336,6 +336,34 @@ func TestIndexGraphAtAnotherRevisionGivesOBS008(t *testing.T) {
 	}
 }
 
+// Without git, the real git port reads the workspace as a plain directory: every file of every subdirectory
+// counts, and the coverage file has no source revision.
+func TestIndexWithoutGitReadsAllFilesOfThePlainDirectory(t *testing.T) {
+	t.Setenv("PATH", t.TempDir())
+
+	dir := indexDir(t)
+	testutil.WriteTree(t, dir, map[string]string{
+		"services/a/x.ts": "x", "services/a/y.ts": "y", "services/a/deep/z/q.ts": "q", "services/legacy/Old.kt": "k", "README.md": "r",
+	})
+
+	deps := indexDeps(indexGraph("demo"), nil)
+	deps.NewGit = nil
+
+	res := runWith(t, &runConfig{Dir: dir, Deps: deps}, "index")
+	if res.Code != 0 {
+		t.Fatalf("exit code = %d, stderr = %q", res.Code, res.Stderr)
+	}
+
+	rec := readCoverage(t, dir)
+	if rec.SourceRevision != "" || !indexFilesCovered(&rec, 4, 2) {
+		t.Errorf("record = %+v", rec)
+	}
+
+	if !strings.Contains(readFile(t, dir, "build/concordia/coverage.json"), `"services/a/deep/z/q.ts"`) {
+		t.Error("the coverage file lacks the file of the nested directory")
+	}
+}
+
 func TestIndexIncompatibleCbmVersionGivesOBS004(t *testing.T) {
 	t.Parallel()
 

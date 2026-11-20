@@ -51,7 +51,7 @@ const (
 )
 
 // requiredCapabilities make `doctor` fail (exit code 5) when they are missing or incompatible.
-var requiredCapabilities = []string{capWorkspace, capCalmSchema, capCbm, capGit}
+var requiredCapabilities = []string{capWorkspace, capCalmSchema, capCbm}
 
 var (
 	gitVersionPattern    = regexp.MustCompile(`(\d+\.\d+(\.\d+)?)`)
@@ -427,7 +427,7 @@ func checkLock(wsp *workspace.Workspace, cbm *capability, renderers []rendererSt
 func checkGit(ctx context.Context, app *Context) capability {
 	res := probe(ctx, app, "git", "--version")
 	if res == nil || res.Code != 0 {
-		return capability{Name: capGit, Status: statusMissing, Detail: "git not found"}
+		return capability{Name: capGit, Status: statusMissing, Detail: "optional: git not found; directories are read as plain directories"}
 	}
 
 	version := gitVersionPattern.FindString(res.Stdout)

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"testing"
 
@@ -29,27 +30,65 @@ func write(t *testing.T, path, content string) {
 	}
 }
 
-func TestCliGitMissingExecutable(t *testing.T) {
+func TestCliGitMissingExecutableReadsPlainDirectory(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 
-	_, err := workspace.NewCliGit(t.TempDir()).Revision(t.Context())
+	dir := t.TempDir()
+	testutil.WriteTree(t, dir, map[string]string{"a/b/c.ts": "x", "d.go": "y", ".concordia/runs/r/manifest.json": "{}"})
+
+	g := workspace.NewCliGit(dir)
+	assertPlainDirectory(t, g, []string{"a/b/c.ts", "d.go"})
+
+	_, err := g.ResolveRef(t.Context(), "HEAD")
 
 	var de *diag.Error
-	if !errors.As(err, &de) || de.Diagnostic.Code != "CO-WRK-012" || de.ExitCode != diag.Toolchain {
-		t.Fatalf("err = %v", err)
+	if !errors.As(err, &de) || de.Diagnostic.Code != "CO-WRK-015" {
+		t.Fatalf("resolve ref err = %v", err)
 	}
 }
 
-func TestCliGitRepositoryWithoutCommit(t *testing.T) {
+// A translated git must still be read as "not a git repository": the fake git answers in English only in the C locale.
+func TestCliGitOutsideRepositoryWithTranslatedGit(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("the fake git is a shell script")
+	}
+
+	bin := t.TempDir()
+	script := "#!/bin/sh\n" +
+		"if [ \"$LC_ALL\" = C ] && [ \"$LANGUAGE\" = C ]; then msg='not a git repository'; else msg='kein Git-Repository'; fi\n" +
+		"echo \"fatal: $msg (or any of the parent directories): .git\" >&2\nexit 128\n"
+	write(t, filepath.Join(bin, "git"), script)
+
+	if err := os.Chmod(filepath.Join(bin, "git"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("PATH", bin)
+	t.Setenv("LANG", "de_DE.UTF-8")
+	t.Setenv("LC_ALL", "de_DE.UTF-8")
+	t.Setenv("LANGUAGE", "de")
+
+	dir := t.TempDir()
+	testutil.WriteTree(t, dir, map[string]string{"src/x.ts": "x"})
+
+	files, err := workspace.NewCliGit(dir).ListFiles(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	equalList(t, files, []string{"src/x.ts"})
+}
+
+// A repository without a commit is read as a plain directory: no revision, every file (also the ones that
+// .gitignore names), no dirty file.
+func TestCliGitRepositoryWithoutCommitIsAPlainDirectory(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
 	testutil.Git(t, dir, "init", "-q")
+	testutil.WriteTree(t, dir, map[string]string{".gitignore": "out/\n", "src/a/b.go": "x", "out/gen.go": "y"})
 
-	rev, err := workspace.NewCliGit(dir).Revision(t.Context())
-	if err != nil || rev != "" {
-		t.Fatalf("revision %q, err %v", rev, err)
-	}
+	assertPlainDirectory(t, workspace.NewCliGit(dir), []string{".gitignore", "out/gen.go", "src/a/b.go"})
 }
 
 func TestCliGitOutsideRepository(t *testing.T) {
@@ -58,9 +97,14 @@ func TestCliGitOutsideRepository(t *testing.T) {
 	dir := t.TempDir()
 	testutil.WriteTree(t, dir, map[string]string{"a/b.ts": "x", "node_modules/m/i.js": "y", ".concordia/runs/r/manifest.json": "{}"})
 
-	g := workspace.NewCliGit(dir)
-
 	// The temporary directory is below the system temporary directory; a parent repository is not expected.
+	assertPlainDirectory(t, workspace.NewCliGit(dir), []string{"a/b.ts"})
+}
+
+// assertPlainDirectory checks that the git port reads a plain directory: no revision, the walked files, no dirty file.
+func assertPlainDirectory(t *testing.T, g *workspace.CliGit, wantFiles []string) {
+	t.Helper()
+
 	rev, err := g.Revision(t.Context())
 	if err != nil || rev != "" {
 		t.Fatalf("revision %q, err %v", rev, err)
@@ -71,7 +115,7 @@ func TestCliGitOutsideRepository(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	equalList(t, files, []string{"a/b.ts"})
+	equalList(t, files, wantFiles)
 
 	dirty, err := g.DirtyFiles(t.Context())
 	if err != nil {

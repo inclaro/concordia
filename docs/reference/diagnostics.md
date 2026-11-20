@@ -1,6 +1,6 @@
 # Diagnostics reference
 
-Concordia reports every problem as a diagnostic with a stable code. This page lists all 151 codes in the catalog (`internal/diag/codes.go`).
+Concordia reports every problem as a diagnostic with a stable code. This page lists all 150 codes in the catalog (`internal/diag/codes.go`).
 
 Diagnostic codes (`CO-<area>-<number>`) are a separate namespace from rule IDs such as `CO-BND-001`, which name policy rules and appear in policy packs. The code `CO-CON-021` is a diagnostic reason; the rule `CO-COV-001` is a rule ID.
 
@@ -24,7 +24,6 @@ Exit codes: 0 ok, 1 violation, 2 invalid input, 3 adapter failure (including a s
 | `CO-WRK-010` | error | 2 | usage error: {detail} |
 | `CO-WRK-011` | error | 2 | destructive action needs confirmation: {detail} |
 | `CO-WRK-012` | error | 5 | git not available or git command failed: {detail} |
-| `CO-WRK-013` | warning | none | no git revision for project {project}: the project root is not in a git repository or has no commit |
 | `CO-WRK-014` | error | 5 | cosign not available: {detail} |
 | `CO-WRK-015` | error | 2 | git reference not valid: {detail} |
 | `CO-WRK-016` | error | 6 | cosign needs network access, and --offline is set: {detail} |
@@ -33,6 +32,8 @@ Exit codes: 0 ok, 1 violation, 2 invalid input, 3 adapter failure (including a s
 | `CO-WRK-099` | error | 7 | internal error: {detail} |
 
 `CO-WRK-003` is a warning about the toolchain. Its detail names what differs: the CBM version, the capability profile, the CALM schema release, or the digest of the CBM executable (`CBM executable <path> has digest <found>, lock has <locked>`). It never stops a run. Run `concordia lock update` to accept the found toolchain. A lock without `resolved.cbm.sha256` gives no digest warning.
+
+`CO-WRK-013` is reserved. It warned about a project without a git revision. A project outside a git repository, or in a repository without a commit, is now read as a plain directory without a warning. The code is not in the catalog, Concordia never emits it, and no later change reuses the number.
 
 ## Intent / architecture (INT)
 
@@ -176,7 +177,7 @@ A rule ID that two packs (or a pack and a policy file) declare gives `CO-POL-003
 
 | Code | Severity | Exit code | Message template |
 |---|---|---|---|
-| `CO-PRJ-001` | error | 5 | Structurizr CLI missing for the requested format: {format} |
+| `CO-PRJ-001` | error | 5 | Structurizr CLI not available; it is needed for {format} |
 | `CO-PRJ-002` | error | 3 | Structurizr validate or export failed: {detail} |
 | `CO-PRJ-005` | error | 2 | C4 level mapping not valid: {detail} |
 | `CO-PRJ-006` | info | none | element not projected: {id} ({detail}) |

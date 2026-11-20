@@ -10,7 +10,6 @@ const (
 	WRK010 = "CO-WRK-010"
 	WRK011 = "CO-WRK-011"
 	WRK012 = "CO-WRK-012"
-	WRK013 = "CO-WRK-013"
 	WRK014 = "CO-WRK-014"
 	WRK015 = "CO-WRK-015"
 	WRK016 = "CO-WRK-016"
@@ -183,7 +182,6 @@ var entries = []Entry{
 	{Code: WRK010, Severity: SeverityError, ExitCode: InvalidInput, Message: "usage error: {detail}"},
 	{Code: WRK011, Severity: SeverityError, ExitCode: InvalidInput, Message: "destructive action needs confirmation: {detail}", Suggestion: "pass --yes to confirm"},
 	{Code: WRK012, Severity: SeverityError, ExitCode: Toolchain, Message: "git not available or git command failed: {detail}", Suggestion: "install git, and make sure that `git status` works in the workspace"},
-	{Code: WRK013, Severity: SeverityWarning, ExitCode: NoExit, Message: "no git revision for project {project}: the project root is not in a git repository or has no commit", Suggestion: "run Concordia in a git repository with at least one commit"},
 	{Code: WRK014, Severity: SeverityError, ExitCode: Toolchain, Message: "cosign not available: {detail}", Suggestion: "install cosign, or set COSIGN to the path of cosign"},
 	{Code: WRK015, Severity: SeverityError, ExitCode: InvalidInput, Message: "git reference not valid: {detail}"},
 	{Code: WRK016, Severity: SeverityError, ExitCode: Network, Message: "cosign needs network access, and --offline is set: {detail}", Suggestion: "remove --offline; to verify a signature offline, give --trusted-root with a Sigstore trusted root file"},
@@ -270,7 +268,7 @@ var entries = []Entry{
 	{Code: EXC009, Severity: SeverityWarning, ExitCode: NoExit, Message: "scoped waiver not applied: {detail}"},
 	{Code: EXC010, Severity: SeverityWarning, ExitCode: NoExit, Message: "scoped waiver matches no current finding: {detail}"},
 	{Code: EXC011, Severity: SeverityWarning, ExitCode: NoExit, Message: "compensating evidence unresolved or digest differs: {detail}"},
-	{Code: PRJ001, Severity: SeverityError, ExitCode: Toolchain, Message: "Structurizr CLI missing for the requested format: {format}", Suggestion: "install the Structurizr CLI or set STRUCTURIZR_CLI; the dsl format needs no other tool"},
+	{Code: PRJ001, Severity: SeverityError, ExitCode: Toolchain, Message: "Structurizr CLI not available; it is needed for {format}", Suggestion: "install the Structurizr CLI (https://docs.structurizr.com/cli) and put structurizr-cli, structurizr.sh or structurizr on the PATH, or set STRUCTURIZR_CLI to its path; only the DSL output works without it"},
 	{Code: PRJ002, Severity: SeverityError, ExitCode: AdapterFailure, Message: "Structurizr validate or export failed: {detail}"},
 	{Code: PRJ005, Severity: SeverityError, ExitCode: InvalidInput, Message: "C4 level mapping not valid: {detail}"},
 	{Code: PRJ006, Severity: SeverityInfo, ExitCode: NoExit, Message: "element not projected: {id} ({detail})"},

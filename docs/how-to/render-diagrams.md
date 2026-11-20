@@ -58,7 +58,7 @@ The command runs the check, then writes `build/concordia/structurizr/workspace.d
 concordia render --format mermaid
 ```
 
-The formats are `mermaid`, `plantuml`, `dot`, `json`, and `static`. Concordia validates the DSL with the CLI, then exports to `build/concordia/structurizr/<format>/`. If no CLI is found, the command fails with `CO-PRJ-001` and exit code 5. If validation or export fails, the command fails with `CO-PRJ-002`. This ad-hoc flow accepts any CLI version.
+The formats are `mermaid`, `plantuml`, `dot`, `json`, and `static`. Concordia validates the DSL with the CLI, then exports to `build/concordia/structurizr/<format>/`. If no CLI is found, the command writes nothing and fails with `CO-PRJ-001` (`Structurizr CLI not available`) and exit code 5; its hint says to install the CLI or set `STRUCTURIZR_CLI`. If validation or export fails, the command fails with `CO-PRJ-002`. This ad-hoc flow accepts any CLI version.
 
 ## The pinned version and confined rendering
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/inclaro/concordia/internal/testutil"
 	"github.com/inclaro/concordia/internal/workspace"
 )
 
@@ -230,23 +231,38 @@ func TestRenderViewsOptionErrors(t *testing.T) {
 	}
 }
 
-// An export needs the Structurizr CLI. Without it the command fails with exit 5 and writes no file.
-func TestRenderViewsExportNeedsTheCLI(t *testing.T) {
+// An export needs the Structurizr CLI. Without it the views that need no export are written, the view with exports
+// is skipped with CO-PRJ-008 and keeps its files, and the command fails with CO-PRJ-001 and exit 5.
+func TestRenderViewsWithoutTheCLIWritesTheViewsThatNeedNoExport(t *testing.T) {
 	t.Parallel()
 
 	export := "      exports:\n        - {format: mermaid, path: docs/views/a.mmd}\n"
-	s := viewsSetup(t, viewsText(generatedView("view-a", viewAPath, export)))
+	s := viewsSetup(t, viewsText(generatedView("view-a", viewAPath, export), generatedView("view-b", viewBPath, "")))
+	testutil.WriteTree(t, s.dir, map[string]string{viewAPath: "old dsl"})
 
 	cfg := *s.cfg
 	cfg.Env = maps.Clone(s.cfg.Env)
 	cfg.Env["PATH"] = ""
 
 	res := runWith(t, &cfg, "render", "--views")
-	if res.Code != 5 || !strings.Contains(res.Stderr, "CO-PRJ-001") {
+	if res.Code != 5 {
 		t.Fatalf("exit code = %d, stderr = %q", res.Code, res.Stderr)
 	}
 
-	if exists(s.dir, viewAPath) || exists(s.dir, viewAPath+".manifest.json") || exists(s.dir, "docs/views/a.mmd") {
-		t.Error("a file was written although the export failed")
+	wantContains(t, res.Stderr, "CO-PRJ-008", "view-a: its exports need the Structurizr CLI",
+		"CO-PRJ-001: Structurizr CLI not available; it is needed for the exports of view view-a", "hint: install the Structurizr CLI")
+
+	if !exists(s.dir, viewBPath) || !exists(s.dir, viewBPath+".manifest.json") {
+		t.Error("view-b, which needs no export, is not written")
+	}
+
+	if readFile(t, s.dir, viewAPath) != "old dsl" {
+		t.Error("the artifact of view-a changed although its export could not run")
+	}
+
+	for _, f := range []string{viewAPath + ".manifest.json", "docs/views/a.mmd"} {
+		if exists(s.dir, f) {
+			t.Errorf("%s was written although the export of view-a could not run", f)
+		}
 	}
 }

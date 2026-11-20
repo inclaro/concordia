@@ -39,8 +39,10 @@ func TestCatalogHasMessageForEveryCodeAndUsesCOFormat(t *testing.T) {
 		seen[e.Code] = true
 	}
 
-	if seen["CO-BND-007"] {
-		t.Error("CO-BND-007 is reserved and must not be in the catalog")
+	for _, reserved := range []string{"CO-BND-007", "CO-WRK-013"} {
+		if seen[reserved] {
+			t.Errorf("%s is reserved and must not be in the catalog", reserved)
+		}
 	}
 }
 
