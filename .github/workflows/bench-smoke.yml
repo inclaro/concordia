@@ -27,7 +27,8 @@ concurrency:
 jobs:
   oracle-smoke:
     runs-on: ubuntu-24.04
-    timeout-minutes: 150
+    # airflow takes about 2h20m on a hosted runner.
+    timeout-minutes: 210
     strategy:
       fail-fast: false
       matrix:
