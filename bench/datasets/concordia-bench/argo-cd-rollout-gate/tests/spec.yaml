@@ -1,0 +1,74 @@
+repo: argo-cd
+checks:
+- id: mandatory-security-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/make-security-rules-blocking
+  expectExit: 2
+  diagnostics: [CO-POL-018]
+- id: mandatory-security-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/make-security-rules-blocking
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors: [CO-POL-018]
+- id: pause-until-2099-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/pause-enforcement-until-2099
+  expectExit: 0
+  select:
+  - {path: summary.rollback, exists: true}
+  absent:
+  - {ruleId: ARGO-SEC-002, enforcement: advisory}
+- id: pause-until-2099-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/pause-enforcement-until-2099
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: pause-until-2020-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/pause-enforcement-until-2020
+  expectExit: 2
+  diagnostics: [CO-WRK-018]
+- id: pause-until-2020-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/pause-enforcement-until-2020
+  expectVerdict: fail
+  expectViolations: []
+  expectErrors: [CO-WRK-018]
+- id: client-package-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/server-uses-repo-server-client
+  expectExit: 0
+  absent:
+  - {location.path: server/bench_ok.go, disposition: active}
+- id: client-package-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/server-uses-repo-server-client
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

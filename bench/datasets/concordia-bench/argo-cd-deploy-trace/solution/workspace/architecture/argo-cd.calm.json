@@ -1,0 +1,483 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "argo-server",
+      "node-type": "service",
+      "name": "Argo Server",
+      "description": "API server and web UI backend.",
+      "concordia": {
+        "tags": [
+          "deployable",
+          "public"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-repo-server",
+      "node-type": "service",
+      "name": "Argo Repo Server",
+      "description": "Git and manifest generation service.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-app-controller",
+      "node-type": "service",
+      "name": "Argo App Controller",
+      "description": "Application reconciliation controller.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-appset-controller",
+      "node-type": "service",
+      "name": "Argo Appset Controller",
+      "description": "ApplicationSet controller.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-notifications",
+      "node-type": "service",
+      "name": "Argo Notifications",
+      "description": "Notifications controller.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-cmp-server",
+      "node-type": "service",
+      "name": "Argo Cmp Server",
+      "description": "Config management plugin sidecar server."
+    },
+    {
+      "unique-id": "argo-commit-server",
+      "node-type": "service",
+      "name": "Argo Commit Server",
+      "description": "Manifest hydrator commit service."
+    },
+    {
+      "unique-id": "argo-apis",
+      "node-type": "service",
+      "name": "Argo Apis",
+      "description": "API types and generated gRPC clients.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-db",
+      "node-type": "service",
+      "name": "Argo Db",
+      "description": "Settings and credential store access.",
+      "concordia": {
+        "tags": [
+          "restricted"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-util",
+      "node-type": "service",
+      "name": "Argo Util",
+      "description": "Shared utilities.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-dex",
+      "node-type": "service",
+      "name": "Argo Dex",
+      "description": "Dex OpenID Connect identity provider.",
+      "concordia": {
+        "tags": [
+          "external",
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-redis",
+      "node-type": "database",
+      "name": "Argo Redis",
+      "description": "Redis cache of Argo CD.",
+      "concordia": {
+        "tags": [
+          "restricted"
+        ]
+      }
+    },
+    {
+      "unique-id": "argo-ns",
+      "node-type": "system",
+      "name": "Argo Ns",
+      "description": "The argocd namespace."
+    },
+    {
+      "unique-id": "argo-default-ns",
+      "node-type": "system",
+      "name": "Argo Default Ns",
+      "description": "The default namespace."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "argo-server-uses-argo-repo-server",
+      "description": "Argo Server uses Argo Repo Server.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-server"
+          },
+          "destination": {
+            "node": "argo-repo-server"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-server-uses-argo-apis",
+      "description": "Argo Server uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-server"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-server-uses-argo-db",
+      "description": "Argo Server uses Argo Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-server"
+          },
+          "destination": {
+            "node": "argo-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-server-uses-argo-util",
+      "description": "Argo Server uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-server"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-app-controller-uses-argo-repo-server",
+      "description": "Argo App Controller uses Argo Repo Server.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-app-controller"
+          },
+          "destination": {
+            "node": "argo-repo-server"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-app-controller-uses-argo-commit-server",
+      "description": "Argo App Controller uses Argo Commit Server.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-app-controller"
+          },
+          "destination": {
+            "node": "argo-commit-server"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-app-controller-uses-argo-apis",
+      "description": "Argo App Controller uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-app-controller"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-app-controller-uses-argo-db",
+      "description": "Argo App Controller uses Argo Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-app-controller"
+          },
+          "destination": {
+            "node": "argo-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-app-controller-uses-argo-util",
+      "description": "Argo App Controller uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-app-controller"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-appset-controller-uses-argo-repo-server",
+      "description": "Argo Appset Controller uses Argo Repo Server.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-appset-controller"
+          },
+          "destination": {
+            "node": "argo-repo-server"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-appset-controller-uses-argo-apis",
+      "description": "Argo Appset Controller uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-appset-controller"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-appset-controller-uses-argo-db",
+      "description": "Argo Appset Controller uses Argo Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-appset-controller"
+          },
+          "destination": {
+            "node": "argo-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-appset-controller-uses-argo-util",
+      "description": "Argo Appset Controller uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-appset-controller"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-notifications-uses-argo-apis",
+      "description": "Argo Notifications uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-notifications"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-notifications-uses-argo-util",
+      "description": "Argo Notifications uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-notifications"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-repo-server-uses-argo-apis",
+      "description": "Argo Repo Server uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-repo-server"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-repo-server-uses-argo-util",
+      "description": "Argo Repo Server uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-repo-server"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-cmp-server-uses-argo-apis",
+      "description": "Argo Cmp Server uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-cmp-server"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-cmp-server-uses-argo-util",
+      "description": "Argo Cmp Server uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-cmp-server"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-commit-server-uses-argo-apis",
+      "description": "Argo Commit Server uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-commit-server"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-commit-server-uses-argo-util",
+      "description": "Argo Commit Server uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-commit-server"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-db-uses-argo-apis",
+      "description": "Argo Db uses Argo Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-db"
+          },
+          "destination": {
+            "node": "argo-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-db-uses-argo-util",
+      "description": "Argo Db uses Argo Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "argo-db"
+          },
+          "destination": {
+            "node": "argo-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "argo-deployed-in-argo-ns",
+      "description": "Deployed in the Argo CD namespace.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "argo-ns",
+          "nodes": [
+            "argo-server",
+            "argo-repo-server",
+            "argo-app-controller",
+            "argo-appset-controller",
+            "argo-notifications",
+            "argo-dex",
+            "argo-redis"
+          ]
+        }
+      }
+    }
+  ]
+}

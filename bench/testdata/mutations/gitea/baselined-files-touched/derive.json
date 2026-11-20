@@ -1,0 +1,14 @@
+[
+  {
+    "path": "modelmigration/base/hash.go",
+    "base_sha256": "94fa297711eaa54bb65cf0a99f1d2497c5c960a41b4e396867dc348d9b7fb561",
+    "edit": "edits/modelmigration/base/hash.go.ed",
+    "sha256": "4149c6b7bd3693536bea2e7aae0e34cea7546004a8310df9b64873aa42f22447"
+  },
+  {
+    "path": "modules/repository/create.go",
+    "base_sha256": "0ffc50d19c637b2943cf38dc27c4f9e888aca20aeabe1bbfc3fc338b5feecb49",
+    "edit": "edits/modules/repository/create.go.ed",
+    "sha256": "61e99a98c2d277329096f0a40facc5fb4b1f4d5312b377bd630fd0c3588125cc"
+  }
+]

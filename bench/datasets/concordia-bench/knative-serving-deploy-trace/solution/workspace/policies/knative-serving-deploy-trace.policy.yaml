@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: knative-serving-deploy-trace
+  version: 1.0.0
+precedence:
+  version: 1
+  order: [KN-PLC-003, INFRA-PLC-001, INFRA-TRC-001]
+rules:
+- id: KN-PLC-003
+  name: The Serving control plane is never placed on edge clusters
+  severity: error
+  owner: team-knative-serving
+  rationale: Configuration drift - control-plane workloads that appear in the edge environment are misplaced and escape the central operations model.
+  remediation: Remove the workload from the edge environment manifests.
+  family: deployment-placement
+  subject:
+    tags: [deployable]
+  obligation:
+    type: forbidden
+    relation:
+      kind: placed-in
+      direction: from-workload
+    scope:
+      environments: [edge]
+  evidence:
+    roles: [parsed-source-fact]
+    minimumResolution: explicitly-bound

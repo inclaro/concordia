@@ -1,0 +1,31 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: knative-serving-structure
+  version: 1.0.0
+rules:
+- id: KN-DNY-001
+  name: The queue-proxy never reaches the reconcilers
+  severity: error
+  owner: team-knative-serving
+  rationale: Blast radius - the sidecar that runs in every user pod must never carry reconciler code, directly or through helpers.
+  remediation: Move the shared logic into the shared module so the queue-proxy no longer depends on controller code.
+  subject:
+    calmNodes: [kn-queue]
+  denyPath:
+    target:
+      calmNodes: [kn-controller]
+    edges: [IMPORTS, CALLS]
+    maxDepth: 4
+- id: KN-ALW-001
+  name: The queue-proxy depends only on shared helpers and API types
+  severity: error
+  owner: team-knative-serving
+  rationale: Missing anti-corruption layer - the sidecar must reach the rest of Serving only through the shared helpers and the API types.
+  remediation: Route the dependency through the shared module or pass the value in from the caller.
+  subject:
+    calmNodes: [kn-queue]
+  allowOnly:
+    targets:
+      calmNodes: [kn-shared, kn-apis]
+    edges: [IMPORTS, CALLS]

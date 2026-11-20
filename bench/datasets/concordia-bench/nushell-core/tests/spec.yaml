@@ -1,0 +1,142 @@
+repo: nushell
+checks:
+- id: core-pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs:
+  - builtin:core
+  rules:
+  - id: NU-LYR-001
+    predicate: layerOrder
+    severity: error
+- id: tags
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: nu-cli
+    nodeType: service
+    tags:
+    - presentation
+  - id: nu-command
+    nodeType: service
+    tags:
+    - application
+  - id: nu-plugin-engine
+    nodeType: service
+    tags:
+    - infrastructure
+  - id: nu-engine
+    nodeType: service
+    tags:
+    - domain
+  - id: nu-protocol
+    nodeType: service
+    tags:
+    - contract
+  - id: nu-utils
+    nodeType: service
+    tags:
+    - shared
+- id: overrides
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - path: policies.packs[0].use
+    equals: builtin:core
+  - path: policies.packs[0].rules.CORE-LYR-003.severity
+    equals: error
+  - path: policies.packs[0].rules.CORE-CYC-001.evidence.minimumCoverage
+    equals: 0.9
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  rules:
+    CORE-DB-001: not-applicable
+    CORE-SEC-001: not-applicable
+    CORE-OBS-001: pass
+    CORE-CYC-001: violation
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  - path: rules[ruleId=CORE-LYR-003].severity
+    equals: error
+- id: shared-code-leaf
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - utils-uses-protocol
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-003
+    kind: forbidden-dependency
+    severity: error
+    location.path: crates/nu-utils/src/bench_protocol.rs
+    disposition: active
+  - ruleId: CORE-DECL-001
+    kind: undeclared
+    location.path: crates/nu-utils/src/bench_protocol.rs
+    disposition: active
+- id: layers-domain-to-presentation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - engine-uses-cli
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-001
+    kind: layer-violation
+    location.path: crates/nu-engine/src/bench_cli.rs
+    disposition: active
+  - ruleId: CORE-LYR-002
+    kind: forbidden-dependency
+    location.path: crates/nu-engine/src/bench_cli.rs
+    disposition: active
+- id: domain-to-infrastructure
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - engine-uses-plugin-engine
+  expectExit: 1
+  findings:
+  - ruleId: CORE-LYR-002
+    kind: forbidden-dependency
+    location.path: crates/nu-engine/src/bench_plugin.rs
+    disposition: active
+  absent:
+  - ruleId: CORE-LYR-001
+    location.path: crates/nu-engine/src/bench_plugin.rs
+- id: service-imports-service
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - parser-uses-command
+  expectExit: 1
+  findings:
+  - ruleId: CORE-BND-001
+    kind: forbidden-dependency
+    location.path: crates/nu-parser/src/bench_command.rs
+    disposition: active
+  - ruleId: CORE-DECL-001
+    kind: undeclared
+    location.path: crates/nu-parser/src/bench_command.rs
+    disposition: active
+- id: allows-contract-import
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - command-uses-protocol
+  expectExit: 0
+  absent:
+  - location.path: crates/nu-command/src/bench_ok.rs
+    disposition: active

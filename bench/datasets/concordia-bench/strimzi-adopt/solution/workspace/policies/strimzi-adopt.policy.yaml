@@ -1,0 +1,33 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: strimzi-adopt
+  version: 1.0.0
+rules:
+- id: STZ-LYR-001
+  name: "Strimzi layers depend downward only"
+  severity: error
+  owner: team-strimzi
+  rationale: "Modularity: a lower layer that imports a higher one inverts the layering and entangles operator code with the shared libraries."
+  remediation: "Move the shared code down into operator-common or pass the dependency in from the operator."
+  layerOrder:
+    layers:
+    - calmNodes: [stz-cluster-operator]
+    - calmNodes: [stz-topic-operator, stz-user-operator]
+    - calmNodes: [stz-operator-common, stz-certificate-issuer]
+    - calmNodes: [stz-config-model]
+    - calmNodes: [stz-api]
+    edges: [IMPORTS]
+- id: STZ-API-001
+  name: "The API model stays a leaf"
+  severity: error
+  owner: team-strimzi
+  rationale: "Modularity: the custom resource model is a contract that every operator depends on, so it must never depend on operator code (stable dependencies principle)."
+  remediation: "Keep operator logic out of the api module; put shared helpers in the api module itself."
+  subject:
+    calmNodes: [stz-api]
+  forbid:
+    target:
+      calmNodes: [stz-cluster-operator, stz-topic-operator, stz-user-operator, stz-operator-common, stz-certificate-issuer, stz-config-model]
+    edges: [IMPORTS]
+    traversal: direct

@@ -1,0 +1,24 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: strimzi
+architecture:
+  source: architecture/strimzi.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: strimzi
+    root: .
+    include: [cluster-operator/src/main/**, topic-operator/src/main/**, user-operator/src/main/**, operator-common/src/main/**, certificate-issuer/src/main/**, config-model/src/main/**, api/src/main/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/strimzi-adopt.policy.yaml, policies/strimzi-structure.policy.yaml]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

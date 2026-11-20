@@ -1,0 +1,89 @@
+repo: argo-cd
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - {id: ARGO-SEC-001, predicate: obligation, severity: error, family: deployment-security}
+  - {id: ARGO-NET-101, predicate: obligation, severity: error, family: deployment-security}
+  - {id: ARGO-SEC-002, predicate: obligation, severity: error, family: deployment-security}
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 1
+  ids: [argo-redis-secret, argo-default-sa, argo-service-accounts]
+- id: hydrated-passes
+  type: results
+  dimension: deployment
+  weight: 2
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  rules: {ARGO-SEC-001: pass, ARGO-NET-101: pass, ARGO-SEC-002: pass}
+  absent:
+  - ruleId: [ARGO-SEC-001, ARGO-NET-101, ARGO-SEC-002]
+    environment: non-ha-hydrated
+    result: [violation, unknown]
+- id: plain-installs
+  type: results
+  dimension: deployment
+  weight: 2
+  args: [--environment, ha]
+  expectExit: 0
+  rules: {ARGO-SEC-001: pass, ARGO-NET-101: pass, ARGO-SEC-002: unknown}
+  findings:
+  - {ruleId: ARGO-SEC-002, environment: ha, subject: argo-dex, result: unknown, reason: binding-gap}
+  absent:
+  - {ruleId: ARGO-SEC-002, environment: ha, result: pass}
+- id: detects-dex-reads-redis-secret
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [dex-reads-redis-secret]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-SEC-001, environment: non-ha-hydrated, subject: argo-dex, result: violation, disposition: active}
+  absent:
+  - ruleId: ARGO-SEC-001
+    subject: [argo-notifications, argo-appset-controller]
+    result: violation
+- id: detects-dex-runs-as-default-sa
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [dex-runs-as-default-sa]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-SEC-002, environment: non-ha-hydrated, subject: argo-dex, result: violation, disposition: active}
+- id: netpol-removed-is-never-pass
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [notifications-netpol-removed]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-NET-101, environment: non-ha-hydrated, subject: argo-notifications, result: unknown, reason: coverage-incomplete}
+  rules: {ARGO-NET-101: unknown}
+- id: precedence-conflict
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [conflicting-rule]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 2
+  diagnostics: [CO-POL-017]
+- id: precedence-resolved
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [conflicting-rule, conflict-resolved]
+  args: [--environment, non-ha-hydrated]
+  expectExit: 0
+  select:
+  - {path: 'rules[ruleId=ARGO-SEC-901].supersededBy.ruleId', equals: ARGO-SEC-001}
+  - {path: 'rules[ruleId=ARGO-SEC-901].verdict', equals: not-applicable}
+  absent:
+  - {ruleId: ARGO-SEC-901}

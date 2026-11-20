@@ -1047,19 +1047,161 @@ run_windows = '''
 exit 1
 '''
 
+[tasks."bench:setup"]
+description = "Install the pinned Python tooling of the Harbor bench (bench/uv.lock)."
+dir = "{{config_root}}/bench"
+run = '''
+set -euo pipefail
+command -v uv >/dev/null || { printf 'bench:setup: missing uv\n' >&2; exit 1; }
+uv sync --frozen
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:test"]
+description = "Run the unit tests of the bench verifier library."
+dir = "{{config_root}}/bench"
+run = "uv run --frozen pytest"
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:build"]
+description = "Build the bench Docker images: base, repository, adopted and stage images."
+depends = ["tools:cbm"]
+usage = 'flag "--repo <id>" help "build only this repository of bench/repos.json"'
+run = '''
+set -euo pipefail
+if [[ -n ${usage_repo:-} ]]; then
+  bash bench/scripts/build-images.sh --repo "$usage_repo"
+else
+  bash bench/scripts/build-images.sh
+fi
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:check"]
+description = "Lint the bench task corpus."
+dir = "{{config_root}}/bench"
+usage = 'flag "--repo <id>" help "lint only the tasks of this repository of bench/tasks.json"'
+run = '''
+set -euo pipefail
+uv run --frozen python scripts/check_tasks.py datasets/concordia-bench ${usage_repo:+--repo "$usage_repo"}
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:smoke"]
+description = "Run the oracle on every bench task; every task must score 1.0 (no LLM)."
+depends = ["tools:cbm"]
+dir = "{{config_root}}/bench"
+usage = 'flag "--repo <id>" help "run only the tasks of this repository of bench/tasks.json"'
+run = '''
+set -euo pipefail
+repo_args=() include=()
+if [[ -n ${usage_repo:-} ]]; then
+  repo_args=(--repo "$usage_repo")
+  mapfile -t names < <(jq -r --arg r "$usage_repo" '.[] | select(.repo == $r) | "\(.repo)-\(.scenario)"' tasks.json)
+  [[ -n ${names[*]:-} ]] || { printf 'bench:smoke: no tasks for %s in tasks.json\n' "$usage_repo" >&2; exit 1; }
+  # harbor accepts --include-task-name only together with an explicit dataset path.
+  include=(--path datasets/concordia-bench)
+  for name in "${names[@]}"; do include+=(--include-task-name "$name"); done
+fi
+bash scripts/build-images.sh "${repo_args[@]}"
+uv run --frozen python scripts/check_tasks.py datasets/concordia-bench "${repo_args[@]}"
+# A named job: concurrent smoke runs of different repositories must not read each other's results.
+job="smoke-${usage_repo:-all}-$(date -u +%Y%m%dT%H%M%S)"
+uv run --frozen harbor run -c configs/smoke.yaml --job-name "$job" "${include[@]}"
+uv run --frozen python scripts/analyze_results.py "jobs/$job" --require 1.0
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:run"]
+description = "Run the terminus-2 agent on every bench task (needs OPENROUTER_API_KEY)."
+depends = ["tools:cbm"]
+dir = "{{config_root}}/bench"
+usage = 'flag "--repo <id>" help "run only the tasks of this repository of bench/tasks.json"'
+run = '''
+set -euo pipefail
+# harbor's --env-file overrides the environment, so check the key it will use.
+key=${OPENROUTER_API_KEY:-}
+if [[ -f .env ]] && grep -q '^OPENROUTER_API_KEY=' .env; then key=$(sed -n 's/^OPENROUTER_API_KEY=//p' .env); fi
+[[ -n $key ]] || { printf 'bench:run: set OPENROUTER_API_KEY in bench/.env or the environment\n' >&2; exit 1; }
+[[ $key != *$'\r'* ]] || { printf 'bench:run: OPENROUTER_API_KEY contains a carriage return; save bench/.env with LF line endings\n' >&2; exit 1; }
+repo_args=() include=()
+if [[ -n ${usage_repo:-} ]]; then
+  repo_args=(--repo "$usage_repo")
+  mapfile -t names < <(jq -r --arg r "$usage_repo" '.[] | select(.repo == $r) | "\(.repo)-\(.scenario)"' tasks.json)
+  [[ -n ${names[*]:-} ]] || { printf 'bench:run: no tasks for %s in tasks.json\n' "$usage_repo" >&2; exit 1; }
+  include=(--path datasets/concordia-bench)
+  for name in "${names[@]}"; do include+=(--include-task-name "$name"); done
+fi
+bash scripts/build-images.sh "${repo_args[@]}"
+uv run --frozen python scripts/check_tasks.py datasets/concordia-bench "${repo_args[@]}"
+env_file=()
+if [[ -f .env ]]; then env_file=(--env-file .env); fi
+job="agent-${usage_repo:-all}-$(date -u +%Y%m%dT%H%M%S)"
+uv run --frozen harbor run -c configs/agent.yaml --job-name "$job" "${env_file[@]}" "${include[@]}"
+uv run --frozen python scripts/analyze_results.py "jobs/$job" --csv jobs/latest.csv
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:analyze"]
+description = "Summarize Harbor bench results (arguments go to scripts/analyze_results.py)."
+dir = "{{config_root}}/bench"
+usage = 'arg "<args>" var=#true help "a job dir, or --latest <jobs-dir>, plus --csv/--require"'
+run = '''
+set -euo pipefail
+eval "set -- ${usage_args:-}"
+uv run --frozen python scripts/analyze_results.py "$@"
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
+[tasks."bench:check-vendored"]
+description = "Check that bench/ stores no third-party upstream file (needs the pinned checkouts or --clone)."
+dir = "{{config_root}}/bench"
+usage = 'arg "<args>" var=#true required=#false help "an upstream checkout dir, or --clone to clone bench/repos.json"'
+run = '''
+set -euo pipefail
+eval "set -- ${usage_args:-}"
+uv run --frozen python scripts/check_vendored.py "$@"
+'''
+run_windows = '''
+[Console]::Error.WriteLine('bench tasks need bash and Docker; run them on Linux or macOS')
+exit 1
+'''
+
 [tasks."codescene:delta"]
-description = "CodeScene delta of the branch against a base ref (needs CS_ACCESS_TOKEN)."
+description = "CodeScene delta of the branch against a base ref, without the bench mutation fixtures (needs CS_ACCESS_TOKEN)."
 usage = 'arg "[base]" default="main" help="git ref to compare HEAD against"'
 run = '''
 set -euo pipefail
 fail() { printf 'codescene:delta: %s\n' "$*" >&2; exit 1; }
 [[ -n ${CS_ACCESS_TOKEN:-} ]] || fail 'set CS_ACCESS_TOKEN to a CodeScene personal access token'
+# bench/testdata holds the mutation fixtures of the third-party bench repositories; they are not our code.
 cs=$(command -v cs || ls -d "$HOME"/.cache/codehealth-mcp/MCP-*/cs 2>/dev/null | sort -V | tail -n 1 || true)
 [[ -n $cs && -x $cs ]] || fail 'missing the cs CLI; install it or the CodeScene MCP server'
 base=${usage_base:-main}
 files=$(mktemp)
 trap 'rm -f "$files"' EXIT
-git diff --name-only --diff-filter=d "$base" HEAD -- . > "$files"
+git diff --name-only --diff-filter=d "$base" HEAD -- . ':(exclude)bench/testdata/**' > "$files"
 "$cs" delta "$base" --file-list "$files" --error-on-warnings
 '''
 run_windows = '''

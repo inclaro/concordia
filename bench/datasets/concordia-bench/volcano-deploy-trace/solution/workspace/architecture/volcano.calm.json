@@ -1,0 +1,558 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "vc-scheduler",
+      "node-type": "service",
+      "name": "Volcano Scheduler",
+      "description": "Batch scheduler: cache, actions and the scheduling loop.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-framework",
+      "node-type": "service",
+      "name": "Volcano Framework",
+      "description": "Scheduler framework and API types that plugins build on.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-plugin-gang",
+      "node-type": "service",
+      "name": "Volcano Plugin Gang",
+      "description": "The gang scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugin-drf",
+      "node-type": "service",
+      "name": "Volcano Plugin Drf",
+      "description": "The drf scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugin-proportion",
+      "node-type": "service",
+      "name": "Volcano Plugin Proportion",
+      "description": "The proportion scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugin-binpack",
+      "node-type": "service",
+      "name": "Volcano Plugin Binpack",
+      "description": "The binpack scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugin-predicates",
+      "node-type": "service",
+      "name": "Volcano Plugin Predicates",
+      "description": "The predicates scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugin-capacity",
+      "node-type": "service",
+      "name": "Volcano Plugin Capacity",
+      "description": "The capacity scheduler plugin."
+    },
+    {
+      "unique-id": "vc-plugins-other",
+      "node-type": "service",
+      "name": "Volcano Other Plugins",
+      "description": "All other scheduler plugins and plugin utilities."
+    },
+    {
+      "unique-id": "vc-controllers",
+      "node-type": "service",
+      "name": "Volcano Controllers",
+      "description": "Controller manager for jobs, queues and pod groups.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-admission",
+      "node-type": "service",
+      "name": "Volcano Admission",
+      "description": "Admission webhooks.",
+      "concordia": {
+        "tags": [
+          "public",
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-agent",
+      "node-type": "service",
+      "name": "Volcano Agent",
+      "description": "Node agent for colocation and QoS.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-shared",
+      "node-type": "service",
+      "name": "Volcano Shared",
+      "description": "Shared utilities, feature gates and kube helpers.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    },
+    {
+      "unique-id": "vc-system-ns",
+      "node-type": "system",
+      "name": "Volcano System Namespace",
+      "description": "Kubernetes namespace volcano-system that hosts the control plane."
+    },
+    {
+      "unique-id": "vc-monitoring-ns",
+      "node-type": "system",
+      "name": "Volcano Monitoring Namespace",
+      "description": "Kubernetes namespace volcano-monitoring that hosts the monitoring stack."
+    },
+    {
+      "unique-id": "vc-monitoring",
+      "node-type": "service",
+      "name": "Volcano Monitoring",
+      "description": "Prometheus server that scrapes the scheduler metrics.",
+      "concordia": {
+        "tags": [
+          "deployable"
+        ]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "vc-scheduler-uses-vc-framework",
+      "description": "vc-scheduler uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-scheduler"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-scheduler-uses-vc-plugins-other",
+      "description": "vc-scheduler uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-scheduler"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-scheduler-uses-vc-shared",
+      "description": "vc-scheduler uses vc-shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-scheduler"
+          },
+          "destination": {
+            "node": "vc-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-framework",
+      "description": "vc-plugins-other uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-controllers-uses-vc-framework",
+      "description": "vc-controllers uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-controllers"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-controllers-uses-vc-shared",
+      "description": "vc-controllers uses vc-shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-controllers"
+          },
+          "destination": {
+            "node": "vc-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-admission-uses-vc-controllers",
+      "description": "vc-admission uses vc-controllers.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-admission"
+          },
+          "destination": {
+            "node": "vc-controllers"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-admission-uses-vc-framework",
+      "description": "vc-admission uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-admission"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-admission-uses-vc-shared",
+      "description": "vc-admission uses vc-shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-admission"
+          },
+          "destination": {
+            "node": "vc-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-agent-uses-vc-shared",
+      "description": "vc-agent uses vc-shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-agent"
+          },
+          "destination": {
+            "node": "vc-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-gang-uses-vc-framework",
+      "description": "vc-plugin-gang uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-gang"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-gang-uses-vc-plugins-other",
+      "description": "vc-plugin-gang uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-gang"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-gang",
+      "description": "vc-plugins-other uses vc-plugin-gang.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-gang"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-drf-uses-vc-framework",
+      "description": "vc-plugin-drf uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-drf"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-drf-uses-vc-plugins-other",
+      "description": "vc-plugin-drf uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-drf"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-drf",
+      "description": "vc-plugins-other uses vc-plugin-drf.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-drf"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-proportion-uses-vc-framework",
+      "description": "vc-plugin-proportion uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-proportion"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-proportion-uses-vc-plugins-other",
+      "description": "vc-plugin-proportion uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-proportion"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-proportion",
+      "description": "vc-plugins-other uses vc-plugin-proportion.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-proportion"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-binpack-uses-vc-framework",
+      "description": "vc-plugin-binpack uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-binpack"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-binpack-uses-vc-plugins-other",
+      "description": "vc-plugin-binpack uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-binpack"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-binpack",
+      "description": "vc-plugins-other uses vc-plugin-binpack.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-binpack"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-predicates-uses-vc-framework",
+      "description": "vc-plugin-predicates uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-predicates"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-predicates-uses-vc-plugins-other",
+      "description": "vc-plugin-predicates uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-predicates"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-predicates",
+      "description": "vc-plugins-other uses vc-plugin-predicates.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-predicates"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-capacity-uses-vc-framework",
+      "description": "vc-plugin-capacity uses vc-framework.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-capacity"
+          },
+          "destination": {
+            "node": "vc-framework"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugin-capacity-uses-vc-plugins-other",
+      "description": "vc-plugin-capacity uses vc-plugins-other.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugin-capacity"
+          },
+          "destination": {
+            "node": "vc-plugins-other"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-plugins-other-uses-vc-plugin-capacity",
+      "description": "vc-plugins-other uses vc-plugin-capacity.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "vc-plugins-other"
+          },
+          "destination": {
+            "node": "vc-plugin-capacity"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "vc-control-plane-in-system-ns",
+      "description": "vc-scheduler, vc-controllers, vc-admission, vc-agent deployed in vc-system-ns.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "vc-system-ns",
+          "nodes": [
+            "vc-scheduler",
+            "vc-controllers",
+            "vc-admission",
+            "vc-agent"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "vc-monitoring-in-monitoring-ns",
+      "description": "vc-monitoring deployed in vc-monitoring-ns.",
+      "relationship-type": {
+        "deployed-in": {
+          "container": "vc-monitoring-ns",
+          "nodes": [
+            "vc-monitoring"
+          ]
+        }
+      }
+    }
+  ]
+}

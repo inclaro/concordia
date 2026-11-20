@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/knative-serving-structure"
+version = "1.0.0"
+description = "Add the queue-proxy structure rules to the adopted knative-serving workspace."
+keywords = ["concordia", "calm", "architecture", "go", "knative-serving", "structure"]
+
+[metadata]
+difficulty = "hard"
+category = "structure"
+tags = ["knative-serving", "go", "structure"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

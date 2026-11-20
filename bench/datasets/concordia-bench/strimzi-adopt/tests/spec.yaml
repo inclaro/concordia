@@ -1,0 +1,124 @@
+repo: strimzi
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: stz-cluster-operator
+    nodeType: service
+  - id: stz-topic-operator
+    nodeType: service
+  - id: stz-user-operator
+    nodeType: service
+  - id: stz-operator-common
+    nodeType: service
+  - id: stz-certificate-issuer
+    nodeType: service
+  - id: stz-config-model
+    nodeType: service
+  - id: stz-api
+    nodeType: service
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - stz-cluster-operator
+    - stz-api
+  - - stz-cluster-operator
+    - stz-operator-common
+  - - stz-cluster-operator
+    - stz-certificate-issuer
+  - - stz-cluster-operator
+    - stz-config-model
+  - - stz-topic-operator
+    - stz-operator-common
+  - - stz-topic-operator
+    - stz-api
+  - - stz-user-operator
+    - stz-operator-common
+  - - stz-user-operator
+    - stz-api
+  - - stz-user-operator
+    - stz-certificate-issuer
+  - - stz-operator-common
+    - stz-api
+  - - stz-operator-common
+    - stz-certificate-issuer
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - stz-cluster-operator
+  - stz-topic-operator
+  - stz-user-operator
+  - stz-operator-common
+  - stz-certificate-issuer
+  - stz-config-model
+  - stz-api
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: STZ-LYR-001
+    predicate: layerOrder
+    severity: error
+  - id: STZ-API-001
+    predicate: forbid
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-api-imports-common
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - api-imports-common
+  expectExit: 1
+  findings:
+  - ruleId: STZ-API-001
+    location.path: api/src/main/java/io/strimzi/api/BenchLeak.java
+    kind: forbidden-dependency
+    disposition: active
+  - ruleId: STZ-LYR-001
+    location.path: api/src/main/java/io/strimzi/api/BenchLeak.java
+    disposition: active
+- id: allows-user-op-imports-api
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - user-op-imports-api
+  expectExit: 0
+  absent:
+  - location.path: user-operator/src/main/java/io/strimzi/operator/user/BenchOk.java
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

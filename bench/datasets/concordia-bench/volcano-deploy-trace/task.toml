@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/volcano-deploy-trace"
+version = "1.0.0"
+description = "Trace the Volcano components to their workloads, images and namespaces in two environments."
+keywords = ["concordia", "calm", "architecture", "go", "volcano", "deploy-trace"]
+
+[metadata]
+difficulty = "medium"
+category = "deploy-trace"
+tags = ["volcano", "go", "deploy-trace"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

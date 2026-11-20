@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/knative-serving-assurance-gate"
+version = "1.0.0"
+description = "Review pull requests that change the rendered manifests or their sources, using Concordia."
+keywords = ["concordia", "calm", "architecture", "go", "knative-serving", "assurance", "gate"]
+
+[metadata]
+difficulty = "hard"
+category = "gate"
+tags = ["knative-serving", "go", "assurance", "gate"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

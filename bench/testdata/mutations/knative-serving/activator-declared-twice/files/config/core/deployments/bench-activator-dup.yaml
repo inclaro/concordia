@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activator
+  namespace: knative-serving
+  labels:
+    app: activator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activator
+  template:
+    metadata:
+      labels:
+        app: activator
+    spec:
+      serviceAccountName: activator
+      containers:
+      - name: activator
+        image: ko://knative.dev/serving/cmd/activator

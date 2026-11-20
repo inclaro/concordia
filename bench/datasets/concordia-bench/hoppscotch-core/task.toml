@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/hoppscotch-core"
+version = "1.0.0"
+description = "Enable the core pack on Hoppscotch with tags and overrides."
+keywords = ["concordia", "calm", "architecture", "typescript", "hoppscotch", "core"]
+
+[metadata]
+difficulty = "medium"
+category = "core"
+tags = ["hoppscotch", "typescript", "core"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 2
+memory_mb = 4096
+storage_mb = 20480
+build_timeout_sec = 600.0

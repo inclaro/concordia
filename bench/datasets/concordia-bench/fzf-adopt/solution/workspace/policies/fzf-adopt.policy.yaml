@@ -1,0 +1,31 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: fzf-adopt
+  version: 1.0.0
+rules:
+- id: FZF-LYR-001
+  name: fzf layers depend downward only
+  severity: error
+  owner: team-fzf
+  rationale: Modularity - a lower layer that imports or calls a higher one is a layer inversion that couples the matcher and renderer to the finder.
+  remediation: Move the shared code down to a lower layer, or pass it in from the caller.
+  layerOrder:
+    layers:
+    - calmNodes: [fzf-cli]
+    - calmNodes: [fzf-core]
+    - calmNodes: [fzf-tui, fzf-algo, fzf-protector]
+    - calmNodes: [fzf-util]
+    edges: [IMPORTS, CALLS]
+- id: FZF-CYC-001
+  name: No import cycles between the fzf leaf modules
+  severity: error
+  owner: team-fzf
+  rationale: Modularity - a cyclic dependency between modules breaks the acyclic dependencies principle and makes them impossible to build or test apart.
+  remediation: Break the cycle by moving the shared type into the lower module or inverting the dependency with an interface.
+  subject:
+    calmNodes: [fzf-cli, fzf-protector, fzf-util]
+  budget:
+    measure: cycles
+    max: 0
+    edges: [IMPORTS, CALLS]

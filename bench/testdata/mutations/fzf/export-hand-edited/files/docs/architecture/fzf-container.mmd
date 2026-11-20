@@ -1,0 +1,32 @@
+graph TB
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["Container View: Fzf"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    subgraph 1 ["Fzf"]
+      style 1 fill:#ffffff,stroke:#444444,color:#444444
+
+      2["<div style='font-weight: bold'>Fzf Algo</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>Fuzzy matching.</div>"]
+      style 2 fill:#ffffff,stroke:#444444,color:#444444
+      3["<div style='font-weight: bold'>Fzf Cli</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>Entry point.</div>"]
+      style 3 fill:#ffffff,stroke:#444444,color:#444444
+      4["<div style='font-weight: bold'>Fzf Core</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>Option parsing and the finder<br />loop.</div>"]
+      style 4 fill:#ffffff,stroke:#444444,color:#444444
+      5["<div style='font-weight: bold'>Fzf Protector</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>OS sandboxing.</div>"]
+      style 5 fill:#ffffff,stroke:#444444,color:#444444
+      6["<div style='font-weight: bold'>Fzf Tui</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>Terminal rendering.</div>"]
+      style 6 fill:#ffffff,stroke:#444444,color:#444444
+      7["<div style='font-weight: bold'>Fzf Util</div><div style='font-size: 70%; margin-top: 0px'>[Container: service]</div><div style='font-size: 80%; margin-top:10px'>Utilities.</div>"]
+      style 7 fill:#ffffff,stroke:#444444,color:#444444
+    end
+
+    3-- "<div>[conforming] Fzf Cli uses Fzf<br />Protector.</div><div style='font-size: 70%'></div>" -->5
+    4-- "<div>[conforming] Fzf Core uses<br />Fzf Algo.</div><div style='font-size: 70%'></div>" -->2
+    4-- "<div>[conforming] Fzf Core uses<br />Fzf Tui.</div><div style='font-size: 70%'></div>" -->6
+    4-- "<div>[conforming] Fzf Core uses<br />Fzf Util.</div><div style='font-size: 70%'></div>" -->7
+    6-- "<div>[conforming] Fzf Tui uses Fzf<br />Util.</div><div style='font-size: 70%'></div>" -->7
+    2-- "<div>[conforming] Fzf Algo uses<br />Fzf Util.</div><div style='font-size: 70%'></div>" -->7
+    3-- "<div>[conforming] Fzf Cli uses Fzf<br />Core.</div><div style='font-size: 70%'></div>" -->4
+
+  end%% edited

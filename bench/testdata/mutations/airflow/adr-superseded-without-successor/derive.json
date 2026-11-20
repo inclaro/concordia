@@ -1,0 +1,8 @@
+[
+  {
+    "path": "airflow-core/adr/lang-sdk/0002-workload-execution.md",
+    "base_sha256": "ea2ca31cbafaaafe1d50ecc6ce301b2a2795b154e658343e3baf7111f1815328",
+    "edit": "edits/airflow-core/adr/lang-sdk/0002-workload-execution.md.ed",
+    "sha256": "9993368798f8ae0921134a7bef911af2ddea0393eb3fa95f402a03db40fd2862"
+  }
+]

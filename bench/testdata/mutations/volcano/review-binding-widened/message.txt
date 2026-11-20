@@ -1,0 +1,1 @@
+chore(bench): bind the admission canary workload

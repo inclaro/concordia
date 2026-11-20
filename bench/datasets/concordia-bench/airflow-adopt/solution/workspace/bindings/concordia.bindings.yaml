@@ -1,0 +1,54 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-af-api-server
+  architectureRef: calm:node:af-api-server
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/api_fastapi/**
+- id: bind-af-execution-api
+  architectureRef: calm:node:af-execution-api
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/api_fastapi/execution_api/**
+- id: bind-af-scheduler
+  architectureRef: calm:node:af-scheduler
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/jobs/**
+- id: bind-af-dag-processing
+  architectureRef: calm:node:af-dag-processing
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/dag_processing/**
+- id: bind-af-executors
+  architectureRef: calm:node:af-executors
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/executors/**
+- id: bind-af-models
+  architectureRef: calm:node:af-models
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/models/**
+- id: bind-af-metadata-db
+  architectureRef: calm:node:af-metadata-db
+  match:
+    any:
+    - sourceRoot: airflow-core/src/airflow/utils/session.py
+    - sourceRoot: airflow-core/src/airflow/settings.py
+- id: bind-af-task-sdk
+  architectureRef: calm:node:af-task-sdk
+  match:
+    any:
+    - sourceRoot: task-sdk/src/airflow/sdk/**
+- id: bind-af-task-runner
+  architectureRef: calm:node:af-task-runner
+  match:
+    any:
+    - sourceRoot: task-sdk/src/airflow/sdk/execution_time/**
+- id: bind-af-provider-standard
+  architectureRef: calm:node:af-provider-standard
+  match:
+    any:
+    - sourceRoot: providers/standard/src/**

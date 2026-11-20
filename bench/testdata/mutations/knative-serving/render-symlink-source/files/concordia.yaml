@@ -1,0 +1,66 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: knative-serving
+architecture:
+  source: architecture/knative-serving.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: knative-serving
+    root: .
+    include: [cmd/**, pkg/**, config/core/**, bench-env/**]
+environments:
+- id: production
+  sources: [config/core/**]
+- id: production-hydrated
+  sources: [bench-env/production-hydrated/**]
+- id: staging-hydrated
+  sources: [bench-env/production-hydrated/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+  packs:
+  - use: builtin:assurance
+assurance:
+  rendering:
+    sources:
+    - environment: production
+      tool: plain
+      path: config/core/deployments
+    - environment: production
+      tool: plain
+      path: config/core/200-roles
+    - environment: production
+      tool: plain
+      path: config/core/200-serviceaccount.yaml
+    - environment: production
+      tool: plain
+      path: config/core/webhooks/secret.yaml
+    - environment: production
+      tool: plain
+      path: config/core/300-resources
+    - environment: production-hydrated
+      tool: plain
+      path: bench-env/production-hydrated
+    - environment: staging-hydrated
+      tool: plain
+      path: bench-env/production-hydrated
+  evaluators:
+  - environment: production
+    kinds: [rbac]
+    assumes: [rbac-authorizer-enabled]
+  - environment: production-hydrated
+    kinds: [rbac]
+    assumes: [rbac-authorizer-enabled]
+  - environment: staging-hydrated
+    kinds: [rbac]
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

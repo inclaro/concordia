@@ -1,0 +1,117 @@
+repo: gitea
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: GITEA-DNY-001
+    predicate: denyPath
+    severity: error
+  - id: GITEA-API-001
+    predicate: [publicApiOnly, forbid]
+    severity: error
+  - id: GITEA-OWN-001
+    predicate: [ownership, forbid]
+    severity: error
+- id: packs-registered
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: concordia.yaml
+  select:
+  - path: policies.files
+    contains: policies/gitea-structure.policy.yaml
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-forbidden-path
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - modules-reach-services
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-DNY-001
+    location.path: modules/benchpath/bench.go
+    kind: forbidden-path
+    disposition: active
+- id: detects-non-public-api
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - router-reads-setting-internal
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-API-001
+    location.path: routers/benchapi/bench.go
+    kind: [non-public-api, forbidden-dependency]
+    disposition: active
+  counts:
+  - match:
+      ruleId: GITEA-API-001
+      location.path: routers/benchapi/bench.go
+    equals: 1
+- id: detects-ownership-violation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - router-imports-db
+  expectExit: 1
+  findings:
+  - ruleId: GITEA-OWN-001
+    location.path: routers/benchown/bench.go
+    kind: [ownership-violation, forbidden-dependency]
+    disposition: active
+- id: allows-setting-facade
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - service-uses-setting-facade
+  absent:
+  - location.path: services/benchapi/bench.go
+    disposition: active
+- id: allows-setting-facade-exit0
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - service-uses-setting-facade
+  absent:
+  - location.path: services/benchapi/bench.go
+    disposition: active
+  expectExit: 0
+  xfail: "D6: CBM index state differs between the first full index and any incremental
+    re-index, so an unrelated heuristic CALLS edge (e.g. services/mailer -> routers.web.repo.actions.ViewJob.Duration)
+    becomes an active finding after any Go file change"
+- id: allows-model-uses-db
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - models-use-db
+  absent:
+  - location.path: models/user/bench_db.go
+    disposition: active
+- id: allows-model-uses-db-exit0
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - models-use-db
+  absent:
+  - location.path: models/user/bench_db.go
+    disposition: active
+  expectExit: 0
+  xfail: "D6: CBM index state differs between the first full index and any incremental
+    re-index, so an unrelated heuristic CALLS edge (e.g. services/mailer -> routers.web.repo.actions.ViewJob.Duration)
+    becomes an active finding after any Go file change"

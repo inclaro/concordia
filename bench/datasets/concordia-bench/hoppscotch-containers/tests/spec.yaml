@@ -1,0 +1,112 @@
+repo: hoppscotch
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 1
+  paths: [concordia.yaml, bindings, policies, bench-env]
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 1
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - {id: HOP-IMG-001, predicate: obligation}
+  - {id: HOP-IMG-002, predicate: obligation}
+  - {id: HOP-CON-001, predicate: obligation}
+  - {id: HOP-DEC-001, predicate: declaredOnly}
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: "environments[id=selfhost].sources", contains: docker-compose.yml}
+  - {path: "environments[id=selfhost].sources", contains: prod.Dockerfile}
+  - {path: "environments[id=selfhost-hydrated].sources", contains: "bench-env/selfhost-hydrated/**"}
+  - {path: "observation.projects[0].include", contains: docker-compose.yml}
+- id: obligation-shapes
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: policies/hoppscotch-containers.policy.yaml
+  select:
+  - {path: "rules[id=HOP-IMG-001].obligation.relation.kind", equals: built-from}
+  - {path: "rules[id=HOP-IMG-001].obligation.relation.direction", equals: from-image}
+  - {path: "rules[id=HOP-IMG-002].obligation.relation.kind", equals: base-image}
+  - {path: "rules[id=HOP-IMG-002].obligation.relation.direction", equals: from-subject}
+  - {path: "rules[id=HOP-IMG-002].obligation.multiplicity", equals: exists}
+  - {path: "rules[id=HOP-IMG-002].evidence.completeness", equals: complete}
+  - {path: "rules[id=HOP-IMG-002].evidence.passCompleteness", equals: any}
+  - {path: "rules[id=HOP-CON-001].obligation.type", equals: forbidden}
+  - {path: "rules[id=HOP-CON-001].obligation.relation.kind", equals: configured-connection}
+- id: compose-bindings
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: bindings/concordia.containers.bindings.yaml
+  select:
+  - {path: "bindings[id=bind-hopp-backend-compose].match.any[0].service", equals: hoppscotch-backend}
+  - {path: "bindings[id=bind-hopp-selfhost-web-compose].match.any[0].service", equals: hoppscotch-app}
+  - {path: "bindings[id=bind-hopp-db-compose].match.any[0].service", equals: hoppscotch-db}
+  - {path: "bindings[id=bind-hopp-db-image].match.any[0].repository", equals: postgres}
+  - {path: "bindings[id=bind-hopp-backend-image].match.any[0].repository", equals: ghcr.io/hoppscotch/bench-backend}
+  - {path: "bindings[id=bind-hopp-backend-dockerfile-hydrated].match.any[0].sourceRoot", equals: bench-env/selfhost-hydrated/Dockerfile}
+- id: head-build-lineage
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  rules: {HOP-IMG-001: pass, HOP-IMG-002: pass, HOP-CON-001: unknown}
+  select:
+  - {path: "rules[ruleId=HOP-IMG-002].obligations[environment=selfhost-hydrated].verdict", equals: pass}
+  - {path: "rules[ruleId=HOP-IMG-002].obligations[environment=selfhost].verdict", equals: pass}
+  findings:
+  - {ruleId: HOP-CON-001, kind: obligation-unknown, reason: coverage-incomplete, environment: selfhost, subject: hopp-selfhost-web}
+  absent:
+  - {ruleId: HOP-IMG-002}
+  - {ruleId: HOP-IMG-001}
+  - {kind: obligation-violation}
+- id: detects-database-url
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [app-gets-database-url]
+  expectExit: 0
+  rules: {HOP-CON-001: violation}
+  findings:
+  - {ruleId: HOP-CON-001, kind: obligation-violation, result: violation, environment: selfhost, subject: hopp-selfhost-web, enforcement: advisory, location.path: docker-compose.yml}
+- id: build-link-lost
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [hydrated-dockerfile-removed]
+  expectExit: 0
+  rules: {HOP-IMG-001: unknown}
+  findings:
+  - {ruleId: HOP-IMG-001, kind: obligation-unknown, reason: coverage-incomplete, environment: selfhost-hydrated, subject: hopp-backend}
+  absent:
+  - {ruleId: HOP-IMG-001, kind: obligation-violation}
+- id: base-image-dropped
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations: [dockerfiles-without-from]
+  expectExit: 0
+  rules: {HOP-IMG-002: unknown}
+  select:
+  - {path: "rules[ruleId=HOP-IMG-002].obligations[environment=selfhost-hydrated].verdict", equals: pass}
+  - {path: "rules[ruleId=HOP-IMG-002].obligations[environment=selfhost].verdict", equals: unknown}
+  findings:
+  - {ruleId: HOP-IMG-002, kind: obligation-unknown, reason: coverage-incomplete, environment: selfhost, subject: hopp-backend}
+  absent:
+  - {ruleId: HOP-IMG-002, kind: obligation-violation}
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

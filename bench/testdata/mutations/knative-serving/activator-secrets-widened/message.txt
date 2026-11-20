@@ -1,0 +1,1 @@
+bench: the activator role reads every secret again

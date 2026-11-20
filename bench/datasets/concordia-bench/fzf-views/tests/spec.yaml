@@ -1,0 +1,86 @@
+repo: fzf
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - docs/architecture/components.md
+  - docs/architecture/fzf-container.dsl
+  - docs/architecture/fzf-container.mmd
+  - docs/architecture/fzf-container.json
+  - docs/architecture/fzf-container.dsl.manifest.json
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: system-node
+  type: calm_nodes
+  dimension: workspace
+  weight: 1
+  nodes:
+  - {id: fzf, nodeType: system}
+- id: views-declared
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - {path: "observation.indexMode", equals: full}
+  - {path: "views[id=fzf-container].origin", equals: generated}
+  - {path: "views[id=fzf-container].output.path", equals: docs/architecture/fzf-container.dsl}
+  - {path: "views[id=fzf-components].origin", equals: authored}
+  - {path: "views[id=fzf-components].source.path", equals: docs/architecture/components.md}
+- id: render-views
+  type: command
+  dimension: governance
+  weight: 2
+  argv: [concordia, render, --views]
+  expectExit: 0
+- id: views-clean
+  type: results
+  dimension: governance
+  weight: 2
+  expectExit: 0
+  rules:
+    VIEW-PRES-001: pass
+    VIEW-FRESH-001: pass
+    VIEW-CORR-001: pass
+  areas:
+    diagramCurrency: pass
+- id: doctor-structurizr
+  type: command
+  dimension: reporting
+  weight: 1
+  argv: [concordia, doctor, --json]
+  expectExit: 0
+  stdoutContains: ["2025.11.09"]
+- id: detects-view-deleted
+  type: results
+  dimension: governance
+  weight: 3
+  mutations: [view-deleted]
+  expectExit: 1
+  findings:
+  - {ruleId: VIEW-PRES-001, kind: view-absent, disposition: active}
+- id: render-refuses-wrong-pin
+  type: command
+  dimension: governance
+  weight: 2
+  argv: [bash, -c, 'concordia index >/dev/null && concordia render --views']
+  env: {STRUCTURIZR_CLI: /opt/concordia-bench/bin/structurizr-wrong-version}
+  expectExit: 5
+  stderrContains: [CO-DGM-004]
+- id: wrong-pin-is-unknown
+  type: results
+  xfail: "D3: view freshness reports view-stale violations instead of unknown when the Structurizr CLI is not the pinned version (docs: unknown, generator cannot run)"
+  dimension: governance
+  weight: 2
+  env: {STRUCTURIZR_CLI: /opt/concordia-bench/bin/structurizr-wrong-version}
+  rules:
+    VIEW-FRESH-001: unknown
+  absent:
+  - {ruleId: VIEW-FRESH-001, disposition: active}

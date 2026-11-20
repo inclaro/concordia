@@ -1,0 +1,1 @@
+feat: topic operator reads a common helper

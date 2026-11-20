@@ -1,0 +1,113 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-stz-cluster-operator
+  architectureRef: calm:node:stz-cluster-operator
+  match:
+    any:
+    - sourceRoot: cluster-operator/src/main/**
+    - {kind: workload, environment: install, resourceKind: Deployment, name: strimzi-cluster-operator}
+    - {kind: workload, environment: install-hydrated, resourceKind: Deployment, name: strimzi-cluster-operator}
+    - {kind: image, repository: quay.io/strimzi/operator}
+- id: bind-stz-topic-operator
+  architectureRef: calm:node:stz-topic-operator
+  match:
+    any:
+    - sourceRoot: topic-operator/src/main/**
+    - {kind: workload, environment: install, resourceKind: Deployment, name: strimzi-topic-operator}
+    - {kind: workload, environment: install-hydrated, resourceKind: Deployment, name: strimzi-topic-operator}
+- id: bind-stz-user-operator
+  architectureRef: calm:node:stz-user-operator
+  match:
+    any:
+    - sourceRoot: user-operator/src/main/**
+    - {kind: workload, environment: install, resourceKind: Deployment, name: strimzi-user-operator}
+    - {kind: workload, environment: install-hydrated, resourceKind: Deployment, name: strimzi-user-operator}
+- id: bind-stz-operator-common
+  architectureRef: calm:node:stz-operator-common
+  match:
+    any:
+    - sourceRoot: operator-common/src/main/**
+- id: bind-stz-certificate-issuer
+  architectureRef: calm:node:stz-certificate-issuer
+  match:
+    any:
+    - sourceRoot: certificate-issuer/src/main/**
+- id: bind-stz-config-model
+  architectureRef: calm:node:stz-config-model
+  match:
+    any:
+    - sourceRoot: config-model/src/main/**
+- id: bind-stz-api
+  architectureRef: calm:node:stz-api
+  match:
+    any:
+    - sourceRoot: api/src/main/**
+- id: bind-stz-access-operator
+  architectureRef: calm:node:stz-access-operator
+  required: false
+  match:
+    any:
+    - {kind: workload, environment: install, resourceKind: Deployment, name: strimzi-access-operator}
+    - {kind: workload, environment: install-hydrated, resourceKind: Deployment, name: strimzi-access-operator}
+    - {kind: image, repository: quay.io/strimzi/access-operator}
+- id: bind-stz-strimzi-ns
+  architectureRef: calm:node:stz-strimzi-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install-hydrated, address: core/Namespace/_/strimzi}
+- id: bind-stz-access-ns
+  architectureRef: calm:node:stz-access-ns
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install, address: core/Namespace/_/strimzi-access-operator}
+    - {kind: infraResource, environment: install-hydrated, address: core/Namespace/_/strimzi-access-operator}
+- id: bind-stz-co-config
+  architectureRef: calm:node:stz-co-config
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install-hydrated, address: core/ConfigMap/strimzi/strimzi-cluster-operator}
+- id: bind-stz-cluster-admin
+  architectureRef: calm:node:stz-cluster-admin
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/cluster-admin}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/cluster-admin}
+- id: bind-stz-cluster-bindings
+  architectureRef: calm:node:stz-cluster-bindings
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator-kafka-broker-delegation}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator-kafka-client-delegation}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-access-operator}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator-kafka-broker-delegation}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-cluster-operator-kafka-client-delegation}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRoleBinding/_/strimzi-access-operator}
+- id: bind-stz-operator-roles
+  architectureRef: calm:node:stz-operator-roles
+  required: false
+  match:
+    any:
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-namespaced}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-global}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-leader-election}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-watched}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-kafka-broker}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-entity-operator}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-kafka-client}
+    - {kind: infraResource, environment: install, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-access-operator}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-namespaced}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-global}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-leader-election}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-cluster-operator-watched}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-kafka-broker}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-entity-operator}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-kafka-client}
+    - {kind: infraResource, environment: install-hydrated, address: rbac.authorization.k8s.io/ClusterRole/_/strimzi-access-operator}

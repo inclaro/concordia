@@ -1,0 +1,73 @@
+repo: hoppscotch
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - {id: HOP-OWN-001, predicate: [ownership, forbid], severity: error}
+  - {id: HOP-BND-002, predicate: forbid, severity: error}
+  - {id: HOP-BND-003, predicate: forbid, severity: error}
+  - {id: HOP-DEC-001, predicate: declaredOnly}
+- id: policy-shape
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: policies/hoppscotch-structure.policy.yaml
+  select:
+  - {path: metadata.id, equals: hoppscotch-structure}
+  - {path: selectors.runtimes.calmNodes, contains: hopp-js-sandbox}
+  - {path: selectors.clients.ref, equals: frontends}
+  - {path: "rules[id=HOP-OWN-001].subject.ref", equals: runtimes}
+  - {path: "rules[id=HOP-BND-002].subject.ref", equals: clients}
+  - {path: "rules[id=HOP-BND-002].aggregation", equals: symbol}
+  - {path: "rules[id=HOP-BND-003].subject.calmNodes", contains: hopp-backend}
+  - {path: "rules[id=HOP-BND-003].aggregation", equals: architecture-pair}
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - {path: summary.rules.unknown, equals: 0}
+- id: detects-ownership
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [backend-imports-sandbox]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-OWN-001, kind: [ownership-violation, forbidden-dependency], location.path: packages/hoppscotch-backend/src/bench-sandbox.ts, disposition: active}
+- id: allows-owner
+  type: results
+  dimension: detection
+  weight: 2
+  mutations: [common-imports-sandbox]
+  expectExit: 0
+  absent:
+  - {location.path: packages/hoppscotch-common/src/bench-sandbox.ts, disposition: active}
+- id: aggregates-by-symbol
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [web-imports-backend-a, web-imports-backend-b]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-BND-002, kind: forbidden-dependency, location.path: packages/hoppscotch-selfhost-web/src/bench-be-a.ts, disposition: active}
+  - {ruleId: HOP-BND-002, kind: forbidden-dependency, location.path: packages/hoppscotch-selfhost-web/src/bench-be-b.ts, disposition: active}
+  counts:
+  - match: {ruleId: HOP-BND-002, location.path: packages/hoppscotch-selfhost-web/src/bench-be-b.ts, disposition: active}
+    equals: 1
+  - match: {ruleId: HOP-BND-002, disposition: active}
+    equals: 2
+- id: aggregates-by-architecture-pair
+  type: results
+  dimension: detection
+  weight: 3
+  mutations: [backend-imports-frontends, backend-imports-frontends-b]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-BND-003, kind: forbidden-dependency, disposition: active}
+  counts:
+  - match: {ruleId: HOP-BND-003, disposition: active}
+    equals: 1

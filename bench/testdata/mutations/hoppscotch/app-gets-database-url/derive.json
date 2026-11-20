@@ -1,0 +1,8 @@
+[
+  {
+    "path": "docker-compose.yml",
+    "base_sha256": "952d96b2a390a4323cf6e71900e7308a1d769d0c40e36f9121db6a18e2a3c560",
+    "edit": "edits/docker-compose.yml.ed",
+    "sha256": "86b550c2043e5f79cf59bd9ac689244df40f7a04c20e81e5190fb12c9f65d999"
+  }
+]

@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/knative-serving-deploy-security"
+version = "1.0.0"
+description = "Add typed security and availability rules and prove them on a hydrated copy."
+keywords = ["concordia", "calm", "architecture", "go", "knative-serving", "deploy-security"]
+
+[metadata]
+difficulty = "hard"
+category = "deploy-security"
+tags = ["knative-serving", "go", "deploy-security"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

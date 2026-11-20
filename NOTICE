@@ -13,3 +13,7 @@ This product includes software developed by third parties:
   from https://github.com/harbor-framework/harbor, Apache License 2.0.
 - OpenSpec agent skills (.agents/skills/openspec-*), MIT License.
 - SARIF 2.1.0 JSON schema (test/schemas/sarif-schema-2.1.0.json), OASIS Open.
+
+The benchmark in bench/ references, and does not include, ten third-party
+repositories listed in bench/repos.json. Its image build clones each of them
+at the pinned commit; their licenses apply to everyone who clones them.

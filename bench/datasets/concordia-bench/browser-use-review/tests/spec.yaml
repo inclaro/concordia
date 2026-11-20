@@ -1,0 +1,165 @@
+repo: browser-use
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - assessments
+  - architecture
+  branch: main
+- id: pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: BU-ASM-001
+    predicate: assessmentCurrency
+  packs:
+  - builtin:review-currency
+- id: workspace-keys
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=library].id
+    equals: library
+  - path: assessments.trustAnchor.ref
+    equals: main
+  - path: assessments.authorities[id=security-review].role
+    equals: reviewer
+  - path: assessments.authorities[id=security-review].mechanism
+    oneOf:
+    - protected-review
+    - null
+  - path: assessments.authorities[id=security-review].reviewers
+    contains: secops@bench.invalid
+  - path: assessments.required[id=llm-egress].assessment
+    equals: ASM-LLM-EGRESS
+  - path: assessments.required[id=llm-egress].environment
+    equals: library
+  - path: assessments.required[id=llm-egress].authority
+    equals: security-review
+- id: assessment-doc
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: assessments/ASM-LLM-EGRESS/v1.yaml
+  select:
+  - path: type
+    equals: security
+  - path: environment
+    equals: library
+  - path: scope.calmNodes
+    contains: bu-llm
+  - path: subject.dependencies
+    length: 3
+- id: status-current
+  type: command
+  dimension: governance
+  weight: 3
+  argv:
+  - bash
+  - -c
+  - concordia index >/dev/null 2>&1; concordia assessment status --json
+  expectExit: 0
+  stdoutJson:
+  - path: assessments[id=ASM-LLM-EGRESS].currency.state
+    equals: current
+  - path: assessments[id=ASM-LLM-EGRESS].currency.approval.verified
+    equals: true
+  - path: assessments[id=ASM-LLM-EGRESS].currency.approval.reviewer
+    equals: secops@bench.invalid
+  - path: required[id=llm-egress].currency.state
+    equals: current
+- id: check-clean
+  type: results
+  dimension: governance
+  weight: 2
+  expectExit: 0
+  rules:
+    REV-APR-001: pass
+    REV-DSP-001: pass
+    REV-CAP-001: pass
+    REV-GOV-001: pass
+    BU-ASM-001: pass
+  areas:
+    assessmentCurrency: pass
+- id: binding-widened
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - llm-binding-widened
+  findings:
+  - ruleId: REV-APR-001
+    kind: assessment-review-required
+    disposition: active
+  rules:
+    REV-APR-001: violation
+- id: llm-gains-telemetry-not-reviewed
+  type: results
+  dimension: governance
+  weight: 1
+  mutations:
+  - llm-gains-telemetry
+  absent:
+  - ruleId:
+    - REV-APR-001
+    - REV-DSP-001
+  rules:
+    REV-APR-001: pass
+    REV-DSP-001: pass
+- id: llm-drops-credentials-not-reviewed
+  type: results
+  dimension: governance
+  weight: 1
+  mutations:
+  - llm-drops-credentials
+  absent:
+  - ruleId:
+    - REV-APR-001
+    - REV-DSP-001
+  rules:
+    REV-APR-001: pass
+    REV-DSP-001: pass
+- id: revoked
+  type: command
+  dimension: governance
+  weight: 3
+  argv:
+  - bash
+  - -c
+  - 'o="$(git rev-parse HEAD)"; trap ''git reset -q --hard "$o"'' EXIT
+
+    out="$(concordia assessment revoke ASM-LLM-EGRESS-v1-1 --reviewer secops@bench.invalid --reason bench 2>&1 || true)"
+
+    d="$(printf ''%s\n'' "$out" | grep -o ''sha256:[0-9a-f]\{64\}'' | tail -1)"
+
+    concordia assessment revoke ASM-LLM-EGRESS-v1-1 --reviewer secops@bench.invalid --reason bench --confirm-subject "$d" >&2
+
+    git add -f assessments >&2; git commit -q -m "chore: revoke approval" >&2
+
+    concordia index >/dev/null 2>&1
+
+    concordia assessment status --json > /tmp/bench-status.json
+
+    concordia check --no-color >/dev/null 2>&1 || true
+
+    jq -n --slurpfile s /tmp/bench-status.json --slurpfile r build/concordia/results.json ''{status: $s[0], results: $r[0]}'''
+  expectExit: 0
+  stdoutJson:
+  - path: status.assessments[id=ASM-LLM-EGRESS].currency.state
+    equals: revoked
+  - path: status.required[id=llm-egress].currency.state
+    equals: revoked
+  - path: results.findings
+    countWhere:
+      ruleId: REV-APR-001
+      kind: assessment-revoked
+      disposition: active
+    equals: 1
+  - path: results.rules[ruleId=REV-APR-001].verdict
+    equals: violation

@@ -1,0 +1,1 @@
+feat: repl locates the browser binary

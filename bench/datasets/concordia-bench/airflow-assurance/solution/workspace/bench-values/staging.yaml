@@ -1,0 +1,13 @@
+executor: CeleryExecutor
+networkPolicies:
+  enabled: true
+pgbouncer:
+  enabled: true
+scheduler:
+  podDisruptionBudget:
+    enabled: true
+apiServer:
+  podDisruptionBudget:
+    enabled: true
+ports:
+  pgbouncer: 6544

@@ -1,0 +1,15 @@
+apiVersion: concordia.io/v1alpha1
+kind: QualityScenarioSet
+scenarios:
+- id: QS-NU-LAYERING
+  area: modifiability
+  qualityAttribute: modifiability
+  stimulusSource: developer
+  stimulus: a developer adds a feature to a lower crate of the workspace
+  environment: development
+  expectedResponse: the change stays inside its crate and no crate gains a dependency on a layer above it
+  owner: team-nushell
+  scope: [nu-engine, nu-protocol]
+  mode: structural
+  criterion:
+    rules: [NU-LYR-001]

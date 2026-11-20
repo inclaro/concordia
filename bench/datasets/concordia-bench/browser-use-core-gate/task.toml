@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/browser-use-core-gate"
+version = "1.0.0"
+description = "Gate teammate branches against the core pack and trust context of browser-use."
+keywords = ["concordia", "calm", "python", "browser-use", "core", "gate"]
+
+[metadata]
+difficulty = "medium"
+category = "core-gate"
+tags = ["browser-use", "python", "core", "gate"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 2
+memory_mb = 4096
+storage_mb = 20480
+build_timeout_sec = 600.0

@@ -1,0 +1,78 @@
+repo: knative-serving
+checks:
+- id: branch-0
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/restore-activator-secret-access
+  expectExit: 0
+  findings:
+  - ruleId: KN-AUTH-001
+    subject: kn-activator
+    environment: production-hydrated
+    result: violation
+    kind: obligation-violation
+    disposition: active
+  - ruleId: KN-AUTH-001
+    subject: kn-activator
+    environment: staging-hydrated
+    result: violation
+    kind: obligation-violation
+    disposition: active
+- id: review-0
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/restore-activator-secret-access
+  expectVerdict: pass
+  expectViolations:
+  - ruleId: KN-AUTH-001
+    path: bench-env/production-hydrated
+  expectErrors: []
+- id: branch-1
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/scan-symlinked-resources
+  expectExit: 0
+  diagnostics:
+  - CO-PRV-005
+  findings:
+  - ruleId: ASR-REN-001
+    environment: production
+    result: unknown
+    reason: rendered-evidence-missing
+    disposition: active
+    location.path: config/core/300-resources
+- id: review-1
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/scan-symlinked-resources
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branch-2
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/reconciler-uses-api-types
+  expectExit: 0
+  absent:
+  - location.path: pkg/reconciler/route/bench_ok.go
+    disposition: active
+- id: review-2
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/reconciler-uses-api-types
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

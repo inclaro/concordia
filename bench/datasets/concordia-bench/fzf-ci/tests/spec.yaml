@@ -1,0 +1,66 @@
+repo: fzf
+checks:
+- id: workflow
+  type: workflow
+  dimension: workspace
+  weight: 2
+  path: .github/workflows/concordia.yml
+  requireRuns:
+  - - concordia index
+  - - concordia
+    - --offline
+    - check
+- id: report-outputs
+  type: report_outputs
+  dimension: workspace
+  weight: 2
+  outputs:
+  - format: junit
+    path: build/concordia/results.xml
+  - format: sarif
+    path: build/concordia/results.sarif
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 1
+  paths:
+  - .github/workflows/concordia.yml
+  - concordia.yaml
+  branch: main
+- id: check-clean-offline
+  dimension: conformance
+  weight: 2
+  type: results
+  offline: true
+  expectExit: 0
+  select:
+  - path: schemaVersion
+    equals: "1.1"
+- id: reports-algo-imports-core
+  type: reports_on_mutation
+  dimension: reporting
+  weight: 3
+  mutation: algo-imports-core
+  ruleId: FZF-LYR-001
+  path: src/algo/bench_core.go
+  sarif: build/concordia/results.sarif
+  junit: build/concordia/results.xml
+  offline: true
+- id: sarif-aggregation
+  type: command
+  dimension: reporting
+  weight: 2
+  mutations: [tui-uses-algo-twice]
+  argv: [bash, -c, 'concordia index >/dev/null && concordia --offline check --no-color']
+  expectExit: 1
+  files:
+  - path: build/concordia/results.sarif
+    json:
+    - path: runs[0].results
+      countWhere: {ruleId: FZF-AGG-001}
+      equals: 1
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: true

@@ -1,0 +1,1 @@
+bench: API server reads the credential store

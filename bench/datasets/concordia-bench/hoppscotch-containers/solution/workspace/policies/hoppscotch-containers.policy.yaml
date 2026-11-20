@@ -1,0 +1,62 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: hoppscotch-containers
+  version: 1.0.0
+selectors:
+  frontends:
+    nodeTypes: [webclient]
+  runtimes:
+    calmNodes: [hopp-js-sandbox, hopp-kernel]
+  clients:
+    ref: frontends
+rules:
+- id: HOP-IMG-001
+  name: The backend image has a build definition
+  severity: error
+  owner: team-hoppscotch
+  family: deployment-trace
+  rationale: Supply chain - an image without a traceable build definition cannot be rebuilt or audited.
+  remediation: Build the image from a Dockerfile that is part of the repository.
+  subject:
+    calmNodes: [hopp-backend]
+  obligation:
+    type: required
+    multiplicity: forAll
+    relation: { kind: built-from, direction: from-image }
+  evidence:
+    completeness: complete
+    passCompleteness: any
+- id: HOP-IMG-002
+  name: The backend Dockerfile declares its base image
+  severity: error
+  owner: team-hoppscotch
+  family: deployment-trace
+  rationale: Supply chain - the base image of a first-party Dockerfile must be declared, so that base image updates are reviewable.
+  remediation: Add a FROM instruction with an explicit base image to the Dockerfile.
+  subject:
+    calmNodes: [hopp-backend]
+  obligation:
+    type: required
+    multiplicity: exists
+    relation: { kind: base-image, direction: from-subject }
+  evidence:
+    completeness: complete
+    passCompleteness: any
+- id: HOP-CON-001
+  name: The web app is not configured with the database connection
+  severity: error
+  owner: team-hoppscotch
+  family: deployment-security
+  rationale: Shared database - only the backend may hold the database connection, every other service reaches data through the backend.
+  remediation: Remove the database URL from the environment of the service and call the backend API instead.
+  subject:
+    calmNodes: [hopp-selfhost-web]
+  obligation:
+    type: forbidden
+    multiplicity: forAll
+    relation:
+      kind: configured-connection
+      direction: from-subject
+      target: { calmNodes: [hopp-db] }
+    scope: { environments: [selfhost] }

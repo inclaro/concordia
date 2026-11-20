@@ -1,0 +1,75 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: volcano
+architecture:
+  source: architecture/volcano.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: volcano
+    root: .
+    include:
+    - cmd/scheduler/**
+    - cmd/controller-manager/**
+    - cmd/webhook-manager/**
+    - cmd/agent/**
+    - pkg/scheduler/**
+    - pkg/controllers/**
+    - pkg/webhooks/**
+    - pkg/agent/**
+    - pkg/util/**
+    - pkg/kube/**
+    - pkg/features/**
+    - pkg/config/**
+    - pkg/signals/**
+    - pkg/version/**
+    - pkg/filewatcher/**
+    - installer/volcano-development.yaml
+    - bench-env/dev/**
+environments:
+- id: dev
+  sources:
+  - installer/volcano-development.yaml
+  - bench-env/dev/**
+bindings:
+  files:
+  - bindings/concordia.bindings.yaml
+  - bindings/volcano.review.bindings.yaml
+policies:
+  files:
+  - policies/*.policy.yaml
+  packs:
+  - use: builtin:review-currency
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+assessments:
+  paths:
+  - assessments
+  trustAnchor:
+    ref: main
+  authorities:
+  - id: security-review
+    role: reviewer
+    mechanism: protected-review
+    reviewers:
+    - secops@bench.invalid
+    - attacker@bench.invalid
+    paths:
+    - assessments/approvals/**
+    - assessments/revocations/**
+  required:
+  - id: admission-security
+    assessment: ASM-ADMISSION
+    type: security
+    scope:
+      calmNodes:
+      - vc-admission
+    environment: dev
+    authority: security-review
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

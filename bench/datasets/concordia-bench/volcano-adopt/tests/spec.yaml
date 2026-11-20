@@ -1,0 +1,190 @@
+repo: volcano
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: vc-scheduler
+    nodeType: service
+  - id: vc-framework
+    nodeType: service
+    tags:
+    - contract
+  - id: vc-plugin-gang
+    nodeType: service
+  - id: vc-plugin-drf
+    nodeType: service
+  - id: vc-plugin-proportion
+    nodeType: service
+  - id: vc-plugin-binpack
+    nodeType: service
+  - id: vc-plugin-predicates
+    nodeType: service
+  - id: vc-plugin-capacity
+    nodeType: service
+  - id: vc-plugins-other
+    nodeType: service
+  - id: vc-controllers
+    nodeType: service
+  - id: vc-admission
+    nodeType: service
+    tags:
+    - public
+  - id: vc-agent
+    nodeType: service
+  - id: vc-shared
+    nodeType: service
+    tags:
+    - shared
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - vc-scheduler
+    - vc-framework
+  - - vc-scheduler
+    - vc-plugins-other
+  - - vc-scheduler
+    - vc-shared
+  - - vc-plugins-other
+    - vc-framework
+  - - vc-controllers
+    - vc-framework
+  - - vc-controllers
+    - vc-shared
+  - - vc-admission
+    - vc-controllers
+  - - vc-admission
+    - vc-framework
+  - - vc-admission
+    - vc-shared
+  - - vc-agent
+    - vc-shared
+  - - vc-plugin-gang
+    - vc-framework
+  - - vc-plugin-gang
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-gang
+  - - vc-plugin-drf
+    - vc-framework
+  - - vc-plugin-drf
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-drf
+  - - vc-plugin-proportion
+    - vc-framework
+  - - vc-plugin-proportion
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-proportion
+  - - vc-plugin-binpack
+    - vc-framework
+  - - vc-plugin-binpack
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-binpack
+  - - vc-plugin-predicates
+    - vc-framework
+  - - vc-plugin-predicates
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-predicates
+  - - vc-plugin-capacity
+    - vc-framework
+  - - vc-plugin-capacity
+    - vc-plugins-other
+  - - vc-plugins-other
+    - vc-plugin-capacity
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - vc-scheduler
+  - vc-framework
+  - vc-plugin-gang
+  - vc-plugin-drf
+  - vc-plugin-proportion
+  - vc-plugin-binpack
+  - vc-plugin-predicates
+  - vc-plugin-capacity
+  - vc-plugins-other
+  - vc-controllers
+  - vc-admission
+  - vc-agent
+  - vc-shared
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: VC-IND-001
+    predicate: independent
+    severity: error
+  - id: VC-ALW-001
+    predicate: [allowOnly, forbid]
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 3
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+- id: detects-gang-imports-drf
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - gang-imports-drf
+  expectExit: 1
+  findings:
+  - ruleId: VC-IND-001
+    kind: peer-dependency
+    location.path: pkg/scheduler/plugins/gang/bench_drf.go
+    disposition: active
+- id: detects-drf-imports-controllers
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - drf-imports-controllers
+  expectExit: 1
+  findings:
+  - ruleId: VC-ALW-001
+    kind: [disallowed-dependency, forbidden-dependency]
+    location.path: pkg/scheduler/plugins/drf/bench_controllers.go
+    disposition: active
+- id: allows-drf-imports-framework
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - drf-imports-framework
+  expectExit: 0
+  absent:
+  - location.path: pkg/scheduler/plugins/drf/bench_framework.go
+    disposition: active
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1

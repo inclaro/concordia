@@ -1,0 +1,68 @@
+[
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/bundles.py",
+    "base_sha256": "c938f6a5471758a9ff0077f6aa58a6ad659f7ea615c3b74fcd07c7926ac6411c",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/bundles.py.ed",
+    "sha256": "81375f3c54b843fd04aec04b3562dcfcd2d92e7c766bfb92cf9c1bc353eb8eee"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/callback_supervisor.py",
+    "base_sha256": "89dbbb82e64aca94b4360b64b34dbd33a59e82dd8b885cab7af3e73d97d39e89",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/callback_supervisor.py.ed",
+    "sha256": "01fd40aaace6d59fe026bcdec3f41717e0da7b7181df310d4d846820dd8fa316"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/comms.py",
+    "base_sha256": "547b139371306275ce5ff5a61b0c6045fce43bbda411e3b836e80a146191841a",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/comms.py.ed",
+    "sha256": "be8d843e21601cfce5521d4fb9feab02ced484f5cfeea246bfd96a33f0db13a9"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/connection_test_supervisor.py",
+    "base_sha256": "99cbd2b5ed53516b5d9175df6875a810e5258b51b37724f978ccd4edcd52a54a",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/connection_test_supervisor.py.ed",
+    "sha256": "7a83bbc6fac3fc8e1493736f7f9407ea3df8ac267d29b18db7cb3f12d43eaa37"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/coordinator.py",
+    "base_sha256": "63f70995021618c8b47cf04f3f02557ef96d8dad26fca65e642191ec7a639ef3",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/coordinator.py.ed",
+    "sha256": "649c420d7cc55b83453417c8c026d3ff5f1bc636172f3be2fdf48a9abcab81a9"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/hitl.py",
+    "base_sha256": "42b97d707313fddb5245dba219fe2f263664577ed576b1dbfc83fe90f360e772",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/hitl.py.ed",
+    "sha256": "80dd82b147f1920a82d43201fb2c7825227e6680ee8aa1c329d1ebd129470555"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/loop.py",
+    "base_sha256": "f33d940cf5075c13dc0d68ea4a2f3ec41a6a5d358504e4ea3ca5676c223a7d2c",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/loop.py.ed",
+    "sha256": "fe9835b1f1d8847c469e0d6fb2d5fe9f9cfa22e3ecedc4c8fd562bb1ccaac2f1"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/request_handlers.py",
+    "base_sha256": "850ccea960becb0a8dc010fc82617eed0dcf0f09d7e878a2cfd3ff4dee52cbdc",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/request_handlers.py.ed",
+    "sha256": "214b8e733541459ad748c4256c286427c895a3847ea8e8cfb6c1257156f63f63"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/schema/versions/v2026_10_30.py",
+    "base_sha256": "74abe4e206a87fbdd9ca657d74f9266ec7b7e8ba30f85b8986854745fa869c3a",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/schema/versions/v2026_10_30.py.ed",
+    "sha256": "6f91e1c10416e0c9423f222f0c9e931e6754cd7b6dba9c79394953563b342fdb"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/supervisor.py",
+    "base_sha256": "c959abf1153d438c9fe4a6f509c7901ff940403ec3fe270cb8e7af1ade2611c0",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/supervisor.py.ed",
+    "sha256": "703d2fb535046a33b636575199a97081e5799f50848a3dba24de4b661507ed20"
+  },
+  {
+    "path": "task-sdk/src/airflow/sdk/execution_time/task_runner.py",
+    "base_sha256": "c4dfccdaea011eceeddd4b1787544212e489dbb23c4a29cdbac84ed09f38b0fc",
+    "edit": "edits/task-sdk/src/airflow/sdk/execution_time/task_runner.py.ed",
+    "sha256": "79ac8d51c2c5d6fe57fae4c615e6061deda7c27bd11ea1c44e552bf4f038a5bc"
+  }
+]

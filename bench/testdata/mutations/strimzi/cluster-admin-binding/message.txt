@@ -1,0 +1,1 @@
+fix: let the kafka client delegation use cluster-admin

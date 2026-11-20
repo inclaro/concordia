@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/dev-hydrated/volcano.yaml",
+    "run": "/opt/venv/bin/python -c 'import sys, yaml; docs = [d for d in yaml.safe_load_all(open(\"installer/volcano-development.yaml\")) if isinstance(d, dict) and d.get(\"kind\") != \"CustomResourceDefinition\"]; sys.stdout.write(\"---\\n\".join(yaml.safe_dump(d, sort_keys=False, width=200) for d in docs))'",
+    "base_sha256": "4a361ec5f569908eb5ce9d7d2753fc36138e1a3b2b9572f334b59eb6f3c7da47",
+    "edit": "edits/bench-env/dev-hydrated/volcano.yaml.ed",
+    "sha256": "a69b686e7b09291875b3e68b07d976558d799ae4cd759286d416a5e7af73d4db"
+  }
+]

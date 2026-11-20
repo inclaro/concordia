@@ -1,0 +1,1 @@
+chore: require a security quality scenario

@@ -1,0 +1,63 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: airflow-structure
+  version: 1.0.0
+rules:
+- id: AF-DNY-001
+  name: Task execution never reaches the metadata database transitively
+  severity: error
+  owner: team-airflow
+  rationale: Transitive coupling lets the task runner reach the metadata database through intermediate modules, defeating the AIP-72 isolation.
+  remediation: Remove the dependency chain, or move the shared code into the Task SDK.
+  subject:
+    calmNodes: [af-task-runner]
+  denyPath:
+    target:
+      calmNodes: [af-metadata-db]
+    edges: [IMPORTS, CALLS]
+    maxDepth: 4
+- id: AF-API-001
+  name: Providers use only the public Task SDK API
+  severity: error
+  owner: team-airflow
+  rationale: Reaching into SDK internals is a leaky abstraction that couples providers to the internal layout of the Task SDK.
+  remediation: Import from the public airflow.sdk package, its bases or its definitions instead.
+  subject:
+    calmNodes: [af-provider-standard]
+  publicApiOnly:
+    target:
+      calmNodes: [af-task-sdk, af-task-runner, af-sdk-api-client]
+    api:
+      sourceRoots:
+      - task-sdk/src/airflow/sdk/__init__.py
+      - task-sdk/src/airflow/sdk/bases/**
+      - task-sdk/src/airflow/sdk/definitions/**
+    edges: [IMPORTS]
+- id: AF-LYR-001
+  name: Core components depend downward only
+  severity: error
+  owner: team-airflow
+  rationale: Lower layers that import higher layers invert the layering and create import cycles across the core.
+  remediation: Move the shared code down into a lower layer, or invert the dependency.
+  layerOrder:
+    layers:
+    - calmNodes: [af-api-server]
+    - calmNodes: [af-scheduler, af-dag-processing]
+    - calmNodes: [af-executors]
+    - calmNodes: [af-models]
+    - calmNodes: [af-metadata-db]
+    edges: [IMPORTS]
+- id: AF-EDG-001
+  name: The task runner reaches the core through the Execution API client
+  severity: error
+  owner: team-airflow
+  rationale: A required dependency keeps the worker contract with the Execution API from eroding.
+  remediation: Restore the use of the SDK API client in the task runner.
+  subject:
+    calmNodes: [af-task-runner]
+  require:
+    edge:
+      target:
+        calmNodes: [af-sdk-api-client]
+      edges: [IMPORTS]

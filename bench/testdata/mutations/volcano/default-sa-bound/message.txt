@@ -1,0 +1,1 @@
+feat(bench): bind the scheduler cluster role to the default service account

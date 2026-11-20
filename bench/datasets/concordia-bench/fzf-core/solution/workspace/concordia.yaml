@@ -1,0 +1,31 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: fzf
+architecture:
+  source: architecture/fzf.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: fzf
+    root: .
+    include: [main.go, src/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+  packs:
+  - use: builtin:core
+    rules:
+      CORE-LYR-003: {severity: error}
+      CORE-LYR-002: {evidence: {minimumConfidence: heuristic}}
+      CORE-DECL-001: {enabled: false}
+      CORE-SEC-001: {enabled: false}
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

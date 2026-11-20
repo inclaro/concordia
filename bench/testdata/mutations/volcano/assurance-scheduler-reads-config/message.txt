@@ -1,0 +1,1 @@
+feat(chart): let the scheduler read configmaps through the API

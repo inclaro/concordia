@@ -1,0 +1,271 @@
+repo: airflow
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  branch: main
+- id: trace-api-server-gap
+  type: command
+  dimension: reporting
+  weight: 2
+  argv:
+  - concordia
+  - trace
+  - af-api-server
+  - --format
+  - json
+  expectExit: 0
+  stdoutJson:
+  - path: architectureId
+    equals: af-api-server
+  - path: traces[environment=chart].level
+    equals: declared
+  - path: traces[environment=chart].gaps[step=workload].lossModes
+    contains: unrendered-template
+  - path: traces[environment=chart].gaps[step=workload].reason
+    equals: coverage-incomplete
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=chart].sources
+    contains: chart/templates/**
+  - path: observation.projects[0].include
+    contains: chart/templates/**
+  - path: policies.packs[*].use
+    contains: builtin:infrastructure
+- id: deploy-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: af-api-server
+    nodeType: service
+    tags:
+    - presentation
+    - deployable
+  - id: af-scheduler
+    nodeType: service
+    tags:
+    - deployable
+  - id: af-dag-processing
+    nodeType: service
+    tags:
+    - deployable
+  - id: af-namespace
+    nodeType: system
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - af-api-server
+  - af-scheduler
+  - af-dag-processing
+  - af-namespace
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules: []
+  packs:
+  - builtin:infrastructure
+- id: honest-unknown-at-head
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  rules:
+    INFRA-PLC-001: unknown
+    INFRA-PLC-002: unknown
+    INFRA-TRC-001: unknown
+    INFRA-TRC-002: unknown
+    INFRA-TRC-004: unknown
+    INFRA-TRC-003: not-applicable
+  areas:
+    deploymentTrace: unknown
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-PLC-001
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-PLC-001
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-PLC-002
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-PLC-002
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-PLC-002
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-001
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-001
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-001
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-002
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-002
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-002
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-004
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-004
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  - ruleId: INFRA-TRC-004
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+    kind: obligation-unknown
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId:
+    - INFRA-PLC-001
+    - INFRA-PLC-002
+    - INFRA-TRC-001
+    - INFRA-TRC-002
+    - INFRA-TRC-004
+    - INFRA-TRC-003
+    result: pass
+  select:
+  - path: deploymentTrace.environments[name=chart].coverage.lossModes
+    contains: unrendered-template
+  - path: deploymentTrace.environments[name=chart].coverage.status
+    equals: partial
+- id: plain-manifest-resolves-only-its-workload
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - trace-plain-dag-processor
+  expectExit: 0
+  areas:
+    deploymentTrace: unknown
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: af-api-server
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-001
+    subject: af-scheduler
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-PLC-002
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-004
+    subject: af-dag-processing
+    environment: chart
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId:
+    - INFRA-PLC-001
+    - INFRA-TRC-001
+    - INFRA-TRC-002
+    subject: af-dag-processing
+  - ruleId:
+    - INFRA-PLC-001
+    - INFRA-PLC-002
+    - INFRA-TRC-001
+    - INFRA-TRC-002
+    - INFRA-TRC-004
+    result: pass

@@ -1,0 +1,73 @@
+[
+  {
+    "path": "bench-env/production-hydrated/200-roles/activator.yaml",
+    "from": "config/core/200-roles/activator.yaml",
+    "base_sha256": "c604e7bac2e45a7902c758847dcc8028876fc403d410f9fa3851f2d1694a26b6",
+    "edit": "edits/bench-env/production-hydrated/200-roles/activator.yaml.ed",
+    "sha256": "3fa90630ef9a3059de9956d029b34b75bb78535287c3d1cab0674b6716c68196"
+  },
+  {
+    "path": "bench-env/production-hydrated/200-roles/addressable-resolvers-clusterrole.yaml",
+    "from": "config/core/200-roles/addressable-resolvers-clusterrole.yaml",
+    "base_sha256": "7f0c48cc86f6ae59e18ee23b1b31cf150f1b3c2309878067245357a45c054afb",
+    "sha256": "7f0c48cc86f6ae59e18ee23b1b31cf150f1b3c2309878067245357a45c054afb"
+  },
+  {
+    "path": "bench-env/production-hydrated/200-roles/clusterrole-namespaced.yaml",
+    "from": "config/core/200-roles/clusterrole-namespaced.yaml",
+    "base_sha256": "b160b9127dcec44d434e4b1a0320596eb992081ad731506bec06b8ed836312e9",
+    "sha256": "b160b9127dcec44d434e4b1a0320596eb992081ad731506bec06b8ed836312e9"
+  },
+  {
+    "path": "bench-env/production-hydrated/200-roles/clusterrole.yaml",
+    "from": "config/core/200-roles/clusterrole.yaml",
+    "base_sha256": "67768cf0ea15a84d7cb8dc28dee675f78f5c9057b19794cc8da76e9bc902ecfa",
+    "sha256": "67768cf0ea15a84d7cb8dc28dee675f78f5c9057b19794cc8da76e9bc902ecfa"
+  },
+  {
+    "path": "bench-env/production-hydrated/200-roles/podspecable-bindings-clusterrole.yaml",
+    "from": "config/core/200-roles/podspecable-bindings-clusterrole.yaml",
+    "base_sha256": "4da88f6ac190f5cf4c97efab04337c6ffe07bd0594f4acf141c7887a46e93a68",
+    "sha256": "4da88f6ac190f5cf4c97efab04337c6ffe07bd0594f4acf141c7887a46e93a68"
+  },
+  {
+    "path": "bench-env/production-hydrated/200-serviceaccount.yaml",
+    "from": "config/core/200-serviceaccount.yaml",
+    "base_sha256": "b357987ac32a73c1a44394be28669f016678a163f60bc45c00b8cea47111ab35",
+    "sha256": "b357987ac32a73c1a44394be28669f016678a163f60bc45c00b8cea47111ab35"
+  },
+  {
+    "path": "bench-env/production-hydrated/deployments/activator.yaml",
+    "from": "config/core/deployments/activator.yaml",
+    "base_sha256": "bb3f7d462829ef52289603b4c31b0c95f65dce2c5003d293c3cc43e398c4f84c",
+    "edit": "edits/bench-env/production-hydrated/deployments/activator.yaml.ed",
+    "sha256": "34324391d6d6c36cbcf4a4fbc36599779fe4cf908c76c2997c6e10caed923555"
+  },
+  {
+    "path": "bench-env/production-hydrated/deployments/autoscaler.yaml",
+    "from": "config/core/deployments/autoscaler.yaml",
+    "base_sha256": "a60623b9eaf16deaaf66d1eb3054f2cdd379cbba9c5a5cb822b0ef64284200bc",
+    "edit": "edits/bench-env/production-hydrated/deployments/autoscaler.yaml.ed",
+    "sha256": "db1b410f378aa251d5ec68502e26ea96b71d551010d480051c9db301f670676e"
+  },
+  {
+    "path": "bench-env/production-hydrated/deployments/controller.yaml",
+    "from": "config/core/deployments/controller.yaml",
+    "base_sha256": "f9dd9677cddf59903fee4c9631264c5665de24bc8e931128667ba52d502ca5b2",
+    "edit": "edits/bench-env/production-hydrated/deployments/controller.yaml.ed",
+    "sha256": "93a869c113d792c3b383e615b11ddc80de426ed6dc6e760610112ae3281fe413"
+  },
+  {
+    "path": "bench-env/production-hydrated/deployments/webhook.yaml",
+    "from": "config/core/deployments/webhook.yaml",
+    "base_sha256": "3afd4db775d272a8e8370f26f70573009ab355898f2d04f669c9cb03199d9e62",
+    "edit": "edits/bench-env/production-hydrated/deployments/webhook.yaml.ed",
+    "sha256": "95239cb20fd245240009bfec8d2208043fed1620f840da27a99f1712d4ddb11d"
+  },
+  {
+    "path": "bench-env/production-hydrated/webhooks/secret.yaml",
+    "from": "config/core/webhooks/secret.yaml",
+    "base_sha256": "e26fdf7943bd8e5a1bcc7308d11211b7245c0fb6ae890477cd1159b84f4df99c",
+    "sha256": "e26fdf7943bd8e5a1bcc7308d11211b7245c0fb6ae890477cd1159b84f4df99c"
+  }
+]

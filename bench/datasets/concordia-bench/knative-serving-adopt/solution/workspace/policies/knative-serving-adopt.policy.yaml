@@ -1,0 +1,30 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: knative-serving-adopt
+  version: 1.0.0
+rules:
+- id: KN-LYR-001
+  name: Serving components depend downward only
+  severity: error
+  owner: team-knative-serving
+  rationale: Modularity - a lower layer that imports or calls a component above it is a layer inversion that couples the API types to the reconcilers.
+  remediation: Move the shared code down to the shared or API layer, or pass it in from the caller.
+  layerOrder:
+    layers:
+    - calmNodes: [kn-activator, kn-autoscaler, kn-controller, kn-webhook, kn-queue]
+    - calmNodes: [kn-shared]
+    - calmNodes: [kn-apis, kn-client]
+    edges: [IMPORTS, CALLS]
+- id: KN-CYC-001
+  name: No dependency cycles between Serving modules
+  severity: error
+  owner: team-knative-serving
+  rationale: Modularity - a cyclic dependency between modules breaks the acyclic dependencies principle and makes them impossible to build or test apart.
+  remediation: Break the cycle by moving the shared type to a lower module or by inverting the dependency with an interface.
+  subject:
+    calmNodes: [kn-activator, kn-autoscaler, kn-controller, kn-webhook, kn-queue, kn-apis, kn-client, kn-shared]
+  require:
+    graphProperty: acyclic
+    edges: [IMPORTS, CALLS]
+    collapseBy: architectureBinding

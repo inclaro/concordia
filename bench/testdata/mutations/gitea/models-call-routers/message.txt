@@ -1,0 +1,1 @@
+bench: model code reuses a router helper

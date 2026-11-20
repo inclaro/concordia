@@ -1,0 +1,33 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-fzf-cli
+  architectureRef: calm:node:fzf-cli
+  match:
+    any:
+    - sourceRoot: main.go
+- id: bind-fzf-core
+  architectureRef: calm:node:fzf-core
+  match:
+    any:
+    - sourceRoot: src/*.go
+- id: bind-fzf-tui
+  architectureRef: calm:node:fzf-tui
+  match:
+    any:
+    - sourceRoot: src/tui/**
+- id: bind-fzf-algo
+  architectureRef: calm:node:fzf-algo
+  match:
+    any:
+    - sourceRoot: src/algo/**
+- id: bind-fzf-protector
+  architectureRef: calm:node:fzf-protector
+  match:
+    any:
+    - sourceRoot: src/protector/**
+- id: bind-fzf-util
+  architectureRef: calm:node:fzf-util
+  match:
+    any:
+    - sourceRoot: src/util/**

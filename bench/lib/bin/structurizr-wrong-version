@@ -1,0 +1,9 @@
+#!/bin/bash
+# structurizr-wrong-version: a stand-in Structurizr CLI that reports an unpinned version.
+# The fzf views task points STRUCTURIZR_CLI here to prove that Concordia refuses it (CO-DGM-004).
+if [ "${1:-}" = "version" ]; then
+  echo "structurizr-cli: 2024.01.01"
+  exit 0
+fi
+echo "structurizr-wrong-version: only 'version' is supported" >&2
+exit 1

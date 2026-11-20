@@ -1,0 +1,14 @@
+[
+  {
+    "path": "airflow-core/adr/lang-sdk/0002-workload-execution.md",
+    "base_sha256": "ea2ca31cbafaaafe1d50ecc6ce301b2a2795b154e658343e3baf7111f1815328",
+    "edit": "edits/airflow-core/adr/lang-sdk/0002-workload-execution.md.ed",
+    "sha256": "e8ea30b49061338cafa576e39402c4e02a8169d9b15c5277526967e433397677"
+  },
+  {
+    "path": "airflow-core/adr/lang-sdk/0004-dag-parsing.md",
+    "base_sha256": "bb2860c3128842ff1b94260a57e31bdf893bf13eadf05e5452c187a91aa8c126",
+    "edit": "edits/airflow-core/adr/lang-sdk/0004-dag-parsing.md.ed",
+    "sha256": "8daff015900525397e66f87b28bc487fb6a1667201050abe601d6487e188db37"
+  }
+]

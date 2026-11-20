@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-dag-processor
+  namespace: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: dag-processor
+  template:
+    metadata:
+      labels:
+        component: dag-processor
+    spec:
+      containers:
+      - name: dag-processor
+        image: apache/airflow:3.4.0

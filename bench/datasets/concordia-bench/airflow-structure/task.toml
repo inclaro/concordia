@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/airflow-structure"
+version = "1.0.0"
+description = "Add the Airflow structure pack: transitive isolation, public SDK API, layering and contract rules."
+keywords = ["concordia", "calm", "python", "airflow", "structure"]
+
+[metadata]
+difficulty = "hard"
+category = "structure"
+tags = ["airflow", "python", "structure"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 12288
+storage_mb = 20480
+build_timeout_sec = 600.0

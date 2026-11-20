@@ -1,0 +1,140 @@
+repo: volcano
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - assessments
+  - architecture
+  - bindings
+  branch: main
+- id: pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules: []
+  packs:
+  - builtin:review-currency
+- id: workspace-keys
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=dev].sources
+    contains: installer/volcano-development.yaml
+  - path: assessments.trustAnchor.ref
+    equals: main
+  - path: assessments.authorities[id=security-review].role
+    equals: reviewer
+  - path: assessments.authorities[id=security-review].mechanism
+    oneOf: [protected-review, null]
+  - path: assessments.authorities[id=security-review].reviewers
+    contains: secops@bench.invalid
+  - path: assessments.required[id=admission-security].assessment
+    equals: ASM-ADMISSION
+  - path: assessments.required[id=admission-security].environment
+    equals: dev
+  - path: assessments.required[id=admission-security].authority
+    equals: security-review
+- id: assessment-doc
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: assessments/ASM-ADMISSION/v1.yaml
+  select:
+  - path: type
+    equals: security
+  - path: environment
+    equals: dev
+  - path: scope.calmNodes
+    contains: vc-admission
+  - path: subject.dependencies
+    length: 3
+- id: status-current
+  type: command
+  dimension: governance
+  weight: 3
+  argv:
+  - bash
+  - -c
+  - concordia index >/dev/null 2>&1; concordia assessment status --json
+  expectExit: 0
+  stdoutJson:
+  - path: assessments[id=ASM-ADMISSION].currency.state
+    equals: current
+  - path: assessments[id=ASM-ADMISSION].currency.approval.verified
+    equals: true
+  - path: assessments[id=ASM-ADMISSION].currency.approval.reviewer
+    equals: secops@bench.invalid
+  - path: required[id=admission-security].currency.state
+    equals: current
+- id: check-clean
+  type: results
+  dimension: governance
+  weight: 2
+  expectExit: 0
+  rules:
+    REV-APR-001: pass
+    REV-DSP-001: pass
+    REV-CAP-001: pass
+    REV-GOV-001: pass
+  areas:
+    assessmentCurrency: pass
+- id: code-import-not-reviewed
+  type: results
+  dimension: governance
+  weight: 1
+  mutations:
+  - review-imports-agent
+  absent:
+  - ruleId:
+    - REV-APR-001
+    - REV-DSP-001
+  rules:
+    REV-APR-001: pass
+    REV-DSP-001: pass
+- id: revoked
+  type: command
+  dimension: governance
+  weight: 3
+  argv:
+  - bash
+  - -c
+  - 'o="$(git rev-parse HEAD)"; trap ''git reset -q --hard "$o"'' EXIT
+
+    out="$(concordia assessment revoke ASM-ADMISSION-v1-1 --reviewer secops@bench.invalid --reason bench 2>&1 || true)"
+
+    d="$(printf ''%s\n'' "$out" | grep -o ''sha256:[0-9a-f]\{64\}'' | tail -1)"
+
+    concordia assessment revoke ASM-ADMISSION-v1-1 --reviewer secops@bench.invalid --reason bench --confirm-subject "$d" >&2
+
+    git add -f assessments >&2; git commit -q -m "chore: revoke approval" >&2
+
+    concordia index >/dev/null 2>&1
+
+    concordia assessment status --json > /tmp/bench-status.json
+
+    concordia check --no-color >/dev/null 2>&1 || true
+
+    jq -n --slurpfile s /tmp/bench-status.json --slurpfile r build/concordia/results.json ''{status: $s[0], results: $r[0]}'''
+  expectExit: 0
+  stdoutJson:
+  - path: status.assessments[id=ASM-ADMISSION].currency.state
+    equals: revoked
+  - path: status.required[id=admission-security].currency.state
+    equals: revoked
+  - path: results.findings
+    countWhere:
+      ruleId: REV-APR-001
+      kind: assessment-revoked
+      disposition: active
+    equals: 1
+  - path: results.rules[ruleId=REV-APR-001].verdict
+    equals: violation
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1

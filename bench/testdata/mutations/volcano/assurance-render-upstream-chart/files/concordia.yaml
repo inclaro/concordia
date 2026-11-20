@@ -1,0 +1,67 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: volcano
+architecture:
+  source: architecture/volcano.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: volcano
+    root: .
+    include:
+    - cmd/scheduler/**
+    - cmd/controller-manager/**
+    - cmd/webhook-manager/**
+    - cmd/agent/**
+    - pkg/scheduler/**
+    - pkg/controllers/**
+    - pkg/webhooks/**
+    - pkg/agent/**
+    - pkg/util/**
+    - pkg/kube/**
+    - pkg/features/**
+    - pkg/config/**
+    - pkg/signals/**
+    - pkg/version/**
+    - pkg/filewatcher/**
+    - installer/volcano-development.yaml
+    - installer/volcano-agent-development.yaml
+environments:
+- id: dev
+  sources:
+  - installer/volcano-development.yaml
+  - installer/volcano-agent-development.yaml
+bindings:
+  files:
+  - bindings/concordia.bindings.yaml
+  - bindings/volcano.assurance.bindings.yaml
+policies:
+  files:
+  - policies/*.policy.yaml
+  packs:
+  - use: builtin:assurance
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+assurance:
+  rendering:
+    sources:
+    - environment: dev
+      tool: helm
+      path: installer/helm/chart/volcano
+      release: volcano
+      namespace: volcano-system
+      valuesFiles:
+      - bench-values/dev.yaml
+  evaluators:
+  - environment: dev
+    kinds:
+    - rbac
+    assumes:
+    - rbac-authorizer-enabled
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

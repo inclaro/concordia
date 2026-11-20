@@ -1,0 +1,58 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: airflow
+architecture:
+  source: architecture/airflow.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: full
+  projects:
+  - name: airflow
+    root: .
+    include:
+    - airflow-core/src/airflow/api_fastapi/*.py
+    - airflow-core/src/airflow/api_fastapi/auth/**/*.py
+    - airflow-core/src/airflow/api_fastapi/common/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/datamodels/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/openapi/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/routes/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/routes/ui/**/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/services/*.py
+    - airflow-core/src/airflow/api_fastapi/core_api/services/ui/**/*.py
+    - airflow-core/src/airflow/api_fastapi/execution_api/**/*.py
+    - airflow-core/src/airflow/api_fastapi/logging/**/*.py
+    - airflow-core/src/airflow/jobs/**/*.py
+    - airflow-core/src/airflow/dag_processing/**/*.py
+    - airflow-core/src/airflow/executors/**/*.py
+    - airflow-core/src/airflow/models/**/*.py
+    - airflow-core/src/airflow/utils/session.py
+    - airflow-core/src/airflow/settings.py
+    - task-sdk/src/airflow/sdk/**/*.py
+    - providers/standard/src/**/*.py
+    - airflow-core/adr/lang-sdk/0002-workload-execution.md
+    - airflow-core/adr/lang-sdk/0004-dag-parsing.md
+    - dev/breeze/doc/adr/0001-record-architecture-decisions.md
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/airflow-adopt.policy.yaml]
+  packs:
+  - use: builtin:adr-governance
+adr:
+  files: [adr/decisions.yaml]
+  lifecycle:
+    active: [accepted]
+  triggers:
+  - id: TRG-EXECUTION-API
+    category: system-boundaries
+    paths:
+    - airflow-core/src/airflow/api_fastapi/execution_api/**
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

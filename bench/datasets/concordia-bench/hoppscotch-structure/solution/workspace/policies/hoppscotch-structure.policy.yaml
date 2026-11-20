@@ -1,0 +1,53 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: hoppscotch-structure
+  version: 1.0.0
+selectors:
+  frontends:
+    nodeTypes: [webclient]
+  runtimes:
+    calmNodes: [hopp-js-sandbox, hopp-kernel]
+  clients:
+    ref: frontends
+rules:
+- id: HOP-OWN-001
+  name: Script runtimes are owned by the clients
+  severity: error
+  owner: team-hoppscotch
+  rationale: Data ownership - the script sandbox and the kernel are owned by the client packages, and a backend or admin dependency on them is a shared-ownership smell.
+  remediation: Move the shared piece into hoppscotch-data, or call the runtime through a client package.
+  subject:
+    ref: runtimes
+  ownership:
+    owners:
+      calmNodes: [hopp-common, hopp-cli, hopp-selfhost-web]
+    edges: [IMPORTS]
+- id: HOP-BND-002
+  name: Web clients do not import the backend
+  severity: error
+  owner: team-hoppscotch
+  rationale: Distributed monolith - a web client that imports backend code ships server code to the browser and couples release cycles.
+  remediation: Talk to the backend over its GraphQL API and share types through hoppscotch-data.
+  aggregation: symbol
+  subject:
+    ref: clients
+  forbid:
+    target:
+      calmNodes: [hopp-backend]
+    edges: [IMPORTS]
+    traversal: direct
+- id: HOP-BND-003
+  name: The backend does not import web clients
+  severity: error
+  owner: team-hoppscotch
+  rationale: Layer inversion - the backend is a lower tier than the web clients, and one pair-level finding is enough to flag the inversion.
+  remediation: Move the shared code into hoppscotch-data.
+  aggregation: architecture-pair
+  subject:
+    calmNodes: [hopp-backend]
+  forbid:
+    target:
+      ref: frontends
+    edges: [IMPORTS]
+    traversal: direct

@@ -1,0 +1,1 @@
+bench: router reads configuration outside the facade

@@ -1,0 +1,24 @@
+# smoke.yaml: oracle-only run of the concordia-bench task corpus.
+#
+# Purpose: every task's reference solution must score 1.0, so an oracle run is
+#          a Concordia regression test on real code with real configuration.
+#          No LLM and no API keys. See bench/README.md.
+# Usage:   cd bench && harbor run -c configs/smoke.yaml
+#          (or `mise run bench:smoke`, which builds the images first)
+
+jobs_dir: jobs
+
+datasets:
+  - path: ./datasets/concordia-bench
+
+n_attempts: 1
+
+n_concurrent_trials: 2
+
+environment:
+  type: docker
+  force_build: false
+  delete: true
+
+agents:
+  - name: oracle

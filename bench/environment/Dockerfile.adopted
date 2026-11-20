@@ -1,0 +1,10 @@
+# Dockerfile.adopted: the repository with Concordia adopted from the reference workspace.
+# Build context: datasets/concordia-bench/<id>-adopt/solution/workspace.
+# Image: concordia-bench-<id>-adopted:latest.
+ARG REPO_ID=unset
+FROM concordia-bench-${REPO_ID}:latest
+COPY . /opt/concordia-bench/reference
+# The CBM daemon of this build leaves lock and socket files in /tmp/cbm-daemon-*. A later
+# build or container reads them as a live owner and the daemon cannot start (CO-OBS-001).
+RUN /opt/concordia-bench/bin/adopt-workspace.sh /opt/concordia-bench/reference \
+    && rm -rf /opt/concordia-bench/reference /tmp/cbm-daemon-*

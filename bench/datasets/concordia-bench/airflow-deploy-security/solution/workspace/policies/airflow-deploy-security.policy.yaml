@@ -1,0 +1,37 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: airflow-deploy-security
+  version: 1.0.0
+rules:
+- id: AF-SEC-001
+  name: Workers do not reference the metadata database secret
+  severity: error
+  owner: team-airflow
+  rationale: With AIP-72 the workers no longer need the database connection, so a shared metadata secret on workers is shared-database coupling and secret sprawl.
+  remediation: Remove the metadata secret from the worker pod specification.
+  family: deployment-security
+  subject:
+    calmNodes: [af-worker]
+  obligation:
+    type: forbidden
+    relation: {kind: references-secret, direction: from-workload, target: {calmNodes: [af-metadata-secret]}}
+    scope: {environments: [prod-hydrated]}
+  evidence:
+    roles: [parsed-source-fact]
+- id: AF-REL-001
+  name: Scheduler and API server have a pod disruption budget
+  severity: error
+  owner: team-airflow
+  rationale: Without a disruption budget a node drain can take down the only scheduler or every API server pod at once, a single point of failure.
+  remediation: Enable the pod disruption budget of the component in the chart values.
+  family: deployment-availability
+  subject:
+    calmNodes: [af-scheduler, af-api-server]
+  obligation:
+    type: required
+    relation: {kind: disruption-policy-target, direction: to-workload}
+    scope: {environments: [prod-hydrated]}
+  evidence:
+    roles: [parsed-source-fact]
+    passCompleteness: any

@@ -1,0 +1,1 @@
+bench: mark the frozen migrations ADR superseded without a successor

@@ -1,0 +1,1 @@
+feat(algo): reuse the finder options

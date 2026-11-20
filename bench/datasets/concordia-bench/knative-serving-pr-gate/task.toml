@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/knative-serving-pr-gate"
+version = "1.0.0"
+description = "Gate a branch with --changed and handle a scoped waiver approved on the trust anchor."
+keywords = ["concordia", "calm", "architecture", "go", "knative-serving", "pr-gate"]
+
+[metadata]
+difficulty = "hard"
+category = "pr-gate"
+tags = ["knative-serving", "go", "pr-gate"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

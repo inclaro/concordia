@@ -1,0 +1,1 @@
+fix: give the app the database url

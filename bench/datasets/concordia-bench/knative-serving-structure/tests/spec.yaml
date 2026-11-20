@@ -1,0 +1,72 @@
+repo: knative-serving
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: KN-DNY-001
+    predicate: denyPath
+    severity: error
+  - id: KN-ALW-001
+    predicate: [allowOnly, forbid]
+    severity: error
+  packs: []
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - policies/knative-serving-structure.policy.yaml
+  - exceptions
+  branch: main
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  rules:
+    KN-DNY-001: violation
+    KN-ALW-001: violation
+    KN-LYR-001: violation
+- id: detects-queue-reaches-reconciler
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - queue-reaches-reconciler
+  expectExit: 1
+  findings:
+  - ruleId: KN-DNY-001
+    kind: forbidden-path
+    location.path: pkg/queue/benchpath/bench.go
+    disposition: active
+- id: detects-queue-imports-autoscaler
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - queue-imports-autoscaler
+  expectExit: 1
+  findings:
+  - ruleId: KN-ALW-001
+    kind: [disallowed-dependency, forbidden-dependency]
+    location.path: pkg/queue/bench_as.go
+    disposition: active
+  absent:
+  - ruleId: KN-DNY-001
+    kind: forbidden-path
+    disposition: active
+- id: allows-queue-imports-shared
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - queue-imports-shared
+  expectExit: 0
+  absent:
+  - location.path: pkg/queue/bench_ok.go
+    disposition: active

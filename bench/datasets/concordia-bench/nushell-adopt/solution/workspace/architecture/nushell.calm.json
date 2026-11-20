@@ -1,0 +1,768 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "nu-cli",
+      "node-type": "service",
+      "name": "Nu Cli",
+      "description": "Line editor, REPL and prompt."
+    },
+    {
+      "unique-id": "nu-command",
+      "node-type": "service",
+      "name": "Nu Command",
+      "description": "Built-in command implementations."
+    },
+    {
+      "unique-id": "nu-cmd-lang",
+      "node-type": "service",
+      "name": "Nu Cmd Lang",
+      "description": "Language keywords and core commands."
+    },
+    {
+      "unique-id": "nu-cmd-base",
+      "node-type": "service",
+      "name": "Nu Cmd Base",
+      "description": "Shared helpers for command crates."
+    },
+    {
+      "unique-id": "nu-cmd-plugin",
+      "node-type": "service",
+      "name": "Nu Cmd Plugin",
+      "description": "Commands that manage plugins."
+    },
+    {
+      "unique-id": "nu-parser",
+      "node-type": "service",
+      "name": "Nu Parser",
+      "description": "Parser."
+    },
+    {
+      "unique-id": "nu-plugin-engine",
+      "node-type": "service",
+      "name": "Nu Plugin Engine",
+      "description": "Engine side of the plugin protocol: spawns and talks to plugins."
+    },
+    {
+      "unique-id": "nu-plugin",
+      "node-type": "service",
+      "name": "Nu Plugin",
+      "description": "Library that plugin authors build on."
+    },
+    {
+      "unique-id": "nu-engine",
+      "node-type": "service",
+      "name": "Nu Engine",
+      "description": "Evaluation engine."
+    },
+    {
+      "unique-id": "nu-plugin-core",
+      "node-type": "service",
+      "name": "Nu Plugin Core",
+      "description": "Shared plugin communication code."
+    },
+    {
+      "unique-id": "nu-plugin-protocol",
+      "node-type": "service",
+      "name": "Nu Plugin Protocol",
+      "description": "Plugin wire protocol types."
+    },
+    {
+      "unique-id": "nu-protocol",
+      "node-type": "service",
+      "name": "Nu Protocol",
+      "description": "Core types: values, signatures, errors."
+    },
+    {
+      "unique-id": "nu-config",
+      "node-type": "service",
+      "name": "Nu Config",
+      "description": "Configuration types."
+    },
+    {
+      "unique-id": "nu-utils",
+      "node-type": "service",
+      "name": "Nu Utils",
+      "description": "Foundation utilities.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "nu-cli-uses-nu-command",
+      "description": "Nu Cli uses Nu Command.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-command"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-cmd-base",
+      "description": "Nu Cli uses Nu Cmd Base.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-cmd-base"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-engine",
+      "description": "Nu Cli uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-parser",
+      "description": "Nu Cli uses Nu Parser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-parser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-plugin-engine",
+      "description": "Nu Cli uses Nu Plugin Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-plugin-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-protocol",
+      "description": "Nu Cli uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-config",
+      "description": "Nu Cli uses Nu Config.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-config"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cli-uses-nu-utils",
+      "description": "Nu Cli uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cli"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-cmd-base",
+      "description": "Nu Command uses Nu Cmd Base.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-cmd-base"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-engine",
+      "description": "Nu Command uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-parser",
+      "description": "Nu Command uses Nu Parser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-parser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-protocol",
+      "description": "Nu Command uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-config",
+      "description": "Nu Command uses Nu Config.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-config"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-command-uses-nu-utils",
+      "description": "Nu Command uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-command"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-lang-uses-nu-cmd-base",
+      "description": "Nu Cmd Lang uses Nu Cmd Base.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-lang"
+          },
+          "destination": {
+            "node": "nu-cmd-base"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-lang-uses-nu-engine",
+      "description": "Nu Cmd Lang uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-lang"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-lang-uses-nu-parser",
+      "description": "Nu Cmd Lang uses Nu Parser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-lang"
+          },
+          "destination": {
+            "node": "nu-parser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-lang-uses-nu-protocol",
+      "description": "Nu Cmd Lang uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-lang"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-lang-uses-nu-utils",
+      "description": "Nu Cmd Lang uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-lang"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-base-uses-nu-engine",
+      "description": "Nu Cmd Base uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-base"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-base-uses-nu-parser",
+      "description": "Nu Cmd Base uses Nu Parser.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-base"
+          },
+          "destination": {
+            "node": "nu-parser"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-base-uses-nu-protocol",
+      "description": "Nu Cmd Base uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-base"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-plugin-uses-nu-engine",
+      "description": "Nu Cmd Plugin uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-plugin"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-plugin-uses-nu-protocol",
+      "description": "Nu Cmd Plugin uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-plugin"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-cmd-plugin-uses-nu-plugin-engine",
+      "description": "Nu Cmd Plugin uses Nu Plugin Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-cmd-plugin"
+          },
+          "destination": {
+            "node": "nu-plugin-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-parser-uses-nu-engine",
+      "description": "Nu Parser uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-parser"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-parser-uses-nu-plugin-engine",
+      "description": "Nu Parser uses Nu Plugin Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-parser"
+          },
+          "destination": {
+            "node": "nu-plugin-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-parser-uses-nu-protocol",
+      "description": "Nu Parser uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-parser"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-parser-uses-nu-utils",
+      "description": "Nu Parser uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-parser"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-engine-uses-nu-engine",
+      "description": "Nu Plugin Engine uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-engine"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-engine-uses-nu-protocol",
+      "description": "Nu Plugin Engine uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-engine"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-engine-uses-nu-plugin-core",
+      "description": "Nu Plugin Engine uses Nu Plugin Core.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-engine"
+          },
+          "destination": {
+            "node": "nu-plugin-core"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-engine-uses-nu-plugin-protocol",
+      "description": "Nu Plugin Engine uses Nu Plugin Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-engine"
+          },
+          "destination": {
+            "node": "nu-plugin-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-engine-uses-nu-utils",
+      "description": "Nu Plugin Engine uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-engine"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-uses-nu-engine",
+      "description": "Nu Plugin uses Nu Engine.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin"
+          },
+          "destination": {
+            "node": "nu-engine"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-uses-nu-protocol",
+      "description": "Nu Plugin uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-uses-nu-plugin-core",
+      "description": "Nu Plugin uses Nu Plugin Core.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin"
+          },
+          "destination": {
+            "node": "nu-plugin-core"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-uses-nu-plugin-protocol",
+      "description": "Nu Plugin uses Nu Plugin Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin"
+          },
+          "destination": {
+            "node": "nu-plugin-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-uses-nu-utils",
+      "description": "Nu Plugin uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-engine-uses-nu-protocol",
+      "description": "Nu Engine uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-engine"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-engine-uses-nu-utils",
+      "description": "Nu Engine uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-engine"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-core-uses-nu-protocol",
+      "description": "Nu Plugin Core uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-core"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-core-uses-nu-plugin-protocol",
+      "description": "Nu Plugin Core uses Nu Plugin Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-core"
+          },
+          "destination": {
+            "node": "nu-plugin-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-core-uses-nu-utils",
+      "description": "Nu Plugin Core uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-core"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-protocol-uses-nu-protocol",
+      "description": "Nu Plugin Protocol uses Nu Protocol.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-protocol"
+          },
+          "destination": {
+            "node": "nu-protocol"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-plugin-protocol-uses-nu-utils",
+      "description": "Nu Plugin Protocol uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-plugin-protocol"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-protocol-uses-nu-config",
+      "description": "Nu Protocol uses Nu Config.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-protocol"
+          },
+          "destination": {
+            "node": "nu-config"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "nu-protocol-uses-nu-utils",
+      "description": "Nu Protocol uses Nu Utils.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "nu-protocol"
+          },
+          "destination": {
+            "node": "nu-utils"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+repo: gitea
+checks:
+- id: pack
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs:
+  - builtin:adr-governance
+- id: dec-rule-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: GITEA-DEC-101
+    predicate: decisions
+- id: adr-config
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: adr.files
+    contains: docs/adr/decisions.yaml
+  - path: observation.indexMode
+    equals: full
+  - path: adr.triggers[id=TRG-MIGRATIONS].category
+    equals: data-model
+- id: register
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: docs/adr/decisions.yaml
+  select:
+  - path: decisions[id=ADR-0001].enforcement
+    equals: required
+  - path: decisions[id=ADR-0002].enforcement
+    equals: required
+  - path: decisions[id=ADR-0001].enforcedBy[0].rule
+    equals: GITEA-MIG-001
+  - path: decisions[id=ADR-0002].enforcedBy[0].rule
+    equals: GITEA-LYR-001
+- id: adr-validate
+  type: command
+  dimension: governance
+  weight: 2
+  argv:
+  - concordia
+  - adr
+  - validate
+  expectExit: 0
+- id: governance-clean
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 0
+  rules:
+    GOV-ADR-001: pass
+    GOV-ADR-002: pass
+    GOV-ADR-003: pass
+    GOV-ADR-004: pass
+    GOV-ADR-005: pass
+    GOV-ADR-006: not-applicable
+    GITEA-DEC-101: pass
+  areas:
+    adrGovernance: pass
+  diagnostics:
+  - CO-ADR-009
+- id: presence-absent
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - adr-file-deleted
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-001
+    kind: adr-absent
+    subject: ADR-2
+    disposition: active
+- id: trigger-unsatisfied
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - migration-change
+  args:
+  - --changed
+  - HEAD~1
+  findings:
+  - ruleId: GOV-ADR-006
+    kind: adr-trigger-unsatisfied
+    subject: TRG-MIGRATIONS
+  expectExit: 4
+  rules:
+    GOV-ADR-006: violation

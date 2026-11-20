@@ -1,0 +1,40 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: strimzi
+architecture:
+  source: architecture/strimzi.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: strimzi
+    root: .
+    include: [cluster-operator/src/main/**, topic-operator/src/main/**, user-operator/src/main/**, operator-common/src/main/**, certificate-issuer/src/main/**, config-model/src/main/**, api/src/main/**, install/**, deploy/hydrated/**]
+environments:
+- id: install
+  sources: [install/cluster-operator/**, install/topic-operator/**, install/user-operator/**, install/access-operator/**]
+- id: install-hydrated
+  sources: [deploy/hydrated/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/strimzi-adopt.policy.yaml, policies/strimzi-deploy-security.policy.yaml]
+  packs:
+  - use: builtin:infrastructure
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error
+  enforcement:
+  - {family: deployment-security, environment: install, mode: shadow}
+  - {family: deployment-security, mode: advisory}
+  - {family: deployment-placement, mode: advisory}
+  - {family: deployment-trace, mode: advisory}
+  rollback:
+    reason: "roll out the Strimzi deployment obligations gradually"
+    authorizedBy: platform-lead@bench.invalid
+    expires: "2020-01-01"

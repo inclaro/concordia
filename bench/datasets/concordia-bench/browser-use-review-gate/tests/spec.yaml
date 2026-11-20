@@ -1,0 +1,103 @@
+repo: browser-use
+checks:
+- id: zone-moved-needs-review
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/move-llm-adapters-to-internet-zone
+  expectExit: 0
+  findings:
+  - ruleId: REV-APR-001
+    kind: assessment-review-required
+    disposition: active
+  - ruleId: BU-ASM-001
+    kind: assessment-review-required
+    disposition: active
+  rules:
+    REV-APR-001: violation
+    BU-ASM-001: violation
+  areas:
+    assessmentCurrency: violation
+- id: review-zone-moved
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/move-llm-adapters-to-internet-zone
+  expectVerdict: pass
+  expectViolations:
+  - ruleId: REV-APR-001
+    path: assessments/ASM-LLM-EGRESS/v1.yaml
+  - ruleId: BU-ASM-001
+    path: assessments/ASM-LLM-EGRESS/v1.yaml
+- id: trust-dropped-undisposed
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/drop-llm-trust-declaration
+  expectExit: 0
+  findings:
+  - ruleId: REV-DSP-001
+    kind: assessment-undisposed-removal
+    disposition: active
+  rules:
+    REV-DSP-001: violation
+- id: review-trust-dropped
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/drop-llm-trust-declaration
+  expectVerdict: pass
+  expectViolations:
+  - ruleId: REV-DSP-001
+    path: assessments/ASM-LLM-EGRESS/v1.yaml
+  - ruleId: REV-APR-001
+    path: assessments/ASM-LLM-EGRESS/v1.yaml
+  - ruleId: BU-ASM-001
+    path: assessments/ASM-LLM-EGRESS/v1.yaml
+- id: reviewer-added-relaxation
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/add-security-reviewer
+  expectExit: 0
+  findings:
+  - ruleId: REV-GOV-001
+    kind: assessment-relaxation
+    disposition: active
+  rules:
+    REV-GOV-001: violation
+- id: review-reviewer-added
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/add-security-reviewer
+  expectVerdict: pass
+  expectViolations:
+  - ruleId: REV-GOV-001
+    path: ''
+- id: tool-registry-import-passes
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/agent-reuses-tool-registry
+  expectExit: 0
+  absent:
+  - location.path: browser_use/agent/bench_ok.py
+    disposition: active
+  areas:
+    assessmentCurrency: pass
+- id: review-tool-registry
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/agent-reuses-tool-registry
+  expectVerdict: pass
+  expectViolations: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

@@ -1,0 +1,1 @@
+fix(chart): drop the scheduler API access to configmaps

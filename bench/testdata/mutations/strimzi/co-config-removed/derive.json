@@ -1,0 +1,8 @@
+[
+  {
+    "path": "deploy/hydrated/strimzi.yaml",
+    "base_sha256": "d42def83728dd5d294bcf93bb08b3b1753c6bbaa3ee2415e96d12d97f595b932",
+    "edit": "edits/deploy/hydrated/strimzi.yaml.ed",
+    "sha256": "3109f132a8b6f42972e00b153313ccd2e7d5b027bf61ccb25407cbee24f02471"
+  }
+]

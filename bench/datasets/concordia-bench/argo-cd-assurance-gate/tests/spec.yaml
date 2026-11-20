@@ -1,0 +1,65 @@
+repo: argo-cd
+checks:
+- id: redis-policy-opened-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/open-redis-policy-in-overlay
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-NET-001, environment: non-ha, result: violation, disposition: active}
+  - {ruleId: ARGO-NET-003, environment: non-ha, result: violation, disposition: active}
+  rules: {ARGO-NET-001: violation, ARGO-NET-003: violation, ARGO-NET-002: pass}
+- id: redis-policy-opened-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/open-redis-policy-in-overlay
+  expectVerdict: pass
+  expectViolations:
+  - {ruleId: ARGO-NET-001, path: gitops/production}
+  - {ruleId: ARGO-NET-003, path: gitops/production}
+  expectErrors: []
+- id: second-base-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/overlay-adds-second-base
+  expectExit: 0
+  findings:
+  - {ruleId: ARGO-CLM-001, environment: non-ha, result: unknown, reason: rendered-evidence-missing, disposition: active}
+  - {ruleId: ASR-REN-001, result: unknown, reason: rendered-evidence-missing, disposition: active}
+  rules: {ARGO-CLM-001: unknown, ASR-REN-001: unknown}
+  absent:
+  - {ruleId: ARGO-CLM-001, result: pass}
+- id: second-base-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/overlay-adds-second-base
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: client-package-run
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/server-uses-repo-server-client
+  expectExit: 0
+  absent:
+  - {location.path: server/bench_ok.go, disposition: active}
+- id: client-package-review
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/server-uses-repo-server-client
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

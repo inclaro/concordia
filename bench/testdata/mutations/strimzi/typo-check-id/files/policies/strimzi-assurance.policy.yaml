@@ -1,0 +1,29 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: strimzi-assurance
+  version: 1.0.0
+rules:
+- id: STZ-AUTH-001
+  name: "The cluster operator is granted access to its configuration map"
+  severity: error
+  owner: team-strimzi
+  rationale: "Security, least privilege: the operator must be able to read its own configuration, and the rendered roles are the evidence of what it is granted."
+  remediation: "Grant the operator service account get access to the ConfigMap in the chart roles."
+  family: effective-access
+  require:
+    effectiveAccess:
+      dimension: authorization
+      from: {calmNodes: [stz-cluster-operator]}
+      to: {calmNodes: [stz-co-config]}
+      expect: granted
+- id: STZ-VER-001
+  name: "The operator unit tests have an admissible result"
+  severity: error
+  owner: team-strimzi
+  rationale: "Testability: a passing unit-test run is claimed only with an authenticated check result for the install environment."
+  remediation: "Publish an authenticated check result for the operator-unit-tests check."
+  require:
+    checkResult:
+      check: operator-unit-tset
+      environment: install

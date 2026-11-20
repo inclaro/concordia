@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/airflow-assurance"
+version = "1.0.0"
+description = "Add rendered-chart assurance: evaluators for network and RBAC, and the assurance claim rules."
+keywords = ["concordia", "calm", "python", "airflow", "assurance"]
+
+[metadata]
+difficulty = "hard"
+category = "assurance"
+tags = ["airflow", "python", "assurance"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 12288
+storage_mb = 20480
+build_timeout_sec = 600.0

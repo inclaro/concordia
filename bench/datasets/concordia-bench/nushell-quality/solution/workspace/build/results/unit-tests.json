@@ -1,0 +1,26 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "nushell",
+      "digest": {
+        "gitCommit": "0000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "predicateType": "https://concordia.io/evidence/check-result/v1",
+  "predicate": {
+    "check": "unit-tests",
+    "outcome": "passed",
+    "revision": "0000000000000000000000000000000000000000",
+    "environment": "ci",
+    "evaluator": {
+      "name": "cargo-test",
+      "version": "1"
+    },
+    "covers": [
+      "nu-engine"
+    ],
+    "time": "2026-01-01T00:00:00Z"
+  }
+}

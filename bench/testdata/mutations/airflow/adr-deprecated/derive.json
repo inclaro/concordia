@@ -1,0 +1,8 @@
+[
+  {
+    "path": "airflow-core/adr/lang-sdk/0004-dag-parsing.md",
+    "base_sha256": "bb2860c3128842ff1b94260a57e31bdf893bf13eadf05e5452c187a91aa8c126",
+    "edit": "edits/airflow-core/adr/lang-sdk/0004-dag-parsing.md.ed",
+    "sha256": "29854f61b2e2a43a12b9297ecb609959f7efdb03ddd4fd7b736b0ac5af42e491"
+  }
+]

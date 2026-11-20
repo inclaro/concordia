@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/gitea-core"
+version = "1.0.0"
+description = "Enable the built-in core pack on Gitea with tags and overrides."
+keywords = ["concordia", "calm", "architecture", "go", "gitea", "core"]
+
+[metadata]
+difficulty = "hard"
+category = "core"
+tags = ["gitea", "go", "core"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

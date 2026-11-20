@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/argo-cd-assurance-gate"
+version = "1.0.0"
+description = "Review teammate branches against the Argo CD assurance rules (rendered install, network policies, roles) and report what Concordia finds."
+keywords = ["concordia", "calm", "architecture", "go", "argo-cd", "assurance-gate"]
+
+[metadata]
+difficulty = "hard"
+category = "assurance-gate"
+tags = ["argo-cd", "go", "assurance-gate"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

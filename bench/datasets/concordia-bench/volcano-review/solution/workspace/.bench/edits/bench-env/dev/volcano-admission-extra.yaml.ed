@@ -1,0 +1,20 @@
+104,217c
+  name: volcano-admission-leases
+.
+99,100c
+    name: volcano-admission
+    namespace: volcano-system
+.
+91,96c
+  name: volcano-admission-leases
+  namespace: volcano-system
+.
+85,86c
+    verbs: ["get", "create", "update"]
+.
+67,82d
+60,65c
+  name: volcano-admission-leases
+  namespace: volcano-system
+.
+1,56d

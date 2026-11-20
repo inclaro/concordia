@@ -1,0 +1,8 @@
+[
+  {
+    "path": "install/access-operator/bench-access-operator-copy.yaml",
+    "from": "install/access-operator/050-Deployment.yaml",
+    "base_sha256": "a2e4c9a82aacb8a46620fde52414529c979e73e6e95226926f2f8a7cd59fc252",
+    "sha256": "a2e4c9a82aacb8a46620fde52414529c979e73e6e95226926f2f8a7cd59fc252"
+  }
+]

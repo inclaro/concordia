@@ -1,0 +1,38 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-stz-cluster-operator
+  architectureRef: calm:node:stz-cluster-operator
+  match:
+    any:
+    - sourceRoot: cluster-operator/src/main/**
+- id: bind-stz-topic-operator
+  architectureRef: calm:node:stz-topic-operator
+  match:
+    any:
+    - sourceRoot: topic-operator/src/main/**
+- id: bind-stz-user-operator
+  architectureRef: calm:node:stz-user-operator
+  match:
+    any:
+    - sourceRoot: user-operator/src/main/**
+- id: bind-stz-operator-common
+  architectureRef: calm:node:stz-operator-common
+  match:
+    any:
+    - sourceRoot: operator-common/src/main/**
+- id: bind-stz-certificate-issuer
+  architectureRef: calm:node:stz-certificate-issuer
+  match:
+    any:
+    - sourceRoot: certificate-issuer/src/main/**
+- id: bind-stz-config-model
+  architectureRef: calm:node:stz-config-model
+  match:
+    any:
+    - sourceRoot: config-model/src/main/**
+- id: bind-stz-api
+  architectureRef: calm:node:stz-api
+  match:
+    any:
+    - sourceRoot: api/src/main/**

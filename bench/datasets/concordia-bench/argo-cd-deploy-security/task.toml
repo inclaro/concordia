@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/argo-cd-deploy-security"
+version = "1.0.0"
+description = "Add security obligations to the Argo CD deployment: secret references, network policies and service accounts."
+keywords = ["concordia", "calm", "architecture", "go", "argo-cd", "deploy-security"]
+
+[metadata]
+difficulty = "hard"
+category = "deploy-security"
+tags = ["argo-cd", "go", "deploy-security"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

@@ -1,0 +1,33 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: knative-serving
+architecture:
+  source: architecture/knative-serving.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: moderate
+  projects:
+  - name: knative-serving
+    root: .
+    include: [cmd/**, pkg/**, config/core/**, bench-env/**]
+environments:
+- id: production
+  sources: [config/core/**]
+- id: edge
+  sources: [bench-env/edge/**]
+- id: production-hydrated
+  sources: [bench-env/production-hydrated/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+  packs:
+  - use: builtin:infrastructure
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

@@ -1,0 +1,331 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "gitea-cmd",
+      "node-type": "service",
+      "name": "Gitea Cmd",
+      "description": "Command-line entry points."
+    },
+    {
+      "unique-id": "gitea-routers",
+      "node-type": "service",
+      "name": "Gitea Routers",
+      "description": "HTTP routing and handlers.",
+      "concordia": {
+        "tags": [
+          "presentation"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-services",
+      "node-type": "service",
+      "name": "Gitea Services",
+      "description": "Business services.",
+      "concordia": {
+        "tags": [
+          "application"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-models",
+      "node-type": "service",
+      "name": "Gitea Models",
+      "description": "Database models.",
+      "concordia": {
+        "tags": [
+          "domain"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-db",
+      "node-type": "database",
+      "name": "Gitea Db",
+      "description": "Database access layer and engine."
+    },
+    {
+      "unique-id": "gitea-modelmigration",
+      "node-type": "service",
+      "name": "Gitea Modelmigration",
+      "description": "Database schema migrations.",
+      "concordia": {
+        "tags": [
+          "infrastructure"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-modules",
+      "node-type": "service",
+      "name": "Gitea Modules",
+      "description": "Shared modules.",
+      "concordia": {
+        "tags": [
+          "shared",
+          "migration-safe"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-setting",
+      "node-type": "service",
+      "name": "Gitea Setting",
+      "description": "Configuration facade.",
+      "concordia": {
+        "tags": [
+          "shared",
+          "migration-safe"
+        ]
+      }
+    },
+    {
+      "unique-id": "gitea-web",
+      "node-type": "webclient",
+      "name": "Gitea Web",
+      "description": "Browser front end (web_src)."
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "gitea-web-uses-gitea-routers",
+      "description": "Gitea Web uses Gitea Routers.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-web"
+          },
+          "destination": {
+            "node": "gitea-routers"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-cmd-uses-gitea-routers",
+      "description": "Gitea Cmd uses Gitea Routers.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-cmd"
+          },
+          "destination": {
+            "node": "gitea-routers"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-cmd-uses-gitea-services",
+      "description": "Gitea Cmd uses Gitea Services.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-cmd"
+          },
+          "destination": {
+            "node": "gitea-services"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-routers-uses-gitea-services",
+      "description": "Gitea Routers uses Gitea Services.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-routers"
+          },
+          "destination": {
+            "node": "gitea-services"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-routers-uses-gitea-models",
+      "description": "Gitea Routers uses Gitea Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-routers"
+          },
+          "destination": {
+            "node": "gitea-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-routers-uses-gitea-modules",
+      "description": "Gitea Routers uses Gitea Modules.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-routers"
+          },
+          "destination": {
+            "node": "gitea-modules"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-routers-uses-gitea-setting",
+      "description": "Gitea Routers uses Gitea Setting.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-routers"
+          },
+          "destination": {
+            "node": "gitea-setting"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-services-uses-gitea-models",
+      "description": "Gitea Services uses Gitea Models.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-services"
+          },
+          "destination": {
+            "node": "gitea-models"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-services-uses-gitea-modules",
+      "description": "Gitea Services uses Gitea Modules.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-services"
+          },
+          "destination": {
+            "node": "gitea-modules"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-services-uses-gitea-setting",
+      "description": "Gitea Services uses Gitea Setting.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-services"
+          },
+          "destination": {
+            "node": "gitea-setting"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-services-uses-gitea-db",
+      "description": "Gitea Services uses Gitea Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-services"
+          },
+          "destination": {
+            "node": "gitea-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-models-uses-gitea-modules",
+      "description": "Gitea Models uses Gitea Modules.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-models"
+          },
+          "destination": {
+            "node": "gitea-modules"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-models-uses-gitea-setting",
+      "description": "Gitea Models uses Gitea Setting.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-models"
+          },
+          "destination": {
+            "node": "gitea-setting"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-models-uses-gitea-db",
+      "description": "Gitea Models uses Gitea Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-models"
+          },
+          "destination": {
+            "node": "gitea-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-modelmigration-uses-gitea-modules",
+      "description": "Gitea Modelmigration uses Gitea Modules.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-modelmigration"
+          },
+          "destination": {
+            "node": "gitea-modules"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-modelmigration-uses-gitea-setting",
+      "description": "Gitea Modelmigration uses Gitea Setting.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-modelmigration"
+          },
+          "destination": {
+            "node": "gitea-setting"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "gitea-modelmigration-uses-gitea-db",
+      "description": "Gitea Modelmigration uses Gitea Db.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "gitea-modelmigration"
+          },
+          "destination": {
+            "node": "gitea-db"
+          }
+        }
+      }
+    }
+  ]
+}

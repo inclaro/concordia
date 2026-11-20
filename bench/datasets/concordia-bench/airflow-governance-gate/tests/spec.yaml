@@ -1,0 +1,49 @@
+repo: airflow
+checks:
+- id: branch-0
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/drop-rule-link-from-decision
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-004
+    kind: adr-enforcement-gap
+    subject: ADR-2
+    result: violation
+    disposition: active
+  rules:
+    GOV-ADR-004: violation
+- id: review-0
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/drop-rule-link-from-decision
+  expectVerdict: fail
+  expectViolations: 
+  - ruleId: GOV-ADR-004
+    path: airflow-core/adr/lang-sdk/0002-workload-execution.md
+  expectErrors: []
+- id: branch-1
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/sdk-reuses-own-definitions
+  expectExit: 0
+  absent:
+  - location.path: task-sdk/src/airflow/sdk/bench_ok.py
+    disposition: active
+- id: review-1
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/sdk-reuses-own-definitions
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

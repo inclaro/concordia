@@ -1,0 +1,43 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: strimzi-deploy-security
+  version: 1.0.0
+rules:
+- id: STZ-SEC-001
+  name: "The cluster operator mounts its configuration map"
+  severity: error
+  owner: team-strimzi
+  rationale: "Configuration drift: the operator must read its settings from the shared configuration map, not from values baked into the deployment."
+  remediation: "Reference the strimzi-cluster-operator ConfigMap from the Deployment (volume or environment)."
+  family: deployment-security
+  subject:
+    calmNodes: [stz-cluster-operator]
+  obligation:
+    type: required
+    relation: {kind: references-configuration, direction: from-workload, target: {calmNodes: [stz-co-config]}}
+    scope: {environments: [install-hydrated]}
+- id: STZ-SEC-002
+  name: "No operator binding grants cluster-admin"
+  severity: error
+  owner: team-strimzi
+  rationale: "Security, excessive privilege: an operator that is bound to cluster-admin can read and change every object of the cluster."
+  remediation: "Bind the operator to a narrow role that lists only the resources it manages."
+  family: deployment-security
+  subject:
+    calmNodes: [stz-cluster-bindings]
+  obligation:
+    type: forbidden
+    relation: {kind: binding-refers-to-role, direction: from-subject, target: {calmNodes: [stz-cluster-admin]}}
+- id: STZ-SEC-003
+  name: "Every operator runs under its own service account"
+  severity: error
+  owner: team-strimzi
+  rationale: "Security, shared identity: workloads that share the default or a common service account cannot be given separate permissions."
+  remediation: "Set serviceAccountName on the Deployment to a dedicated ServiceAccount."
+  family: deployment-security
+  subject:
+    calmNodes: [stz-cluster-operator, stz-topic-operator, stz-user-operator, stz-access-operator]
+  obligation:
+    type: required
+    relation: {kind: uses-runtime-identity, direction: from-workload}

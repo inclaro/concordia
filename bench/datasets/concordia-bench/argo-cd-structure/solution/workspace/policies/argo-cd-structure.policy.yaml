@@ -1,0 +1,29 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-structure, version: 1.0.0}
+rules:
+- id: ARGO-OWN-001
+  name: Only the API server and the controllers read the settings and credential store
+  severity: error
+  owner: team-argo-cd
+  rationale: 'Data ownership - shared database: the notifications controller and the plugin servers must not reach the credential store directly.'
+  remediation: Read the settings through the owning component instead of importing the store.
+  subject:
+    calmNodes: [argo-db]
+  ownership:
+    owners:
+      calmNodes: [argo-server, argo-app-controller, argo-appset-controller]
+    edges: [IMPORTS, CALLS]
+- id: ARGO-CYC-001
+  name: The repo server, the ApplicationSet controller, the notifications controller and the commit server form no dependency cycle
+  severity: error
+  owner: team-argo-cd
+  rationale: Modularity - a cyclic dependency between components breaks the acyclic dependencies principle.
+  remediation: Break the cycle by moving the shared type down or inverting the dependency.
+  subject:
+    calmNodes: [argo-repo-server, argo-appset-controller, argo-notifications, argo-commit-server]
+  evidence: {onUnknown: warn}
+  require:
+    graphProperty: acyclic
+    edges: [IMPORTS, CALLS]
+    collapseBy: architectureBinding

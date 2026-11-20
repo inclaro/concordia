@@ -1,0 +1,8 @@
+[
+  {
+    "path": "bench-env/production-hydrated/200-roles/activator.yaml",
+    "base_sha256": "3fa90630ef9a3059de9956d029b34b75bb78535287c3d1cab0674b6716c68196",
+    "edit": "edits/bench-env/production-hydrated/200-roles/activator.yaml.ed",
+    "sha256": "c604e7bac2e45a7902c758847dcc8028876fc403d410f9fa3851f2d1694a26b6"
+  }
+]

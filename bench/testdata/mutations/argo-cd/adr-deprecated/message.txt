@@ -1,0 +1,1 @@
+bench: deprecate the independent components decision

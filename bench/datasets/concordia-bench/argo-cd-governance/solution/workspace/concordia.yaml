@@ -1,0 +1,28 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata: {name: argo-cd}
+architecture: {source: architecture/argo-cd.calm.json}
+observation:
+  provider: codebase-memory-mcp
+  indexMode: full
+  projects:
+  - name: argo-cd
+    root: .
+    include: [cmd/**/*.go, server/**/*.go, controller/**/*.go, reposerver/**/*.go, applicationset/**/*.go, cmpserver/**/*.go, commitserver/**/*.go, notification_controller/**/*.go, pkg/**/*.go, util/**/*.go, common/**/*.go, docs/adr/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/*.policy.yaml]
+  packs:
+  - {use: 'builtin:adr-governance'}
+exceptions: {baseline: exceptions/concordia.baseline.json, waivers: exceptions/waivers.yaml}
+adr:
+  files: [docs/adr/decisions.yaml]
+  lifecycle:
+    active: [accepted]
+    statusMap: {Approved: accepted}
+  triggers:
+  - id: TRG-INSTALL
+    category: deployment-strategy
+    paths: [manifests/**]
+check: {minimumCoverage: 0.9, unknown: fail, failOn: error}

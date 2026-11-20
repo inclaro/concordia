@@ -1,0 +1,20 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-deploy-trace, version: 1.0.0}
+rules:
+- id: ARGO-TRC-101
+  name: The HA install runs a Redis workload from a resolved image
+  severity: error
+  owner: team-argo-cd
+  rationale: Reliability - the HA install must carry its own cache workload, otherwise the control plane has a single point of failure.
+  remediation: Declare the Redis HA workloads with an image in the HA install manifests.
+  family: deployment-trace
+  subject:
+    calmNodes: [argo-redis]
+  obligation:
+    type: required
+    multiplicity: exists
+    relation: {kind: uses-image, direction: from-workload}
+    scope:
+      environments: [ha]
+  evidence: {minimumResolution: exact, completeness: complete, passCompleteness: any}

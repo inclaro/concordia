@@ -1,0 +1,14 @@
+[
+  {
+    "path": "packages/hoppscotch-backend/Dockerfile",
+    "base_sha256": "058d1c9fd57666851c4d346ba78d4f74febc698b7c4f2f652d85b7753bc548a9",
+    "edit": "edits/packages/hoppscotch-backend/Dockerfile.ed",
+    "sha256": "3fb837dee270af36648263f6bbaf5b0c6a0b7affd9036892634a15f034ddefec"
+  },
+  {
+    "path": "prod.Dockerfile",
+    "base_sha256": "25cc11e1ae7cc6be4cb4bf0f27ddb6a10dcb7535b6118f3b5bf13020c791049d",
+    "edit": "edits/prod.Dockerfile.ed",
+    "sha256": "59482f244ac054ffe8761312ea973d923b9c397254bde8b5cbe8f2aec9eb88e8"
+  }
+]

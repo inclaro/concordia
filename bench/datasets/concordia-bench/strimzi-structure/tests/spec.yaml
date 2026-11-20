@@ -1,0 +1,78 @@
+repo: strimzi
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: STZ-IND-001
+    predicate: independent
+    severity: error
+  - id: STZ-CYC-001
+    predicate: require.graphProperty
+    severity: error
+  - id: STZ-BUD-001
+    predicate: budget
+    severity: error
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  rules:
+    STZ-BUD-001: pass
+    STZ-CYC-001: pass
+    STZ-IND-001: violation
+- id: detects-peer-import
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - topic-op-imports-user-op
+  expectExit: 1
+  findings:
+  - ruleId: STZ-IND-001
+    kind: peer-dependency
+    location.path: topic-operator/src/main/java/io/strimzi/operator/topic/BenchUserA.java
+    disposition: active
+  counts:
+  - match:
+      ruleId: STZ-IND-001
+      disposition: active
+    equals: 1
+- id: detects-cycle
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - cert-imports-user-op
+  expectExit: 1
+  findings:
+  - ruleId: STZ-CYC-001
+    kind: cycle
+    location.path: certificate-issuer/src/main/java/io/strimzi/certs/BenchUser.java
+    disposition: active
+- id: detects-budget
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - user-op-imports-cluster-op
+  expectExit: 1
+  findings:
+  - ruleId: STZ-BUD-001
+    kind: budget-exceeded
+    disposition: active
+- id: allows-topic-common
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - topic-op-imports-common
+  expectExit: 0
+  absent:
+  - location.path: topic-operator/src/main/java/io/strimzi/operator/topic/BenchOk.java
+    disposition: active

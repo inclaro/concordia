@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/volcano-review-gate"
+version = "1.0.0"
+description = "Review four Volcano branches against the approved admission security assessment with Concordia."
+keywords = ["concordia", "calm", "architecture", "go", "volcano", "review", "gate"]
+
+[metadata]
+difficulty = "medium"
+category = "gate"
+tags = ["volcano", "go", "review", "gate"]
+
+[agent]
+timeout_sec = 3600.0
+
+[verifier]
+timeout_sec = 2400.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

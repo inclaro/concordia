@@ -1,0 +1,26 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: nushell-adopt
+  version: 1.0.0
+rules:
+- id: NU-LYR-001
+  name: Nushell crates depend downward only
+  severity: error
+  owner: team-nushell
+  rationale: Modularity - a crate that imports a crate above it inverts the layering and creates a dependency cycle in the workspace.
+  remediation: Move the shared item down to the lower crate, or pass it in from the caller.
+  layerOrder:
+    layers:
+    - calmNodes: [nu-cli]
+    - calmNodes: [nu-command, nu-cmd-lang, nu-cmd-plugin]
+    - calmNodes: [nu-cmd-base]
+    - calmNodes: [nu-parser]
+    - calmNodes: [nu-plugin-engine, nu-plugin]
+    - calmNodes: [nu-engine]
+    - calmNodes: [nu-plugin-core]
+    - calmNodes: [nu-plugin-protocol]
+    - calmNodes: [nu-protocol]
+    - calmNodes: [nu-config]
+    - calmNodes: [nu-utils]
+    edges: [IMPORTS]

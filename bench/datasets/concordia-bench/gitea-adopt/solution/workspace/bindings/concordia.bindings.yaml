@@ -1,0 +1,44 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-gitea-cmd
+  architectureRef: calm:node:gitea-cmd
+  match:
+    any:
+    - sourceRoot: main.go
+    - sourceRoot: cmd/**
+- id: bind-gitea-routers
+  architectureRef: calm:node:gitea-routers
+  match:
+    any:
+    - sourceRoot: routers/**
+- id: bind-gitea-services
+  architectureRef: calm:node:gitea-services
+  match:
+    any:
+    - sourceRoot: services/**
+- id: bind-gitea-models
+  architectureRef: calm:node:gitea-models
+  match:
+    any:
+    - sourceRoot: models/**
+- id: bind-gitea-db
+  architectureRef: calm:node:gitea-db
+  match:
+    any:
+    - sourceRoot: models/db/**
+- id: bind-gitea-modelmigration
+  architectureRef: calm:node:gitea-modelmigration
+  match:
+    any:
+    - sourceRoot: modelmigration/**
+- id: bind-gitea-modules
+  architectureRef: calm:node:gitea-modules
+  match:
+    any:
+    - sourceRoot: modules/**
+- id: bind-gitea-setting
+  architectureRef: calm:node:gitea-setting
+  match:
+    any:
+    - sourceRoot: modules/setting/**

@@ -1,0 +1,4 @@
+5,6c
+// Guard calls OS specific protections like pledge on OpenBSD
+func Guard() {}
+.

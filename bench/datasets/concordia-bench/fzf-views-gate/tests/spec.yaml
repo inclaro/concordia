@@ -1,0 +1,103 @@
+repo: fzf
+checks:
+- id: detects-draw-protector
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/draw-protector-using-utilities
+  expectExit: 1
+  findings:
+  - {"ruleId": "VIEW-CORR-001", "kind": "view-drift", "location.path": "docs/architecture/components.md", "disposition": "active"}
+- id: review-draw-protector
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/draw-protector-using-utilities
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: VIEW-CORR-001
+    path: docs/architecture/components.md
+- id: detects-renderer-model
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/renderer-uses-matcher
+  expectExit: 1
+  findings:
+  - {"ruleId": "VIEW-FRESH-001", "kind": "view-stale", "disposition": "active"}
+  - {"ruleId": "VIEW-CORR-001", "kind": "view-drift", "location.path": "docs/architecture/components.md", "disposition": "active"}
+- id: review-renderer-model
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/renderer-uses-matcher
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: VIEW-CORR-001
+    path: docs/architecture/components.md
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.dsl
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.dsl.manifest.json
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.json
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.mmd
+- id: detects-mermaid
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/tweak-generated-mermaid
+  expectExit: 1
+  findings:
+  - {"ruleId": "VIEW-FRESH-001", "kind": "view-stale", "location.path": "docs/architecture/fzf-container.mmd", "disposition": "active"}
+- id: review-mermaid
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/tweak-generated-mermaid
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.mmd
+- id: detects-json
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/tweak-generated-json
+  expectExit: 1
+  findings:
+  - {"ruleId": "VIEW-FRESH-001", "kind": "view-stale", "location.path": "docs/architecture/fzf-container.json", "disposition": "active"}
+- id: review-json
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/tweak-generated-json
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: VIEW-FRESH-001
+    path: docs/architecture/fzf-container.json
+- id: detects-tui
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/tui-measures-text
+  expectExit: 0
+  absent:
+  - {location.path: src/tui/bench_util.go, disposition: active}
+- id: review-tui
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/tui-measures-text
+  expectVerdict: pass
+  expectViolations: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

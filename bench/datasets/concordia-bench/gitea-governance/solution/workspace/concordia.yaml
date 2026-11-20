@@ -1,0 +1,48 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: gitea
+architecture:
+  source: architecture/gitea.calm.json
+observation:
+  provider: codebase-memory-mcp
+  indexMode: full
+  projects:
+  - name: gitea
+    root: .
+    include:
+    - main.go
+    - cmd/**
+    - routers/**
+    - services/**
+    - models/**
+    - modelmigration/**
+    - modules/**
+    - docs/adr/**
+bindings:
+  files:
+  - bindings/concordia.bindings.yaml
+policies:
+  files:
+  - policies/gitea-adopt.policy.yaml
+  - policies/gitea-governance.policy.yaml
+  packs:
+  - use: builtin:adr-governance
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error
+adr:
+  files:
+  - docs/adr/decisions.yaml
+  lifecycle:
+    active:
+    - accepted
+  triggers:
+  - id: TRG-MIGRATIONS
+    category: data-model
+    paths:
+    - modelmigration/**

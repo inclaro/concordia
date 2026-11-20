@@ -1,0 +1,181 @@
+repo: knative-serving
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - bench-env/production-hydrated
+  - policies/knative-serving-assurance.policy.yaml
+  - bindings
+  - architecture
+  branch: main
+- id: assurance-declared
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: assurance.evaluators[environment=production].kinds
+    contains: rbac
+  - path: assurance.evaluators[environment=production-hydrated].assumes
+    contains: rbac-authorizer-enabled
+  - path: assurance.rendering.sources[environment=production-hydrated].tool
+    equals: plain
+  - path: assurance.evaluators[environment=staging-hydrated].kinds
+    contains: rbac
+  - path: assurance.rendering.sources[environment=staging-hydrated].tool
+    equals: plain
+  - path: policies.packs[*].use
+    contains: builtin:assurance
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: KN-AUTH-001
+    predicate: require.effectiveAccess
+    severity: error
+    family: effective-access
+  - id: KN-AUTH-002
+    predicate: require.effectiveAccess
+    severity: error
+    family: effective-access
+  - id: KN-NET-001
+    predicate: require.effectiveAccess
+    severity: error
+    family: effective-access
+  packs:
+  - builtin:assurance
+- id: assurance-validate
+  type: command
+  dimension: assurance
+  weight: 2
+  argv:
+  - concordia
+  - assurance
+  - validate
+  expectExit: 0
+- id: evaluations-honest
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  findings:
+  - ruleId: KN-NET-001
+    subject: kn-activator
+    environment: production
+    result: unknown
+    reason: no-evaluator-available
+    enforcement: advisory
+  - ruleId: KN-NET-001
+    subject: kn-activator
+    environment: production-hydrated
+    result: unknown
+    reason: no-evaluator-available
+  - ruleId: KN-NET-001
+    subject: kn-activator
+    environment: staging-hydrated
+    result: unknown
+    reason: no-evaluator-available
+  - ruleId: KN-AUTH-001
+    subject: kn-activator
+    environment: production
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: KN-AUTH-002
+    subject: kn-controller
+    environment: production
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: ASR-REN-001
+    environment: production
+    result: unknown
+    reason: rendered-evidence-missing
+  absent:
+  - ruleId: KN-AUTH-001
+    environment: production-hydrated
+  - ruleId: KN-AUTH-002
+    environment: production-hydrated
+  - ruleId: KN-AUTH-002
+    environment: staging-hydrated
+  - ruleId: ASR-REN-001
+    environment: production-hydrated
+  - ruleId: ASR-REN-001
+    environment: staging-hydrated
+  - result: pass
+  diagnostics:
+  - CO-PRV-005
+  select:
+  - path: assurance.evaluations
+    countWhere:
+      environment: production-hydrated
+      evaluator: rbac
+      verdict: granted
+    equals: 7
+  - path: assurance.evaluations
+    countWhere:
+      environment: production-hydrated
+      evaluator: rbac
+      verdict: not-granted
+    equals: 7
+- id: undeclared-authorizer-never-passes
+  type: results
+  dimension: assurance
+  weight: 3
+  expectExit: 0
+  findings:
+  - ruleId: KN-AUTH-001
+    subject: kn-activator
+    environment: staging-hydrated
+    result: unknown
+    reason: enforcement-not-declared
+    enforcement: advisory
+  absent:
+  - ruleId: KN-AUTH-001
+    environment: staging-hydrated
+    result:
+    - pass
+    - violation
+- id: unrenderable-workload-is-unknown
+  type: results
+  dimension: assurance
+  weight: 3
+  mutations:
+  - bench-ko-image-workload
+  expectExit: 0
+  findings:
+  - ruleId: ASR-REN-001
+    environment: production-hydrated
+    result: unknown
+    reason: rendered-evidence-missing
+  - ruleId: KN-AUTH-001
+    subject: kn-activator
+    environment: production-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: KN-AUTH-002
+    subject: kn-controller
+    environment: production-hydrated
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId: KN-AUTH-001
+    environment: production-hydrated
+    result:
+    - pass
+    - violation
+  - ruleId: KN-AUTH-002
+    environment: production-hydrated
+    result:
+    - pass
+    - violation
+  diagnostics:
+  - CO-PRV-005
+  select:
+  - path: assurance.evaluations
+    countWhere:
+      environment: production-hydrated
+      evaluator: rbac
+      verdict: unknown
+    equals: 14

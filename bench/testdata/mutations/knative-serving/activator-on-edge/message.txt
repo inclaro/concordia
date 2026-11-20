@@ -1,0 +1,1 @@
+bench: the activator appears in the edge environment

@@ -1,0 +1,3 @@
+52c
+        image: gcr.io/knative-releases/knative.dev/serving/cmd/controller:v1.24.0
+.

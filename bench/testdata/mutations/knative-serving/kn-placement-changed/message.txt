@@ -1,0 +1,1 @@
+bench: the webhook is no longer deployed in the namespace

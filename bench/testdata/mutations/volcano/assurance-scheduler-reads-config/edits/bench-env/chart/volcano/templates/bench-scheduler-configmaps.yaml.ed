@@ -1,0 +1,27 @@
+172,335c
+  kind: ClusterRole
+  name: bench-scheduler-configmaps
+subjects:
+  - kind: ServiceAccount
+    name: volcano-scheduler
+    namespace: volcano-system
+.
+169,170d
+159,167c
+  name: bench-scheduler-configmaps
+.
+157a
+kind: ClusterRoleBinding
+.
+156d
+127,154c
+    verbs: ["get", "list"]
+.
+59,124d
+53,57c
+  name: bench-scheduler-configmaps
+.
+51a
+kind: ClusterRole
+.
+1,50d

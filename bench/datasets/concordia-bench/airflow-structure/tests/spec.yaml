@@ -1,0 +1,103 @@
+repo: airflow
+checks:
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: AF-DNY-001
+    predicate: denyPath
+    severity: error
+  - id: AF-API-001
+    predicate: [publicApiOnly, forbid]
+    severity: error
+  - id: AF-LYR-001
+    predicate: layerOrder
+    severity: error
+  - id: AF-EDG-001
+    predicate: require.edge
+    severity: error
+- id: api-client-node
+  type: calm_nodes
+  dimension: workspace
+  weight: 1
+  nodes:
+  - id: af-sdk-api-client
+    nodeType: service
+    tags:
+    - contract
+- id: api-client-bound
+  type: bound_nodes
+  dimension: workspace
+  weight: 1
+  ids:
+  - af-sdk-api-client
+- id: check-clean
+  type: results
+  dimension: conformance
+  weight: 2
+  expectExit: 0
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  - path: summary.rules.error
+    equals: 0
+  - path: rules[ruleId=AF-EDG-001].verdict
+    equals: pass
+- id: detects-deny-path
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - runner-reaches-session
+  expectExit: 1
+  findings:
+  - ruleId: AF-DNY-001
+    kind: forbidden-path
+    location.path: task-sdk/src/airflow/sdk/execution_time/bench_path.py
+    disposition: active
+- id: detects-non-public-api
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - provider-imports-sdk-internal
+  expectExit: 1
+  findings:
+  - ruleId: AF-API-001
+    kind: [non-public-api, forbidden-dependency]
+    location.path: providers/standard/src/airflow/providers/standard/bench_internal.py
+    disposition: active
+- id: detects-layer-violation
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - models-imports-scheduler
+  expectExit: 1
+  findings:
+  - ruleId: AF-LYR-001
+    kind: layer-violation
+    location.path: airflow-core/src/airflow/models/bench_layer.py
+    disposition: active
+- id: detects-missing-edge
+  type: results
+  dimension: detection
+  weight: 3
+  mutations:
+  - runner-drops-api-client
+  expectExit: 1
+  findings:
+  - ruleId: AF-EDG-001
+    kind: missing-edge
+    disposition: active
+- id: allows-public-api
+  type: results
+  dimension: detection
+  weight: 2
+  mutations:
+  - provider-imports-sdk-public
+  expectExit: 0
+  absent:
+  - location.path: providers/standard/src/airflow/providers/standard/bench_public.py
+    disposition: active

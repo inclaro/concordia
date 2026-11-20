@@ -1,0 +1,47 @@
+@startuml
+title <size:24>Deployment View: production</size>
+
+set separator none
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+hide stereotype
+
+<style>
+  root {
+    BackgroundColor: #ffffff;
+    FontColor: #444444;
+  }
+  // Element,concordia:conforming
+  .Element-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw== {
+    BackgroundColor: #ffffff;
+    LineColor: #2e7d32;
+    LineStyle: 0;
+    LineThickness: 3;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+    MaximumWidth: 450;
+  }
+  // Element,concordia:conforming
+  .DeploymentNode-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw== {
+    BackgroundColor: #ffffff;
+    LineColor: #2e7d32;
+    LineStyle: 0;
+    LineThickness: 3;
+    FontColor: #444444;
+    FontSize: 24;
+    HorizontalAlignment: center;
+    Shadowing: 0;
+  }
+</style>
+
+rectangle "Kn Ns\n<size:16>[Deployment Node: system]</size>" <<DeploymentNode-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw==>> as production.KnNs {
+  rectangle "==Kn Activator\n<size:16>[Container: service]</size>\n\nRequest buffer and proxy that wakes revisions scaled to zero." <<Element-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw==>> as production.KnNs.KnActivator_1
+  rectangle "==Kn Autoscaler\n<size:16>[Container: service]</size>\n\nAutoscaler that decides how many pods each revision needs." <<Element-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw==>> as production.KnNs.KnAutoscaler_1
+  rectangle "==Kn Controller\n<size:16>[Container: service]</size>\n\nReconcilers for services, routes, configurations and revisions." <<Element-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw==>> as production.KnNs.KnController_1
+  rectangle "==Kn Webhook\n<size:16>[Container: service]</size>\n\nAdmission webhook that defaults and validates Serving resources." <<Element-RWxlbWVudCxjb25jb3JkaWE6Y29uZm9ybWluZw==>> as production.KnNs.KnWebhook_1
+}
+
+@enduml

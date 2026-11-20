@@ -1,0 +1,1 @@
+bench: queue-proxy calls a shared http helper

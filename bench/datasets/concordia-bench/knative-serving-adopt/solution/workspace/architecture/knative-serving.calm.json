@@ -1,0 +1,411 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "kn-activator",
+      "node-type": "service",
+      "name": "Kn Activator",
+      "description": "Request buffer and proxy that wakes revisions scaled to zero.",
+      "concordia": {
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    {
+      "unique-id": "kn-autoscaler",
+      "node-type": "service",
+      "name": "Kn Autoscaler",
+      "description": "Autoscaler that decides how many pods each revision needs."
+    },
+    {
+      "unique-id": "kn-controller",
+      "node-type": "service",
+      "name": "Kn Controller",
+      "description": "Reconcilers for services, routes, configurations and revisions."
+    },
+    {
+      "unique-id": "kn-webhook",
+      "node-type": "service",
+      "name": "Kn Webhook",
+      "description": "Admission webhook that defaults and validates Serving resources."
+    },
+    {
+      "unique-id": "kn-queue",
+      "node-type": "service",
+      "name": "Kn Queue",
+      "description": "Queue-proxy sidecar that runs in every user pod."
+    },
+    {
+      "unique-id": "kn-apis",
+      "node-type": "service",
+      "name": "Kn Apis",
+      "description": "API types of the Serving resources.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "kn-client",
+      "node-type": "service",
+      "name": "Kn Client",
+      "description": "Generated clients, informers and listers.",
+      "concordia": {
+        "tags": [
+          "contract"
+        ]
+      }
+    },
+    {
+      "unique-id": "kn-shared",
+      "node-type": "service",
+      "name": "Kn Shared",
+      "description": "Shared HTTP, logging, metrics, networking and resource helpers.",
+      "concordia": {
+        "tags": [
+          "shared"
+        ]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "kn-activator-uses-kn-apis",
+      "description": "Kn Activator uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-activator-uses-kn-autoscaler",
+      "description": "Kn Activator uses Kn Autoscaler.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-autoscaler"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-activator-uses-kn-client",
+      "description": "Kn Activator uses Kn Client.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-client"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-activator-uses-kn-controller",
+      "description": "Kn Activator uses Kn Controller.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-controller"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-activator-uses-kn-queue",
+      "description": "Kn Activator uses Kn Queue.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-queue"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-activator-uses-kn-shared",
+      "description": "Kn Activator uses Kn Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-activator"
+          },
+          "destination": {
+            "node": "kn-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-autoscaler-uses-kn-apis",
+      "description": "Kn Autoscaler uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-autoscaler"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-autoscaler-uses-kn-controller",
+      "description": "Kn Autoscaler uses Kn Controller.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-autoscaler"
+          },
+          "destination": {
+            "node": "kn-controller"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-autoscaler-uses-kn-shared",
+      "description": "Kn Autoscaler uses Kn Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-autoscaler"
+          },
+          "destination": {
+            "node": "kn-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-client-uses-kn-apis",
+      "description": "Kn Client uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-client"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-activator",
+      "description": "Kn Controller uses Kn Activator.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-activator"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-apis",
+      "description": "Kn Controller uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-autoscaler",
+      "description": "Kn Controller uses Kn Autoscaler.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-autoscaler"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-client",
+      "description": "Kn Controller uses Kn Client.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-client"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-queue",
+      "description": "Kn Controller uses Kn Queue.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-queue"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-controller-uses-kn-shared",
+      "description": "Kn Controller uses Kn Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-controller"
+          },
+          "destination": {
+            "node": "kn-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-queue-uses-kn-activator",
+      "description": "Kn Queue uses Kn Activator.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-queue"
+          },
+          "destination": {
+            "node": "kn-activator"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-queue-uses-kn-autoscaler",
+      "description": "Kn Queue uses Kn Autoscaler.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-queue"
+          },
+          "destination": {
+            "node": "kn-autoscaler"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-queue-uses-kn-shared",
+      "description": "Kn Queue uses Kn Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-queue"
+          },
+          "destination": {
+            "node": "kn-shared"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-shared-uses-kn-apis",
+      "description": "Kn Shared uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-shared"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-webhook-uses-kn-apis",
+      "description": "Kn Webhook uses Kn Apis.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-webhook"
+          },
+          "destination": {
+            "node": "kn-apis"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-webhook-uses-kn-autoscaler",
+      "description": "Kn Webhook uses Kn Autoscaler.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-webhook"
+          },
+          "destination": {
+            "node": "kn-autoscaler"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-webhook-uses-kn-controller",
+      "description": "Kn Webhook uses Kn Controller.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-webhook"
+          },
+          "destination": {
+            "node": "kn-controller"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "kn-webhook-uses-kn-shared",
+      "description": "Kn Webhook uses Kn Shared.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "kn-webhook"
+          },
+          "destination": {
+            "node": "kn-shared"
+          }
+        }
+      }
+    }
+  ]
+}

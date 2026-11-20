@@ -1,0 +1,170 @@
+repo: knative-serving
+checks:
+- id: environments
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: environments[id=production].sources
+    contains: config/core/**
+  - path: environments[id=edge].sources
+    contains: bench-env/edge/**
+  - path: observation.projects[0].include
+    contains: bench-env/**
+  - path: policies.packs[*].use
+    contains: builtin:infrastructure
+- id: deploy-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: kn-activator
+    nodeType: service
+    tags:
+    - deployable
+    - public
+  - id: kn-autoscaler
+    nodeType: service
+    tags:
+    - deployable
+  - id: kn-controller
+    nodeType: service
+    tags:
+    - deployable
+  - id: kn-webhook
+    nodeType: service
+    tags:
+    - deployable
+  - id: kn-ns
+    nodeType: system
+  - id: kn-testing-ns
+    nodeType: system
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - kn-activator
+  - kn-autoscaler
+  - kn-controller
+  - kn-webhook
+  - kn-queue
+  - kn-apis
+  - kn-client
+  - kn-shared
+  - kn-ns
+  - kn-testing-ns
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  rules:
+  - id: KN-PLC-003
+    predicate: obligation
+    severity: error
+    family: deployment-placement
+  packs:
+  - builtin:infrastructure
+- id: placement-at-head
+  type: results
+  dimension: deployment
+  weight: 3
+  expectExit: 0
+  rules:
+    INFRA-PLC-001: pass
+    INFRA-TRC-001: pass
+    KN-PLC-003: pass
+    INFRA-TRC-003: not-applicable
+    INFRA-PLC-002: unknown
+  findings:
+  - ruleId: INFRA-PLC-002
+    subject: kn-activator
+    environment: production
+    result: unknown
+    reason: coverage-incomplete
+  - ruleId: INFRA-TRC-004
+    subject: kn-webhook
+    environment: production
+    result: unknown
+    reason: coverage-incomplete
+  absent:
+  - ruleId: INFRA-PLC-001
+    environment: production
+  - ruleId: INFRA-TRC-001
+    environment: production
+  - ruleId: KN-PLC-003
+- id: detects-webhook-in-other-namespace
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - webhook-in-other-namespace
+  expectExit: 0
+  rules:
+    INFRA-PLC-002: violation
+  findings:
+  - ruleId: INFRA-PLC-002
+    subject: kn-webhook
+    environment: production
+    result: violation
+    enforcement: advisory
+  absent:
+  - ruleId: INFRA-PLC-002
+    subject: kn-activator
+    result: violation
+- id: detects-activator-declared-twice
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - activator-declared-twice
+  expectExit: 0
+  findings:
+  - ruleId: INFRA-PLC-001
+    subject: kn-activator
+    environment: production
+    result: unknown
+    reason: evidence-conflict
+  - ruleId: INFRA-TRC-001
+    subject: kn-activator
+    environment: production
+    result: unknown
+    reason: evidence-conflict
+  diagnostics:
+  - CO-OBS-021
+- id: detects-activator-on-edge
+  type: results
+  dimension: deployment
+  weight: 3
+  mutations:
+  - activator-on-edge
+  expectExit: 0
+  rules:
+    KN-PLC-003: violation
+  findings:
+  - ruleId: KN-PLC-003
+    subject: kn-activator
+    environment: edge
+    result: violation
+    enforcement: advisory
+- id: trace-activator
+  type: command
+  dimension: reporting
+  weight: 2
+  argv:
+  - concordia
+  - trace
+  - kn-activator
+  - --format
+  - json
+  expectExit: 0
+  stdoutJson:
+  - path: traces[environment=production].steps
+    length: 5
+  - path: traces[environment=production].level
+    equals: declared
+  - path: traces[environment=production].rules[ruleId=INFRA-PLC-001].verdict
+    equals: pass
+  - path: traces[environment=edge].steps
+    length: 5

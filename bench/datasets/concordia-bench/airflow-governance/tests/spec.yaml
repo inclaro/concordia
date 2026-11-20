@@ -1,0 +1,202 @@
+repo: airflow
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - adr
+  - .cbmignore
+  branch: main
+- id: rules-declared
+  type: rules_declared
+  dimension: workspace
+  weight: 2
+  packs:
+  - builtin:adr-governance
+- id: workspace-adr
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: adr.files
+    contains: adr/decisions.yaml
+  - path: adr.lifecycle.active
+    equals:
+    - accepted
+  - path: adr.triggers[id=TRG-EXECUTION-API].category
+    equals: system-boundaries
+  - path: adr.triggers[id=TRG-EXECUTION-API].paths
+    contains: airflow-core/src/airflow/api_fastapi/execution_api/**
+  - path: observation.indexMode
+    equals: full
+- id: register
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: adr/decisions.yaml
+  select:
+  - path: decisions[id=ADR-2].path
+    equals: airflow-core/adr/lang-sdk/0002-workload-execution.md
+  - path: decisions[id=ADR-2].enforcedBy[*].rule
+    contains: AF-ISO-001
+  - path: decisions[id=ADR-2].enforcement
+    equals: required
+  - path: decisions[id=ADR-4].path
+    equals: airflow-core/adr/lang-sdk/0004-dag-parsing.md
+  - path: decisions[id=ADR-4].governs[*].ref
+    contains: calm:node:af-dag-processing
+  - path: decisions[id=ADR-1].path
+    equals: dev/breeze/doc/adr/0001-record-architecture-decisions.md
+  - path: decisions[id=ADR-1].enforcement
+    equals: none
+- id: adr-validate
+  type: command
+  dimension: governance
+  weight: 2
+  argv:
+  - concordia
+  - adr
+  - validate
+  expectExit: 0
+- id: check-clean
+  type: results
+  dimension: governance
+  weight: 3
+  expectExit: 0
+  rules:
+    GOV-ADR-001: pass
+    GOV-ADR-002: pass
+    GOV-ADR-003: pass
+    GOV-ADR-004: pass
+    GOV-ADR-005: pass
+    GOV-ADR-006: not-applicable
+  diagnostics:
+  - CO-ADR-009
+  select:
+  - path: summary.rules.unknown
+    equals: 0
+  - path: areas.adrGovernance.verdict
+    equals: pass
+- id: detects-adr-absent
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - adr-file-deleted
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-001
+    kind: adr-absent
+    subject: ADR-4
+    result: violation
+    disposition: active
+  rules:
+    GOV-ADR-001: violation
+- id: detects-adr-inactive
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - adr-deprecated
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-002
+    kind: adr-inactive
+    subject: ADR-4
+    result: violation
+    disposition: active
+  - ruleId: GOV-ADR-003
+    kind: adr-rule-unjustified
+    subject: AF-DEC-001
+    result: violation
+    disposition: active
+  rules:
+    GOV-ADR-002: violation
+    GOV-ADR-003: violation
+- id: detects-contradictory-status
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - adr-superseded-without-successor
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-005
+    kind: adr-contradictory-status
+    subject: ADR-2
+    result: violation
+    disposition: active
+  - ruleId: GOV-ADR-002
+    kind: adr-contradictory-status
+    subject: ADR-2
+    result: unknown
+    reason: evidence-conflict
+    disposition: active
+  rules:
+    GOV-ADR-005: violation
+    GOV-ADR-002: unknown
+- id: detects-supersession-cycle
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - supersession-cycle
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-005
+    kind: adr-cycle
+    result: violation
+    disposition: active
+  - ruleId: GOV-ADR-002
+    kind: adr-cycle
+    subject: ADR-4
+    result: unknown
+    reason: evidence-conflict
+    disposition: active
+  rules:
+    GOV-ADR-005: violation
+- id: detects-advisory-only
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - rule-made-advisory
+  expectExit: 1
+  findings:
+  - ruleId: GOV-ADR-004
+    kind: adr-advisory-only
+    subject: ADR-2
+    result: violation
+    disposition: active
+  rules:
+    GOV-ADR-004: violation
+- id: detects-trigger-unsatisfied
+  type: results
+  dimension: governance
+  weight: 3
+  mutations:
+  - execution-api-change
+  expectExit: 4
+  findings:
+  - ruleId: GOV-ADR-006
+    kind: adr-trigger-unsatisfied
+    subject: TRG-EXECUTION-API
+    result: violation
+    disposition: active
+    location.path: airflow-core/src/airflow/api_fastapi/execution_api/bench_change.py
+  rules:
+    GOV-ADR-006: violation
+    AF-ISO-001: unknown
+  newBranch: true
+  branch: feature/bench-change
+  args:
+  - --changed
+  - main
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

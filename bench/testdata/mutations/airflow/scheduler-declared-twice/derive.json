@@ -1,0 +1,9 @@
+[
+  {
+    "path": "bench-env/prod-hydrated/bench-scheduler-copy.yaml",
+    "run": "helm template airflow chart/ --namespace airflow --set executor=CeleryExecutor,networkPolicies.enabled=true,pgbouncer.enabled=true,scheduler.podDisruptionBudget.enabled=true,apiServer.podDisruptionBudget.enabled=true --set-string fernetKey=SGRTaGdmVWh4YVJNc29oVUEwcmRMbmRBR1BUd0Rmdlo=,apiSecretKey=tUM9EiPDJN9d9XIiXANWCLWZOWA5kkci,jwtSecret=SIbQxwZUMZrmt9kI8LCyGhxonEUYnum6ptlTjYJgXzbJ16C2QPEjH3vj3oUa0TbiOAYAIgmm9LfKgrzTFTgO9L1po4ZOoWeKpjUdzaEUpFYGqXO2o08Zy1069pZvgW8j,redis.password=ICtF9xWbA6 | /opt/venv/bin/python /opt/concordia-bench/bin/hydrate-namespace.py /dev/stdin /dev/stdout airflow",
+    "base_sha256": "5480d0612325a72c9ded8f8dca4e951c80cdd583c0ebc3e03f513afd33f2184a",
+    "edit": "edits/bench-env/prod-hydrated/bench-scheduler-copy.yaml.ed",
+    "sha256": "6cabadf5cc663f994107cb8da0f2e58882867856bc039777291d3e1df1e065cc"
+  }
+]

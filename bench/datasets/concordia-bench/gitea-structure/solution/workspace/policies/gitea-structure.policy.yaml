@@ -1,0 +1,46 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: gitea-structure
+  version: 1.0.0
+rules:
+- id: GITEA-DNY-001
+  name: Shared modules cannot reach services or routers
+  severity: error
+  owner: team-gitea
+  rationale: 'Modularity (transitive coupling): a shared module that reaches services or routers through intermediate packages drags the whole application into every consumer.'
+  remediation: 'Break the path at the first hop; move the shared code down or invert the dependency.'
+  subject:
+    calmNodes: [gitea-modules, gitea-setting]
+  denyPath:
+    target:
+      calmNodes: [gitea-services, gitea-routers]
+    edges: [IMPORTS, CALLS]
+    maxDepth: 3
+- id: GITEA-API-001
+  name: Configuration is read through the setting facade
+  severity: error
+  owner: team-gitea
+  rationale: 'Leaky abstraction: routers and services that call setting internals couple to how configuration is loaded instead of the facade.'
+  remediation: 'Use the functions of modules/setting/setting.go or modules/setting/config_provider.go.'
+  aggregation: file
+  subject:
+    calmNodes: [gitea-routers, gitea-services]
+  publicApiOnly:
+    target:
+      calmNodes: [gitea-setting]
+    api:
+      sourceRoots: [modules/setting/setting.go, modules/setting/config_provider.go]
+    edges: [CALLS]
+- id: GITEA-OWN-001
+  name: Only models, services and migrations own the database layer
+  severity: error
+  owner: team-gitea
+  rationale: 'Shared database and data ownership: access to the database layer from handlers bypasses the services that own transactions and invariants.'
+  remediation: 'Call a service or a model function instead of the database layer.'
+  subject:
+    calmNodes: [gitea-db]
+  ownership:
+    owners:
+      calmNodes: [gitea-models, gitea-services, gitea-modelmigration]
+    edges: [IMPORTS, CALLS]

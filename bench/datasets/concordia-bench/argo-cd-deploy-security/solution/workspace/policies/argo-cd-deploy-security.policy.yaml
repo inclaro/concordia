@@ -1,0 +1,51 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-deploy-security, version: 1.0.0}
+rules:
+- id: ARGO-SEC-001
+  name: Only the cache clients read the Redis password secret
+  severity: error
+  owner: team-argo-cd
+  rationale: 'Least privilege - secret sprawl: the identity provider, the notifications controller and the ApplicationSet controller never need the cache password.'
+  remediation: Remove the reference to the Redis secret from the workload.
+  family: deployment-security
+  subject:
+    calmNodes: [argo-dex, argo-notifications, argo-appset-controller]
+  obligation:
+    type: forbidden
+    relation:
+      kind: references-secret
+      direction: from-workload
+      target:
+        calmNodes: [argo-redis-secret]
+  evidence: {minimumResolution: exact, completeness: partial}
+- id: ARGO-NET-101
+  name: Every Argo CD workload is selected by a network policy
+  severity: error
+  owner: team-argo-cd
+  rationale: Zero-trust networking - a pod that no NetworkPolicy selects accepts traffic from the whole cluster.
+  remediation: Add a NetworkPolicy whose pod selector matches the workload.
+  family: deployment-security
+  subject:
+    tags: [deployable]
+  obligation:
+    type: required
+    relation: {kind: policy-selects-workload, direction: to-workload}
+  evidence: {minimumResolution: exact, completeness: complete, passCompleteness: any}
+- id: ARGO-SEC-002
+  name: No Argo CD workload runs as the default service account
+  severity: error
+  owner: team-argo-cd
+  rationale: Excessive privilege - the default service account is shared by every pod that names none.
+  remediation: Give the workload its own service account.
+  family: deployment-security
+  subject:
+    tags: [deployable]
+  obligation:
+    type: forbidden
+    relation:
+      kind: uses-runtime-identity
+      direction: from-workload
+      target:
+        calmNodes: [argo-default-sa]
+  evidence: {minimumResolution: exact, completeness: partial}

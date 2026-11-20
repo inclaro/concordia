@@ -1,0 +1,12 @@
+# Dockerfile.stage: a later stage image, built from the oracle workspace of one scenario.
+# Build context: datasets/concordia-bench/<id>-<scenario>/solution/workspace.
+# Image: concordia-bench-<id>-<scenario>:latest.
+ARG FROM_IMAGE
+FROM ${FROM_IMAGE}
+ARG SCENARIO
+COPY . /opt/concordia-bench/stage
+# Stale CBM daemon state from an earlier layer blocks the daemon (CO-OBS-001); clear it
+# before the apply, and clear this build's state after it.
+RUN rm -rf /tmp/cbm-daemon-* \
+    && /opt/concordia-bench/bin/apply-workspace.sh /opt/concordia-bench/stage "${SCENARIO}" \
+    && rm -rf /opt/concordia-bench/stage /tmp/cbm-daemon-*

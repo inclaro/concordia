@@ -1,0 +1,160 @@
+repo: hoppscotch
+checks:
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - architecture
+  - bindings
+  - policies
+  - exceptions
+  branch: main
+- id: model-valid
+  type: model_valid
+  dimension: workspace
+  weight: 2
+- id: calm-nodes
+  type: calm_nodes
+  dimension: workspace
+  weight: 2
+  nodes:
+  - id: hopp-backend
+    nodeType: service
+  - id: hopp-cli
+    nodeType: service
+  - id: hopp-selfhost-web
+    nodeType: webclient
+  - id: hopp-sh-admin
+    nodeType: webclient
+  - id: hopp-common
+    nodeType: service
+    tags:
+    - application
+  - id: hopp-js-sandbox
+    nodeType: service
+  - id: hopp-kernel
+    nodeType: service
+  - id: hopp-data
+    nodeType: service
+    tags:
+    - shared-kernel
+    - domain
+  - id: hopp-db
+    nodeType: database
+- id: relationships
+  type: relationships
+  dimension: workspace
+  weight: 1
+  connects:
+  - - hopp-selfhost-web
+    - hopp-common
+  - - hopp-selfhost-web
+    - hopp-data
+  - - hopp-selfhost-web
+    - hopp-kernel
+  - - hopp-selfhost-web
+    - hopp-backend
+  - - hopp-sh-admin
+    - hopp-backend
+  - - hopp-common
+    - hopp-data
+  - - hopp-common
+    - hopp-js-sandbox
+  - - hopp-common
+    - hopp-kernel
+  - - hopp-cli
+    - hopp-data
+  - - hopp-cli
+    - hopp-js-sandbox
+  - - hopp-js-sandbox
+    - hopp-data
+  - - hopp-backend
+    - hopp-db
+- id: bound-nodes
+  type: bound_nodes
+  dimension: workspace
+  weight: 2
+  ids:
+  - hopp-backend
+  - hopp-cli
+  - hopp-selfhost-web
+  - hopp-sh-admin
+  - hopp-common
+  - hopp-js-sandbox
+  - hopp-kernel
+  - hopp-data
+- id: rules-declared
+  dimension: workspace
+  weight: 2
+  type: rules_declared
+  rules:
+  - id: HOP-DEC-001
+    predicate: declaredOnly
+    severity: error
+  - id: HOP-OBS-001
+    predicate: observedRequired
+    severity: error
+- id: selectors
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: policies/hoppscotch-adopt.policy.yaml
+  select:
+  - {path: selectors.frontends.nodeTypes, contains: webclient}
+  - {path: selectors.runtimes.calmNodes, contains: hopp-kernel}
+  - {path: selectors.clients.ref, equals: frontends}
+- id: observation-required
+  type: yaml_file
+  dimension: workspace
+  weight: 1
+  path: architecture/hoppscotch.calm.json
+  select:
+  - {path: "relationships[unique-id=hopp-selfhost-web-uses-hopp-kernel].concordia.observation.required", equals: true}
+  - {path: "relationships[unique-id=hopp-selfhost-web-uses-hopp-kernel].concordia.observation.minimum-confidence", equals: heuristic}
+  - {path: "relationships[unique-id=hopp-kernel-uses-hopp-data].concordia.observation.allowed-edge-kinds", contains: CALLS}
+- id: check-clean
+  dimension: conformance
+  weight: 3
+  type: results
+  expectExit: 0
+  select:
+  - {path: summary.rules.unknown, equals: 0}
+- id: detects-undeclared
+  dimension: detection
+  weight: 3
+  type: results
+  mutations: [data-imports-kernel]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-DEC-001, kind: undeclared, location.path: packages/hoppscotch-data/src/bench-kernel.ts, disposition: active}
+- id: detects-contradiction
+  dimension: detection
+  weight: 3
+  type: results
+  mutations: [kernel-imports-data]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-DEC-001, kind: contradiction, location.path: packages/hoppscotch-kernel/src/bench-data.ts, disposition: active}
+- id: detects-unobserved
+  dimension: detection
+  weight: 3
+  type: results
+  mutations: [kernel-mode-renamed]
+  expectExit: 1
+  findings:
+  - {ruleId: HOP-OBS-001, kind: unobserved, disposition: active}
+- id: allows-declared-import
+  dimension: detection
+  weight: 2
+  type: results
+  mutations: [cli-imports-data]
+  expectExit: 0
+  absent:
+  - {location.path: packages/hoppscotch-cli/src/bench-ok.ts, disposition: active}
+- id: deterministic
+  type: deterministic
+  dimension: determinism
+  weight: 1
+  offline: false

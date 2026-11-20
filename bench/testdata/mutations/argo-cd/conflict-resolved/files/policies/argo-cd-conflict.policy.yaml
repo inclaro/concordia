@@ -1,0 +1,24 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata: {id: argo-cd-conflict, version: 1.0.0}
+precedence:
+  version: 1
+  order: [ARGO-SEC-001, ARGO-SEC-901]
+rules:
+- id: ARGO-SEC-901
+  name: The identity provider reads the Redis password secret
+  severity: error
+  owner: team-argo-cd
+  rationale: Availability - a proposal that the identity provider stores its sessions in the cache.
+  remediation: Drop the rule or the opposing rule.
+  family: deployment-security
+  subject:
+    calmNodes: [argo-dex]
+  obligation:
+    type: required
+    relation:
+      kind: references-secret
+      direction: from-workload
+      target:
+        calmNodes: [argo-redis-secret]
+  evidence: {minimumResolution: exact, completeness: partial}

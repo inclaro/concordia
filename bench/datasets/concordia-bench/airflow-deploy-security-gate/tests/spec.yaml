@@ -1,0 +1,77 @@
+repo: airflow
+checks:
+- id: branch-0
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/disable-scheduler-disruption-budget
+  expectExit: 0
+  rules:
+    AF-REL-001: unknown
+  findings:
+  - ruleId: AF-REL-001
+    subject: af-scheduler
+    environment: prod-hydrated
+    result: unknown
+    reason: coverage-incomplete
+    enforcement: advisory
+    disposition: active
+  absent:
+  - ruleId: AF-REL-001
+    subject: af-scheduler
+    result: pass
+- id: review-0
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/disable-scheduler-disruption-budget
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branch-1
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/sdk-reuses-own-definitions
+  expectExit: 0
+  absent:
+  - location.path: task-sdk/src/airflow/sdk/bench_ok.py
+    disposition: active
+- id: review-1
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/sdk-reuses-own-definitions
+  expectVerdict: pass
+  expectViolations: []
+  expectErrors: []
+- id: branch-2
+  type: results
+  dimension: detection
+  weight: 1
+  branch: pr/sdk-uses-core-models
+  expectExit: 1
+  findings:
+  - ruleId: AF-ISO-001
+    kind: forbidden-dependency
+    location.path: task-sdk/src/airflow/sdk/bench_models.py
+    disposition: active
+- id: review-2
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  branch: pr/sdk-uses-core-models
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: AF-ISO-001
+    path: task-sdk/src/airflow/sdk/bench_models.py
+  - ruleId: AF-DEC-001
+    path: task-sdk/src/airflow/sdk/bench_models.py
+  expectErrors: []
+- id: branches-unchanged
+  type: branches_unchanged
+  dimension: workspace
+  weight: 2

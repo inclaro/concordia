@@ -1,0 +1,35 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: volcano-structure
+  version: 1.0.0
+rules:
+- id: VC-DNY-001
+  name: Admission cannot reach scheduling logic
+  severity: error
+  owner: team-volcano
+  rationale: Transitive coupling - an admission webhook that reaches the scheduler or a plugin through any chain of calls embeds scheduling logic in the admission path.
+  remediation: Cut the chain; share data through the framework API types or move the logic out of the webhook.
+  subject:
+    calmNodes: [vc-admission]
+  denyPath:
+    target:
+      calmNodes: [vc-scheduler, vc-plugin-gang, vc-plugin-drf, vc-plugin-proportion, vc-plugin-binpack, vc-plugin-predicates, vc-plugin-capacity]
+    edges: [IMPORTS, CALLS]
+    maxDepth: 3
+- id: VC-BUD-001
+  name: The framework hub does not gain dependents
+  severity: error
+  owner: team-volcano
+  rationale: Hub-like dependency - every new component that uses the scheduler framework makes it harder to change, so the current count is a ratchet.
+  remediation: Depend on a narrower interface or on shared code instead of the framework, or lower the count first.
+  subject:
+    calmNodes: [vc-admission]
+  evidence:
+    onUnknown: warn
+  budget:
+    measure: forbidden-edges
+    target:
+      calmNodes: [vc-framework]
+    max: 19
+    edges: [IMPORTS, CALLS]

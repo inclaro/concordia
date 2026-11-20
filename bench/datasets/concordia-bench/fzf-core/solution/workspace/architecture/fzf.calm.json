@@ -1,0 +1,167 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "nodes": [
+    {
+      "unique-id": "fzf-cli",
+      "node-type": "service",
+      "name": "Fzf Cli",
+      "description": "Entry point."
+    },
+    {
+      "unique-id": "fzf-core",
+      "node-type": "service",
+      "name": "Fzf Core",
+      "description": "Option parsing and the finder loop.",
+      "concordia": {
+        "tags": [
+          "application"
+        ]
+      }
+    },
+    {
+      "unique-id": "fzf-tui",
+      "node-type": "service",
+      "name": "Fzf Tui",
+      "description": "Terminal rendering.",
+      "concordia": {
+        "tags": [
+          "presentation"
+        ]
+      }
+    },
+    {
+      "unique-id": "fzf-algo",
+      "node-type": "service",
+      "name": "Fzf Algo",
+      "description": "Fuzzy matching.",
+      "concordia": {
+        "tags": [
+          "domain"
+        ]
+      }
+    },
+    {
+      "unique-id": "fzf-protector",
+      "node-type": "service",
+      "name": "Fzf Protector",
+      "description": "OS sandboxing.",
+      "concordia": {
+        "tags": [
+          "infrastructure"
+        ]
+      }
+    },
+    {
+      "unique-id": "fzf-util",
+      "node-type": "service",
+      "name": "Fzf Util",
+      "description": "Utilities.",
+      "concordia": {
+        "tags": [
+          "shared",
+          "shared-kernel"
+        ]
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "fzf-cli-uses-fzf-core",
+      "description": "Fzf Cli uses Fzf Core.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-cli"
+          },
+          "destination": {
+            "node": "fzf-core"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-cli-uses-fzf-protector",
+      "description": "Fzf Cli uses Fzf Protector.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-cli"
+          },
+          "destination": {
+            "node": "fzf-protector"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-core-uses-fzf-tui",
+      "description": "Fzf Core uses Fzf Tui.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-core"
+          },
+          "destination": {
+            "node": "fzf-tui"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-core-uses-fzf-algo",
+      "description": "Fzf Core uses Fzf Algo.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-core"
+          },
+          "destination": {
+            "node": "fzf-algo"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-core-uses-fzf-util",
+      "description": "Fzf Core uses Fzf Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-core"
+          },
+          "destination": {
+            "node": "fzf-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-tui-uses-fzf-util",
+      "description": "Fzf Tui uses Fzf Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-tui"
+          },
+          "destination": {
+            "node": "fzf-util"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "fzf-algo-uses-fzf-util",
+      "description": "Fzf Algo uses Fzf Util.",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "fzf-algo"
+          },
+          "destination": {
+            "node": "fzf-util"
+          }
+        }
+      }
+    }
+  ]
+}

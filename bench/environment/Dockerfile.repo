@@ -1,0 +1,23 @@
+# Dockerfile.repo: one upstream repository at its pinned commit, with a one-commit history.
+# Build context: bench/. Image: concordia-bench-<id>:latest.
+FROM concordia-bench-base:latest
+ARG REPO_ID
+ARG REPO_URL
+ARG REPO_SHA
+ARG REPO_TAG
+
+# The checkout lives at /workspace/repo, not /app: codebase-memory-mcp refuses a
+# top-level directory as "too broad to index as one root", and Concordia binds no
+# file when the workspace root is a symlink to the real checkout.
+WORKDIR /workspace/repo
+RUN git init -q \
+    && git fetch -q --depth 1 "$REPO_URL" "$REPO_SHA" \
+    && git checkout -q FETCH_HEAD \
+    && rm -rf .git \
+    && git init -q -b main \
+    && git add -A \
+    && GIT_AUTHOR_DATE=2026-01-01T00:00:00Z GIT_COMMITTER_DATE=2026-01-01T00:00:00Z \
+        git commit -q -m "upstream $REPO_ID $REPO_TAG"
+
+RUN echo "$REPO_ID" > /opt/concordia-bench/repo-id
+COPY testdata/mutations/${REPO_ID} /opt/concordia-bench/mutations/${REPO_ID}

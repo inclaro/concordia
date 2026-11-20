@@ -1,0 +1,27 @@
+apiVersion: concordia.io/v1alpha1
+kind: DecisionRegister
+decisions:
+- id: ADR-2
+  path: airflow-core/adr/lang-sdk/0002-workload-execution.md
+  expect: active
+  categories: [system-boundaries]
+  governs:
+  - ref: calm:node:af-task-runner
+  enforcement: required
+- id: ADR-4
+  path: airflow-core/adr/lang-sdk/0004-dag-parsing.md
+  expect: active
+  categories: [dag-processing]
+  governs:
+  - ref: calm:node:af-dag-processing
+  enforcement: required
+  enforcedBy:
+  - rule: AF-DEC-001
+    pack: {id: airflow-adopt, version: 1.0.0}
+- id: ADR-1
+  path: dev/breeze/doc/adr/0001-record-architecture-decisions.md
+  expect: active
+  categories: [quality-tradeoffs]
+  governs:
+  - ref: calm:node:af-provider-standard
+  enforcement: none

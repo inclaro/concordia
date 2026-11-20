@@ -1,0 +1,25 @@
+schema_version = "1.4"
+
+[task]
+name = "concordia-bench/nushell-quality-gate"
+version = "1.0.0"
+description = "Review Nushell branches that change the quality workspace and the code, with Concordia."
+keywords = ["concordia", "calm", "architecture", "rust", "nushell", "gate"]
+
+[metadata]
+difficulty = "hard"
+category = "gate"
+tags = ["nushell", "rust", "gate"]
+
+[agent]
+timeout_sec = 5400.0
+
+[verifier]
+timeout_sec = 3600.0
+
+[environment]
+network_mode = "public"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+build_timeout_sec = 600.0

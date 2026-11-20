@@ -1,0 +1,165 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+- id: bind-vc-scheduler-hydrated
+  architectureRef: calm:node:vc-scheduler
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev-hydrated
+      resourceKind: Deployment
+      name: volcano-scheduler
+- id: bind-vc-controllers-hydrated
+  architectureRef: calm:node:vc-controllers
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev-hydrated
+      resourceKind: Deployment
+      name: volcano-controllers
+- id: bind-vc-admission-hydrated
+  architectureRef: calm:node:vc-admission
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev-hydrated
+      resourceKind: Deployment
+      name: volcano-admission
+    - kind: workload
+      environment: dev-hydrated
+      resourceKind: Job
+      name: volcano-admission-init
+- id: bind-vc-agent-hydrated
+  architectureRef: calm:node:vc-agent
+  required: false
+  match:
+    any:
+    - kind: workload
+      environment: dev-hydrated
+      resourceKind: DaemonSet
+      name: volcano-agent
+- id: bind-vc-system-ns-hydrated
+  architectureRef: calm:node:vc-system-ns
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/Namespace/_/volcano-system
+- id: bind-vc-monitoring-ns-hydrated
+  architectureRef: calm:node:vc-monitoring-ns
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/Namespace/_/volcano-monitoring
+- id: bind-vc-cluster-rolebindings
+  architectureRef: calm:node:vc-cluster-rolebindings
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-admission-role
+    - kind: infraResource
+      environment: dev
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-controllers-role
+    - kind: infraResource
+      environment: dev
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-scheduler-role
+    - kind: infraResource
+      environment: dev
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-agent-role
+    - kind: infraResource
+      environment: monitoring
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/prometheus-volcano
+    - kind: infraResource
+      environment: monitoring
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/kube-state-metrics
+    - kind: infraResource
+      environment: dev-hydrated
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-admission-role
+    - kind: infraResource
+      environment: dev-hydrated
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-controllers-role
+    - kind: infraResource
+      environment: dev-hydrated
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-scheduler-role
+    - kind: infraResource
+      environment: dev-hydrated
+      address: rbac.authorization.k8s.io/ClusterRoleBinding/_/volcano-bench-role
+- id: bind-vc-default-sa
+  architectureRef: calm:node:vc-default-sa
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: monitoring
+      address: core/ServiceAccount/volcano-monitoring/default
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/ServiceAccount/volcano-system/default
+- id: bind-vc-scheduler-config
+  architectureRef: calm:node:vc-scheduler-config
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/ConfigMap/volcano-system/volcano-scheduler-configmap
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/ConfigMap/volcano-system/volcano-scheduler-configmap
+- id: bind-vc-admission-sa
+  architectureRef: calm:node:vc-admission
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/ServiceAccount/volcano-system/volcano-admission
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/ServiceAccount/volcano-system/volcano-admission
+- id: bind-vc-controllers-sa
+  architectureRef: calm:node:vc-controllers
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/ServiceAccount/volcano-system/volcano-controllers
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/ServiceAccount/volcano-system/volcano-controllers
+- id: bind-vc-scheduler-sa
+  architectureRef: calm:node:vc-scheduler
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/ServiceAccount/volcano-system/volcano-scheduler
+    - kind: infraResource
+      environment: dev-hydrated
+      address: core/ServiceAccount/volcano-system/volcano-scheduler
+- id: bind-vc-agent-sa
+  architectureRef: calm:node:vc-agent
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: dev
+      address: core/ServiceAccount/volcano-system/volcano-agent
+- id: bind-vc-monitoring-sa
+  architectureRef: calm:node:vc-monitoring
+  required: false
+  match:
+    any:
+    - kind: infraResource
+      environment: monitoring
+      address: core/ServiceAccount/volcano-monitoring/kube-state-metrics

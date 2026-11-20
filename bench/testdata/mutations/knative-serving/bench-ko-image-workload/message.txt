@@ -1,0 +1,1 @@
+bench: a new workload manifest references an image that Concordia cannot render

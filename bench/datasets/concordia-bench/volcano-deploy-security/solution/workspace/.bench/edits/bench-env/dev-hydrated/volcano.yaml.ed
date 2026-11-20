@@ -1,0 +1,9 @@
+15a
+kind: Secret
+metadata:
+  name: volcano-admission-secret
+  namespace: volcano-system
+type: Opaque
+---
+apiVersion: v1
+.

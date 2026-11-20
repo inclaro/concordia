@@ -1,0 +1,4 @@
+69a
+    environment:
+      - DATABASE_URL=postgresql://postgres:testpass@hoppscotch-db:5432/hoppscotch?connect_timeout=300
+.

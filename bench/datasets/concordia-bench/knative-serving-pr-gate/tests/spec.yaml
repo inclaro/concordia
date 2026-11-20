@@ -1,0 +1,83 @@
+repo: knative-serving
+checks:
+- id: review-report
+  type: review_report
+  dimension: reporting
+  weight: 3
+  path: review.json
+  expectVerdict: fail
+  expectViolations:
+  - ruleId: KN-LYR-001
+    path: pkg/apis/serving/bench_rec.go
+  - ruleId: KN-PLC-003
+    path: bench-env/edge/bench-activator.yaml
+- id: committed
+  type: committed
+  dimension: workspace
+  weight: 2
+  paths:
+  - concordia.yaml
+  - exceptions/waivers.yaml
+  branch: feature/bench-change
+- id: authority
+  type: yaml_file
+  dimension: workspace
+  weight: 2
+  path: concordia.yaml
+  select:
+  - path: assessments.trustAnchor.ref
+    equals: main
+  - path: assessments.authorities[id=arch-exceptions].role
+    equals: exception
+  - path: assessments.authorities[id=arch-exceptions].reviewers
+    contains: board@bench.invalid
+- id: changed-gate
+  type: results
+  dimension: detection
+  weight: 3
+  branch: feature/bench-change
+  args: &id001
+  - --changed
+  - main
+  expectExit: 1
+  findings:
+  - ruleId: KN-LYR-001
+    kind: layer-violation
+    location.path: pkg/apis/serving/bench_rec.go
+    disposition: active
+  - ruleId: KN-PLC-003
+    subject: kn-activator
+    environment: edge
+    result: violation
+    disposition: waived
+  absent:
+  - location.path: pkg/reconciler/route/bench_ok.go
+    disposition: active
+  - ruleId: KN-PLC-003
+    disposition: active
+- id: scoped-waiver
+  type: waived
+  dimension: governance
+  weight: 3
+  branch: feature/bench-change
+  args: *id001
+  ruleId: KN-PLC-003
+  scope: true
+  owner: team-knative-serving
+  issue: KN-PILOT-1
+  expires: '2099-12-31'
+  expectExit: 1
+- id: expired-waiver
+  type: results
+  dimension: governance
+  weight: 2
+  branch: feature/bench-change
+  args: *id001
+  env:
+    CONCORDIA_NOW: '2100-01-01T00:00:00Z'
+  expectExit: 1
+  findings:
+  - ruleId: KN-PLC-003
+    subject: kn-activator
+    environment: edge
+    disposition: expired-waiver

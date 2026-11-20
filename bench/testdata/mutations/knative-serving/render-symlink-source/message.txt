@@ -1,0 +1,1 @@
+bench: a rendering source with symbolic links is added
