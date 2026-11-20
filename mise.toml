@@ -1129,6 +1129,7 @@ exit 1
 
 [tasks."bench:run"]
 description = "Run the terminus-2 agent on every bench task (needs OPENROUTER_API_KEY)."
+depends = ["tools:cbm"]
 dir = "{{config_root}}/bench"
 usage = 'flag "--repo <id>" help "run only the tasks of this repository of bench/tasks.json"'
 run = '''
