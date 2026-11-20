@@ -49,7 +49,7 @@ The tutorials are `showboat` documents. After changing a command, an output, or 
 
 ## Run the benchmark
 
-[concordia-bench](bench/README.md) runs Concordia on ten real open-source repositories inside Harbor containers. `mise run bench:smoke --repo <id>` runs the reference solutions of one repository and needs Docker, `uv`, and `jq` (Linux and macOS). The `Bench oracle smoke` workflow runs it for every repository on a pull request that changes `bench/`, `cmd/`, or `internal/`. The repositories are cloned at the commits that `bench/repos.json` pins; `bench/` stores no upstream file (`mise run bench:check-vendored`). See [bench/README.md](bench/README.md) for the task types, the runs, and the triage of failures.
+[concordia-bench](bench/README.md) runs Concordia on ten real open-source repositories inside Harbor containers. `mise run bench:smoke --repo <id>` runs the reference solutions of one repository and needs Docker, `uv`, and `jq` (Linux and macOS). CI does not run the benchmark; run it locally when a change affects it. The repositories are cloned at the commits that `bench/repos.json` pins; `bench/` stores no upstream file (`mise run bench:check-vendored`). See [bench/README.md](bench/README.md) for the task types, the runs, and the triage of failures.
 
 ## Specify a change
 
