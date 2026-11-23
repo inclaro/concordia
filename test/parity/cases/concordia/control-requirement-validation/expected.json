@@ -32,7 +32,7 @@
       "findings": [
         {
           "message": "must have required property 'name'",
-          "path": "/nodes/api/controls/api-access/requirements/0",
+          "path": "/nodes/api/controls/api-access/requirements/0/config",
           "rule": "control-requirement-validation",
           "severity": "error"
         }
@@ -53,7 +53,7 @@
       "findings": [
         {
           "message": "must be string",
-          "path": "/nodes/api/controls/api-access/requirements/0/owner",
+          "path": "/nodes/api/controls/api-access/requirements/0/config/owner",
           "rule": "control-requirement-validation",
           "severity": "error"
         }
@@ -113,5 +113,5 @@
       "loadError": false
     }
   },
-  "tag": "cli-v1.70.0"
+  "tag": "cli-v1.74.0"
 }
