@@ -138,11 +138,13 @@ type AssuranceRecords struct {
 const (
 	EvaluatorNetworkPolicy = "network-policy"
 	EvaluatorRBAC          = "rbac"
+	EvaluatorCloudFirewall = "cloud-firewall"
 )
 
 // Enforcement assumptions that an evaluator result may rely on.
 const (
 	AssumeNetworkPolicyEnforced = "network-policy-enforced"
+	AssumeFirewallRulesInPlan   = "firewall-rules-complete-in-plan"
 	AssumeRBACAuthorizerEnabled = "rbac-authorizer-enabled"
 )
 

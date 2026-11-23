@@ -1,0 +1,1193 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.17.0",
+  "complete": true,
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "aws_subnet.public",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cidr_block": "10.20.0.0/24",
+          "vpc_id": "vpc-0a1b2c3d"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_subnet.app",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cidr_block": "10.20.1.0/24",
+          "vpc_id": "vpc-0a1b2c3d"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_subnet.data",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "data",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cidr_block": "10.20.2.0/24",
+          "vpc_id": "vpc-0a1b2c3d"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_subnet.batch",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "batch",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cidr_block": "10.20.3.0/24",
+          "vpc_id": "vpc-0a1b2c3d"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.gateway",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "gateway",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "gateway",
+          "ingress": [],
+          "egress": []
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.ledger_db",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "ledger_db",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "ledger-db",
+          "ingress": [],
+          "egress": []
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lb.public",
+      "mode": "managed",
+      "type": "aws_lb",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "public",
+          "internal": false
+        },
+        "after_unknown": {
+          "id": true,
+          "security_groups": true,
+          "subnets": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.ledger",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "ledger",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "identifier": "ledger",
+          "engine": "postgres"
+        },
+        "after_unknown": {
+          "id": true,
+          "vpc_security_group_ids": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_egress_rule.gateway_out",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_egress_rule",
+      "name": "gateway_out",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ip_protocol": "-1",
+          "cidr_ipv4": "0.0.0.0/0"
+        },
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.gateway_https",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "gateway_https",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ip_protocol": "tcp",
+          "from_port": 443,
+          "to_port": 443,
+          "cidr_ipv4": "0.0.0.0/0"
+        },
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.ledger_from_gateway",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "ledger_from_gateway",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ip_protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "description": "temporary debug access"
+        },
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true,
+          "referenced_security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.app",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "id": "sg-app",
+          "name": "app",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 6379,
+              "to_port": 6379,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [
+                "sg-cache"
+              ],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.cache",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "cache",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "id": "sg-cache",
+          "name": "cache",
+          "egress": [],
+          "ingress": [
+            {
+              "from_port": 6379,
+              "to_port": 6379,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [
+                "sg-app"
+              ],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.app",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-app"
+          ],
+          "private_ip": "10.20.1.10"
+        },
+        "after_unknown": {
+          "id": true,
+          "subnet_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_elasticache_cluster.cache",
+      "mode": "managed",
+      "type": "aws_elasticache_cluster",
+      "name": "cache",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cluster_id": "cache",
+          "security_group_ids": [
+            "sg-cache"
+          ]
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.batch",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "batch",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "batch",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.batch",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "batch",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc"
+        },
+        "after_unknown": {
+          "id": true,
+          "vpc_security_group_ids": true,
+          "private_ip": true,
+          "subnet_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group_rule.ledger_from_batch",
+      "mode": "managed",
+      "type": "aws_security_group_rule",
+      "name": "ledger_from_batch",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "type": "ingress",
+          "protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "cidr_blocks": [
+            "10.20.3.0/25"
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.reporter",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "reporter",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "id": "sg-reporter",
+          "name": "reporter",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 443,
+              "to_port": 443,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [
+                "pl-0123456789abcdef0"
+              ],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.reporter",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "reporter",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-reporter"
+          ],
+          "private_ip": "10.20.1.20"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.workers",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "workers",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "id": "sg-workers",
+          "name": "workers",
+          "ingress": [
+            {
+              "from_port": 7000,
+              "to_port": 7000,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": true,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": true,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.worker_a",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "worker_a",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-workers"
+          ],
+          "private_ip": "10.20.1.30"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.worker_b",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "worker_b",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-workers"
+          ],
+          "private_ip": "10.20.1.31"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.legacy",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "legacy",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc"
+        },
+        "after_unknown": {
+          "id": true,
+          "vpc_security_group_ids": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket.archive",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "archive",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "bucket": "archive"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.dynamic",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "dynamic",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "dynamic",
+          "egress": []
+        },
+        "after_unknown": {
+          "id": true,
+          "ingress": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.dynamic",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "dynamic",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "private_ip": "10.20.1.40"
+        },
+        "after_unknown": {
+          "id": true,
+          "vpc_security_group_ids": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.dynamic_from_batch",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "dynamic_from_batch",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ip_protocol": "tcp",
+          "from_port": 8080,
+          "to_port": 8080
+        },
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true,
+          "referenced_security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_subnet.public",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "public",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.0.0/24"
+            },
+            "vpc_id": {
+              "constant_value": "vpc-0a1b2c3d"
+            }
+          }
+        },
+        {
+          "address": "aws_subnet.app",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "app",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.1.0/24"
+            },
+            "vpc_id": {
+              "constant_value": "vpc-0a1b2c3d"
+            }
+          }
+        },
+        {
+          "address": "aws_subnet.data",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "data",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.2.0/24"
+            },
+            "vpc_id": {
+              "constant_value": "vpc-0a1b2c3d"
+            }
+          }
+        },
+        {
+          "address": "aws_subnet.batch",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "batch",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.3.0/24"
+            },
+            "vpc_id": {
+              "constant_value": "vpc-0a1b2c3d"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.gateway",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "gateway",
+          "expressions": {
+            "name": {
+              "constant_value": "gateway"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.ledger_db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "ledger_db",
+          "expressions": {
+            "name": {
+              "constant_value": "ledger-db"
+            }
+          }
+        },
+        {
+          "address": "aws_lb.public",
+          "mode": "managed",
+          "type": "aws_lb",
+          "name": "public",
+          "expressions": {
+            "name": {
+              "constant_value": "public"
+            },
+            "internal": {
+              "constant_value": false
+            },
+            "security_groups": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            },
+            "subnets": {
+              "references": [
+                "aws_subnet.public.id",
+                "aws_subnet.public"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_db_instance.ledger",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "ledger",
+          "expressions": {
+            "identifier": {
+              "constant_value": "ledger"
+            },
+            "engine": {
+              "constant_value": "postgres"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.gateway_out",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_egress_rule",
+          "name": "gateway_out",
+          "expressions": {
+            "ip_protocol": {
+              "constant_value": "-1"
+            },
+            "cidr_ipv4": {
+              "constant_value": "0.0.0.0/0"
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.gateway_https",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "gateway_https",
+          "expressions": {
+            "ip_protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 443
+            },
+            "to_port": {
+              "constant_value": 443
+            },
+            "cidr_ipv4": {
+              "constant_value": "0.0.0.0/0"
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.ledger_from_gateway",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "ledger_from_gateway",
+          "expressions": {
+            "ip_protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 5432
+            },
+            "to_port": {
+              "constant_value": 5432
+            },
+            "description": {
+              "constant_value": "temporary debug access"
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            },
+            "referenced_security_group_id": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.app",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "app",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-app"
+            },
+            "name": {
+              "constant_value": "app"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.cache",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "cache",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-cache"
+            },
+            "name": {
+              "constant_value": "cache"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "app",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.10"
+            },
+            "subnet_id": {
+              "references": [
+                "aws_subnet.app.id",
+                "aws_subnet.app"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_elasticache_cluster.cache",
+          "mode": "managed",
+          "type": "aws_elasticache_cluster",
+          "name": "cache",
+          "expressions": {
+            "cluster_id": {
+              "constant_value": "cache"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.batch",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "batch",
+          "expressions": {
+            "name": {
+              "constant_value": "batch"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.batch",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "batch",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.batch.id",
+                "aws_security_group.batch"
+              ]
+            },
+            "subnet_id": {
+              "references": [
+                "aws_subnet.batch.id",
+                "aws_subnet.batch"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group_rule.ledger_from_batch",
+          "mode": "managed",
+          "type": "aws_security_group_rule",
+          "name": "ledger_from_batch",
+          "expressions": {
+            "type": {
+              "constant_value": "ingress"
+            },
+            "protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 5432
+            },
+            "to_port": {
+              "constant_value": 5432
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.reporter",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "reporter",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-reporter"
+            },
+            "name": {
+              "constant_value": "reporter"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.reporter",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "reporter",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.20"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.workers",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "workers",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-workers"
+            },
+            "name": {
+              "constant_value": "workers"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.worker_a",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "worker_a",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.30"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.worker_b",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "worker_b",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.31"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.legacy",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "legacy",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "data.aws_security_group.shared.id",
+                "data.aws_security_group.shared"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_s3_bucket.archive",
+          "mode": "managed",
+          "type": "aws_s3_bucket",
+          "name": "archive",
+          "expressions": {
+            "bucket": {
+              "constant_value": "archive"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.dynamic",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "dynamic",
+          "expressions": {
+            "name": {
+              "constant_value": "dynamic"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.dynamic",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "dynamic",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.40"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.dynamic.id",
+                "aws_security_group.dynamic"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.dynamic_from_batch",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "dynamic_from_batch",
+          "expressions": {
+            "ip_protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 8080
+            },
+            "to_port": {
+              "constant_value": 8080
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.dynamic.id",
+                "aws_security_group.dynamic"
+              ]
+            },
+            "referenced_security_group_id": {
+              "references": [
+                "aws_security_group.batch.id",
+                "aws_security_group.batch"
+              ]
+            }
+          }
+        },
+        {
+          "address": "data.aws_security_group.shared",
+          "mode": "data",
+          "type": "aws_security_group",
+          "name": "shared",
+          "expressions": {
+            "name": {
+              "constant_value": "shared"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
