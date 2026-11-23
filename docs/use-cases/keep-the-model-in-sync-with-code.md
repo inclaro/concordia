@@ -74,6 +74,8 @@ FAIL CORE-DECL-001 Dependencies between services, databases, and web clients are
   ledger-service -> payments-service: 2 finding(s)
     services/ledger-service/src/settlement.ts    imports services/payments-service/src/api/index.ts
     services/ledger-service/src/settlement.ts:4  calls services.payments-service.src.api.paymentStatus in services/payments-service/src/api/index.ts
+  payments-service: 1 finding(s)
+    services/payments-service/src/PaymentService.ts:5  http_calls __route__ANY__http://card-network.example.com/authorize
   reporting-job -> ledger-db: 3 finding(s)
     jobs/reporting/src/nightly.ts    imports services/ledger-service/src/db/schema.ts
     jobs/reporting/src/nightly.ts:5  calls LedgerTable.totals in services/ledger-service/src/db/schema.ts
@@ -85,8 +87,6 @@ FAIL CORE-DECL-001 Dependencies between services, databases, and web clients are
     services/channels-api/src/accounts.ts:10  calls ProfileStore.load in services/customer-profile/src/internal/ProfileStore.ts
     services/channels-api/src/accounts.ts:9   calls ProfileStore in services/customer-profile/src/internal/ProfileStore.ts
     services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
-  payments-service: 1 finding(s)
-    services/payments-service/src/PaymentService.ts:5  http_calls __route__ANY__http://card-network.example.com/authorize
   Fix: Remove the dependency from the code, or declare it as a relationship in the architecture model. Edges of kind HTTP_CALLS and ASYNC_CALLS are heuristic in the CBM adapter, so lower evidence.minimumConfidence to heuristic with a rule override to check them.
 10 active error(s), 1 active info(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown
 exit code: 1

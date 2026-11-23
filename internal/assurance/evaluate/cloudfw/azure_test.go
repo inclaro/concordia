@@ -41,7 +41,7 @@ type azureScenario struct {
 }
 
 func azureScenarios() []azureScenario {
-	return slices.Concat(azureAllowScenarios(), azureDenyScenarios(), azureUnknownScenarios())
+	return slices.Concat(azureAllowScenarios(), azureDenyScenarios(), azureUnknownScenarios(), azureReviewScenarios())
 }
 
 func azureAllowScenarios() []azureScenario {

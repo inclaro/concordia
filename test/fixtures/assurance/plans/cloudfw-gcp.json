@@ -685,6 +685,58 @@
         },
         "after_sensitive": {}
       }
+    },
+    {
+      "address": "google_compute_firewall.deny_other_host",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_other_host",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "deny-other-host",
+          "direction": "INGRESS",
+          "priority": 100,
+          "disabled": false,
+          "allow": [],
+          "deny": [{ "protocol": "tcp", "ports": ["9060"] }],
+          "source_ranges": [],
+          "source_tags": ["web"],
+          "source_service_accounts": [],
+          "destination_ranges": ["10.20.0.9/32"],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": { "id": true, "self_link": true, "network": true, "creation_timestamp": true },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.deny_other_source_out",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_other_source_out",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "deny-other-source-out",
+          "direction": "EGRESS",
+          "priority": 100,
+          "disabled": false,
+          "allow": [],
+          "deny": [{ "protocol": "tcp", "ports": ["9070"] }],
+          "source_ranges": ["10.99.0.0/24"],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": { "id": true, "self_link": true, "network": true, "creation_timestamp": true },
+        "after_sensitive": {}
+      }
     }
   ],
   "configuration": {
@@ -963,6 +1015,24 @@
                 "google_compute_network.vpc"
               ]
             }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_other_host",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_other_host",
+          "expressions": {
+            "network": { "references": ["google_compute_network.vpc.name", "google_compute_network.vpc"] }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_other_source_out",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_other_source_out",
+          "expressions": {
+            "network": { "references": ["google_compute_network.vpc.name", "google_compute_network.vpc"] }
           }
         }
       ]

@@ -86,6 +86,8 @@ type Evaluator struct {
 	byConfig map[string][]*plan.Resource
 	// live are the resources that exist after apply, in input order (sorted by address).
 	live []*plan.Resource
+	// changed are the rule resources that the plan deletes or updates, including those that do not exist after apply.
+	changed []*plan.Resource
 }
 
 // New indexes the input. It does not fail: whatever the evaluator cannot use becomes a gap of the results that
@@ -100,8 +102,13 @@ func New(in *Input) *Evaluator {
 	}
 
 	for i := range in.Resources {
-		if res := &in.Resources[i]; exists(res) {
+		res := &in.Resources[i]
+		if exists(res) {
 			evaluator.index(res)
+		}
+
+		if changesRule(res) {
+			evaluator.changed = append(evaluator.changed, res)
 		}
 	}
 

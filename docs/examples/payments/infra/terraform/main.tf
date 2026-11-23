@@ -1,4 +1,5 @@
-# The plan in infra/plans was recorded from this configuration.
+# The plan in infra/plans is a hand-written `terraform show -json` document of a plan of this configuration
+# against the deployed estate. In that plan, only aws_vpc_security_group_ingress_rule.ledger_from_gateway is new.
 
 terraform {
   required_providers {

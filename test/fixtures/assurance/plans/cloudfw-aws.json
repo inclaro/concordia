@@ -686,6 +686,469 @@
         },
         "after_sensitive": {}
       }
+    },
+    {
+      "address": "aws_security_group.f1_app",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "f1_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "f1_app",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.f1_bastion",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "f1_bastion",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "f1_bastion",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.f1_db",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "f1_db",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "f1-db",
+          "egress": [],
+          "ingress": [
+            {
+              "from_port": 22,
+              "to_port": 22,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            },
+            {
+              "from_port": 5432,
+              "to_port": 5432,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "ingress": [
+            {
+              "security_groups": true
+            },
+            {
+              "security_groups": true
+            }
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.f1_partial",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "f1_partial",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "f1-partial",
+          "egress": [],
+          "ingress": []
+        },
+        "after_unknown": {
+          "id": true,
+          "ingress": [
+            true
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc.main",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "cidr_block": "10.20.0.0/16"
+        },
+        "after_unknown": {
+          "id": true,
+          "default_security_group_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.f2_default",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "f2_default",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "private_ip": "10.20.1.45"
+        },
+        "after_unknown": {
+          "id": true,
+          "vpc_security_group_ids": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.f8_extra",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "f8_extra",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "f8-extra",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.f8",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "f8",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-app"
+          ],
+          "private_ip": "10.20.1.50"
+        },
+        "after_unknown": {
+          "id": true,
+          "primary_network_interface_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_network_interface_sg_attachment.f8_extra",
+      "mode": "managed",
+      "type": "aws_network_interface_sg_attachment",
+      "name": "f8_extra",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {},
+        "after_unknown": {
+          "id": true,
+          "security_group_id": true,
+          "network_interface_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.existing_app",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "existing_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "id": "sg-existing-app",
+          "name": "existing-app",
+          "ingress": [],
+          "egress": [
+            {
+              "from_port": 0,
+              "to_port": 0,
+              "protocol": "-1",
+              "cidr_blocks": [
+                "0.0.0.0/0"
+              ],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.existing_db",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "existing_db",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "id": "sg-existing-db",
+          "name": "existing-db",
+          "egress": [],
+          "ingress": [
+            {
+              "from_port": 5432,
+              "to_port": 5432,
+              "protocol": "tcp",
+              "cidr_blocks": [],
+              "ipv6_cidr_blocks": [],
+              "security_groups": [
+                "sg-existing-app"
+              ],
+              "self": false,
+              "prefix_list_ids": [],
+              "description": ""
+            }
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group_rule.existing_db_from_app",
+      "mode": "managed",
+      "type": "aws_security_group_rule",
+      "name": "existing_db_from_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "id": "sgrule-0123",
+          "type": "ingress",
+          "protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "security_group_id": "sg-existing-db",
+          "source_security_group_id": "sg-existing-app"
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.existing_app",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "existing_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "id": "i-0123456789abcdef0",
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-existing-app"
+          ],
+          "private_ip": "10.20.1.60",
+          "primary_network_interface_id": "eni-0123456789abcdef0"
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.existing",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "existing",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "after": {
+          "id": "db-existing",
+          "identifier": "existing",
+          "vpc_security_group_ids": [
+            "sg-existing-db"
+          ]
+        },
+        "after_unknown": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_instance.f8b",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "f8b",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "ami": "ami-0abc",
+          "vpc_security_group_ids": [
+            "sg-app"
+          ],
+          "private_ip": "10.20.1.70"
+        },
+        "after_unknown": {
+          "id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_network_interface.f8b_eni",
+      "mode": "managed",
+      "type": "aws_network_interface",
+      "name": "f8b_eni",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "private_ip": "10.20.1.71"
+        },
+        "after_unknown": {
+          "id": true,
+          "security_groups": true,
+          "subnet_id": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_network_interface_attachment.f8b",
+      "mode": "managed",
+      "type": "aws_network_interface_attachment",
+      "name": "f8b",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "device_index": 1
+        },
+        "after_unknown": {
+          "id": true,
+          "instance_id": true,
+          "network_interface_id": true
+        },
+        "after_sensitive": {}
+      }
     }
   ],
   "configuration": {
@@ -1172,6 +1635,350 @@
               "references": [
                 "aws_security_group.batch.id",
                 "aws_security_group.batch"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.f1_app",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "f1_app",
+          "expressions": {
+            "name": {
+              "constant_value": "f1_app"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.f1_bastion",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "f1_bastion",
+          "expressions": {
+            "name": {
+              "constant_value": "f1_bastion"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.f1_db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "f1_db",
+          "expressions": {
+            "name": {
+              "constant_value": "f1-db"
+            },
+            "ingress": [
+              {
+                "from_port": {
+                  "constant_value": 5432
+                },
+                "to_port": {
+                  "constant_value": 5432
+                },
+                "protocol": {
+                  "constant_value": "tcp"
+                },
+                "security_groups": {
+                  "references": [
+                    "aws_security_group.f1_app.id",
+                    "aws_security_group.f1_app"
+                  ]
+                }
+              },
+              {
+                "from_port": {
+                  "constant_value": 22
+                },
+                "to_port": {
+                  "constant_value": 22
+                },
+                "protocol": {
+                  "constant_value": "tcp"
+                },
+                "security_groups": {
+                  "references": [
+                    "aws_security_group.f1_bastion.id",
+                    "aws_security_group.f1_bastion"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_security_group.f1_partial",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "f1_partial",
+          "expressions": {
+            "name": {
+              "constant_value": "f1-partial"
+            }
+          }
+        },
+        {
+          "address": "aws_vpc.main",
+          "mode": "managed",
+          "type": "aws_vpc",
+          "name": "main",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.0.0/16"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.f2_default",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "f2_default",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.45"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_vpc.main.default_security_group_id",
+                "aws_vpc.main"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.f8_extra",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "f8_extra",
+          "expressions": {
+            "name": {
+              "constant_value": "f8-extra"
+            }
+          }
+        },
+        {
+          "address": "aws_instance.f8",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "f8",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.50"
+            }
+          }
+        },
+        {
+          "address": "aws_network_interface_sg_attachment.f8_extra",
+          "mode": "managed",
+          "type": "aws_network_interface_sg_attachment",
+          "name": "f8_extra",
+          "expressions": {
+            "security_group_id": {
+              "references": [
+                "aws_security_group.f8_extra.id",
+                "aws_security_group.f8_extra"
+              ]
+            },
+            "network_interface_id": {
+              "references": [
+                "aws_instance.f8.primary_network_interface_id",
+                "aws_instance.f8"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.existing_app",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "existing_app",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-existing-app"
+            },
+            "name": {
+              "constant_value": "existing-app"
+            }
+          }
+        },
+        {
+          "address": "aws_security_group.existing_db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "existing_db",
+          "expressions": {
+            "id": {
+              "constant_value": "sg-existing-db"
+            },
+            "name": {
+              "constant_value": "existing-db"
+            },
+            "ingress": [
+              {
+                "from_port": {
+                  "constant_value": 5432
+                },
+                "to_port": {
+                  "constant_value": 5432
+                },
+                "protocol": {
+                  "constant_value": "tcp"
+                },
+                "security_groups": {
+                  "references": [
+                    "aws_security_group.existing_app.id",
+                    "aws_security_group.existing_app"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_security_group_rule.existing_db_from_app",
+          "mode": "managed",
+          "type": "aws_security_group_rule",
+          "name": "existing_db_from_app",
+          "expressions": {
+            "id": {
+              "constant_value": "sgrule-0123"
+            },
+            "type": {
+              "constant_value": "ingress"
+            },
+            "protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 5432
+            },
+            "to_port": {
+              "constant_value": 5432
+            },
+            "security_group_id": {
+              "references": [
+                "aws_security_group.existing_db.id",
+                "aws_security_group.existing_db"
+              ]
+            },
+            "source_security_group_id": {
+              "references": [
+                "aws_security_group.existing_app.id",
+                "aws_security_group.existing_app"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_instance.existing_app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "existing_app",
+          "expressions": {
+            "id": {
+              "constant_value": "i-0123456789abcdef0"
+            },
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.60"
+            },
+            "primary_network_interface_id": {
+              "constant_value": "eni-0123456789abcdef0"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.existing_app.id",
+                "aws_security_group.existing_app"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_db_instance.existing",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "existing",
+          "expressions": {
+            "id": {
+              "constant_value": "db-existing"
+            },
+            "identifier": {
+              "constant_value": "existing"
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.existing_db.id",
+                "aws_security_group.existing_db"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_instance.f8b",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "f8b",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-0abc"
+            },
+            "private_ip": {
+              "constant_value": "10.20.1.70"
+            }
+          }
+        },
+        {
+          "address": "aws_network_interface.f8b_eni",
+          "mode": "managed",
+          "type": "aws_network_interface",
+          "name": "f8b_eni",
+          "expressions": {
+            "private_ip": {
+              "constant_value": "10.20.1.71"
+            },
+            "security_groups": {
+              "references": [
+                "aws_security_group.f8_extra.id",
+                "aws_security_group.f8_extra"
+              ]
+            },
+            "subnet_id": {
+              "references": [
+                "aws_subnet.app.id",
+                "aws_subnet.app"
+              ]
+            }
+          }
+        },
+        {
+          "address": "aws_network_interface_attachment.f8b",
+          "mode": "managed",
+          "type": "aws_network_interface_attachment",
+          "name": "f8b",
+          "expressions": {
+            "device_index": {
+              "constant_value": 1
+            },
+            "instance_id": {
+              "references": [
+                "aws_instance.f8b.id",
+                "aws_instance.f8b"
+              ]
+            },
+            "network_interface_id": {
+              "references": [
+                "aws_network_interface.f8b_eni.id",
+                "aws_network_interface.f8b_eni"
               ]
             }
           }

@@ -168,3 +168,28 @@ func unknownAt(r *plan.Resource, path string) bool {
 
 	return slices.ContainsFunc(r.Unknown, func(u string) bool { return related(pathTokens(u), steps) })
 }
+
+// listHasUnknownElements reports whether Unknown marks a whole element of the list at the path, for example
+// `ingress[1]`. The plan reader leaves such an element out of Values, so the indexes of Values no longer line up with
+// the indexes of Unknown: a provider treats the list as unknown.
+func listHasUnknownElements(r *plan.Resource, path string) bool {
+	list := pathTokens(path)
+
+	return slices.ContainsFunc(r.Unknown, func(u string) bool { return isElementOf(pathTokens(u), list) })
+}
+
+// listUnknown reports whether the list at the path is unknown until apply as a whole or in whole elements.
+func listUnknown(r *plan.Resource, path string) bool {
+	return slices.Contains(r.Unknown, planPath(path)) || listHasUnknownElements(r, path)
+}
+
+// isElementOf reports whether the steps name one element of the list: the list steps and one index.
+func isElementOf(steps, list pathSteps) bool {
+	if len(steps) != len(list)+1 || !related(steps, list) {
+		return false
+	}
+
+	_, err := strconv.Atoi(steps[len(list)])
+
+	return err == nil
+}

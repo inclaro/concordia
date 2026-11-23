@@ -267,20 +267,21 @@ func TestReferencesResolveAnUnknownGroupIDThroughTheConfiguration(t *testing.T) 
 		t.Errorf("references = %v, want %v", rule.References, want)
 	}
 
-	// A nested block has the path form of Unknown; a local is dropped; a data source keeps its address.
+	// A nested block has the path form of Unknown; a local stays as an opaque entry; a data source keeps its address.
 	db := resource(t, p, "aws_security_group.db")
 
 	wantDB := map[string][]string{
-		"ingress[0].security_groups": {"aws_security_group.gateway"},
+		"ingress[0].security_groups": {"aws_security_group.gateway", "local.extra_groups"},
 		"vpc_id":                     {"data.aws_vpc.main"},
 	}
 	if !reflect.DeepEqual(db.References, wantDB) {
 		t.Errorf("references = %v, want %v", db.References, wantDB)
 	}
 
-	// Only variables are referenced: no resource, so no references.
-	if gateway := resource(t, p, "aws_security_group.gateway"); gateway.References != nil {
-		t.Errorf("references = %v, want nil", gateway.References)
+	// A variable is kept as an opaque entry, never as its value.
+	gateway := resource(t, p, "aws_security_group.gateway")
+	if want := map[string][]string{"vpc_id": {"var.vpc_id"}}; !reflect.DeepEqual(gateway.References, want) {
+		t.Errorf("references = %v, want %v", gateway.References, want)
 	}
 }
 
@@ -327,6 +328,58 @@ func TestReferencesAreNilWithoutAUsableConfiguration(t *testing.T) {
 			p := readInline(t, `{"format_version":"1.2",`+change+tc.configuration+`}`)
 			if p.Resources[0].References != nil {
 				t.Errorf("references = %v, want nil", p.Resources[0].References)
+			}
+		})
+	}
+}
+
+// A reference through a variable, a local or `each.value` can carry a resource ID that the plan does not name, so it
+// stays in the list as an opaque entry: a consumer must not take the rest of the list for the whole of it.
+func TestReferencesKeepOpaqueVariableLocalAndEachValueEntries(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2",
+		"resource_changes":[{"address":"module.net.aws_instance.app[\"a\"]","module_address":"module.net","mode":"managed",
+			"type":"aws_instance","name":"app","change":{"actions":["create"],"after":{},"after_unknown":{"vpc_security_group_ids":true},"after_sensitive":{}}}],
+		"configuration":{"root_module":{"module_calls":{"net":{"module":{"resources":[{"address":"aws_instance.app",
+			"expressions":{
+				"vpc_security_group_ids":{"references":["aws_security_group.this.id","aws_security_group.this",
+					"var.extra_security_group_ids","local.groups[0]","each.value.id","each.value","each.key","count.index",
+					"path.module","self.id","terraform.workspace"]}
+			}}]}}}}}}`)
+
+	want := map[string][]string{"vpc_security_group_ids": {
+		"module.net.aws_security_group.this", "module.net.each.value", "module.net.local.groups", "module.net.var.extra_security_group_ids",
+	}}
+	if got := p.Resources[0].References; !reflect.DeepEqual(got, want) {
+		t.Errorf("references = %v, want %v", got, want)
+	}
+}
+
+func TestReferencesNameOpaqueEntries(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		address string
+		want    bool
+	}{
+		{"var.extra", true},
+		{"local.groups", true},
+		{"each.value", true},
+		{"module.net.var.extra", true},
+		{"module.a.module.b.local.groups", true},
+		{"module.net.each.value", true},
+		{"aws_security_group.this", false},
+		{"module.net.aws_security_group.this", false},
+		{"data.aws_vpc.main", false},
+		{"module.var", false},
+		{"module.net", false},
+	} {
+		t.Run(tc.address, func(t *testing.T) {
+			t.Parallel()
+
+			if got := plan.IsOpaqueReference(tc.address); got != tc.want {
+				t.Errorf("IsOpaqueReference(%q) = %v, want %v", tc.address, got, tc.want)
 			}
 		})
 	}

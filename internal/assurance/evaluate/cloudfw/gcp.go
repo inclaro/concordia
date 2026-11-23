@@ -17,6 +17,8 @@ const (
 	gcpIPPath         = "network_interface.0.network_ip"
 	gcpEmailPath      = "service_account.0.email"
 	gcpSubnetworkType = "google_compute_subnetwork"
+	gcpNetworkType    = "google_compute_network"
+	gcpAccountType    = "google_service_account"
 )
 
 // gcpEndpointTypes are the resource types that can be an end of a GCP query.
@@ -30,13 +32,14 @@ var gcpPolicyPrefixes = []string{
 	"google_compute_firewall_policy",
 }
 
-// gcpEndpoint is one end of a GCP query: its network (by name), its addresses, its network tags, and its service
-// account.
+// gcpEndpoint is one end of a GCP query: its network (by name), its addresses, its network tags, its service
+// account, and whether the plan shows that it may have IPv6 addresses.
 type gcpEndpoint struct {
-	network  string
-	addrs    addrSet
-	tags     gcpSet
-	accounts gcpSet
+	network   string
+	addrs     addrSet
+	tags      gcpSet
+	accounts  gcpSet
+	dualStack bool
 }
 
 // gcpSet is a list of values of an attribute. gaps is not empty when a part of the list is not known.
@@ -89,10 +92,11 @@ func (e *Evaluator) gcpEndpointOf(res *plan.Resource) (*gcpEndpoint, []assurance
 	}
 
 	return &gcpEndpoint{
-		network:  network,
-		addrs:    e.gcpAddrs(res),
-		tags:     e.gcpSetAt(res, "tags", ""),
-		accounts: e.gcpSetAt(res, gcpEmailPath, "email"),
+		network:   network,
+		addrs:     e.gcpAddrs(res),
+		tags:      e.gcpSetAt(res, "tags", ""),
+		accounts:  e.gcpSetAt(res, gcpEmailPath, "email"),
+		dualStack: e.gcpDualStack(res),
 	}, nil
 }
 
@@ -116,7 +120,7 @@ func (e *Evaluator) gcpNetworkKey(res *plan.Resource, path string, point *side) 
 		return gcpName(value), true
 	}
 
-	target, ok := e.ref(res, path, point)
+	target, ok := e.refOfType(res, path, point, gcpNetworkType)
 	if !ok {
 		return "", false
 	}
@@ -141,7 +145,7 @@ func (e *Evaluator) gcpSubnet(res *plan.Resource) *plan.Resource {
 		return e.gcpNamed(gcpSubnetworkType, value)
 	}
 
-	target, _ := e.ref(res, gcpSubnetworkPath, &side{})
+	target, _ := e.refOfType(res, gcpSubnetworkPath, &side{}, gcpSubnetworkType)
 
 	return target
 }
@@ -212,6 +216,8 @@ func (e *Evaluator) gcpRefValues(res *plan.Resource, path, field string, point *
 	var vals []string
 
 	targets, _ := e.configRefs(res, planPath(path), point)
+	targets, _ = keepTypes(attrRef{res: res, path: planPath(path)}, targets, point, resourceTypes{gcpAccountType})
+
 	for _, target := range targets {
 		if value, ok := attrString(target, field); ok {
 			vals = append(vals, value)

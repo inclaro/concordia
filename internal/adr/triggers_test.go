@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/inclaro/concordia/internal/adr"
 	"github.com/inclaro/concordia/internal/conformance"
 	"github.com/inclaro/concordia/internal/intent"
+	"github.com/inclaro/concordia/internal/testutil"
 	"github.com/inclaro/concordia/internal/workspace"
 )
 
@@ -317,5 +319,23 @@ func TestLoadBaseModelWithoutMappingAtBaseFails(t *testing.T) {
 	_, err := adr.LoadBaseModel(context.Background(), baseWorkspace(), git, "main")
 	if err == nil || !strings.Contains(err.Error(), baseControlURL+" has no entry in architecture.urlMapping") {
 		t.Fatalf("err = %v, want the unmapped requirement URL", err)
+	}
+}
+
+// A relative mapping entry that leaves the workspace (a shared file in a monorepo) is not in the revision, so it is
+// read from disk next to the real workspace, not next to the temporary directory of the base.
+func TestLoadBaseModelReadsAMappingEntryOutsideTheWorkspaceFromDisk(t *testing.T) {
+	parent := t.TempDir()
+	testutil.WriteTree(t, parent, map[string]string{"shared/req.json": `{"description": "data ownership requirement"}`})
+
+	wsp := baseWorkspace()
+	wsp.Root = filepath.Join(parent, "repo")
+	git := &workspace.FakeGit{FilesAt: map[string]map[string]string{"main": {
+		baseSource:  baseCALM,
+		baseMapping: `{"` + baseControlURL + `": "../../shared/req.json"}`,
+	}}}
+
+	if _, err := adr.LoadBaseModel(context.Background(), wsp, git, "main"); err != nil {
+		t.Fatalf("load base model: %v", err)
 	}
 }

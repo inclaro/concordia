@@ -74,8 +74,10 @@ func parseRange(text string) (netip.Prefix, bool) {
 	return netip.PrefixFrom(p.Addr().Unmap(), p.Bits()).Masked(), true
 }
 
-// matchPrefix matches a rule prefix (a CIDR or an IP) against the address set of an endpoint: yes when the rule
-// contains the set, no when they do not overlap, and maybe with a gap otherwise.
+// matchPrefix matches a rule prefix (a CIDR or an IP) against the address set of an endpoint. The evaluator evaluates
+// IPv4 paths: an IPv4 rule is yes when it contains the set, no when they do not overlap, and maybe with a gap
+// otherwise. An IPv6 rule (or an IPv6 endpoint set) is never evaluated: it is maybe, never yes and never no, so it
+// cannot decide a result that an IPv4 rule does not decide.
 func matchPrefix(rule string, endpoint addrSet, into *side) tri {
 	prefix, ok := parseRange(rule)
 
@@ -84,8 +86,16 @@ func matchPrefix(rule string, endpoint addrSet, into *side) tri {
 		into.gap(evaluate.GapInvalidRange, fmt.Sprintf("%q is not a CIDR or an IP address", rule))
 
 		return triMaybe
+	case !prefix.Addr().Is4():
+		into.gap(evaluate.GapAddressDependent, prefix.String()+": IPv6 ranges are not evaluated")
+
+		return triMaybe
 	case !endpoint.known:
 		return matchUnknownSet(prefix, into)
+	case !endpoint.prefix.Addr().Is4():
+		into.gap(evaluate.GapAddressDependent, endpoint.prefix.String()+": IPv6 ranges are not evaluated")
+
+		return triMaybe
 	case endpoint.containedIn(prefix):
 		return triYes
 	case !prefix.Overlaps(endpoint.prefix):
@@ -97,8 +107,8 @@ func matchPrefix(rule string, endpoint addrSet, into *side) tri {
 	return triMaybe
 }
 
-// matchUnknownSet matches a rule prefix against an endpoint whose addresses are unknown: only an all-addresses
-// prefix is sure to match.
+// matchUnknownSet matches an IPv4 rule prefix against an endpoint whose addresses are unknown: only `0.0.0.0/0` is
+// sure to match.
 func matchUnknownSet(p netip.Prefix, s *side) tri {
 	if p.Bits() == 0 {
 		return triYes
@@ -109,7 +119,8 @@ func matchUnknownSet(p netip.Prefix, s *side) tri {
 	return triMaybe
 }
 
-// anyPrefix is the or of matchPrefix over the rule prefixes. An empty list matches nothing.
+// anyPrefix is the or of matchPrefix over the rule prefixes. An empty list matches nothing. It is yes when an IPv4
+// range matches, and maybe when only an IPv6 range could.
 func anyPrefix(rules []string, ep addrSet, s *side) tri {
 	result := triNo
 	for _, rule := range rules {

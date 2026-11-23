@@ -447,9 +447,9 @@ No SLSA level is derived or shown.
 
 | Field | Description |
 |---|---|
-| `environment`, `kind`, `query` | The environment, `network-policy`, `rbac`, or `cloud-firewall`, and the query as text. A `cloud-firewall` query has the form `tcp/<port> from <source address> to <destination address>`, with plan addresses. |
+| `environment`, `kind`, `query` | The environment, `network-policy`, `rbac`, or `cloud-firewall`, and the query as text. A `cloud-firewall` query has the form `<protocol>/<port> from <source address> to <destination address>`, with plan addresses, for example `tcp/5432 from aws_lb.public to aws_db_instance.ledger`. The protocol is `tcp` for a rule with `ports`; a rule without `ports` can also give `udp/<port>` queries. |
 | `verdict`, `reason` | `allowed`, `denied`, `granted`, `not-granted`, or `unknown`, and the reason of an `unknown`. |
-| `policies` | The policies, bindings, and roles that decided the answer. For `cloud-firewall`, each entry is `<address> <rule>`, for example `aws_vpc_security_group_ingress_rule.ledger_from_gateway rule`. |
+| `policies` | The policies, bindings, and roles that decided the answer. For `cloud-firewall`, each entry is `<address> <rule>`, where `<rule>` names the rule in the resource: `rule` for a standalone AWS rule resource, `ingress[i]` or `egress[i]` for an inline rule of an AWS security group, and the forms in [cloud-firewall](assurance.md#cloud-firewall) for Azure and GCP. For example, the open path of the payments example lists `aws_security_group.gateway egress[0]`, `aws_vpc_security_group_egress_rule.gateway_out rule`, and `aws_vpc_security_group_ingress_rule.ledger_from_gateway rule`. |
 | `assumptions`, `declaredAssumptions` | The enforcement assumptions that the answer relies on, and those that the workspace declares. |
 | `limits`, `gaps` | The limits of the evaluator and the gaps of its input. |
 | `evaluator`, `evaluatorVersion`, `inputDigest` | The evaluator that answered and the digest of its input. The same rendered input gives the same answer and digest. For `cloud-firewall`, `inputDigest` is the SHA-256 of the plan bytes, or the digest of the sorted plan digests when the environment has more plans. |

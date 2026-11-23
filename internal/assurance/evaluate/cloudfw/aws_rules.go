@@ -51,12 +51,16 @@ type awsRule struct {
 	res    *plan.Resource
 	fields *awsFields
 	owner  *plan.Resource
+	// element is the `security_groups` attribute of an inline block, nil for a rule resource.
+	element *blockElement
 	// path is the prefix of the attribute paths: `ingress[0].` for an inline rule, empty for a rule resource.
 	path string
 	name string
 	// gaps explain an owner group that does not resolve; applies is then maybe.
 	gaps    []assurance.Gap
 	applies tri
+	// stale is true for an inline rule of a group that a rule resource the plan changes may belong to.
+	stale bool
 }
 
 func (rule *awsRule) attr(field string) string { return rule.path + field }
@@ -70,8 +74,8 @@ func (e *Evaluator) awsSide(query *Query, self, peer *awsEndpoint, dir *awsDirec
 	verdict := triNo
 
 	for _, rule := range e.awsRules(self, dir) {
-		scratch := &side{gaps: rule.gaps}
-		match := and(rule.applies, e.awsMatch(query, &rule, peer, scratch))
+		scratch := &side{gaps: slices.Clip(rule.gaps)}
+		match := rule.staleMatch(and(rule.applies, e.awsMatch(query, &rule, peer, scratch)), scratch)
 		verdict = or(verdict, match)
 
 		switch match {
@@ -100,13 +104,14 @@ func awsDecided(verdict tri, yes, maybe *side) *side {
 	return &side{verdict: verdict}
 }
 
-// awsRules lists the rules of the direction that may apply to the endpoint: the inline blocks of its groups, and
-// the rule resources whose owner group is one of its groups or does not resolve.
+// awsRules lists the rules of the direction that may apply to the endpoint: the inline blocks of its groups, the
+// rule resources whose owner group is one of its groups or does not resolve, and the pending rules of attachments
+// that may add a group.
 func (e *Evaluator) awsRules(endpoint *awsEndpoint, dir *awsDirection) []awsRule {
-	var rules []awsRule
+	rules := slices.Clone(endpoint.pending)
 
 	for _, group := range endpoint.groups {
-		rules = append(rules, awsInlineRules(group, dir)...)
+		rules = append(rules, e.awsInlineRulesOf(group, dir)...)
 	}
 
 	for _, res := range e.ofType(awsGroupRule, dir.vpcType) {
@@ -119,10 +124,11 @@ func (e *Evaluator) awsRules(endpoint *awsEndpoint, dir *awsDirection) []awsRule
 }
 
 // awsInlineRules are the inline blocks of the direction of a group. A block list that is unknown until apply (a
-// dynamic block, or the computed copy of the rule resources) may hold a rule that allows the traffic: it is one rule
-// that applies maybe, without fields, with the gap unknown-after-apply.
+// dynamic block, or the computed copy of the rule resources), or that has an element unknown until apply, may hold
+// a rule that allows the traffic: it is one rule that applies maybe, without fields, with the gap
+// unknown-after-apply.
 func awsInlineRules(group *plan.Resource, dir *awsDirection) []awsRule {
-	if slices.Contains(group.Unknown, dir.block) {
+	if slices.Contains(group.Unknown, dir.block) || listHasUnknownElements(group, dir.block) {
 		return []awsRule{{
 			res: group, owner: group, name: dir.block, applies: triMaybe,
 			gaps: []assurance.Gap{{Kind: evaluate.GapUnknownAfterApply, Detail: group.Address + "." + dir.block}},
@@ -136,6 +142,7 @@ func awsInlineRules(group *plan.Resource, dir *awsDirection) []awsRule {
 		name := fmt.Sprintf("%s[%d]", dir.block, i)
 		rules = append(rules, awsRule{
 			res: group, fields: &awsInlineFields, owner: group, path: name + ".", name: name, applies: triYes,
+			element: &blockElement{list: dir.block, field: awsAttrGroups, index: i},
 		})
 	}
 
@@ -164,7 +171,7 @@ func (e *Evaluator) awsStandaloneRule(endpoint *awsEndpoint, res *plan.Resource,
 	rule := awsRule{res: res, fields: fields, name: "rule"}
 	check := &side{}
 
-	owner, resolved := e.ref(res, "security_group_id", check)
+	owner, resolved := e.refOfType(res, "security_group_id", check, awsGroupTypes...)
 
 	switch {
 	case !resolved:
@@ -240,33 +247,52 @@ func awsUnknownAttr(rule *awsRule, field string, check *side) tri {
 // group, `self`, a CIDR, or a prefix list.
 func (e *Evaluator) awsPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
 	return or(
-		or(e.awsGroupPeer(rule, peer, check), awsSelfPeer(rule, peer)),
+		or(e.awsGroupPeer(rule, peer, check), awsSelfPeer(rule, peer, check)),
 		or(awsCIDRPeer(rule, peer, check), awsPrefixListPeer(rule, check)),
 	)
 }
 
-// awsGroupPeer is yes when a group that the rule references is a group of the peer.
+// awsGroupPeer is yes when a group that the rule references is a group of the peer, and maybe when it may be a
+// group that an unresolved attachment adds to the peer.
 func (e *Evaluator) awsGroupPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
-	groups, ok := e.refs(rule.res, rule.attr(rule.fields.groups), check)
+	groups, ok := e.awsRuleGroups(rule, check)
 
 	switch {
 	case slices.ContainsFunc(groups, peer.hasGroup):
 		return triYes
 	case !ok:
 		return triMaybe
+	case len(groups) > 0:
+		return peer.mayHaveGroup(check)
 	}
 
 	return triNo
 }
 
-// awsSelfPeer is yes when the rule names its own group and that group is a group of the peer.
-func awsSelfPeer(rule *awsRule, peer *awsEndpoint) tri {
-	// A rule whose owner does not resolve has no owner, which no peer has as a group.
-	if attrBool(rule.res, rule.attr("self")) && peer.hasGroup(rule.owner) {
+// awsRuleGroups resolves the groups that a rule references: through all inline blocks of the list for an inline
+// rule, because the plan does not keep the configuration order of the blocks.
+func (e *Evaluator) awsRuleGroups(rule *awsRule, check *side) ([]*plan.Resource, bool) {
+	if rule.element != nil {
+		return e.blockRefsOfType(rule.res, *rule.element, check, awsGroupTypes...)
+	}
+
+	return e.refsOfType(rule.res, rule.attr(rule.fields.groups), check, awsGroupTypes...)
+}
+
+// awsSelfPeer is yes when the rule names its own group and that group is a group of the peer. A rule whose owner
+// does not resolve (its gaps are on the rule), or a peer that an unresolved attachment may add the group to, gives
+// maybe.
+func awsSelfPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
+	switch {
+	case !attrBool(rule.res, rule.attr("self")):
+		return triNo
+	case rule.owner == nil:
+		return triMaybe
+	case peer.hasGroup(rule.owner):
 		return triYes
 	}
 
-	return triNo
+	return peer.mayHaveGroup(check)
 }
 
 // awsCIDRPeer matches the IPv4 and IPv6 ranges of the rule against the addresses of the peer.

@@ -4,13 +4,11 @@ import (
 	"cmp"
 	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/inclaro/concordia/internal/assurance"
 	"github.com/inclaro/concordia/internal/assurance/evaluate"
 	"github.com/inclaro/concordia/internal/assurance/evaluate/cloudfw"
-	"github.com/inclaro/concordia/internal/assurance/evaluate/netpol"
 	"github.com/inclaro/concordia/internal/assurance/evidence"
 	"github.com/inclaro/concordia/internal/assurance/plan"
 	"github.com/inclaro/concordia/internal/binding"
@@ -64,11 +62,12 @@ func (a *accessAsk) locatePlan(outcomes []ExternalOutcome) []ExternalOutcome {
 	return outcomes
 }
 
-// cloudPair says whether the pair is for cloud-firewall (both ends are planned resources) or mixed (one end is a
-// planned resource and the other a workload). A pair with one planned end and another end bound to neither goes to
-// cloud-firewall, which reports the binding gap of that end.
+// cloudPair says whether the pair is for cloud-firewall (both ends have an `infraResource` binding in the
+// environment) or mixed (one end has one and the other is a workload). A pair with one planned end and another end
+// bound to neither goes to cloud-firewall, which reports the binding gap of that end. The binding decides, not the
+// plan: a missing plan or a bound address that the plan does not hold is the answer of cloud-firewall.
 func (a *accessAsk) cloudPair(pair [2]string) (cloud, mixed bool) {
-	fromPlanned, toPlanned := len(a.plannedOf(pair[0])) > 0, len(a.plannedOf(pair[1])) > 0
+	fromPlanned, toPlanned := len(a.infraMatches(pair[0])) > 0, len(a.infraMatches(pair[1])) > 0
 
 	switch {
 	case fromPlanned == toPlanned:
@@ -103,34 +102,57 @@ func (a *accessAsk) environmentPlans() []*evidence.Plan {
 	return out
 }
 
-// plannedOf gives the planned resources of the environment that a CALM element is bound to, sorted by address. An
-// `infraResource` match names a resource by its address, or every instance of it by the address without the instance
-// key. Bindings that are only proposed do not count.
-func (a *accessAsk) plannedOf(calmID string) []*plan.Resource {
-	var out []*plan.Resource
+// infraMatches gives the `infraResource` matches of the environment that bind a CALM element. Bindings that are only
+// proposed do not count.
+func (a *accessAsk) infraMatches(calmID string) []*binding.Match {
+	var out []*binding.Match
 
 	for i := range a.run.bindings {
-		b := &a.run.bindings[i]
-		if b.ArchitectureRef != calmID || b.Status == binding.StatusProposed {
-			continue
-		}
-
-		for j := range b.Match {
-			out = append(out, a.plannedMatching(&b.Match[j])...)
+		if b := &a.run.bindings[i]; b.ArchitectureRef == calmID && b.Status != binding.StatusProposed {
+			out = append(out, a.infraMatchesOf(b)...)
 		}
 	}
 
-	slices.SortFunc(out, func(x, y *plan.Resource) int { return canonjson.CompareUTF16(x.Address, y.Address) })
+	return out
+}
 
-	return slices.CompactFunc(out, func(x, y *plan.Resource) bool { return x.Address == y.Address })
+// infraMatchesOf gives the `infraResource` matches of one binding that name the environment.
+func (a *accessAsk) infraMatchesOf(b *binding.Binding) []*binding.Match {
+	var out []*binding.Match
+
+	for j := range b.Match {
+		if match := &b.Match[j]; match.Kind == binding.MatchInfraResource && match.Environment == a.model.environment {
+			out = append(out, match)
+		}
+	}
+
+	return out
+}
+
+// endpointsOf gives the plan addresses that a CALM element is bound to, sorted. An `infraResource` match names a
+// resource by its address, or every instance of it by the address without the instance key. A match that no resource
+// of the usable plans has stays as written, so that the evaluator reports the address as not found.
+func (a *accessAsk) endpointsOf(calmID string) []string {
+	var out []string
+
+	for _, match := range a.infraMatches(calmID) {
+		found := a.plannedMatching(match)
+		if len(found) == 0 {
+			out = append(out, match.Address)
+		}
+
+		for _, r := range found {
+			out = append(out, r.Address)
+		}
+	}
+
+	slices.SortFunc(out, canonjson.CompareUTF16)
+
+	return slices.Compact(out)
 }
 
 // plannedMatching gives the resources of the usable plans of the environment that an `infraResource` match names.
 func (a *accessAsk) plannedMatching(match *binding.Match) []*plan.Resource {
-	if match.Kind != binding.MatchInfraResource || match.Environment != a.model.environment {
-		return nil
-	}
-
 	var out []*plan.Resource
 
 	for _, declared := range a.environmentPlans() {
@@ -172,9 +194,8 @@ func (a *accessAsk) cloud(pairs [][2]string) []ExternalOutcome {
 	}
 
 	plans := a.environmentPlans()
-	if !slices.ContainsFunc(plans, func(p *evidence.Plan) bool { return p.Plan != nil }) {
-		return a.unknownAll(pairs, unknownCause{ReasonRenderedEvidenceMissing,
-			fmt.Sprintf("environment %s has no usable plan (assurance.plans)", scope.environment)})
+	if cause, blocked := planGate(plans, scope.environment); blocked {
+		return a.unknownAll(pairs, cause)
 	}
 
 	ask := *a
@@ -187,6 +208,88 @@ func (a *accessAsk) cloud(pairs [][2]string) []ExternalOutcome {
 	}
 
 	return outcomes
+}
+
+// planGate gives the cause of the `unknown` outcomes of an environment whose plans the evaluator cannot read as one
+// input: no usable plan, or an address of a provider resource that two plans hold. The evaluator indexes resources by
+// address, so it would read one of the two resources and drop the other; it does not report which resources an
+// answer read, so no pair of the environment can be shown not to depend on the dropped one. Resources of other
+// providers (`random_id`, say) are never read as firewall evidence: a reference to one gives a gap, so their shared
+// addresses do not count.
+func planGate(plans []*evidence.Plan, environment string) (unknownCause, bool) {
+	if !slices.ContainsFunc(plans, func(p *evidence.Plan) bool { return p.Plan != nil }) {
+		return unknownCause{ReasonRenderedEvidenceMissing, fmt.Sprintf("environment %s has no usable plan (assurance.plans)", environment)}, true
+	}
+
+	if address, count := sharedAddress(plans); count > 1 {
+		return unknownCause{ReasonCoverageIncomplete, fmt.Sprintf("%s: %s is in %d plans of environment %s",
+			evaluate.GapUnresolvedReference, address, count, environment)}, true
+	}
+
+	return unknownCause{}, false
+}
+
+// sharedAddress gives the first address, in sorted order, that more than one usable plan holds, and the number of
+// plans that hold it; a count below two means that every address is in one plan. Deposed objects do not count.
+func sharedAddress(plans []*evidence.Plan) (address string, count int) {
+	counts := addressCounts(plans)
+
+	var shared []string
+
+	for candidate, n := range counts {
+		if n > 1 {
+			shared = append(shared, candidate)
+		}
+	}
+
+	if len(shared) == 0 {
+		return "", 0
+	}
+
+	address = slices.MinFunc(shared, canonjson.CompareUTF16)
+
+	return address, counts[address]
+}
+
+// addressCounts gives the number of plans that hold each address.
+func addressCounts(plans []*evidence.Plan) map[string]int {
+	counts := map[string]int{}
+
+	for _, declared := range plans {
+		for _, address := range planAddresses(declared.Plan) {
+			counts[address]++
+		}
+	}
+
+	return counts
+}
+
+// cloudTypePrefixes are the type prefixes of the providers whose resources the evaluator reads.
+var cloudTypePrefixes = []string{"aws_", "azurerm_", "google_"}
+
+// planAddresses gives the addresses of the provider resources of a plan that are not deposed, without duplicates. A
+// plan that was not read has none.
+func planAddresses(p *plan.Plan) []string {
+	if p == nil {
+		return nil
+	}
+
+	out := make([]string, 0, len(p.Resources))
+
+	for i := range p.Resources {
+		if r := &p.Resources[i]; r.Deposed == "" && isCloudType(r.Type) {
+			out = append(out, r.Address)
+		}
+	}
+
+	slices.Sort(out)
+
+	return slices.Compact(out)
+}
+
+// isCloudType reports whether a resource type belongs to a provider that the evaluator reads.
+func isCloudType(typ string) bool {
+	return slices.ContainsFunc(cloudTypePrefixes, func(prefix string) bool { return strings.HasPrefix(typ, prefix) })
 }
 
 // cloudAsker holds the evaluator of one environment for the queries of one rule.
@@ -263,12 +366,12 @@ func lowestIntegrity(plans []*evidence.Plan) string {
 
 // pair asks the queries of one pair of elements and gives its outcomes.
 func (c *cloudAsker) pair(pair [2]string) []ExternalOutcome {
-	sources := c.ask.plannedOf(pair[0])
+	sources := c.ask.endpointsOf(pair[0])
 	if len(sources) == 0 {
 		return []ExternalOutcome{c.ask.bindingGap(pair, unboundElement{pair[0], "a planned resource"})}
 	}
 
-	destinations := c.ask.plannedOf(pair[1])
+	destinations := c.ask.endpointsOf(pair[1])
 	if len(destinations) == 0 {
 		return []ExternalOutcome{c.ask.bindingGap(pair, unboundElement{pair[1], "a planned resource"})}
 	}
@@ -277,30 +380,29 @@ func (c *cloudAsker) pair(pair [2]string) []ExternalOutcome {
 
 	for _, destination := range destinations {
 		for _, source := range sources {
-			c.probePorts(probes, source, destination)
+			c.probePorts(probes, cloudfw.Query{From: cloudfw.Endpoint{Address: source}, To: cloudfw.Endpoint{Address: destination}})
 		}
 	}
 
 	return c.ask.portOutcomes(pair, probes)
 }
 
-// probePorts asks the query of each port for one source and one destination.
-func (c *cloudAsker) probePorts(probes *portProbes, source, destination *plan.Resource) {
+// probePorts asks the query of each port for the source and the destination of the query.
+func (c *cloudAsker) probePorts(probes *portProbes, ends cloudfw.Query) {
 	for _, port := range c.ports {
-		found := c.query(source, destination, port)
+		query := ends
+		query.Protocol, query.Port = port.protocol, port.number
+
+		found := c.query(&query, port)
 		probes.add(port, &found)
 	}
 }
 
 // query asks the evaluator one question and records it.
-func (c *cloudAsker) query(source, destination *plan.Resource, port portKey) probe {
-	query := cloudfw.Query{
-		From: cloudfw.Endpoint{Address: source.Address}, To: cloudfw.Endpoint{Address: destination.Address},
-		Protocol: port.protocol, Port: port.number,
-	}
-	result := c.evaluator.Evaluate(&query)
+func (c *cloudAsker) query(query *cloudfw.Query, port portKey) probe {
+	result := c.evaluator.Evaluate(query)
 
-	text := fmt.Sprintf("%s from %s to %s", port, source.Address, destination.Address)
+	text := fmt.Sprintf("%s from %s to %s", port, query.From.Address, query.To.Address)
 
 	c.ask.run.recordEvaluation(c.ask.entryOf(&answerFacts{
 		query: text, verdict: string(result.Verdict), reason: result.Reason, policies: ruleNames(result.Rules),
@@ -338,102 +440,4 @@ func ruleNames(refs []cloudfw.RuleRef) []string {
 	}
 
 	return out
-}
-
-// firewallRuleTypes are the resource types whose values name the ports of firewall rules.
-var firewallRuleTypes = []string{
-	"aws_security_group", "aws_security_group_rule", "aws_vpc_security_group_ingress_rule",
-	"aws_vpc_security_group_egress_rule", "azurerm_network_security_group", "azurerm_network_security_rule",
-	"google_compute_firewall",
-}
-
-// planPorts gives the TCP ports to query when the rule names none: every number that a firewall rule of the plans
-// names (the ends of ranges included), and one port that no rule names, which stands for "every other port".
-func planPorts(resources []plan.Resource) []portKey {
-	set := &portSet{seen: map[portKey]bool{}, named: map[int]bool{}}
-
-	for i := range resources {
-		if slices.Contains(firewallRuleTypes, resources[i].Type) {
-			set.collectValue(resources[i].Values)
-		}
-	}
-
-	set.addUnnamedProbe()
-
-	return set.sorted()
-}
-
-// collectValue adds the ports of every rule object in a planned value: the resource itself, and its nested blocks.
-func (s *portSet) collectValue(value any) {
-	switch typed := value.(type) {
-	case map[string]any:
-		s.collectRule(typed)
-
-		for _, nested := range typed {
-			s.collectValue(nested)
-		}
-	case []any:
-		for _, nested := range typed {
-			s.collectValue(nested)
-		}
-	}
-}
-
-// collectRule adds the ports of one rule object: an AWS `from_port` to `to_port` range, Azure destination port
-// ranges, and GCP `ports`.
-func (s *portSet) collectRule(rule map[string]any) {
-	from, fromKnown := portNumber(rule["from_port"])
-	to, toKnown := portNumber(rule["to_port"])
-
-	if fromKnown && toKnown {
-		s.addRange(netpol.ProtocolTCP, from, to)
-	}
-
-	for _, key := range []string{"destination_port_range", "destination_port_ranges", "ports"} {
-		s.collectSpecs(rule[key])
-	}
-}
-
-// collectSpecs adds the ports of a port text or a list of them.
-func (s *portSet) collectSpecs(value any) {
-	switch typed := value.(type) {
-	case string:
-		s.collectSpec(typed)
-	case []any:
-		for _, item := range typed {
-			if text, ok := item.(string); ok {
-				s.collectSpec(text)
-			}
-		}
-	}
-}
-
-// collectSpec adds a port text: `80` or `1000-2000`. `*` names no port.
-func (s *portSet) collectSpec(spec string) {
-	low, high, isRange := strings.Cut(strings.TrimSpace(spec), "-")
-
-	from, err := strconv.Atoi(low)
-	if err != nil {
-		return
-	}
-
-	to := from
-	if isRange {
-		if to, err = strconv.Atoi(high); err != nil {
-			return
-		}
-	}
-
-	s.addRange(netpol.ProtocolTCP, from, to)
-}
-
-// portNumber reads a port number of a planned value.
-func portNumber(value any) (int, bool) {
-	if value == nil {
-		return 0, false
-	}
-
-	n, err := strconv.Atoi(fmt.Sprint(value))
-
-	return n, err == nil
 }

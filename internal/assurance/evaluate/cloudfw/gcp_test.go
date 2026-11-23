@@ -38,7 +38,7 @@ type gcpScenario struct {
 func TestGCPFirewallSemantics(t *testing.T) {
 	t.Parallel()
 
-	for _, sc := range slices.Concat(gcpVerdictScenarios(), gcpUnknownScenarios()) {
+	for _, sc := range slices.Concat(gcpVerdictScenarios(), gcpUnknownScenarios(), gcpReviewScenarios()) {
 		t.Run(sc.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -209,11 +209,5 @@ func gcpAddFirewallPolicy(in *cloudfw.Input) {
 
 // gcpDropReferences removes the configuration references of a resource.
 func gcpDropReferences(address string) func(in *cloudfw.Input) {
-	return func(in *cloudfw.Input) {
-		for i := range in.Resources {
-			if in.Resources[i].Address == address {
-				in.Resources[i].References = nil
-			}
-		}
-	}
+	return gcpEdit(address, func(res *plan.Resource) { res.References = nil })
 }

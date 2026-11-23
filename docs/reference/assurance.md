@@ -323,34 +323,56 @@ You choose the evaluator for each pair of a rule with your bindings:
 | rendered workloads, both | `network-policy` |
 | a planned resource and a rendered workload | none: `unknown`, `binding-gap`, "the pair mixes planned cloud resources and Kubernetes workloads" |
 
-When only one element binds to a planned resource and the other binds to nothing in the environment, Concordia uses `cloud-firewall`, and the result is a `binding-gap` for the unbound element. A pair of `cloud-firewall` does not need rendered manifests.
+When only one element binds to a planned resource and the other binds to nothing in the environment, Concordia uses `cloud-firewall`, and the result is a `binding-gap` for the unbound element. A pair of `cloud-firewall` does not need rendered manifests. The `infraResource` binding decides the evaluator, not the plan. A missing or unreadable plan gives `rendered-evidence-missing`, and a bound address that the plan does not hold gives `rendered-evidence-missing` with the gap `workload-not-in-input`, which names the address.
 
 #### Endpoints
 
-An endpoint is the plan address of a resource. The evaluator finds the rules that apply to it and its address set: one CIDR prefix, or unknown.
+An endpoint is the plan address of a resource. The evaluator finds the rules that apply to it and its address set: one IPv4 prefix, or unknown.
 
 | Provider | Endpoint type | Rules come from | Address set |
 |---|---|---|---|
-| AWS | `aws_instance`, `aws_network_interface` | the security groups in `vpc_security_group_ids` or `security_groups` | `private_ip` as a `/32`, else the `cidr_block` of the subnet |
+| AWS | `aws_instance`, `aws_network_interface` | the security groups in `vpc_security_group_ids` or `security_groups`, plus the groups that other resources attach (see below) | `private_ip` as a `/32`, else the `cidr_block` of the subnet. An instance with a second network interface (attached or in a `network_interface` block) has an unknown set. |
 | AWS | `aws_lb`, `aws_ecs_service` (`network_configuration`), `aws_lambda_function` (`vpc_config`) | the security groups of the resource | the subnet `cidr_block` when all subnets have the same one, else unknown |
 | AWS | `aws_db_instance`, `aws_rds_cluster`, `aws_elasticache_cluster`, `aws_elasticache_replication_group` | the security groups of the resource | unknown |
-| AWS | `aws_security_group` | the group itself | unknown |
+| AWS | `aws_security_group`, `aws_default_security_group` | the group itself | unknown |
 | Azure | `azurerm_network_interface` | the NSG of the NIC and the NSG of its subnet | `ip_configuration[0].private_ip_address` as a `/32`, else the subnet |
 | Azure | `azurerm_linux_virtual_machine`, `azurerm_windows_virtual_machine` | as for its NIC. A VM with more than one NIC is not supported. | as for its NIC |
-| Azure | `azurerm_subnet`, `azurerm_private_endpoint` | the NSG of the subnet | `address_prefixes[0]` of the subnet |
+| Azure | `azurerm_subnet` | the NSG of the subnet | the subnet |
+| Azure | `azurerm_private_endpoint` | the NSG of its subnet, inbound only when the subnet enables network policies for private endpoints (see below) | the subnet |
 | GCP | `google_compute_instance`, `google_compute_instance_template` | the firewall rules of its network that target it | `network_interface[0].network_ip` as a `/32`, else the `ip_cidr_range` of the subnetwork |
 
-Any other type gives the gap `unsupported-resource-type`.
+The address set of an Azure subnet is its one entry of `address_prefixes`. A subnet with more than one prefix has an unknown set, because the endpoint can have an address in any of them.
+
+Any other endpoint type gives the gap `unsupported-resource-type`. An AWS endpoint that names no security group gives `unresolved-reference`, because the default group of the VPC is not in the plan.
 
 #### Rule sources
 
 | Provider | Resources that the evaluator reads |
 |---|---|
-| AWS | `aws_security_group` (inline `ingress` and `egress`), `aws_security_group_rule`, `aws_vpc_security_group_ingress_rule`, `aws_vpc_security_group_egress_rule` |
+| AWS | `aws_security_group` and `aws_default_security_group` (inline `ingress` and `egress`), `aws_security_group_rule`, `aws_vpc_security_group_ingress_rule`, `aws_vpc_security_group_egress_rule`, `aws_network_interface_sg_attachment`, `aws_network_interface_attachment`, `aws_network_interface` resources whose `attachment` block names an instance, and the `network_interface` blocks of `aws_instance` |
 | Azure | `azurerm_network_security_group` (inline `security_rule`), `azurerm_network_security_rule`, `azurerm_subnet_network_security_group_association`, `azurerm_network_interface_security_group_association`, `azurerm_network_interface_application_security_group_association` |
 | GCP | `google_compute_firewall` |
 
-An attribute that is unknown until apply, such as the ID of a security group that the plan creates, resolves through the `references` of the plan's `configuration`. A reference to a resource with one instance resolves to that instance. A reference to a resource with more instances, to a data source, or to nothing gives the gap `unresolved-reference`. An unknown attribute that no reference resolves gives the gap `unknown-after-apply`.
+On AWS, the groups of an instance or network interface also include the groups that `aws_network_interface_sg_attachment` attaches, and the groups of the network interfaces that are attached to an instance. An instance's own `network_interface[*].network_interface_id` blocks count too. They resolve like the other inline blocks (see "References"). An attachment that may concern the endpoint but does not resolve gives `unresolved-reference`, with the detail `<resource>.<path> does not resolve, so it may attach a security group to <instance>`. It makes a side that no rule allows `unknown`. These cases are attachments that do not resolve:
+
+- a `network_interface` block of the instance whose interface does not resolve, or a `network_interface` list that is unknown as a whole or in part;
+- an `attachment` block of a network interface whose `instance` is unknown and no configuration reference names it, or an `attachment` list that is unknown as a whole. Every instance endpoint then gets `unknown-after-apply` on `<nic>.attachment[*].instance` and `unresolved-reference` with `<nic>.attachment does not resolve, so it may attach a security group to <instance>`.
+
+An Azure rule resource belongs to an NSG through the configuration reference of `network_security_group_name`, else through the NSG name and resource group in the plan.
+
+#### References
+
+An attribute that is unknown until apply, such as the ID of a security group that the plan creates, resolves through the `references` of the plan's `configuration`. These rules apply:
+
+- A reference to a resource with one instance resolves to that instance.
+- A reference to a resource with more instances, to a data source, or to nothing gives the gap `unresolved-reference`.
+- An unknown attribute that no reference resolves gives the gap `unknown-after-apply`.
+- A reference must name a resource of the expected kind: a security group, subnet, NSG, NIC, application security group, network, subnetwork, or service account. A reference to another type gives `unresolved-reference` with the detail `<address>.<path> names <other>, a <type>, not one of <types>`. For example, `aws_vpc.main.default_security_group_id` names an `aws_vpc`, not a security group.
+- A reference through `var.`, `local.`, or `each.value` never resolves, because the plan does not say which resource the value names. It gives `unresolved-reference` with the detail `<entry> is a variable or local value; the resource it names is not known from the plan`, and the result is `unknown`.
+
+The inline blocks AWS `ingress` and `egress`, and Azure `security_rule`, are sets. The plan lists them in another order than the configuration. So a reference in one block resolves across all blocks of the list. When the blocks name different resources, the result is `unresolved-reference`: `<address>.<list>[*].<field>: the blocks name different resources, and the plan does not keep the configuration order of the blocks`. A block whose reference goes through a variable or local value names a different set from a block that names a resource, so it gives this gap too. A list that is unknown as a whole, or that has an element that is unknown as a whole, gives `unknown-after-apply` on `<group>.ingress`, `<group>.egress`, or `<nsg>.security_rule`.
+
+In a plan against existing state, the inline list of a group or NSG is a copy of all its rules, including rule resources. When the plan deletes or updates a rule resource (`aws_security_group_rule`, `aws_vpc_security_group_ingress_rule`, `aws_vpc_security_group_egress_rule`, or `azurerm_network_security_rule`), the inline list may still hold the old rule. So when such a resource belongs to the group or NSG, or its owner does not resolve (always the case for a deleted resource), a match on the inline list is `unknown`. The gap is `unknown-after-apply`, with the detail `<group or NSG>.<ingress|egress|security_rule> may repeat a rule that the plan changes`. An `aws_security_group_rule` whose `type` is unknown affects both directions. On Azure, an inline `security_rule` with the same name as a rule resource that surely belongs to the NSG is left out, and the planned values of the resource decide. A plan with only `create` and `no-op` actions is not affected.
 
 #### Semantics
 
@@ -358,22 +380,45 @@ Traffic is `allowed` when the source side allows it outbound and the destination
 
 | Provider | How one side decides |
 |---|---|
-| AWS | Rules only allow. The union of the rules of all groups of the endpoint applies. A group with no rule for the direction denies it. Concordia does not add the AWS default egress rule, because Terraform removes it from the groups that it manages. An egress rule of a group of the source must match the destination, and an ingress rule of a group of the destination must match the source. A rule matches the peer through a referenced group, `self`, or a CIDR. When the whole inline `ingress` or `egress` list of a group is unknown until apply, the side is `unknown` with `unknown-after-apply`, unless another rule allows the traffic. |
-| Azure | Every NSG on the path must allow the traffic: the NIC NSG and the subnet NSG of the source (outbound), then the subnet NSG and the NIC NSG of the destination (inbound). An absent NSG allows. In each NSG, the rules of the direction run by ascending priority, and the first rule that matches decides. Concordia adds the Azure default rules at 65000, 65001, and 65500. So `AllowVnetInBound` allows traffic inside one virtual network unless a rule with a lower number denies it. A rule limited to source ports other than `*` matches as `unknown`, because a query has no source port. |
-| GCP | Egress is checked at the source against the destination address. Ingress is checked at the destination against the source address, network tags, and service account. A rule applies to an instance when it has no targets, or a target tag or target service account of the instance. Rules run by ascending priority, deny before allow at equal priority, and the first rule that matches decides. Concordia adds the implied rules at 65535: deny all ingress, allow all egress. The results name them with the address `implied`. Disabled rules are skipped. |
+| AWS | Rules only allow. The union of the rules of all groups of the endpoint applies. A group with no rule for the direction denies it. Concordia does not add the AWS default egress rule, because Terraform removes it from the groups that it manages. An egress rule of a group of the source must match the destination, and an ingress rule of a group of the destination must match the source. A rule matches the peer through a referenced group, `self`, or a CIDR. An inline list that is unknown until apply makes the side `unknown`, unless another rule allows the traffic. |
+| Azure | Every NSG on the path must allow the traffic: the NIC NSG and the subnet NSG of the source (outbound), then the subnet NSG and the NIC NSG of the destination (inbound). An absent NSG allows. In each NSG, the rules of the direction run by ascending priority, and the first rule that matches decides. Concordia adds the Azure default rules at 65000, 65001, and 65500. So `AllowVnetInBound` allows traffic inside one virtual network unless a rule with a lower number denies it. An unknown `priority`, `direction`, or `access` makes the rule uncertain. An NSG whose `security_rule` list is unknown is `unknown` at that check point. |
+| GCP | Egress is checked at the source against the destination address. Ingress is checked at the destination against the source address, network tags, and service account. A rule applies to an instance when it has no targets, or a target tag or target service account of the instance. An ingress rule also matches its `destination_ranges` against the destination, and an egress rule its `source_ranges` against the source; no ranges means every address. Rules run by ascending priority, deny before allow at equal priority, and the first rule that matches decides. Concordia adds the implied rules at 65535: deny all ingress, allow all egress. The results name them with the address `implied`. Disabled rules are skipped. A rule whose `priority`, `direction`, `disabled`, `allow` or `deny` list, or a `protocol` or `ports` inside a block, is unknown until apply is uncertain: it comes first, and if it may match, the side is `unknown` with `unknown-after-apply`. |
 
-A rule that may match, but that the evaluator cannot decide, before a rule that decides, makes the side `unknown`. Rule prefixes match the endpoint address set like this:
+A rule that may match, but that the evaluator cannot decide, before a rule that decides, makes the side `unknown`.
+
+An Azure private endpoint gets the inbound check of its subnet NSG only when the subnet enables network policies for private endpoints. Concordia reads `private_endpoint_network_policies` first, then the older `private_endpoint_network_policies_enabled` and `enforce_private_link_endpoint_network_policies`:
+
+| Subnet policy | Subnet NSG, inbound to the private endpoint |
+|---|---|
+| `Enabled`, `NetworkSecurityGroupEnabled` | applies |
+| `Disabled`, `RouteTableEnabled` | does not apply |
+| unknown until apply | `unknown`, `unknown-after-apply` |
+| not in the plan | `unknown`, `unsupported-policy-kind` |
+
+Rule prefixes match the endpoint address set like this:
 
 | Rule prefix | Match |
 |---|---|
-| contains the endpoint prefix | yes |
-| does not overlap the endpoint prefix | no |
-| overlaps the endpoint prefix partly | `unknown`, `address-dependent-range` |
-| `0.0.0.0/0` or `::/0`, endpoint prefix unknown | yes |
-| any other prefix, endpoint prefix unknown | `unknown`, `address-dependent-range` |
+| an IPv4 prefix that contains the endpoint prefix | yes |
+| an IPv4 prefix that does not overlap the endpoint prefix | no |
+| an IPv4 prefix that overlaps the endpoint prefix partly | `unknown`, `address-dependent-range` |
+| `0.0.0.0/0`, endpoint prefix unknown | yes |
+| any other IPv4 prefix, endpoint prefix unknown | `unknown`, `address-dependent-range` |
+| an IPv6 prefix, including `::/0` | `unknown`, `address-dependent-range`, detail `<prefix>: IPv6 ranges are not evaluated` |
 | does not parse | `unknown`, `invalid-address-range` |
 
-Protocols `-1`, `all`, and `*` match every protocol. ICMP and other protocols never match a TCP or UDP query. Azure service tags: `*` matches, `VirtualNetwork` matches when both endpoints are in one virtual network, `Internet` and `AzureLoadBalancer` do not match, and any other tag gives `unsupported-policy-kind`.
+An IPv6 prefix never decides a result on its own: it is `unknown` unless an IPv4 rule decides first.
+
+On Azure and GCP, an IPv4 deny cannot stop IPv6 traffic, which falls through to a later rule. So when a deny decides through an address prefix and the plan shows that an endpoint may be dual-stack, the result is `unknown`. The gap is `address-dependent-range`, with the detail `<address> <rule>: an IPv4 deny decided, and the endpoints may be dual-stack`.
+
+| Provider | The deny counts when | Dual-stack evidence |
+|---|---|---|
+| Azure | its source or destination names a CIDR or an IP. `*`, service tags, `VirtualNetwork`, application security groups, and default rules never count. | an `ip_configuration` of the NIC with `private_ip_address_version` `IPv6`, or an IPv6 prefix in the `address_prefixes` of the subnet |
+| GCP | it is an egress deny, or an ingress deny that does not select the peer by source tags or service accounts only | `network_interface.0.stack_type` of the instance, or `stack_type` of its subnetwork, set to a value other than `IPV4_ONLY` |
+
+Without that evidence, the deny decides and the result can be `denied`. AWS needs no such rule, because its rules only allow.
+
+Protocols `-1`, `all`, and `*` match every protocol. ICMP and other protocols never match a TCP or UDP query. Azure source ports other than `*` (`source_port_range` or `source_port_ranges`) give `unknown` with `unsupported-policy-kind`, detail `source port range`, because a query has no source port. Azure service tags: `*` matches, `VirtualNetwork` matches when both endpoints are in one virtual network, `Internet` and `AzureLoadBalancer` do not match, and any other tag gives `unsupported-policy-kind`. Concordia compares virtual networks by resource group and name, else by the configuration reference. A reference to a network with more than one instance gives `unresolved-reference`, and the result is `unknown`.
 
 The `RuleRef` of a result names each rule that decided it, as `<address> <rule>`: for example `aws_security_group.web ingress[0]`, `aws_vpc_security_group_ingress_rule.db rule`, `azurerm_network_security_group.app AllowHttps (priority 100)`, or `google_compute_firewall.db priority 1000 allow`.
 
@@ -383,21 +428,23 @@ A `denied` result rests on the assumption `firewall-rules-complete-in-plan`: no 
 
 The plan does not need a signed statement. The claim `cloud-network-isolation` needs the integrity `content not verified`. Each evaluation in [`assurance.evaluations`](results.md#evaluations) records the plan digest in `inputDigest` and the integrity of the plan binding in `integrity`: `content not verified` for a plan without a statement, `producer authenticated` for a plan that a verified statement binds. With more plans in the environment, `inputDigest` is the digest of their sorted digests, and `integrity` is the lowest. `concordia export bundle` copies the plans, so a reader can check the bytes by digest.
 
-Without `ports`, Concordia queries TCP on every port that a firewall rule of the environment's plans names, and one port that no rule names.
+With `ports`, Concordia queries TCP on each port, because the rule form has no protocol. Without `ports`, Concordia takes the ports from the firewall rules of the environment's plans, separately for each protocol. A rule for UDP, or for every protocol, is also queried over UDP, and the query in `assurance.evaluations` names the protocol, for example `udp/53 from …`. For each port and range that a rule names, Concordia queries both ends, the ports next to them, and one port inside the range. It also queries, for each protocol in use, one port that no rule of that protocol names, so a rule that opens every port (`*`, a GCP block without ports, AWS `-1`) still gets a query. A rule matches ports only through these ranges, so every group of ports that the rules treat alike gets at least one query: the answer holds for every port of the protocol.
+
+Concordia reads the plans of an environment as one input, by resource address. When two plans hold the same address of an `aws_`, `azurerm_`, or `google_` resource, every cloud pair of the environment is `unknown` with `coverage-incomplete` and the detail `unresolved-reference: <address> is in <n> plans of environment <env>`. Concordia cannot tell which of the two resources an answer would read, and it does not record which resources an answer read, so the rule covers the whole environment, not only the pairs that use the address. An address of another provider, for example `random_id.suffix` in two root modules, does not count: the evaluator never reads those resources as firewall rules or endpoints.
 
 #### Gaps and limits
 
 | Gap | Meaning |
 |---|---|
-| `incomplete-plan` | A plan of the environment is not `complete` (it has deferred changes, or it could not be read). Every query is `unknown`. |
-| `workload-not-in-input` | An endpoint address is not a resource of the plans after apply. |
+| `incomplete-plan` | A plan of the environment is not `complete`: it has deferred changes, or one of several plans could not be read. Every query is `unknown`. When no plan can be read, the result is `rendered-evidence-missing`. |
+| `workload-not-in-input` | An endpoint address, for example a bound address with a typo, is not a resource of the plans after apply. The result is `rendered-evidence-missing`. |
 | `mixed-providers` | The two endpoints belong to different providers. |
-| `unsupported-resource-type` | The endpoint type is not in the table above. |
-| `unresolved-reference` | A security group, NSG, subnet, or network that the evaluator needs does not resolve to one resource of the plan. |
-| `unknown-after-apply` | An attribute that the evaluator needs is unknown until apply, and no reference resolves it. |
-| `address-dependent-range`, `invalid-address-range` | A rule prefix overlaps the endpoint partly, needs an address that the plan does not know, or does not parse. |
+| `unsupported-resource-type` | The endpoint type is not in the table above, or an Azure VM has more than one NIC. |
+| `unresolved-reference` | A reference does not resolve to one resource of the expected kind: it names several instances, a data source, nothing, or another resource type, or it goes through a variable or local value; inline blocks name different resources; an AWS attachment or `network_interface` block does not resolve; or an Azure subnet or NIC has more than one associated NSG. |
+| `unknown-after-apply` | An attribute that the evaluator needs is unknown until apply, and no reference resolves it. This includes an inline rule list that is unknown, an inline list that may repeat a rule that the plan deletes or updates, an unknown `instance` in an attachment block, an unknown Azure rule `priority`, `direction`, or `access`, an unknown GCP rule field, and an unknown private-endpoint policy. |
+| `address-dependent-range`, `invalid-address-range` | A rule prefix overlaps the endpoint partly, needs an address that the plan does not know, is an IPv6 prefix, or does not parse; or an IPv4 deny decided on Azure or GCP for endpoints that may be dual-stack. |
 | `peering-not-evaluated` | Azure `VirtualNetwork` across two virtual networks, or two GCP instances in different networks. |
-| `unsupported-policy-kind` | An AWS prefix list, an Azure service tag or source port range, or a GCP firewall policy. Any `google_compute_network_firewall_policy*`, `google_compute_region_network_firewall_policy*`, or `google_compute_firewall_policy*` resource in the plan makes every GCP query `unknown`. |
+| `unsupported-policy-kind` | An AWS prefix list; an Azure service tag, a source port range, an application security group against an endpoint without a NIC, or a private endpoint whose subnet does not state its network policies; or a GCP firewall policy. Any `google_compute_network_firewall_policy*`, `google_compute_region_network_firewall_policy*`, or `google_compute_firewall_policy*` resource in the plan makes every GCP query `unknown`. |
 
 The contract states these limits on every result:
 
@@ -406,6 +453,17 @@ The contract states these limits on every result:
 - GCP hierarchical and network firewall policies are not evaluated.
 - Rules managed outside this plan are assumed absent, not observed.
 - A plan states what would be applied, not what is applied.
+- IPv6 ranges are not evaluated. A rule that names one gives `unknown`, unless an IPv4 rule decides first.
+
+#### Known limits of this release
+
+These limits are known and recorded. The first two can give `denied` for traffic that IPv6 may still allow. The other three make results `unknown` more often than needed, and never give a wrong `allowed` or `denied`.
+
+- **GCP stack type.** When the plan does not state `stack_type` on a GCP instance or its subnetwork, Concordia takes the instance as IPv4-only. An IPv4 deny then decides, and the result can be `denied`, even if the instance gets an IPv6 address after apply.
+- **Azure IPv6 evidence.** On Azure, an IPv4 deny holds for IPv6 traffic too only when the plan shows no IPv6 address on the endpoints. Concordia reads two things as evidence: an `ip_configuration` of the NIC with `private_ip_address_version` `IPv6`, and an IPv6 prefix in the `address_prefixes` of the subnet. An IPv6 address that comes from anywhere else is not seen, and the deny decides.
+- **Azure rule owner through a variable.** When the `network_security_group_name` of an `azurerm_network_security_rule` comes through a variable or local value, Concordia cannot tell which NSG the rule belongs to. It treats the rule as possibly belonging to every NSG, so a match on it is `unknown` wherever it may apply.
+- **Deleted rule resources.** A rule resource that the plan deletes has no planned values, so its group or NSG is not known. Every inline rule that matches is then `unknown`, on every security group (for the direction of the rule) and on every NSG of the plan, not only on the one that held the rule.
+- **Shared addresses across plans.** When two plans of one environment hold the same address of an `aws_`, `azurerm_`, or `google_` resource, every cloud pair of that environment is `unknown`, not only the pairs that use the resource.
 
 The enabled claim is `cloud-network-isolation`. The evaluator does not enable `network-isolation`, `effective-encryption-in-transit`, `cloud-iam`, or `routing-reachability`.
 
@@ -423,7 +481,7 @@ A `require.effectiveAccess` rule passes through three gates, in this order:
 | The environment has the evidence of the evaluator: rendered resources for `network-policy` and `rbac`, a usable plan for `cloud-firewall`. The namespaces that the result involves have `complete` coverage. A CALM element that is not bound to a rendered resource or a planned resource is a `binding-gap`. | `unknown`, `rendered-evidence-missing`, `coverage-incomplete`, or `binding-gap` |
 | A `denied` or `not-granted` result has its assumption declared. | `unknown`, `enforcement-not-declared` |
 
-A rule that expects `denied` is violated by one open port, and is met when every port is closed. Without `ports`, Concordia queries the ports that the destination declares, every port that a policy rule names, and one port that no rule names. Each query appears in [`assurance.evaluations`](results.md#evaluations), with the evaluator, its version, the digest of the rendered input, the policies that decided it, the assumptions, the limits, and the gaps.
+A rule that expects `denied` is violated by one open port, and is met when every port is closed. Without `ports`, `network-policy` queries the ports that the destination declares, every port that a policy rule names, and one port that no rule names. `cloud-firewall` collects the ports of the firewall rules separately for each protocol, so that every group of ports that the rules treat alike gets a query. The [`cloud-firewall`](#cloud-firewall) section describes this. Each query appears in [`assurance.evaluations`](results.md#evaluations), with the evaluator, its version, the digest of its input, the policies or rules that decided it, the assumptions, the limits, and the gaps.
 
 ### Limits and gaps
 
@@ -634,7 +692,7 @@ rules:
 
 The rule has the family `assurance-claim`, with the maturity `advisory`, and it is not reducible for `check --changed`: it always evaluates the full scope. A rule-level `subject` is refused (`CO-POL-001`). Concordia looks the claim up in the registry when it evaluates the rule, not when it compiles it. A claim that is not registered, or whose contract is not loaded, is `unknown` with `claim-not-enabled`, not a compile error. A claim of an experimental contract caps the severity of the rule at `warning`.
 
-Concordia evaluates these claims for a rule: `complete-resource-set`, `container-occurrence-versions`, and `resolved-selections` for each environment, and `exact-lineage`, `deployed-digest`, `deployment-succeeded`, and `runtime-drift` for each container occurrence. A claim that has its own rule family or evaluator (`planned-resources`, `network-isolation`, `rbac-grants`, `check-outcome`, `quality-scenario-verdict`) is `unknown` with `no-evidence-supplied` through `require.claim`. These claims are evaluated through `require.effectiveAccess`, `require.checkResult`, or a quality scenario. The pack rules are:
+Concordia evaluates these claims for a rule: `complete-resource-set`, `container-occurrence-versions`, and `resolved-selections` for each environment, and `exact-lineage`, `deployed-digest`, `deployment-succeeded`, and `runtime-drift` for each container occurrence. A claim that has its own rule family or evaluator (`planned-resources`, `network-isolation`, `cloud-network-isolation`, `rbac-grants`, `check-outcome`, `quality-scenario-verdict`) is `unknown` with `no-evidence-supplied` through `require.claim`. These claims are evaluated through `require.effectiveAccess`, `require.checkResult`, or a quality scenario. The pack rules are:
 
 | Rule | Claim | Severity |
 |---|---|---|

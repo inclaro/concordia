@@ -207,26 +207,137 @@ func TestCloudFirewallPairGates(t *testing.T) {
 	}
 }
 
-// Without ports in the rule, the queries cover every port that a firewall rule of the plan names and one port that
-// no rule names.
+// portTexts gives `protocol/number` for each port.
+func portTexts(ports []portKey) []string {
+	out := make([]string, 0, len(ports))
+	for _, port := range ports {
+		out = append(out, port.String())
+	}
+
+	return out
+}
+
+// Without ports in the rule, the queries cover every port that a firewall rule of the plan names, the ports next to
+// it, and one port that no rule names.
 func TestPlanPortsIncludeAProbeOutsideEveryRule(t *testing.T) {
 	t.Parallel()
 
 	resources := []plan.Resource{
-		{Type: "aws_vpc_security_group_ingress_rule", Values: map[string]any{"from_port": float64(5432), "to_port": float64(5432)}},
-		{Type: "azurerm_network_security_rule", Values: map[string]any{"destination_port_ranges": []any{"1-2", "443"}}},
-		{Type: "google_compute_firewall", Values: map[string]any{"allow": []any{map[string]any{"ports": []any{"8080"}}}}},
+		{Type: "aws_vpc_security_group_ingress_rule", Values: map[string]any{"ip_protocol": "tcp", "from_port": float64(5432), "to_port": float64(5432)}},
+		{Type: "azurerm_network_security_rule", Values: map[string]any{"protocol": "Tcp", "destination_port_ranges": []any{"1-2", "443"}}},
+		{Type: "google_compute_firewall", Values: map[string]any{"allow": []any{map[string]any{"protocol": "tcp", "ports": []any{"8080"}}}}},
 		{Type: "aws_s3_bucket", Values: map[string]any{"from_port": float64(9), "to_port": float64(9)}},
 	}
 
-	ports := planPorts(resources)
+	want := []string{
+		"tcp/1", "tcp/2", "tcp/3", "tcp/4", "tcp/442", "tcp/443", "tcp/444", "tcp/5431", "tcp/5432", "tcp/5433",
+		"tcp/8079", "tcp/8080", "tcp/8081",
+	}
+	if got := portTexts(planPorts(resources)); !slices.Equal(got, want) {
+		t.Errorf("ports = %v, want %v", got, want)
+	}
+}
 
-	got := make([]int, 0, len(ports))
-	for _, port := range ports {
-		got = append(got, port.number)
+// Finding 9: a rule that opens UDP, or every protocol, is probed over UDP, with a UDP port that no rule names.
+func TestPlanPortsProbeUDPWhereARuleOpensIt(t *testing.T) {
+	t.Parallel()
+
+	resources := []plan.Resource{
+		{Type: "aws_vpc_security_group_ingress_rule", Values: map[string]any{"ip_protocol": "udp", "from_port": float64(53), "to_port": float64(53)}},
+		{Type: "aws_security_group_rule", Values: map[string]any{"protocol": "icmp", "from_port": float64(8), "to_port": float64(8)}},
 	}
 
-	if want := []int{1, 2, 3, 443, 5432, 8080}; !slices.Equal(got, want) {
-		t.Errorf("ports = %v, want %v", got, want)
+	got := portTexts(planPorts(resources))
+	for _, want := range []string{"udp/53", "udp/1", "tcp/1"} {
+		if !slices.Contains(got, want) {
+			t.Errorf("ports %v do not hold %s", got, want)
+		}
+	}
+
+	if slices.Contains(got, "tcp/53") || slices.Contains(got, "tcp/8") {
+		t.Errorf("ports %v probe a UDP or ICMP rule over TCP", got)
+	}
+}
+
+// Finding 12: deny rules on both ends of an allowed range must not hide its open inside.
+func TestPlanPortsSampleTheInsideOfARange(t *testing.T) {
+	t.Parallel()
+
+	rule := func(ports string) plan.Resource {
+		return plan.Resource{Type: "azurerm_network_security_rule", Values: map[string]any{"protocol": "Tcp", "destination_port_range": ports}}
+	}
+
+	got := planPorts([]plan.Resource{rule("8000-8100"), rule("8000"), rule("8100")})
+
+	inside := slices.ContainsFunc(got, func(port portKey) bool { return port.number > 8000 && port.number < 8100 })
+	if !inside {
+		t.Errorf("ports %v sample no port inside 8000-8100", portTexts(got))
+	}
+}
+
+// Finding 9: a rule without ports queries the plan's UDP rule over UDP, and the query names the protocol.
+func TestCloudFirewallProbesUDPForARuleWithoutPorts(t *testing.T) {
+	t.Parallel()
+
+	udp := cloudPlan(t)
+	for i := range udp.Plan.Resources {
+		if r := &udp.Plan.Resources[i]; r.Address == openingRule {
+			r.Values["ip_protocol"], r.Values["from_port"], r.Values["to_port"] = "udp", float64(53), float64(53)
+		}
+	}
+
+	run := cloudRun(&udp, cloudEvaluator(workspace.AssumeFirewallRulesInPlan))
+	rule := cloudRule("ledger-db")
+	rule.Predicate.EffectiveAccess.Ports = nil
+
+	got := onlyOutcome(t, run, rule)
+
+	const want = "udp/53 from aws_lb.public to aws_db_instance.ledger"
+	if !slices.ContainsFunc(run.report.Evaluations, func(e EvaluationEntry) bool { return e.Query == want }) {
+		t.Errorf("no evaluation %q", want)
+	}
+
+	if got.Verdict != VerdictViolation || !strings.Contains(got.Detail, want) {
+		t.Errorf("outcome = %s %q, want a violation through %s", got.Verdict, got.Detail, want)
+	}
+}
+
+// Finding 4: an address that two plans of the environment hold is not read last-wins.
+func TestCloudFirewallAddressInTwoPlansIsUnknown(t *testing.T) {
+	t.Parallel()
+
+	first, second := cloudPlan(t), cloudPlan(t)
+	second.Declared.File = "infra/plans/other.json"
+
+	run := cloudRun(&first, cloudEvaluator(workspace.AssumeFirewallRulesInPlan))
+	run.ev.Plans = append(run.ev.Plans, second)
+
+	got := onlyOutcome(t, run, cloudRule("ledger-db"))
+	if got.Reason != ReasonCoverageIncomplete || !strings.Contains(got.Detail, "is in 2 plans of environment production") {
+		t.Errorf("outcome = %s %q %q, want coverage-incomplete for an address in two plans", got.Verdict, got.Reason, got.Detail)
+	}
+}
+
+// Finding 11: a bound address that the plan does not hold, and a plan that was not read, are answered by
+// cloud-firewall, not sent to network-policy.
+func TestCloudFirewallReportsMissingPlanEvidence(t *testing.T) {
+	t.Parallel()
+
+	withRule := cloudPlan(t)
+	typo := cloudRun(&withRule, cloudEvaluator(workspace.AssumeFirewallRulesInPlan))
+	typo.bindings[1] = infraBinding("ledger-db", "aws_db_instance.ledgr")
+
+	got := onlyOutcome(t, typo, cloudRule("ledger-db"))
+
+	named := got.Reason == ReasonRenderedEvidenceMissing && strings.Contains(got.Detail, "aws_db_instance.ledgr")
+	if !named || !planLocated(&got) {
+		t.Errorf("address not in the plan = %q %q at %+v", got.Reason, got.Detail, got.Location)
+	}
+
+	unread := evidence.Plan{Coverage: assurance.CoverageFailed, Declared: withRule.Declared}
+
+	got = onlyOutcome(t, cloudRun(&unread, cloudEvaluator()), cloudRule("ledger-db"))
+	if got.Reason != ReasonRenderedEvidenceMissing || !strings.Contains(got.Detail, "has no usable plan") {
+		t.Errorf("unread plan = %q %q", got.Reason, got.Detail)
 	}
 }

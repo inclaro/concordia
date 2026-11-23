@@ -26,6 +26,7 @@ var Limits = []string{
 	"GCP hierarchical and network firewall policies are not evaluated",
 	"rules managed outside this plan are assumed absent, not observed",
 	"a plan states what would be applied, not what is applied",
+	"IPv6 ranges are not evaluated; a rule that names one gives unknown unless an IPv4 rule decides first",
 }
 
 // Contract is the evaluator contract that the claim registry and `doctor` show.

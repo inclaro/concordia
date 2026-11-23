@@ -24,9 +24,14 @@ func (e *Evaluator) refs(r *plan.Resource, path string, s *side) (found []*plan.
 		ok = ok && resolved
 	}
 
+	return sortResources(found), ok
+}
+
+// sortResources sorts the resources by address and removes repeats.
+func sortResources(found []*plan.Resource) []*plan.Resource {
 	slices.SortFunc(found, func(a, b *plan.Resource) int { return canonjson.CompareUTF16(a.Address, b.Address) })
 
-	return slices.Compact(found), ok
+	return slices.Compact(found)
 }
 
 // ref resolves an attribute that names one resource. It gives nil and ok true when the attribute is absent, and ok
@@ -99,6 +104,11 @@ func (e *Evaluator) configRefs(r *plan.Resource, path string, into *side) (found
 		return nil, false
 	}
 
+	return e.resolveAll(addresses, into)
+}
+
+// resolveAll resolves each configuration address to its single instance. ok is false when one does not resolve.
+func (e *Evaluator) resolveAll(addresses []string, into *side) (found []*plan.Resource, ok bool) {
 	ok = true
 
 	for _, config := range addresses {
@@ -115,18 +125,17 @@ func (e *Evaluator) configRefs(r *plan.Resource, path string, into *side) (found
 	return found, ok
 }
 
-// resolveConfig resolves a configuration address (without instance keys) to its single instance in the plan.
+// resolveConfig resolves a configuration address (without instance keys) to its single instance in the plan. A data
+// source, or an opaque `var.`, `local.`, or `each.value` entry whose value may hold any resource, does not resolve.
 func (e *Evaluator) resolveConfig(config string, into *side) (*plan.Resource, bool) {
-	if isDataSource(config) {
+	switch inst := e.instances(config); {
+	case isDataSource(config):
 		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(dataSourceFormat, config))
-
-		return nil, false
-	}
-
-	switch inst := e.instances(config); len(inst) {
-	case 1:
+	case plan.IsOpaqueReference(config):
+		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(opaqueFormat, config))
+	case len(inst) == 1:
 		return inst[0], true
-	case 0:
+	case len(inst) == 0:
 		into.gap(evaluate.GapUnresolvedReference, config+" is not a resource of the plan after apply")
 	default:
 		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s has %d instances", config, len(inst)))
@@ -137,6 +146,9 @@ func (e *Evaluator) resolveConfig(config string, into *side) (*plan.Resource, bo
 
 // dataSourceFormat is the gap detail of a reference to a data source.
 const dataSourceFormat = "%s is a data source; its rules are not in the plan"
+
+// opaqueFormat is the gap detail of a reference through a variable, a local value, or `each.value`.
+const opaqueFormat = "%s is a variable or local value; the resource it names is not known from the plan"
 
 // isDataSource reports whether the configuration address names a data source (`data.<type>.<name>`, in any module).
 func isDataSource(config string) bool {

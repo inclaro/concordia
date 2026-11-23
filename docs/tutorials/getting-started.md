@@ -128,7 +128,7 @@ cd /tmp/concordia-docs/getting-started && concordia bind validate
 ```
 
 ```output
-bindings valid: 11 binding(s), 60/238 observed node(s) bound, 0 unbound file(s)
+bindings valid: 11 binding(s), 60/242 observed node(s) bound, 0 unbound file(s)
 ```
 
 All 11 bindings are valid. `0 unbound file(s)` means that every file CBM read belongs to an architecture node, so no code escapes the rules.

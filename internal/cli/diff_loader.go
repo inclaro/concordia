@@ -229,12 +229,13 @@ func completeRunOf(wsp *workspace.Workspace, text []byte) (*conformance.Run, err
 	return run, nil
 }
 
-// gitSnapshot is a git revision that is read into the root of wsp: a copy of the current workspace, so that the
+// gitSnapshot is a git revision that is read into the root of wsp: a copy of the current workspace disk, so that the
 // architecture of the revision is validated against the trust vocabulary that the worktree side also uses.
 type gitSnapshot struct {
-	git workspace.GitPort
-	wsp *workspace.Workspace
-	rev string
+	git  workspace.GitPort
+	wsp  *workspace.Workspace
+	disk *workspace.Workspace
+	rev  string
 }
 
 func (l *diffLoader) gitRef(ctx context.Context, ref string) (*diffSide, error) {
@@ -264,7 +265,7 @@ func (l *diffLoader) gitRef(ctx context.Context, ref string) (*diffSide, error) 
 
 	clone := *wsp
 	clone.Root = dir
-	snapshot := gitSnapshot{git: git, rev: rev, wsp: &clone}
+	snapshot := gitSnapshot{git: git, rev: rev, wsp: &clone, disk: wsp}
 
 	if side.model, err = snapshot.model(ctx, source); err != nil {
 		return nil, err
@@ -313,7 +314,7 @@ func (s gitSnapshot) model(ctx context.Context, source string) (*intent.Architec
 		return nil, fmt.Errorf("write %s: %w", target, err)
 	}
 
-	urlMapping, err := adr.URLMappingAt(ctx, s.git, s.rev, s.wsp)
+	urlMapping, err := adr.URLMappingAt(ctx, adr.Revision{Git: s.git, Rev: s.rev}, s.disk, s.wsp)
 	if err != nil {
 		return nil, fmt.Errorf("url mapping at %s: %w", s.rev, err)
 	}

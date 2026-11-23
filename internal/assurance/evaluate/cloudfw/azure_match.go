@@ -6,6 +6,7 @@ import (
 
 	"github.com/inclaro/concordia/internal/assurance"
 	"github.com/inclaro/concordia/internal/assurance/evaluate"
+	"github.com/inclaro/concordia/internal/assurance/plan"
 )
 
 // azureFixedPrefixes are the prefix values whose match does not depend on the endpoints. Both endpoints are private
@@ -126,7 +127,7 @@ func (e *Evaluator) azurePeer(rule *azureRule, fields *azurePeerFields, pair *az
 
 	prefixes := append(attrStrings(rule.res, rule.base+fields.prefix), attrStrings(rule.res, rule.base+fields.prefixes)...)
 	for _, value := range prefixes {
-		result = or(result, azurePrefix(value, end, pair, report))
+		result = or(result, e.azurePrefix(value, end, pair, report))
 	}
 
 	return or(result, e.azureGroups(rule, fields.groups, end, report))
@@ -134,7 +135,7 @@ func (e *Evaluator) azurePeer(rule *azureRule, fields *azurePeerFields, pair *az
 
 // azureGroups matches the application security groups of one end of the rule against the endpoint.
 func (e *Evaluator) azureGroups(rule *azureRule, path string, end *azureEndpoint, report *side) tri {
-	asgs, ok := e.refs(rule.res, rule.base+path, report)
+	asgs, ok := e.azureRuleASGs(rule, path, report)
 
 	switch {
 	case !ok:
@@ -146,14 +147,24 @@ func (e *Evaluator) azureGroups(rule *azureRule, path string, end *azureEndpoint
 	return azureInGroups(end, asgs, report)
 }
 
+// azureRuleASGs resolves the ASG list of a rule. The list of an inline rule resolves through the references of
+// all inline rules, because the plan keeps the inline rules in set order and not in configuration order.
+func (e *Evaluator) azureRuleASGs(rule *azureRule, path string, report *side) ([]*plan.Resource, bool) {
+	if rule.inline {
+		return e.blockRefsOfType(rule.res, blockElement{list: azureRulesAttr, field: path, index: rule.index}, report, azureASG)
+	}
+
+	return e.refsOfType(rule.res, rule.base+path, report, azureASG)
+}
+
 // azurePrefix matches one prefix value: `*`, a CIDR or IP, or a service tag.
-func azurePrefix(value string, end *azureEndpoint, pair *azurePair, report *side) tri {
+func (e *Evaluator) azurePrefix(value string, end *azureEndpoint, pair *azurePair, report *side) tri {
 	if fixed, ok := azureFixedPrefixes[strings.ToLower(value)]; ok {
 		return fixed
 	}
 
 	if strings.EqualFold(value, azureVirtualNetwork) {
-		return azureSameVNet(pair, report)
+		return e.azureSameVNet(pair, report)
 	}
 
 	if azureIsAddress(value) {

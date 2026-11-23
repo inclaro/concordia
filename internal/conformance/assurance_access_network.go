@@ -112,11 +112,16 @@ func (s *portSet) collectPolicy(np *netpol.NetworkPolicy) {
 	}
 }
 
-// addUnnamedProbe adds the lowest port that no rule names and no range covers.
+// addUnnamedProbe adds the lowest TCP port that no rule names and no range covers.
 func (s *portSet) addUnnamedProbe() {
+	s.addUnnamedProbeFor(netpol.ProtocolTCP)
+}
+
+// addUnnamedProbeFor adds the lowest port of the protocol that no rule names and no range covers.
+func (s *portSet) addUnnamedProbeFor(protocol string) {
 	for number := 1; number <= maxPortNumber; number++ {
 		if !s.covered(number) {
-			s.seen[portKey{netpol.ProtocolTCP, number}] = true
+			s.seen[portKey{protocol, number}] = true
 
 			return
 		}

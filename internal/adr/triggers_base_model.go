@@ -2,6 +2,7 @@ package adr
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -37,7 +38,7 @@ func LoadBaseModel(ctx context.Context, wspace *workspace.Workspace, git workspa
 	snapshot := *wspace
 	snapshot.Root = dir
 
-	found, err := revisionTree{git: git, rev: base, root: dir}.write(ctx, source)
+	_, found, err := revisionTree{git: git, rev: base, root: dir}.write(ctx, source)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +47,7 @@ func LoadBaseModel(ctx context.Context, wspace *workspace.Workspace, git workspa
 		return nil, fmt.Errorf("%s does not exist at %s", source, base)
 	}
 
-	mapping, err := URLMappingAt(ctx, git, base, &snapshot)
+	mapping, err := URLMappingAt(ctx, Revision{Git: git, Rev: base}, wspace, &snapshot)
 	if err != nil {
 		return nil, err
 	}
@@ -59,14 +60,25 @@ func LoadBaseModel(ctx context.Context, wspace *workspace.Workspace, git workspa
 	return model, nil
 }
 
-// URLMappingAt writes the URL mapping file (architecture.urlMapping) of snapshot and the workspace files that it maps,
-// as of rev, under snapshot.Root, and gives the mapping with absolute paths under that root (see
-// intent.LoadURLMapping). snapshot is a copy of the workspace whose Root is the directory of the revision.
+// Revision is a git revision that a workspace is read at.
+type Revision struct {
+	Git workspace.GitPort
+	Rev string
+}
+
+// URLMappingAt writes the URL mapping file (architecture.urlMapping) of the workspace wsp and the workspace files that
+// it maps, as of the revision, under snapshot.Root, and gives the mapping with absolute paths. snapshot is a copy of
+// wsp whose Root is the directory of the revision. A relative entry resolves against the directory of the mapping
+// file, as intent.LoadURLMapping does:
+//   - an entry inside the workspace is read from the revision into snapshot.Root;
+//   - an entry that leaves the workspace (for example ../shared/req.json in a monorepo) is not in the revision, so it
+//     resolves against the directory of the mapping file in wsp.Root and is read as it is on disk now;
+//   - an absolute entry is used as it is, also read as it is on disk now.
 //
-// A mapping file that rev does not have gives an empty mapping: the revision had no mapping, so a mapped URL in its
-// architecture is reported by the loader. A mapped file that rev does not have is not written, so the loader reports
-// it as unreadable. A mapped path outside the workspace is not read from git and stays as the mapping gives it.
-func URLMappingAt(ctx context.Context, git workspace.GitPort, rev string, snapshot *workspace.Workspace) (map[string]string, error) {
+// A mapping file that the revision does not have gives an empty mapping: the revision had no mapping, so a mapped URL
+// in its architecture is reported by the loader. A mapped file that the revision does not have is not written, so the
+// loader reports it as unreadable.
+func URLMappingAt(ctx context.Context, revision Revision, wsp, snapshot *workspace.Workspace) (map[string]string, error) {
 	configured := snapshot.Architecture.URLMapping
 	if configured == "" {
 		return map[string]string{}, nil
@@ -77,25 +89,57 @@ func URLMappingAt(ctx context.Context, git workspace.GitPort, rev string, snapsh
 		return nil, fmt.Errorf("architecture.urlMapping %w", err)
 	}
 
-	tree := revisionTree{git: git, rev: rev, root: snapshot.Root}
+	tree := revisionTree{git: revision.Git, rev: revision.Rev, root: snapshot.Root}
 
-	found, err := tree.write(ctx, name)
+	data, found, err := tree.write(ctx, name)
 	if err != nil || !found {
 		return map[string]string{}, err
 	}
 
-	mapping, err := intent.LoadURLMapping(snapshot)
-	if err != nil {
-		return nil, fmt.Errorf("load url mapping at %s: %w", rev, err)
+	var entries map[string]string
+	if err := json.Unmarshal(data, &entries); err != nil {
+		return nil, fmt.Errorf("parse url mapping %s at %s: %w", name, revision.Rev, err)
 	}
 
-	for _, local := range mapping {
-		if err := tree.writeMapped(ctx, local); err != nil {
+	dir := filepath.Dir(filepath.FromSlash(name))
+	placer := mappingPlacer{tree: tree, revisionDir: filepath.Join(snapshot.Root, dir), diskDir: wsp.ResolveInRoot(dir)}
+	mapping := make(map[string]string, len(entries))
+
+	for url, entry := range entries {
+		if mapping[url], err = placer.place(ctx, entry); err != nil {
 			return nil, err
 		}
 	}
 
 	return mapping, nil
+}
+
+// mappingPlacer gives the local paths of URL mapping entries: in revisionDir, the directory of the mapping file in
+// the revision tree, or in diskDir, the same directory in the workspace on disk.
+type mappingPlacer struct {
+	tree        revisionTree
+	revisionDir string
+	diskDir     string
+}
+
+// place gives the absolute local path of a mapping entry (see URLMappingAt) and writes it from the revision when it
+// is inside the workspace.
+func (m *mappingPlacer) place(ctx context.Context, entry string) (string, error) {
+	local := filepath.FromSlash(entry)
+	if filepath.IsAbs(local) {
+		return local, nil
+	}
+
+	inRevision := filepath.Join(m.revisionDir, local)
+
+	rel, under := strings.CutPrefix(inRevision, m.tree.root+string(filepath.Separator))
+	if !under {
+		return filepath.Join(m.diskDir, local), nil
+	}
+
+	_, _, err := m.tree.write(ctx, filepath.ToSlash(rel))
+
+	return inRevision, err
 }
 
 // revisionTree writes files of a git revision under a root directory.
@@ -105,36 +149,24 @@ type revisionTree struct {
 	root string
 }
 
-// write copies the workspace-relative file name of the revision under the root. It gives false when the revision
-// has no such file.
-func (r revisionTree) write(ctx context.Context, name string) (bool, error) {
-	data, found, err := r.git.ShowFile(ctx, r.rev, name)
+// write copies the workspace-relative file name of the revision under the root and gives its content. It gives false
+// when the revision has no such file.
+func (r revisionTree) write(ctx context.Context, name string) (data []byte, found bool, err error) {
+	data, found, err = r.git.ShowFile(ctx, r.rev, name)
 	if err != nil {
-		return false, fmt.Errorf("read %s at %s: %w", name, r.rev, err)
+		return nil, false, fmt.Errorf("read %s at %s: %w", name, r.rev, err)
 	}
 
 	if !found {
-		return false, nil
+		return nil, false, nil
 	}
 
 	target := filepath.Join(r.root, filepath.FromSlash(name))
 	if err := fsutil.WriteFileAtomic(target, data); err != nil {
-		return false, fmt.Errorf("write %s: %w", target, err)
+		return nil, false, fmt.Errorf("write %s: %w", target, err)
 	}
 
-	return true, nil
-}
-
-// writeMapped copies the mapped file at the absolute path local when it is under the root.
-func (r revisionTree) writeMapped(ctx context.Context, local string) error {
-	rel, under := strings.CutPrefix(local, r.root+string(filepath.Separator))
-	if !under {
-		return nil
-	}
-
-	_, err := r.write(ctx, filepath.ToSlash(rel))
-
-	return err
+	return data, true, nil
 }
 
 // baseModelSource gives the slash-separated workspace-relative path of architecture.source, or an error when the

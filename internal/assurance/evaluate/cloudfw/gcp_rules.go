@@ -1,57 +1,11 @@
 package cloudfw
 
 import (
-	"cmp"
 	"fmt"
 	"slices"
 
 	"github.com/inclaro/concordia/internal/assurance/plan"
 )
-
-// GCP firewall rule values.
-const (
-	gcpFirewallType     = "google_compute_firewall"
-	gcpIngress          = "INGRESS"
-	gcpEgress           = "EGRESS"
-	gcpDefaultPriority  = 1000
-	gcpImpliedPriority  = 65535
-	gcpAllow            = "allow"
-	gcpDeny             = "deny"
-	gcpAllAddresses     = "0.0.0.0/0"
-	gcpImpliedRuleOwner = "implied"
-)
-
-// gcpRule is one firewall rule of a direction. res is nil for an implied rule, which matches all traffic.
-type gcpRule struct {
-	res      *plan.Resource
-	priority int
-	deny     bool
-}
-
-func (r *gcpRule) action() string {
-	if r.deny {
-		return gcpDeny
-	}
-
-	return gcpAllow
-}
-
-func (r *gcpRule) verdict() tri {
-	if r.deny {
-		return triNo
-	}
-
-	return triYes
-}
-
-func (r *gcpRule) record(point *side) {
-	owner := gcpImpliedRuleOwner
-	if r.res != nil {
-		owner = r.res.Address
-	}
-
-	point.rule(owner, fmt.Sprintf("priority %d %s", r.priority, r.action()))
-}
 
 // gcpCheck is one check point: egress at the source, or ingress at the destination. target is the instance that
 // the rules apply to, peer the other end.
@@ -79,7 +33,7 @@ func (e *Evaluator) gcpSide(check *gcpCheck) *side {
 			point.verdict = triMaybe
 		case triYes:
 			rule.record(point)
-			point.verdict = rule.verdict()
+			point.verdict = e.gcpDecision(&rule, check, point)
 		}
 
 		return point
@@ -88,66 +42,33 @@ func (e *Evaluator) gcpSide(check *gcpCheck) *side {
 	return point
 }
 
-// gcpRules are the enabled firewall rules of the direction and the implied rule, by ascending priority, deny before
-// allow at equal priority.
-func (e *Evaluator) gcpRules(ingress bool) []gcpRule {
-	direction, impliedDeny := gcpEgress, false
-	if ingress {
-		direction, impliedDeny = gcpIngress, true
-	}
-
-	rules := []gcpRule{{priority: gcpImpliedPriority, deny: impliedDeny}}
-
-	for _, firewall := range e.ofType(gcpFirewallType) {
-		if attrBool(firewall, "disabled") || gcpDirection(firewall) != direction {
-			continue
-		}
-
-		priority, ok := attrInt(firewall, "priority")
-		if !ok {
-			priority = gcpDefaultPriority
-		}
-
-		rules = append(rules, gcpRule{res: firewall, priority: priority, deny: blockCount(firewall, gcpDeny) > 0})
-	}
-
-	slices.SortStableFunc(rules, func(a, b gcpRule) int {
-		return cmpChain(cmp.Compare(a.priority, b.priority), gcpDenyFirst(a.deny, b.deny))
-	})
-
-	return rules
-}
-
-func gcpDirection(firewall *plan.Resource) string {
-	if direction, ok := attrString(firewall, "direction"); ok && direction != "" {
-		return direction
-	}
-
-	return gcpIngress
-}
-
-func gcpDenyFirst(a, b bool) int {
-	switch {
-	case a == b:
-		return 0
-	case a:
-		return -1
-	}
-
-	return 1
-}
-
-// gcpMatch matches one rule against the traffic of the check point.
+// gcpMatch matches one rule against the traffic of the check point. An uncertain rule that may match gives maybe.
 func (e *Evaluator) gcpMatch(rule *gcpRule, check *gcpCheck, point *side) tri {
 	if rule.res == nil {
 		return triYes
 	}
 
 	firewall := rule.res
-	applies := and(e.gcpInNetwork(firewall, check.target.network, point), e.gcpTargets(firewall, check.target, point))
-	ports := gcpPorts(firewall, rule.action(), check.query, point)
+	applies := and(e.gcpInNetwork(firewall, check.target.network, point), e.gcpTargets(firewall, check, point))
+	traffic := and(gcpRulePorts(rule, check.query, point), e.gcpPeer(firewall, check, point))
 
-	return and(and(ports, applies), e.gcpPeer(firewall, check, point))
+	match := and(applies, traffic)
+	if match == triNo || !rule.uncertain() {
+		return match
+	}
+
+	point.gaps = append(point.gaps, rule.gaps...)
+
+	return triMaybe
+}
+
+// gcpRulePorts matches the protocol and port of the query; a rule whose action the plan does not give may match.
+func gcpRulePorts(rule *gcpRule, query *Query, point *side) tri {
+	if rule.actionUnknown {
+		return triMaybe
+	}
+
+	return gcpPorts(rule.res, rule.action(), query, point)
 }
 
 // gcpInNetwork is whether the firewall rule belongs to the network.
@@ -164,17 +85,35 @@ func (e *Evaluator) gcpInNetwork(firewall *plan.Resource, network string, point 
 	return triNo
 }
 
-// gcpTargets is whether the rule applies to the instance: it has no targets, or a target tag or target service
-// account of the instance.
-func (e *Evaluator) gcpTargets(firewall *plan.Resource, endpoint *gcpEndpoint, point *side) tri {
+// gcpTargets is whether the rule applies to the instance of the check point: it has no targets, or a target tag or
+// target service account of the instance; and the instance address is in the ranges of its side of the rule
+// (`destination_ranges` for ingress, `source_ranges` for egress), when the rule has them.
+func (e *Evaluator) gcpTargets(firewall *plan.Resource, check *gcpCheck, point *side) tri {
+	endpoint := check.target
 	tags := e.gcpSetAt(firewall, "target_tags", "")
 	accounts := e.gcpSetAt(firewall, "target_service_accounts", "email")
 
-	if tags.empty() && accounts.empty() {
+	targeted := triYes
+	if !tags.empty() || !accounts.empty() {
+		targeted = or(gcpOverlap(&tags, &endpoint.tags, point), gcpOverlap(&accounts, &endpoint.accounts, point))
+	}
+
+	return and(targeted, e.gcpOwnRanges(firewall, check, point))
+}
+
+// gcpOwnRanges matches the ranges of the rule for the instance of the check point. No ranges means every address.
+func (e *Evaluator) gcpOwnRanges(firewall *plan.Resource, check *gcpCheck, point *side) tri {
+	path := "source_ranges"
+	if check.ingress {
+		path = "destination_ranges"
+	}
+
+	ranges := e.gcpSetAt(firewall, path, "")
+	if ranges.empty() {
 		return triYes
 	}
 
-	return or(gcpOverlap(&tags, &endpoint.tags, point), gcpOverlap(&accounts, &endpoint.accounts, point))
+	return gcpRanges(&ranges, check.target.addrs, point)
 }
 
 // gcpPeer matches the other end: the destination ranges for egress, and the source ranges, tags, and service
@@ -247,9 +186,17 @@ func gcpPorts(firewall *plan.Resource, action string, query *Query, point *side)
 }
 
 func gcpBlock(firewall *plan.Resource, path string, query *Query, point *side) tri {
+	if gcpUnknownField(firewall, path+".protocol", point) {
+		return triMaybe
+	}
+
 	protocol, _ := attrString(firewall, path+".protocol")
 	if matchProtocol(protocol, query) == triNo {
 		return triNo
+	}
+
+	if gcpUnknownField(firewall, path+".ports", point) {
+		return triMaybe
 	}
 
 	ports := attrStrings(firewall, path+".ports")
@@ -258,4 +205,15 @@ func gcpBlock(firewall *plan.Resource, path string, query *Query, point *side) t
 	}
 
 	return anyPortSpec(ports, query.Port, point)
+}
+
+// gcpUnknownField reports whether the attribute is unknown until apply, and records the gap when it is.
+func gcpUnknownField(firewall *plan.Resource, path string, point *side) bool {
+	if !unknownAt(firewall, path) {
+		return false
+	}
+
+	point.gaps = append(point.gaps, gcpUnknownGap(firewall, path))
+
+	return true
 }

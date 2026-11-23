@@ -21,6 +21,11 @@ type azureEndpoint struct {
 	asgs   []*plan.Resource
 	// asgGaps say why the ASG membership of the endpoint is not fully known.
 	asgGaps []assurance.Gap
+	// policyGaps say why subnetNSG is maybe.
+	policyGaps []assurance.Gap
+	// subnetNSG is yes when the NSG of the subnet applies to inbound traffic of the endpoint, no when it does not
+	// (a private endpoint whose subnet disables network policies), and maybe when the plan does not say.
+	subnetNSG tri
 }
 
 // azureEndpointKinds reads the NIC and subnet of each supported endpoint type.
@@ -41,7 +46,7 @@ func (e *Evaluator) azureEndpointOf(r *plan.Resource, report *side) (*azureEndpo
 		return nil, false
 	}
 
-	end := &azureEndpoint{res: r}
+	end := &azureEndpoint{res: r, subnetNSG: triYes}
 	if !read(e, end, report) {
 		return nil, false
 	}
@@ -58,7 +63,7 @@ func (e *Evaluator) azureNICEndpoint(end *azureEndpoint, report *side) bool {
 
 // azureVMEndpoint reads a virtual machine through its only NIC. A machine with more than one NIC is not supported.
 func (e *Evaluator) azureVMEndpoint(end *azureEndpoint, report *side) bool {
-	nics, ok := e.refs(end.res, "network_interface_ids", report)
+	nics, ok := e.refsOfType(end.res, "network_interface_ids", report, azureNIC)
 
 	switch {
 	case !ok:
@@ -83,29 +88,31 @@ func (e *Evaluator) azureSubnetEndpoint(end *azureEndpoint, _ *side) bool {
 	return true
 }
 
+// azurePrivateEndpoint reads the subnet of a private endpoint, and whether its NSG applies to the endpoint.
 func (e *Evaluator) azurePrivateEndpoint(end *azureEndpoint, report *side) bool {
-	subnet, ok := e.ref(end.res, azureSubnetIDAttr, report)
+	subnet, ok := e.refOfType(end.res, azureSubnetIDAttr, report, azureSubnet)
 	end.subnet = subnet
+
+	if subnet != nil {
+		policy := &side{}
+		end.subnetNSG = azureEndpointPolicies(subnet, policy)
+		end.policyGaps = policy.gaps
+	}
 
 	return ok
 }
 
 // azureWithNIC reads the subnet and the private IP of the NIC of the endpoint.
 func (e *Evaluator) azureWithNIC(end *azureEndpoint, nic *plan.Resource, report *side) bool {
-	if nic.Type != azureNIC {
-		report.gaps = append(report.gaps, unsupportedResource(nic))
-
-		return false
-	}
-
-	subnet, ok := e.ref(nic, azureNICSubnetAttr, report)
+	subnet, ok := e.refOfType(nic, azureNICSubnetAttr, report, azureSubnet)
 	end.nic, end.subnet = nic, subnet
 	end.ip, _ = attrString(nic, azureNICPrivateIPAttr)
 
 	return ok
 }
 
-// azureAddrs is the address set of the endpoint: its private IP, else the first prefix of its subnet.
+// azureAddrs is the address set of the endpoint: its private IP, else the prefix of its subnet. A subnet with more
+// than one prefix gives an unknown set, because the endpoint can have an address in any of them.
 func azureAddrs(end *azureEndpoint) addrSet {
 	if end.ip != "" {
 		return hostSet(end.ip)
@@ -115,7 +122,7 @@ func azureAddrs(end *azureEndpoint) addrSet {
 		return unknownAddrs
 	}
 
-	if prefixes := attrStrings(end.subnet, "address_prefixes"); len(prefixes) > 0 {
+	if prefixes := attrStrings(end.subnet, "address_prefixes"); len(prefixes) == 1 {
 		return prefixSet(prefixes[0])
 	}
 
@@ -141,13 +148,13 @@ func (e *Evaluator) azureMembership(end *azureEndpoint) {
 // azureAddMember adds the ASG of one association when it binds the NIC of the endpoint. An association that does
 // not resolve leaves a gap in report.
 func (e *Evaluator) azureAddMember(end *azureEndpoint, assoc *plan.Resource, report *side) {
-	nic, ok := e.ref(assoc, azureNICIDAttr, report)
+	nic, ok := e.refOfType(assoc, azureNICIDAttr, report, azureNIC)
 	if !ok || nic != end.nic {
 		return
 	}
 
-	if asg, ok := e.ref(assoc, azureASGIDAttr, report); ok && asg != nil {
-		end.asgs = azureAppendUnique(end.asgs, asg)
+	if asg, ok := e.refOfType(assoc, azureASGIDAttr, report, azureASG); ok && asg != nil {
+		end.asgs = appendUnique(end.asgs, asg)
 	}
 }
 
@@ -173,40 +180,6 @@ func azureNoInterface(end *azureEndpoint) assurance.Gap {
 		Kind:   evaluate.GapUnsupportedKind,
 		Detail: fmt.Sprintf("application security group against %s, which has no network interface", end.res.Address),
 	}
-}
-
-// azureVNet identifies the virtual network of the subnet of an endpoint: the known name and resource group, or the
-// configuration reference. It is "" when neither is known.
-func azureVNet(end *azureEndpoint) string {
-	if end.subnet == nil {
-		return ""
-	}
-
-	name, hasName := attrString(end.subnet, "virtual_network_name")
-	group, hasGroup := attrString(end.subnet, "resource_group_name")
-
-	if hasName && hasGroup {
-		return "name:" + group + "/" + name
-	}
-
-	if refs := end.subnet.References["virtual_network_name"]; len(refs) == 1 {
-		return "ref:" + refs[0]
-	}
-
-	return ""
-}
-
-// azureSameVNet is yes when both endpoints are in subnets of one virtual network, else maybe: traffic between
-// networks depends on peering, which is not evaluated.
-func azureSameVNet(pair *azurePair, report *side) tri {
-	if from := azureVNet(pair.from); from != "" && from == azureVNet(pair.to) {
-		return triYes
-	}
-
-	report.gap(evaluate.GapPeeringNotEvaluated, fmt.Sprintf("VirtualNetwork: %s and %s are not in one virtual network of the plan",
-		pair.from.res.Address, pair.to.res.Address))
-
-	return triMaybe
 }
 
 // azureIsAddress reports whether a prefix value is meant as an address (a CIDR or an IP), not a service tag.

@@ -203,7 +203,7 @@ See [Keep critical paths isolated](../use-cases/keep-critical-paths-isolated.md)
 
 After the outage, the security team asks a second question. The ledger database holds the bank's record of every movement of money. Can anything on the internet side reach it? Rule `PAY-NET-002` says that the public load balancer must have no network path to the ledger database on port 5432.
 
-Concordia does not answer this from the model. The bindings map the load balancer to `aws_lb.public` and the database to `aws_db_instance.ledger` in a Terraform plan, the output of `terraform show -json`. Concordia reads the security groups and their rules from that plan.
+Concordia does not answer this from the model. The bindings map the load balancer to `aws_lb.public` and the database to `aws_db_instance.ledger` in a Terraform plan, the output of `terraform show -json`. The plan compares the Terraform code with the estate that is already deployed. Concordia reads the security groups and their rules from that plan.
 
 ```bash
 cd /tmp/concordia-docs/tour && concordia check --rule PAY-NET-002 --no-color 2>&1 | sed -n '/^Deployment trace/q;p'
@@ -218,29 +218,49 @@ FAIL PAY-NET-002 The public load balancer has no network path to the ledger data
   Owner: team-platform
   public-load-balancer -> ledger-db: 1 finding(s)
     infra/plans/production.json
-      open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
+      open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_security_group.gateway egress[0], aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
   Fix: Remove the security group rule that admits the load balancer group to the ledger database.
 
 ```
 
-The path is open. The finding names the plan file, `infra/plans/production.json`, and the two rules that open the path: the egress rule of the load balancer allows all traffic out, and the ingress rule `ledger_from_gateway` admits the load balancer's security group to the database on 5432. This is the rule in the Terraform code:
+The path is open. The finding names the plan file, `infra/plans/production.json`, and the rules that open the path. On the load balancer side, the egress rule `gateway_out` allows all traffic out. It shows twice, because the plan lists the deployed rule both as its own resource and in the `egress` list of the `gateway` security group. On the database side, the ingress rule `ledger_from_gateway` admits the load balancer's security group on 5432.
+
+The plan also shows which change opens the path. Everything else in the estate is already deployed (`no-op`). Only the debug rule is new:
+
+```bash
+cd /tmp/concordia-docs/tour && jq -r '.resource_changes[] | "\(.change.actions | join(",")) \(.address)"' infra/plans/production.json
+```
+
+```output
+no-op aws_db_instance.ledger
+no-op aws_lb.public
+no-op aws_security_group.gateway
+no-op aws_security_group.ledger_db
+no-op aws_subnet.public
+no-op aws_vpc.main
+no-op aws_vpc_security_group_egress_rule.gateway_out
+no-op aws_vpc_security_group_ingress_rule.ledger_from_app
+create aws_vpc_security_group_ingress_rule.ledger_from_gateway
+```
+
+This is the new rule in the Terraform code:
 
 ```bash
 cd /tmp/concordia-docs/tour && grep -n -A7 '"ledger_from_gateway"' infra/terraform/main.tf
 ```
 
 ```output
-71:resource "aws_vpc_security_group_ingress_rule" "ledger_from_gateway" {
-72-  security_group_id            = aws_security_group.ledger_db.id
-73-  description                  = "temporary debug access"
-74-  referenced_security_group_id = aws_security_group.gateway.id
-75-  ip_protocol                  = "tcp"
-76-  from_port                    = 5432
-77-  to_port                      = 5432
-78-}
+72:resource "aws_vpc_security_group_ingress_rule" "ledger_from_gateway" {
+73-  security_group_id            = aws_security_group.ledger_db.id
+74-  description                  = "temporary debug access"
+75-  referenced_security_group_id = aws_security_group.gateway.id
+76-  ip_protocol                  = "tcp"
+77-  from_port                    = 5432
+78-  to_port                      = 5432
+79-}
 ```
 
-Somebody added "temporary debug access", and it stayed. No code review of the services could see it.
+Somebody added "temporary debug access". No code review of the services could see it. Concordia reports it from the plan, before Terraform applies it.
 
 The rule is `advisory`: it reports, but it does not change the exit code. The contract of the effective-access rules is not yet stable, so they cannot be `mandatory` in this release. The exit code of this run is 0:
 
@@ -269,7 +289,7 @@ Targets: calm:node:ledger-db
 Finding 0375…de4
   Fingerprint: sha256:03752564dacfb15d175792e9bb0bc88d8766a97460efc2171a5df5c31b1f8de4
   Kind: obligation-violation
-  Message: effective network access from public-load-balancer to ledger-db (environment production): open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
+  Message: effective network access from public-load-balancer to ledger-db (environment production): open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_security_group.gateway egress[0], aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
   Source: calm:node:public-load-balancer
   Target: calm:node:ledger-db
   Owner: team-platform
@@ -288,10 +308,11 @@ cd /tmp/concordia-docs/tour && jq '.assurance.evaluations[] | select(.kind == "c
   "query": "tcp/5432 from aws_lb.public to aws_db_instance.ledger",
   "verdict": "allowed",
   "policies": [
+    "aws_security_group.gateway egress[0]",
     "aws_vpc_security_group_egress_rule.gateway_out rule",
     "aws_vpc_security_group_ingress_rule.ledger_from_gateway rule"
   ],
-  "inputDigest": "sha256:9612fb61973d4b7b643e49a58d10adf974866e6f3090c041f5746297eb70d898",
+  "inputDigest": "sha256:f39e6f816f9c0ce49e79dc6e909338b23cb34ce331a371c8145fb2d2d6539e0e",
   "integrity": "content not verified"
 }
 ```

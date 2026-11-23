@@ -31,9 +31,17 @@ type azureRule struct {
 	base      string
 	address   string
 	fixedGaps []assurance.Gap
+	// index is the position of an inline rule in the `security_rule` list of the plan values.
+	index int
 	// fixed is no when the rule is not a rule of the NSG, maybe when its owner or its priority, direction, or access
 	// is not known (fixedGaps say why), else yes.
 	fixed tri
+	// inline is true for a `security_rule` block of the NSG.
+	inline bool
+	// owned is the ownership of a rule resource by the NSG: yes when the rule surely belongs to it.
+	owned tri
+	// stale is true for an inline rule of an NSG that a rule resource the plan changes may belong to.
+	stale bool
 }
 
 // azureDefault is one of the default rules that Azure adds to every NSG.
@@ -92,7 +100,8 @@ func azureBuildDefaults() []*plan.Resource {
 // azureRulesOf lists the rules of the NSG for one direction in ascending priority: the inline rules, the rule
 // resources of the NSG, and the default rules.
 func (e *Evaluator) azureRulesOf(nsg *plan.Resource, outbound bool) []azureRule {
-	rules := slices.Concat(azureInlineRules(nsg), e.azureStandaloneRules(nsg), azureDefaultRules(nsg))
+	standalone := e.azureStandaloneRules(nsg)
+	rules := slices.Concat(e.azureFreshInline(nsg, standalone), standalone, azureDefaultRules(nsg))
 	rules = slices.DeleteFunc(rules, func(r azureRule) bool { return !r.inDirection(outbound) })
 
 	slices.SortStableFunc(rules, func(a, b azureRule) int { return cmp.Compare(a.priority(), b.priority()) })
@@ -100,15 +109,32 @@ func (e *Evaluator) azureRulesOf(nsg *plan.Resource, outbound bool) []azureRule 
 	return rules
 }
 
+// azureRulesAttr is the list of inline rules of an NSG.
+const azureRulesAttr = "security_rule"
+
 func azureInlineRules(nsg *plan.Resource) []azureRule {
-	count := blockCount(nsg, "security_rule")
+	count := blockCount(nsg, azureRulesAttr)
 	rules := make([]azureRule, 0, count)
 
 	for i := range count {
-		rules = append(rules, newAzureRule(nsg, fmt.Sprintf("security_rule[%d].", i), nsg.Address, triYes))
+		rule := newAzureRule(nsg, fmt.Sprintf("%s[%d].", azureRulesAttr, i), nsg.Address, triYes)
+		rule.inline, rule.index = true, i
+		rules = append(rules, rule)
 	}
 
 	return rules
+}
+
+// azureRulesUnknown reports, with a gap, whether the inline rule list of the NSG is unknown until apply as a whole
+// or in whole elements (a dynamic block, or the computed list of a new NSG).
+func azureRulesUnknown(nsg *plan.Resource, report *side) bool {
+	if !slices.Contains(nsg.Unknown, azureRulesAttr) && !listHasUnknownElements(nsg, azureRulesAttr) {
+		return false
+	}
+
+	report.gap(evaluate.GapUnknownAfterApply, nsg.Address+"."+azureRulesAttr)
+
+	return true
 }
 
 func azureDefaultRules(nsg *plan.Resource) []azureRule {
@@ -129,6 +155,7 @@ func (e *Evaluator) azureStandaloneRules(nsg *plan.Resource) []azureRule {
 		owner := &side{}
 		if belongs := e.azureRuleOwner(res, nsg, owner); belongs != triNo {
 			rule := newAzureRule(res, "", res.Address, belongs)
+			rule.owned = belongs
 			rule.fixedGaps = append(rule.fixedGaps, owner.gaps...)
 			rules = append(rules, rule)
 		}
@@ -157,7 +184,7 @@ func newAzureRule(res *plan.Resource, base, address string, owner tri) azureRule
 // `network_security_group_name` first, then the name and resource group in the plan.
 func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, report *side) tri {
 	if refs := rule.References["network_security_group_name"]; len(refs) > 0 {
-		return e.azureOwnerByReference(refs, nsg, report)
+		return e.azureOwnerByReference(rule, refs, nsg, report)
 	}
 
 	name, hasName := attrString(rule, "network_security_group_name")
@@ -176,19 +203,14 @@ func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, report *side) tri {
 	return azureNamedLike(nsg, name, group, report)
 }
 
-// azureOwnerByReference is yes when a referenced NSG is the NSG, maybe when a reference does not resolve.
-func (e *Evaluator) azureOwnerByReference(refs []string, nsg *plan.Resource, report *side) tri {
-	result := triNo
+// azureOwnerByReference is yes when a referenced NSG is the NSG, maybe when a reference does not resolve to an NSG.
+func (e *Evaluator) azureOwnerByReference(rule *plan.Resource, refs []string, nsg *plan.Resource, report *side) tri {
+	found, resolved := e.resolveAll(refs, report)
+	owners, typed := keepTypes(attrRef{res: rule, path: "network_security_group_name"}, found, report, []string{azureNSG})
 
-	for _, config := range refs {
-		owner, ok := e.resolveConfig(config, report)
-		if !ok {
-			result = or(result, triMaybe)
-
-			continue
-		}
-
-		result = or(result, azureIf(owner == nsg))
+	result := azureIf(slices.Contains(owners, nsg))
+	if !resolved || !typed {
+		result = or(result, triMaybe)
 	}
 
 	return result

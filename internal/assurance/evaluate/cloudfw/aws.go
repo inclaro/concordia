@@ -8,8 +8,12 @@ import (
 	"github.com/inclaro/concordia/internal/assurance/plan"
 )
 
-// awsSecurityGroup is the resource type of a security group, which can also be bound directly as an endpoint.
-const awsSecurityGroup = "aws_security_group"
+// awsGroupTypes are the resource types of a security group. An attribute that holds security group IDs must name
+// one of them, and an endpoint of one of these types is the group itself.
+var awsGroupTypes = []string{"aws_security_group", "aws_default_security_group"}
+
+// awsSubnet is the resource type of a subnet, whose `cidr_block` gives the addresses of an endpoint.
+const awsSubnet = "aws_subnet"
 
 // Attribute names that several AWS endpoint types or rule sources share.
 const (
@@ -20,10 +24,12 @@ const (
 	awsAttrGroupIDs  = "security_group_ids"
 )
 
-// awsEndpoint is one end of an AWS query: its security groups and its address set.
+// awsEndpoint is one end of an AWS query: its security groups, its address set, and the pending rules of
+// attachments that may add groups to it but do not resolve.
 type awsEndpoint struct {
-	groups []*plan.Resource
-	addrs  addrSet
+	groups  []*plan.Resource
+	pending []awsRule
+	addrs   addrSet
 }
 
 // awsEndpointSpec names the attributes of an endpoint type: its security groups, its subnets, and its private IP.
@@ -61,9 +67,10 @@ func (e *Evaluator) evaluateAWS(q *Query, from, to *plan.Resource) Result {
 }
 
 // awsEndpoint resolves the security groups and the address set of an endpoint. The gaps say why the groups are not
-// known.
+// known. Groups that other resources attach to the network interfaces of the endpoint are added; an attachment that
+// may concern the endpoint but does not resolve becomes a pending rule that allows maybe.
 func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.Gap) {
-	if res.Type == awsSecurityGroup {
+	if slices.Contains(awsGroupTypes, res.Type) {
 		return &awsEndpoint{groups: []*plan.Resource{res}, addrs: unknownAddrs}, nil
 	}
 
@@ -74,7 +81,7 @@ func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.G
 
 	check := &side{}
 
-	groups, resolved := e.refs(res, spec.groups, check)
+	groups, resolved := e.refsOfType(res, spec.groups, check, awsGroupTypes...)
 	if !resolved {
 		return nil, check.gaps
 	}
@@ -86,7 +93,17 @@ func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.G
 		return nil, check.gaps
 	}
 
-	return &awsEndpoint{groups: groups, addrs: e.awsAddrs(res, &spec)}, nil
+	attached := e.awsAttachments(res)
+	endpoint := &awsEndpoint{
+		groups: sortResources(slices.Concat(groups, attached.groups)), addrs: e.awsAddrs(res, &spec), pending: attached.pending,
+	}
+
+	// A second network interface gives the endpoint a second address.
+	if attached.interfaces > 0 {
+		endpoint.addrs = unknownAddrs
+	}
+
+	return endpoint, nil
 }
 
 // awsAddrs is the address set of an endpoint: its private IP when it is known, else the CIDR that all its subnets
@@ -104,7 +121,7 @@ func (e *Evaluator) awsAddrs(res *plan.Resource, spec *awsEndpointSpec) addrSet 
 
 	// A subnet that does not resolve leaves the addresses unknown; a rule prefix that depends on them then gives
 	// the gap address-dependent-range.
-	subnets, ok := e.refs(res, spec.subnets, &side{})
+	subnets, ok := e.refsOfType(res, spec.subnets, &side{}, awsSubnet)
 	if !ok {
 		return unknownAddrs
 	}
