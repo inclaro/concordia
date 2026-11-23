@@ -11,12 +11,15 @@ import (
 	"github.com/inclaro/concordia/internal/diag"
 	"github.com/inclaro/concordia/internal/fsutil"
 	"github.com/inclaro/concordia/internal/intent"
+	"github.com/inclaro/concordia/internal/trust"
 	"github.com/inclaro/concordia/internal/workspace"
 )
 
 // LoadBaseModel loads the architecture file (architecture.source) as of base through GitPort.ShowFile and the
-// normal intent loader. It gives an error when the source is not a workspace-relative file, the base has no such
-// file, or the document cannot be loaded.
+// normal intent loader. The base document is validated against the trust vocabulary of the current workspace, the
+// same vocabulary that the current model is loaded with, so that both sides of the comparison use one configuration.
+// It gives an error when the source is not a workspace-relative file, the base has no such file, or the document
+// cannot be loaded.
 func LoadBaseModel(ctx context.Context, wspace *workspace.Workspace, git workspace.GitPort, base string) (*intent.ArchitectureModel, error) {
 	source, err := baseModelSource(wspace.Architecture.Source)
 	if err != nil {
@@ -32,7 +35,7 @@ func LoadBaseModel(ctx context.Context, wspace *workspace.Workspace, git workspa
 		return nil, fmt.Errorf("%s does not exist at %s", source, base)
 	}
 
-	return loadBaseModelData(source, base, data)
+	return loadBaseModelData(source, base, data, trust.FromWorkspace(wspace))
 }
 
 // baseModelSource gives the slash-separated workspace-relative path of architecture.source, or an error when the
@@ -50,8 +53,9 @@ func baseModelSource(configured string) (string, error) {
 	return source, nil
 }
 
-// loadBaseModelData writes the base document into a temporary workspace and loads it with the intent loader.
-func loadBaseModelData(source, base string, data []byte) (*intent.ArchitectureModel, error) {
+// loadBaseModelData writes the base document into a temporary workspace and loads it with the intent loader and the
+// trust vocabulary.
+func loadBaseModelData(source, base string, data []byte, vocabulary trust.Vocabulary) (*intent.ArchitectureModel, error) {
 	dir, err := os.MkdirTemp("", "concordia-adr-base-")
 	if err != nil {
 		return nil, fmt.Errorf("create temporary directory: %w", err)
@@ -64,7 +68,7 @@ func loadBaseModelData(source, base string, data []byte) (*intent.ArchitectureMo
 		return nil, fmt.Errorf("write %s: %w", target, err)
 	}
 
-	result := intent.LoadArchitecture(target, intent.LoadContext{Root: dir, URLMapping: map[string]string{}})
+	result := intent.LoadArchitecture(target, intent.LoadContext{Root: dir, URLMapping: map[string]string{}, Trust: vocabulary})
 	if result.Model == nil {
 		return nil, fmt.Errorf("load %s at %s: %s", source, base, firstDiagnosticMessage(result.Diagnostics))
 	}

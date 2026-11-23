@@ -257,3 +257,35 @@ func TestLoadBaseModelFromGit(t *testing.T) {
 		t.Fatal("remote source should fail")
 	}
 }
+
+// A base CALM that uses a classification the workspace declares loads, and the architecture trigger is decided.
+func TestLoadBaseModelUsesWorkspaceTrustVocabulary(t *testing.T) {
+	const base = `{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {"unique-id": "orders", "node-type": "service", "name": "Orders", "description": "Orders"},
+    {"unique-id": "orders-db", "node-type": "database", "name": "Orders DB", "description": "Orders data",
+     "concordia": {"trust": {"classification": "restricted"}}}
+  ],
+  "relationships": []
+}`
+
+	git := &workspace.FakeGit{FilesAt: map[string]map[string]string{"main": {"architecture/a.calm.json": base}}}
+	wsp := &workspace.Workspace{
+		Architecture: workspace.Architecture{Source: "architecture/a.calm.json"},
+		Trust:        &workspace.Trust{Classifications: []string{"public", "internal", "restricted"}},
+	}
+
+	model, err := adr.LoadBaseModel(context.Background(), wsp, git, "main")
+	if err != nil {
+		t.Fatalf("load base model: %v", err)
+	}
+
+	current := triggerCurrent()
+	trig := []workspace.ADRTrigger{{ID: "TRG-DATA", Category: "data-ownership", Architecture: []string{"relationship-added"}, NodeTypes: []string{"database"}}}
+	reg, paths := triggerRegister()
+
+	got := adr.EvaluateTriggers(trig, &adr.ChangeSet{Files: []string{"architecture/a.calm.json"}}, model, nil, current, reg, paths)
+	triggerWant(t, "result", got[0].Result, "violation")
+	triggerWantList(t, "raised by", got[0].RaisedBy, []string{"relationship-added:orders-to-db"})
+}

@@ -14,6 +14,7 @@ import (
 	"github.com/inclaro/concordia/internal/fsutil"
 	"github.com/inclaro/concordia/internal/intent"
 	"github.com/inclaro/concordia/internal/remote"
+	"github.com/inclaro/concordia/internal/trust"
 	"github.com/inclaro/concordia/internal/workspace"
 )
 
@@ -121,14 +122,19 @@ func modelLoadFailure(diagnostics []diag.Diagnostic) (code, detail string) {
 	return code, detail
 }
 
-// loadModel loads a CALM document at an absolute path with an empty URL mapping. Its diagnostics are ignored.
-func loadModelFile(ctx context.Context, root, abs string, res *remote.Resolver) (*intent.ArchitectureModel, error) {
-	lc := intent.LoadContext{Root: root, URLMapping: map[string]string{}}
+// modelLoadContext is the context that loads a CALM document of a workspace: its root, an empty URL mapping, and its
+// trust vocabulary.
+func modelLoadContext(wsp *workspace.Workspace) *intent.LoadContext {
+	return &intent.LoadContext{Root: wsp.Root, URLMapping: map[string]string{}, Trust: trust.FromWorkspace(wsp)}
+}
+
+// loadModelFile loads a CALM document at an absolute path. Its diagnostics are ignored.
+func loadModelFile(ctx context.Context, abs string, lc *intent.LoadContext, res *remote.Resolver) (*intent.ArchitectureModel, error) {
 	if res != nil {
 		lc.Remote = func(u string) (string, string, string) { return res.Resolve(ctx, u) }
 	}
 
-	result := intent.LoadArchitecture(abs, lc)
+	result := intent.LoadArchitecture(abs, *lc)
 	if result.Model == nil {
 		code, detail := modelLoadFailure(result.Diagnostics)
 
@@ -155,7 +161,7 @@ func (l *diffLoader) worktreeModel(ctx context.Context, wsp *workspace.Workspace
 		local = wsp.ResolveInRoot(local)
 	}
 
-	return loadModelFile(ctx, wsp.Root, local, res)
+	return loadModelFile(ctx, local, modelLoadContext(wsp), res)
 }
 
 func bindingsOf(wsp *workspace.Workspace, model *intent.ArchitectureModel) (*[]binding.Binding, error) {
@@ -217,11 +223,12 @@ func completeRunOf(wsp *workspace.Workspace, text []byte) (*conformance.Run, err
 	return run, nil
 }
 
-// gitSnapshot is a git revision that is read into a directory.
+// gitSnapshot is a git revision that is read into the root of wsp: a copy of the current workspace, so that the
+// architecture of the revision is validated against the trust vocabulary that the worktree side also uses.
 type gitSnapshot struct {
 	git workspace.GitPort
+	wsp *workspace.Workspace
 	rev string
-	dir string
 }
 
 func (l *diffLoader) gitRef(ctx context.Context, ref string) (*diffSide, error) {
@@ -249,7 +256,9 @@ func (l *diffLoader) gitRef(ctx context.Context, ref string) (*diffSide, error) 
 		return nil, err
 	}
 
-	snapshot := gitSnapshot{git: git, rev: rev, dir: dir}
+	clone := *wsp
+	clone.Root = dir
+	snapshot := gitSnapshot{git: git, rev: rev, wsp: &clone}
 
 	if side.model, err = snapshot.model(ctx, source); err != nil {
 		return nil, err
@@ -258,9 +267,6 @@ func (l *diffLoader) gitRef(ctx context.Context, ref string) (*diffSide, error) 
 	if err := snapshot.writeBindingFiles(ctx, wsp.Bindings.Files); err != nil {
 		return nil, err
 	}
-
-	clone := *wsp
-	clone.Root = dir
 
 	if side.bindings, err = bindingsOf(&clone, side.model); err != nil {
 		return nil, err
@@ -296,12 +302,12 @@ func (s gitSnapshot) model(ctx context.Context, source string) (*intent.Architec
 		return &intent.ArchitectureModel{}, nil
 	}
 
-	target := filepath.Join(s.dir, filepath.FromSlash(source))
+	target := filepath.Join(s.wsp.Root, filepath.FromSlash(source))
 	if err = fsutil.WriteFileAtomic(target, data); err != nil {
 		return nil, fmt.Errorf("write %s: %w", target, err)
 	}
 
-	return loadModelFile(ctx, s.dir, target, nil)
+	return loadModelFile(ctx, target, modelLoadContext(s.wsp), nil)
 }
 
 // writeBindingFiles copies the binding files that patterns match from the revision into the directory.
@@ -327,7 +333,7 @@ func (s gitSnapshot) writeBindingFiles(ctx context.Context, patterns []string) e
 			continue
 		}
 
-		target := filepath.Join(s.dir, filepath.FromSlash(file))
+		target := filepath.Join(s.wsp.Root, filepath.FromSlash(file))
 		if err = fsutil.WriteFileAtomic(target, content); err != nil {
 			return fmt.Errorf("write %s: %w", target, err)
 		}
@@ -361,20 +367,25 @@ func (l *diffLoader) bundle(ctx context.Context, arg, abs string) (*diffSide, er
 		return nil, err
 	}
 
-	source := wsp.Architecture.Source
-	if source == "" || strings.HasPrefix(source, "https://") {
-		return nil, diag.Fail(diag.WRK010, diag.Detail("the bundle has no local architecture.source"))
-	}
-
 	side := &diffSide{kind: sideBundle, value: arg, run: run}
 
-	if side.model, err = loadModelFile(ctx, wsp.Root, wsp.ResolveInRoot(source), nil); err != nil {
+	if side.model, err = bundleModel(ctx, wsp); err != nil {
 		return nil, err
 	}
 
 	side.bindings, err = bindingsOf(wsp, side.model)
 
 	return side, err
+}
+
+// bundleModel loads the local architecture of the workspace that a bundle holds.
+func bundleModel(ctx context.Context, wsp *workspace.Workspace) (*intent.ArchitectureModel, error) {
+	source := wsp.Architecture.Source
+	if source == "" || strings.HasPrefix(source, "https://") {
+		return nil, diag.Fail(diag.WRK010, diag.Detail("the bundle has no local architecture.source"))
+	}
+
+	return loadModelFile(ctx, wsp.ResolveInRoot(source), modelLoadContext(wsp), nil)
 }
 
 // bundleWorkspace loads the workspace that a bundle holds among its inputs.
