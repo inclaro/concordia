@@ -4,8 +4,9 @@
 //
 // Two kinds of attribute never become values. An attribute that is unknown until apply is a gap, never a guess. An
 // attribute that the plan marks sensitive is replaced by a redaction marker and recorded as a redaction; the plan's
-// other copies of the value (`variables`, `planned_values`, `prior_state`, `configuration`) are never read, because
-// they carry no marker per attribute.
+// other copies of the value (`variables`, `planned_values`, `prior_state`) are never read, because they carry no
+// marker per attribute. Of the `configuration` section only the `references` lists are read, which hold addresses and
+// not values; `constant_value` is never read.
 package plan
 
 import (
@@ -76,6 +77,10 @@ type Resource struct {
 	Values map[string]any `json:"values,omitempty"`
 	// Unknown are the paths of the attributes that are unknown until apply, sorted, for example `input.owner`.
 	Unknown []string `json:"unknown,omitempty"`
+	// References are the resources that the configuration names in each attribute, by the attribute path in the form
+	// of Unknown (for example `ingress[0].security_groups`). Each address is absolute in the module tree and has no
+	// instance key; the lists are sorted and hold no duplicates. References is nil when the configuration names none.
+	References map[string][]string `json:"references,omitempty"`
 }
 
 // document is the part of the plan JSON that the reader uses. Fields that it does not use are not decoded.
@@ -88,6 +93,7 @@ type document struct {
 	PlannedValues    json.RawMessage   `json:"planned_values"`
 	Values           json.RawMessage   `json:"values"`
 	ResourceChanges  []json.RawMessage `json:"resource_changes"`
+	Configuration    json.RawMessage   `json:"configuration"`
 	Errored          bool              `json:"errored"`
 }
 
@@ -133,6 +139,8 @@ func Read(data []byte, file string) (*Plan, []diag.Diagnostic) {
 	if detail = out.addChanges(doc.ResourceChanges, file); detail != "" {
 		return reject(file, detail)
 	}
+
+	out.addReferences(doc.Configuration)
 
 	out.sortEntries()
 
