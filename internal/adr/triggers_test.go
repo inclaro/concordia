@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/inclaro/concordia/internal/adr"
@@ -258,34 +259,63 @@ func TestLoadBaseModelFromGit(t *testing.T) {
 	}
 }
 
-// A base CALM that uses a classification the workspace declares loads, and the architecture trigger is decided.
-func TestLoadBaseModelUsesWorkspaceTrustVocabulary(t *testing.T) {
-	const base = `{
+const (
+	baseSource     = "architecture/a.calm.json"
+	baseMapping    = "architecture/url-mapping.json"
+	baseControlURL = "https://example.org/controls/data-ownership/1.0/requirement.json"
+)
+
+// baseCALM is a CALM document with the orders service and a restricted orders-db that has a control whose
+// requirement URL is baseControlURL. The document has no relationship.
+const baseCALM = `{
   "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
   "nodes": [
     {"unique-id": "orders", "node-type": "service", "name": "Orders", "description": "Orders"},
     {"unique-id": "orders-db", "node-type": "database", "name": "Orders DB", "description": "Orders data",
-     "concordia": {"trust": {"classification": "restricted"}}}
+     "concordia": {"trust": {"classification": "restricted"}},
+     "controls": {"ctl-ownership": {"description": "Orders owns its data.", "requirements": [
+       {"requirement-url": "` + baseControlURL + `", "config": {"control-id": "ctl-ownership", "engine": "concordia", "rule-ids": ["DATA-001"]}}
+     ]}}}
   ],
   "relationships": []
 }`
 
-	git := &workspace.FakeGit{FilesAt: map[string]map[string]string{"main": {"architecture/a.calm.json": base}}}
-	wsp := &workspace.Workspace{
-		Architecture: workspace.Architecture{Source: "architecture/a.calm.json"},
+// baseWorkspace declares the restricted classification and the URL mapping file of the base revision.
+func baseWorkspace() *workspace.Workspace {
+	return &workspace.Workspace{
+		Architecture: workspace.Architecture{Source: baseSource, URLMapping: baseMapping},
 		Trust:        &workspace.Trust{Classifications: []string{"public", "internal", "restricted"}},
 	}
+}
 
-	model, err := adr.LoadBaseModel(context.Background(), wsp, git, "main")
+// A base CALM that uses a workspace-declared classification and a URL-mapped control requirement loads with the
+// mapping and the mapped file of the base revision, and the architecture trigger is decided.
+func TestLoadBaseModelUsesWorkspaceTrustAndRevisionURLMapping(t *testing.T) {
+	git := &workspace.FakeGit{FilesAt: map[string]map[string]string{"main": {
+		baseSource:  baseCALM,
+		baseMapping: `{"` + baseControlURL + `": "resources/requirement.json"}`,
+		"architecture/resources/requirement.json": `{"description": "data ownership requirement"}`,
+	}}}
+
+	model, err := adr.LoadBaseModel(context.Background(), baseWorkspace(), git, "main")
 	if err != nil {
 		t.Fatalf("load base model: %v", err)
 	}
 
-	current := triggerCurrent()
 	trig := []workspace.ADRTrigger{{ID: "TRG-DATA", Category: "data-ownership", Architecture: []string{"relationship-added"}, NodeTypes: []string{"database"}}}
 	reg, paths := triggerRegister()
 
-	got := adr.EvaluateTriggers(trig, &adr.ChangeSet{Files: []string{"architecture/a.calm.json"}}, model, nil, current, reg, paths)
+	got := adr.EvaluateTriggers(trig, &adr.ChangeSet{Files: []string{baseSource}}, model, nil, triggerCurrent(), reg, paths)
 	triggerWant(t, "result", got[0].Result, "violation")
 	triggerWantList(t, "raised by", got[0].RaisedBy, []string{"relationship-added:orders-to-db"})
+}
+
+// A base revision without the mapping file has no mapping, so its mapped control requirement is not resolved.
+func TestLoadBaseModelWithoutMappingAtBaseFails(t *testing.T) {
+	git := &workspace.FakeGit{FilesAt: map[string]map[string]string{"main": {baseSource: baseCALM}}}
+
+	_, err := adr.LoadBaseModel(context.Background(), baseWorkspace(), git, "main")
+	if err == nil || !strings.Contains(err.Error(), baseControlURL+" has no entry in architecture.urlMapping") {
+		t.Fatalf("err = %v, want the unmapped requirement URL", err)
+	}
 }

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/inclaro/concordia/internal/adr"
 	"github.com/inclaro/concordia/internal/binding"
 	"github.com/inclaro/concordia/internal/bundle"
 	"github.com/inclaro/concordia/internal/conformance"
@@ -122,10 +123,10 @@ func modelLoadFailure(diagnostics []diag.Diagnostic) (code, detail string) {
 	return code, detail
 }
 
-// modelLoadContext is the context that loads a CALM document of a workspace: its root, an empty URL mapping, and its
-// trust vocabulary.
-func modelLoadContext(wsp *workspace.Workspace) *intent.LoadContext {
-	return &intent.LoadContext{Root: wsp.Root, URLMapping: map[string]string{}, Trust: trust.FromWorkspace(wsp)}
+// modelLoadContext is the context that loads a CALM document of a workspace: its root, the URL mapping, and its trust
+// vocabulary.
+func modelLoadContext(wsp *workspace.Workspace, urlMapping map[string]string) *intent.LoadContext {
+	return &intent.LoadContext{Root: wsp.Root, URLMapping: urlMapping, Trust: trust.FromWorkspace(wsp)}
 }
 
 // loadModelFile loads a CALM document at an absolute path. Its diagnostics are ignored.
@@ -161,7 +162,12 @@ func (l *diffLoader) worktreeModel(ctx context.Context, wsp *workspace.Workspace
 		local = wsp.ResolveInRoot(local)
 	}
 
-	return loadModelFile(ctx, local, modelLoadContext(wsp), res)
+	urlMapping, err := intent.LoadURLMapping(wsp)
+	if err != nil {
+		return nil, fmt.Errorf("load url mapping: %w", err)
+	}
+
+	return loadModelFile(ctx, local, modelLoadContext(wsp, urlMapping), res)
 }
 
 func bindingsOf(wsp *workspace.Workspace, model *intent.ArchitectureModel) (*[]binding.Binding, error) {
@@ -307,7 +313,12 @@ func (s gitSnapshot) model(ctx context.Context, source string) (*intent.Architec
 		return nil, fmt.Errorf("write %s: %w", target, err)
 	}
 
-	return loadModelFile(ctx, target, modelLoadContext(s.wsp), nil)
+	urlMapping, err := adr.URLMappingAt(ctx, s.git, s.rev, s.wsp)
+	if err != nil {
+		return nil, fmt.Errorf("url mapping at %s: %w", s.rev, err)
+	}
+
+	return loadModelFile(ctx, target, modelLoadContext(s.wsp, urlMapping), nil)
 }
 
 // writeBindingFiles copies the binding files that patterns match from the revision into the directory.
@@ -378,14 +389,15 @@ func (l *diffLoader) bundle(ctx context.Context, arg, abs string) (*diffSide, er
 	return side, err
 }
 
-// bundleModel loads the local architecture of the workspace that a bundle holds.
+// bundleModel loads the local architecture of the workspace that a bundle holds. A bundle does not hold the URL
+// mapping file or the files it maps, so the mapping is empty.
 func bundleModel(ctx context.Context, wsp *workspace.Workspace) (*intent.ArchitectureModel, error) {
 	source := wsp.Architecture.Source
 	if source == "" || strings.HasPrefix(source, "https://") {
 		return nil, diag.Fail(diag.WRK010, diag.Detail("the bundle has no local architecture.source"))
 	}
 
-	return loadModelFile(ctx, wsp.ResolveInRoot(source), modelLoadContext(wsp), nil)
+	return loadModelFile(ctx, wsp.ResolveInRoot(source), modelLoadContext(wsp, map[string]string{}), nil)
 }
 
 // bundleWorkspace loads the workspace that a bundle holds among its inputs.
