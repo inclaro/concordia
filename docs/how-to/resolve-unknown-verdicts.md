@@ -15,12 +15,21 @@ This guide shows you how to find out why a rule returned `unknown` and how to fi
    concordia check --rule <rule-id> --no-color
    ```
 
-   Use the ID of the rule that reports `unknown`. The commerce example uses `CO-COV-001`.
+   Use the ID of the rule that reports `unknown`. In the payments example (`docs/examples/payments/`), `PAY-LEG-001` reports `unknown`, because the workspace excludes the Kotlin code of `legacy-core-banking` from the graph:
 
-2. Read the reason code in the rule block. To see the rule's coverage numbers and evidence, run:
+   ```console
+   $ concordia check --rule PAY-LEG-001 --no-color | grep -A4 '^UNKNOWN'
+   UNKNOWN PAY-LEG-001 Legacy core banking must not call the ledger service
+     Why it matters: The legacy core banking system is being retired. If it still calls the ledger, switching it off breaks the bank's books.
+     Cannot judge: minimum coverage not met: 0.750 < 0.9 (CO-CON-021)
+     Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
+     Coverage: 75.0% (required 90.0%)
+   ```
+
+2. Read the reason codes in the rule block. To see the rule's coverage numbers and evidence, run:
 
    ```bash
-   concordia explain CO-COV-001
+   concordia explain PAY-LEG-001
    ```
 
 3. Find the code in the table below and apply the fix. If the rule is a typed rule, or comes from a review, decision, or assurance pack, find its reason in [find the fix by reason](#find-the-fix-by-reason).
@@ -28,6 +37,7 @@ This guide shows you how to find out why a rule returned `unknown` and how to fi
 | Reason | Meaning | Fix |
 |---|---|---|
 | `CO-CON-021` | File coverage is below the required ratio. | [Raise coverage](#co-con-021-coverage-below-the-minimum) |
+| `CO-CON-026` | The files of one language are below the required ratio. | [Raise coverage](#co-con-021-coverage-below-the-minimum) |
 | `CO-CON-023` | Some edges have less confidence than the rule requires. | [Lower the threshold](#co-con-023-evidence-below-the-confidence-threshold) |
 | `CO-POL-009` | The rule uses an edge kind that CBM cannot observe. | [Change the edge kind](#co-pol-009-unsupported-edge-kind) |
 | `CO-CON-024` | The rule scope contains no files. | [Fix the scope](#co-con-024-empty-scope) |
@@ -80,6 +90,8 @@ Coverage is the share of in-scope files that the graph covers. Excluded files st
    ```
 
 A rule can also set its own `evidence.minimumCoverage`. See [policies](../reference/policies.md).
+
+`CO-CON-026` is the same check for the files of one language, for example `.kt 0.000 < 0.9` when no Kotlin file is in the graph. Include and index the files of that language, or set `evidence.coverage.supportedLanguages` of the rule to a lower ratio. See [the `evidence` block](../reference/policies.md#the-evidence-block).
 
 ## CO-CON-023: evidence below the confidence threshold
 

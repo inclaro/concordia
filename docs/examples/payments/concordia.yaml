@@ -1,0 +1,72 @@
+apiVersion: concordia.io/v1alpha1
+kind: Workspace
+metadata:
+  name: payments-platform
+architecture:
+  source: architecture/payments.calm.json
+  urlMapping: architecture/url-mapping.json
+observation:
+  provider: codebase-memory-mcp
+  projects:
+    - name: payments-example
+      root: .
+      include: [services/**, jobs/**]
+      exclude: [services/legacy-core-banking/**]
+  indexMode: full
+environments:
+  - id: production
+    sources: [deploy/production/**]
+bindings:
+  files: [bindings/concordia.bindings.yaml]
+policies:
+  files: [policies/**/*.policy.yaml]
+  packs:
+    - use: builtin:core
+    - use: builtin:adr-governance
+      rules:
+        GOV-ADR-006: { severity: error }
+    - use: builtin:review-currency
+    - use: builtin:assurance
+exceptions:
+  baseline: exceptions/concordia.baseline.json
+  waivers: exceptions/waivers.yaml
+trust:
+  dimensions: []
+  classifications: [public, internal, restricted]
+adr:
+  files: [governance/decisions.yaml]
+  triggers:
+    - id: TRG-DATA-OWNERSHIP
+      category: data-ownership
+      architecture: [relationship-added]
+      nodeTypes: [database]
+assessments:
+  paths: [assessments]
+  trustAnchor: { ref: main }
+  authorities:
+    - id: security-review
+      role: reviewer
+      mechanism: protected-review
+      reviewers: [alice@example.com]
+      paths: [assessments/approvals/**]
+  required:
+    - id: ledger-threat-model
+      assessment: ASM-LEDGER
+      type: security
+      scope: { calmNodes: [ledger-service, ledger-db] }
+      environment: production
+      authority: security-review
+assurance:
+  rendering:
+    sources:
+      - { environment: production, tool: plain, path: deploy/production }
+  plans:
+    - { environment: production, tool: terraform, file: infra/plans/production.json }
+  evaluators:
+    - environment: production
+      kinds: [network-policy, rbac, cloud-firewall]
+      assumes: [network-policy-enforced, rbac-authorizer-enabled, firewall-rules-complete-in-plan]
+check:
+  minimumCoverage: 0.9
+  unknown: fail
+  failOn: error

@@ -447,12 +447,13 @@ No SLSA level is derived or shown.
 
 | Field | Description |
 |---|---|
-| `environment`, `kind`, `query` | The environment, `network-policy` or `rbac`, and the query as text. |
+| `environment`, `kind`, `query` | The environment, `network-policy`, `rbac`, or `cloud-firewall`, and the query as text. A `cloud-firewall` query has the form `tcp/<port> from <source address> to <destination address>`, with plan addresses. |
 | `verdict`, `reason` | `allowed`, `denied`, `granted`, `not-granted`, or `unknown`, and the reason of an `unknown`. |
-| `policies` | The policies, bindings, and roles that decided the answer. |
+| `policies` | The policies, bindings, and roles that decided the answer. For `cloud-firewall`, each entry is `<address> <rule>`, for example `aws_vpc_security_group_ingress_rule.ledger_from_gateway rule`. |
 | `assumptions`, `declaredAssumptions` | The enforcement assumptions that the answer relies on, and those that the workspace declares. |
 | `limits`, `gaps` | The limits of the evaluator and the gaps of its input. |
-| `evaluator`, `evaluatorVersion`, `inputDigest` | The evaluator that answered and the digest of its input. The same rendered input gives the same answer and digest. |
+| `evaluator`, `evaluatorVersion`, `inputDigest` | The evaluator that answered and the digest of its input. The same rendered input gives the same answer and digest. For `cloud-firewall`, `inputDigest` is the SHA-256 of the plan bytes, or the digest of the sorted plan digests when the environment has more plans. |
+| `integrity` | Optional. The integrity of the evidence that the evaluator read: `content not verified`, `content verified by digest`, or `producer authenticated`. A `cloud-firewall` entry always has it: `content not verified` for a plan without a statement, `producer authenticated` for a plan that a verified statement binds, and the lowest level when the environment has more plans. |
 
 ### `checkResults`
 

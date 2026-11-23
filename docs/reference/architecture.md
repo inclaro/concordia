@@ -49,7 +49,7 @@ The relationship extension has two optional keys: `observation` (below) and `tru
 | `minimum-confidence` | `resolved`, `runtime`, `syntactic`, `heuristic`, `unknown` | Lowest confidence that counts as evidence. |
 | `required` | boolean | The declared relationship must be observed. Default: `false`. |
 
-Example, from the commerce example:
+Example, from the relationship `payments-to-fraud` of `docs/examples/payments/architecture/payments.calm.json`:
 
 ```json
 "concordia": {
@@ -76,14 +76,14 @@ A CALM control requirement can carry a `config` (or a `config-url`) that links t
 | `unknown-disposition` | `fail`, `warn`, `ignore` | no | What an unknown verdict of these rules and checks does. With `fail`, a check with no definite result fails the run (exit code `4`). `warn` and `ignore` leave the verdict `unknown` and the run unchanged. |
 | `minimum-policy-coverage` | number 0..1 | no | Required coverage for these rules. For `check-ids`, the coverage is the share of the checks that have a definite result (`pass`, `violation`, or `not-applicable`). Below the minimum, the verdict of the control is at least `unknown` with the reason `coverage-incomplete`. |
 
-Example, from `docs/examples/commerce/architecture/commerce.calm.json`:
+Example, from the control `ctl-ledger-ownership` on `ledger-db` in `docs/examples/payments/architecture/payments.calm.json`:
 
 ```json
 "config": {
-  "control-id": "architecture-001",
+  "control-id": "ctl-ledger-ownership",
   "engine": "concordia",
-  "policy-ref": "../policies/boundaries.policy.yaml",
-  "rule-ids": ["CO-BND-001"],
+  "policy-ref": "../policies/payments.policy.yaml",
+  "rule-ids": ["PAY-DB-001"],
   "unknown-disposition": "fail",
   "minimum-policy-coverage": 0.9
 }

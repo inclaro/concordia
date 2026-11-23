@@ -363,30 +363,42 @@ The three forms have the same properties:
 
 ### `require.effectiveAccess`
 
+From the payments example (`docs/examples/payments/policies/payments.policy.yaml`), without `owner`, `rationale`, and `remediation`:
+
 ```yaml
-- id: ORG-NET-001
-  name: The public gateway has no network path to the database
+- id: PAY-NET-002
+  name: The public load balancer has no network path to the ledger database
   severity: error
   require:
     effectiveAccess:
       dimension: network
-      from: { calmNodes: [public-gateway] }
-      to: { calmNodes: [orders-db] }
+      from: {calmNodes: [public-load-balancer]}
+      to: {calmNodes: [ledger-db]}
       expect: denied
       ports: [5432]
 ```
 
-The rule asks an evaluator what an environment allows between two sets of workloads. The evaluators read the rendered documents of the environment, never the code graph: a missing selection edge is not isolation.
+The rule asks an evaluator what an environment allows between two sets of workloads or planned cloud resources. The evaluators read the rendered documents and the infrastructure plans of the environment, never the code graph: a missing selection edge is not isolation.
+
+For `dimension: network`, the bindings of each pair select the evaluator:
+
+| The two CALM elements bind to | Evaluator |
+|---|---|
+| rendered workloads (`workload` matches), both | `network-policy` |
+| planned resources of the environment (`infraResource` matches), both | `cloud-firewall`, which reads the plans in [`assurance.plans`](workspace.md#assuranceplans) |
+| a planned resource and a rendered workload | none: `unknown` with `binding-gap` and the detail `the pair mixes planned cloud resources and Kubernetes workloads` |
+
+In the payments example, `public-load-balancer` binds to `aws_lb.public` and `ledger-db` binds to `aws_db_instance.ledger`, so `cloud-firewall` answers PAY-NET-002. See [cloud-firewall](assurance.md#cloud-firewall).
 
 | Field | Type | Description |
 |---|---|---|
-| `require.effectiveAccess.dimension` | `network` or `authorization`, required | `network` asks the `network-policy` evaluator, `authorization` asks the `rbac` evaluator. Any other value gives `CO-POL-002` with the supported values. |
-| `require.effectiveAccess.from` | selector, required | The subjects: workloads that connect (`network`) or that act (`authorization`). |
+| `require.effectiveAccess.dimension` | `network` or `authorization`, required | `network` asks the `network-policy` evaluator for pairs bound to workloads and the `cloud-firewall` evaluator for pairs bound to planned resources; `authorization` asks the `rbac` evaluator. Any other value gives `CO-POL-002` with the supported values. |
+| `require.effectiveAccess.from` | selector, required | The subjects: workloads or planned cloud resources that connect (`network`), or workloads that act (`authorization`). |
 | `require.effectiveAccess.to` | selector, required | The targets. A pair of one element with itself says nothing and is left out. |
 | `require.effectiveAccess.expect` | string, required | `denied` or `allowed` for `network`; `not-granted` or `granted` for `authorization`. Another value, or a value of the other dimension, gives `CO-POL-002`. |
-| `require.effectiveAccess.ports` | list of integers 1 to 65535, at least 1, unique | The destination ports to query. Only for `network`: with `authorization` the compiler gives `CO-POL-002`. Without ports, Concordia queries the ports that the destination declares, every port that a policy rule names, and one port that no rule names, so a policy that opens only unnamed ports is not missed. |
+| `require.effectiveAccess.ports` | list of integers 1 to 65535, at least 1, unique | The destination ports to query. Only for `network`: with `authorization` the compiler gives `CO-POL-002`. Without ports, `network-policy` queries the ports that the destination declares, every port that a policy rule names, and one port that no rule names, so a policy that opens only unnamed ports is not missed. `cloud-firewall` queries every port that a firewall rule of the plans names, and one port that no rule names. |
 
-The rule is evaluated for each environment of the run, each pair of subject and target, and each port. `expect: denied` is violated by one open port; `expect: allowed` is met by one open port. A closed answer (`denied` or `not-granted`) holds only when the enforcement that it assumes is declared under `assurance.evaluators[].assumes`; an answer of `allowed` or `granted` needs no assumption. Reasons of an `unknown`: `no-evaluator-available` (no evaluator of the kind is enabled for the environment), `rendered-evidence-missing`, `coverage-incomplete` (a namespace whose render is not complete), `enforcement-not-declared`, and `claim-not-enabled`. The report lists each query in [`assurance.evaluations`](results.md#evaluations).
+The rule is evaluated for each environment of the run, each pair of subject and target, and each port. `expect: denied` is violated by one open port; `expect: allowed` is met by one open port. A closed answer (`denied` or `not-granted`) holds only when the enforcement that it assumes is declared under `assurance.evaluators[].assumes`; an answer of `allowed` or `granted` needs no assumption. Reasons of an `unknown`: `no-evaluator-available` (no evaluator of the kind is enabled for the environment), `rendered-evidence-missing` (no rendered resources, or no usable plan for `cloud-firewall`), `coverage-incomplete` (a namespace whose render is not complete, or a plan that is not complete), `binding-gap` (an element without a binding in the environment, or a mixed pair), `enforcement-not-declared`, and `claim-not-enabled`. The report lists each query in [`assurance.evaluations`](results.md#evaluations).
 
 ### `require.checkResult`
 

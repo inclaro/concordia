@@ -1,0 +1,126 @@
+apiVersion: concordia.io/v1alpha1
+kind: PolicyPack
+metadata:
+  id: payments-architecture
+  version: 1.0.0
+rules:
+  - id: PAY-API-001
+    name: Payments uses only the published fraud API
+    severity: error
+    owner: team-payments
+    rationale: When the fraud team refactors its risk model, every caller of its internals breaks. A refactor of the risk model once stopped payment authorization in production. The fraud API is the part that the fraud team keeps stable.
+    remediation: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
+    subject:
+      calmNodes: [payments-service]
+    publicApiOnly:
+      target:
+        calmNodes: [fraud-service]
+      api:
+        sourceRoots: [services/fraud-service/src/api/**]
+      edges: [IMPORTS, CALLS]
+  - id: PAY-CYC-001
+    name: Services are free of cycles
+    severity: error
+    owner: team-architecture
+    rationale: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other. A cycle between payments and the ledger means that a ledger incident can stop payments.
+    remediation: Break the cycle. For example, let payments publish a settled event that the ledger consumes, instead of the ledger calling payments.
+    subject:
+      nodeTypes: [service]
+    require:
+      graphProperty: acyclic
+      edges: [IMPORTS, CALLS]
+      collapseBy: architectureBinding
+  - id: PAY-PATH-001
+    name: Critical services do not depend on non-critical services
+    severity: error
+    owner: team-architecture
+    rationale: Payment authorization must keep working when a non-critical service such as notifications is down. A path from a critical service to a non-critical one, direct or through other code, lets a minor outage stop payments.
+    remediation: Remove the dependency, or decouple it with a queue so that the critical service does not wait for the non-critical one.
+    subject:
+      tags: [critical]
+    denyPath:
+      target:
+        tags: [non-critical]
+      edges: [IMPORTS, CALLS]
+      maxDepth: 4
+  - id: PAY-DB-001
+    name: Only the ledger service accesses the ledger database
+    severity: error
+    owner: team-ledger
+    rationale: The ledger database holds the bank's record of every movement of money. Code outside the ledger service that reads or writes it bypasses the ledger's checks and breaks when the schema changes.
+    remediation: Read ledger data through the ledger service API, or a published read model, instead of the database schema.
+    subject:
+      calmNodes: [ledger-db]
+    ownership:
+      owners:
+        calmNodes: [ledger-service]
+      edges: [IMPORTS, CALLS, READS, WRITES]
+  - id: PAY-NET-001
+    name: The channels API has no network path to the fraud cache
+    severity: error
+    owner: team-fraud
+    rationale: The fraud cache holds risk scores. An internet-facing workload that can reach it can read or poison the scores that decide which payments go through.
+    remediation: Remove the NetworkPolicy that admits the channels namespace to the fraud cache, or narrow it to the fraud service.
+    require:
+      effectiveAccess:
+        dimension: network
+        from: {calmNodes: [channels-api]}
+        to: {calmNodes: [fraud-cache]}
+        expect: denied
+        ports: [6379]
+  - id: PAY-NET-002
+    name: The public load balancer has no network path to the ledger database
+    severity: error
+    owner: team-platform
+    rationale: The ledger database must be reachable only from the application tier. An open path from the internet-facing load balancer puts the bank's ledger one misconfiguration away from the internet.
+    remediation: Remove the security group rule that admits the load balancer group to the ledger database.
+    require:
+      effectiveAccess:
+        dimension: network
+        from: {calmNodes: [public-load-balancer]}
+        to: {calmNodes: [ledger-db]}
+        expect: denied
+        ports: [5432]
+  - id: PAY-RBAC-001
+    name: The channels API cannot change the fraud cache
+    severity: error
+    owner: team-fraud
+    rationale: A service account of an internet-facing workload that can patch a deployment in the fraud namespace can replace the fraud cache with its own image.
+    remediation: Remove the RoleBinding that grants the channels-api service account a role in the fraud namespace.
+    require:
+      effectiveAccess:
+        dimension: authorization
+        from: {calmNodes: [channels-api]}
+        to: {calmNodes: [fraud-cache]}
+        expect: not-granted
+  - id: PAY-TLS-001
+    name: Payments calls other services over HTTPS in production
+    severity: error
+    owner: team-payments
+    rationale: Payment data in transit must be encrypted. A plain HTTP call from the payments service sends card and account data in clear text.
+    remediation: Use an https URL for the call, or route it through the service mesh that terminates TLS.
+    subject:
+      calmNodes: [payments-service]
+    obligation:
+      type: forbidden
+      relation: {kind: calls-service, direction: from-subject}
+      applies:
+        allOf:
+          - environment: production
+          - not: {protocol: https}
+  - id: PAY-LEG-001
+    name: Legacy core banking must not call the ledger service
+    severity: error
+    owner: team-core-banking
+    rationale: The legacy core banking system is being retired. If it still calls the ledger, switching it off breaks the bank's books.
+    remediation: Index the legacy Kotlin code so that Concordia can show that the legacy system never calls the ledger service.
+    subject:
+      calmNodes: [legacy-core-banking]
+    forbid:
+      target:
+        calmNodes: [ledger-service]
+      edges: [CALLS]
+      traversal: direct
+    evidence:
+      minimumConfidence: resolved
+      onUnknown: fail

@@ -41,7 +41,7 @@ The line between the second and third level is the one that matters. A digest is
 
 The same distinction appears in the bundle. `export verify` prints `content verified by digest` for an archive whose files match their digests, and `producer authenticated` only when you also verify the signature of the bundle.
 
-Claims ask for the level that fits the risk. Claims about what Concordia computes itself from committed files, such as a render or a NetworkPolicy evaluation, need at least a digest. Claims that someone else would otherwise assert (a plan, exact lineage, a deployed digest, runtime drift, the outcome of a check, a measurement) need an authenticated producer. A statement in a bare in-toto file, or in a DSSE envelope without a Sigstore bundle, cannot be verified, so it never goes above the lower levels.
+Claims ask for the level that fits the risk. Claims about what Concordia computes itself from committed files, such as a render or a NetworkPolicy evaluation, need at least a digest. Claims that someone else would otherwise assert (a plan, exact lineage, a deployed digest, runtime drift, the outcome of a check, a measurement) need an authenticated producer. A statement in a bare in-toto file, or in a DSSE envelope without a Sigstore bundle, cannot be verified, so it never goes above the lower levels. A cloud firewall result reads an unsigned plan at `content not verified`, and the result shows this integrity next to the digest of the plan, so you can see how much the result rests on.
 
 ## Admissibility
 

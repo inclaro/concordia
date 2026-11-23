@@ -1,0 +1,661 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_vpc.main",
+          "mode": "managed",
+          "type": "aws_vpc",
+          "name": "main",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "cidr_block": "10.16.0.0/12",
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_subnet.public",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "public",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "cidr_block": "10.16.1.0/24",
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_security_group.gateway",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "gateway",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "payments-gateway",
+            "description": "Public load balancer of the payments platform",
+            "revoke_rules_on_delete": false,
+            "tags": null,
+            "ingress": [],
+            "egress": []
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_security_group.ledger_db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "ledger_db",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "ledger-db",
+            "description": "Ledger database",
+            "revoke_rules_on_delete": false,
+            "tags": null,
+            "ingress": [],
+            "egress": []
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_lb.public",
+          "mode": "managed",
+          "type": "aws_lb",
+          "name": "public",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "name": "payments-public",
+            "load_balancer_type": "network",
+            "internal": false,
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_db_instance.ledger",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "ledger",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "identifier": "ledger",
+            "engine": "postgres",
+            "instance_class": "db.r6g.large",
+            "allocated_storage": 100,
+            "username": "ledger",
+            "manage_master_user_password": true,
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.gateway_out",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_egress_rule",
+          "name": "gateway_out",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "description": "Load balancer to its targets",
+            "cidr_ipv4": "0.0.0.0/0",
+            "ip_protocol": "-1",
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.ledger_from_app",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "ledger_from_app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "description": "Application subnets to the ledger database",
+            "cidr_ipv4": "10.20.0.0/16",
+            "ip_protocol": "tcp",
+            "from_port": 5432,
+            "to_port": 5432,
+            "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.ledger_from_gateway",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "ledger_from_gateway",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "description": "temporary debug access",
+            "ip_protocol": "tcp",
+            "from_port": 5432,
+            "to_port": 5432,
+            "tags": null
+          },
+          "sensitive_values": {}
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_vpc.main",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "cidr_block": "10.16.0.0/12",
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "default_security_group_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_subnet.public",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "cidr_block": "10.16.1.0/24",
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "vpc_id": true,
+          "availability_zone": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.gateway",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "gateway",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "payments-gateway",
+          "description": "Public load balancer of the payments platform",
+          "revoke_rules_on_delete": false,
+          "tags": null,
+          "ingress": [],
+          "egress": []
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "vpc_id": true,
+          "owner_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_security_group.ledger_db",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "ledger_db",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "ledger-db",
+          "description": "Ledger database",
+          "revoke_rules_on_delete": false,
+          "tags": null,
+          "ingress": [],
+          "egress": []
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "vpc_id": true,
+          "owner_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_lb.public",
+      "mode": "managed",
+      "type": "aws_lb",
+      "name": "public",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "payments-public",
+          "load_balancer_type": "network",
+          "internal": false,
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "dns_name": true,
+          "zone_id": true,
+          "vpc_id": true,
+          "subnets": true,
+          "security_groups": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_db_instance.ledger",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "ledger",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "identifier": "ledger",
+          "engine": "postgres",
+          "instance_class": "db.r6g.large",
+          "allocated_storage": 100,
+          "username": "ledger",
+          "manage_master_user_password": true,
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "address": true,
+          "endpoint": true,
+          "port": true,
+          "vpc_security_group_ids": true,
+          "master_user_secret": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_egress_rule.gateway_out",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_egress_rule",
+      "name": "gateway_out",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "description": "Load balancer to its targets",
+          "cidr_ipv4": "0.0.0.0/0",
+          "ip_protocol": "-1",
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "security_group_id": true,
+          "security_group_rule_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.ledger_from_app",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "ledger_from_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "description": "Application subnets to the ledger database",
+          "cidr_ipv4": "10.20.0.0/16",
+          "ip_protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "security_group_id": true,
+          "security_group_rule_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.ledger_from_gateway",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "ledger_from_gateway",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "description": "temporary debug access",
+          "ip_protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "tags": null
+        },
+        "after_unknown": {
+          "id": true,
+          "arn": true,
+          "security_group_id": true,
+          "security_group_rule_id": true,
+          "referenced_security_group_id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "full_name": "registry.terraform.io/hashicorp/aws",
+        "version_constraint": "~> 5.0",
+        "expressions": {
+          "region": {
+            "constant_value": "eu-west-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_vpc.main",
+          "mode": "managed",
+          "type": "aws_vpc",
+          "name": "main",
+          "provider_config_key": "aws",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.16.0.0/12"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_subnet.public",
+          "mode": "managed",
+          "type": "aws_subnet",
+          "name": "public",
+          "provider_config_key": "aws",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.16.1.0/24"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_security_group.gateway",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "gateway",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "payments-gateway"
+            },
+            "description": {
+              "constant_value": "Public load balancer of the payments platform"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_security_group.ledger_db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "ledger_db",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "ledger-db"
+            },
+            "description": {
+              "constant_value": "Ledger database"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_lb.public",
+          "mode": "managed",
+          "type": "aws_lb",
+          "name": "public",
+          "provider_config_key": "aws",
+          "expressions": {
+            "name": {
+              "constant_value": "payments-public"
+            },
+            "load_balancer_type": {
+              "constant_value": "network"
+            },
+            "internal": {
+              "constant_value": false
+            },
+            "subnets": {
+              "references": [
+                "aws_subnet.public.id",
+                "aws_subnet.public"
+              ]
+            },
+            "security_groups": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_db_instance.ledger",
+          "mode": "managed",
+          "type": "aws_db_instance",
+          "name": "ledger",
+          "provider_config_key": "aws",
+          "expressions": {
+            "identifier": {
+              "constant_value": "ledger"
+            },
+            "engine": {
+              "constant_value": "postgres"
+            },
+            "instance_class": {
+              "constant_value": "db.r6g.large"
+            },
+            "allocated_storage": {
+              "constant_value": 100
+            },
+            "username": {
+              "constant_value": "ledger"
+            },
+            "manage_master_user_password": {
+              "constant_value": true
+            },
+            "vpc_security_group_ids": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_vpc_security_group_egress_rule.gateway_out",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_egress_rule",
+          "name": "gateway_out",
+          "provider_config_key": "aws",
+          "expressions": {
+            "security_group_id": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            },
+            "description": {
+              "constant_value": "Load balancer to its targets"
+            },
+            "cidr_ipv4": {
+              "constant_value": "0.0.0.0/0"
+            },
+            "ip_protocol": {
+              "constant_value": "-1"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.ledger_from_app",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "ledger_from_app",
+          "provider_config_key": "aws",
+          "expressions": {
+            "security_group_id": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            },
+            "description": {
+              "constant_value": "Application subnets to the ledger database"
+            },
+            "cidr_ipv4": {
+              "constant_value": "10.20.0.0/16"
+            },
+            "ip_protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 5432
+            },
+            "to_port": {
+              "constant_value": 5432
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.ledger_from_gateway",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "ledger_from_gateway",
+          "provider_config_key": "aws",
+          "expressions": {
+            "security_group_id": {
+              "references": [
+                "aws_security_group.ledger_db.id",
+                "aws_security_group.ledger_db"
+              ]
+            },
+            "description": {
+              "constant_value": "temporary debug access"
+            },
+            "referenced_security_group_id": {
+              "references": [
+                "aws_security_group.gateway.id",
+                "aws_security_group.gateway"
+              ]
+            },
+            "ip_protocol": {
+              "constant_value": "tcp"
+            },
+            "from_port": {
+              "constant_value": 5432
+            },
+            "to_port": {
+              "constant_value": 5432
+            }
+          },
+          "schema_version": 0
+        }
+      ]
+    }
+  },
+  "timestamp": "2026-11-20T09:00:00Z",
+  "applyable": true,
+  "complete": true,
+  "errored": false
+}

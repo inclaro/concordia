@@ -1,0 +1,23 @@
+# The threat model of the ledger service and its database.
+apiVersion: concordia.io/v1alpha1
+kind: Assessment
+id: ASM-LEDGER
+version: 1
+type: security
+title: Ledger threat model
+scope:
+  calmNodes: [ledger-service, ledger-db]
+environment: production
+subject:
+  summary: The ledger API and the trust context of the ledger database
+  dependencies:
+    - kind: implementation
+      selector:
+        path: services/ledger-service/src/api/index.ts
+    - kind: trust-context
+      selector:
+        calmNodes: [ledger-db]
+assumptions: []
+evidence: []
+outcome: satisfactory
+state: ready-for-review

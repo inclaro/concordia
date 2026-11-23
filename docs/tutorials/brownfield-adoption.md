@@ -1,103 +1,96 @@
 # Adopting Concordia on an existing codebase
 
-*2026-10-21T01:26:38Z by Showboat 0.6.1*
-<!-- showboat-id: f2bc5b18-98cb-47cf-8248-99680971474c -->
+*2026-11-23T17:49:21Z by Showboat 0.6.1*
+<!-- showboat-id: 2ae15dc8-ae34-4ee0-8d26-db56622cb0b9 -->
 
-We will adopt Concordia on a codebase that already has violations. The goal is to accept today's violations, and to fail the build only on new ones. This tutorial assumes you finished [Getting started](getting-started.md).
+A bank cannot fix years of architecture debt before it turns on a new check. In this tutorial you adopt Concordia on the payments platform of a retail bank, which already breaks several of its rules. You accept the findings that exist today, and you fail the build only on new ones. This tutorial assumes that you finished [Getting started](getting-started.md).
 
-First, we create a fresh repository from the sample project, named `commerce-brownfield`, and index it. Run the commands from the root of a Concordia checkout. As in [Getting started](getting-started.md), the index output leaves out the generation ID, which changes with every commit.
+First, you create a fresh repository from the payments example, with the CBM project name `payments-brownfield`. Run the commands from the root of a Concordia checkout.
 
 ```bash
-rm -rf /tmp/concordia-docs/brownfield && mkdir -p /tmp/concordia-docs/brownfield && cp -R docs/examples/commerce/. /tmp/concordia-docs/brownfield && cd /tmp/concordia-docs/brownfield && sed -i.bak 's/name: commerce-example/name: commerce-brownfield/' concordia.yaml && rm concordia.yaml.bak && ls
+rm -rf /tmp/concordia-docs/brownfield && mkdir -p /tmp/concordia-docs/brownfield && cp -R docs/examples/payments/. /tmp/concordia-docs/brownfield && cd /tmp/concordia-docs/brownfield && sed -i.bak 's/name: payments-example/name: payments-brownfield/' concordia.yaml && rm concordia.yaml.bak && ls
 ```
 
 ```output
 architecture
+assessments
 bindings
 concordia.yaml
+deploy
+docs
 exceptions
-packages
+governance
+infra
+jobs
 policies
 services
 ```
 
 ```bash
-cd /tmp/concordia-docs/brownfield && git init -q -b main && git config user.name "Concordia Docs" && git config user.email docs@concordia.invalid && git config commit.gpgsign false && git add -A && git commit -q -m "Initial commerce example" && git log --format=%s
+cd /tmp/concordia-docs/brownfield && git init -q -b main && git config user.name "Concordia Docs" && git config user.email docs@concordia.invalid && git config commit.gpgsign false && git add -A && git commit -q -m "Initial payments example" && git log --format=%s
 ```
 
 ```output
-Initial commerce example
+Initial payments example
 ```
+
+Next, you index the code. As in [Getting started](getting-started.md), the output leaves out the generation ID, which changes with every commit.
 
 ```bash
 cd /tmp/concordia-docs/brownfield && concordia index | grep -v '^generation'
 ```
 
 ```output
-project: commerce-brownfield
-files: 6/7 covered (85.7%)
+project: payments-brownfield
+files: 14/15 covered (93.3%)
 excluded: 1, stale: 0, unindexed: 0
 coverage file: build/concordia/coverage.json
 ```
 
-Now we run the check. Notice the summary line: the code has eight active findings, and `CO-COV-001` is `unknown`. This is the state of a typical brownfield codebase on the first day. We use `--quiet` to hide baselined findings, which do not exist yet, and to keep later outputs short.
+The index covers 14 of 15 files. The one excluded file is the Kotlin code of the legacy core banking system, which the workspace leaves out on purpose.
+
+Now you run the check. The full report is long, so the command keeps only two lines: the overall verdict and the count of findings. `--quiet` hides baselined findings, which do not exist yet. The last command reads the exit code from `build/concordia/results.json`, the machine-readable results that every check writes.
 
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
+cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet | grep -E '^(Conformance|[0-9]+ active)'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
 ```
 
 ```output
-Conformance: violation (4 violation, 1 unknown, 8 findings)
-
-FAIL CO-BND-001 Billing uses Fulfillment contracts only
-  Why it matters: When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.
-  Owner: team-billing
-  billing-service -> fulfillment-service: 3 finding(s)
-    services/billing/src/InvoiceService.ts    imports services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/InvoiceService.ts:7  calls ShipmentStore.reserve in services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/InvoiceService.ts:6  calls ShipmentStore in services/fulfillment/src/internal/ShipmentStore.ts
-  Fix: Import from packages/fulfillment-contract instead.
-
-UNKNOWN CO-COV-001 Legacy must not call Billing
-  Why it matters: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
-  Cannot judge: minimum coverage not met: 0.500 < 0.9 (CO-CON-021)
-  Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
-  Coverage: 50.0% (required 90.0%)
-
-FAIL CO-CYC-001 Services are acyclic
-  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
-  Owner: team-billing
-  Coverage: 85.7% (required 90.0%)
-  cycle through billing-service, fulfillment-service: 1 finding(s)
-    services/billing/src/InvoiceService.ts:6  calls ShipmentStore in services/fulfillment/src/internal/ShipmentStore.ts
-                                              then notifyShipped calls InvoiceService in services/billing/src/InvoiceService.ts
-  Fix: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
-
-FAIL CO-DECL-001 Dependencies are declared
-  Why it matters: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
-  Owner: team-fulfillment
-  Coverage: 85.7% (required 90.0%)
-  fulfillment-service -> billing-service: 3 finding(s)
-    services/fulfillment/src/notify.ts    imports services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:4  calls InvoiceService in services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:5  calls InvoiceService.issue in services/billing/src/InvoiceService.ts
-  Fix: Add the relationship to the CALM model if it is intended, or remove the dependency.
-
-FAIL CO-LYR-001 Billing sits above Fulfillment
-  Why it matters: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
-  Owner: team-fulfillment
-  fulfillment-service -> billing-service: 1 finding(s)
-    services/fulfillment/src/notify.ts  imports services/billing/src/InvoiceService.ts
-  Fix: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
-
-Not configured: Deployment trace, ADR governance, Diagram currency, Assessment currency, Quality evaluation
-No environment declared: the deployment trace and environment-specific assurance need a declared environment.
-
-8 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 1 unknown
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 36 findings)
+33 active error(s), 4 active info(s), 0 baselined, 0 waived, 0 expired waiver(s), 5 unknown
 exit code: 1
 ```
 
-We record all eight findings as a baseline. A baseline lists the fingerprint of each accepted finding, with the time it was accepted.
+Notice the last summary line: the code has 33 active errors. The exit code is 1, so this check fails every build. This is the state of a typical brownfield codebase on the first day. To see where the errors are, you count the findings by disposition, severity, and rule:
+
+```bash
+cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | "\(.disposition) \(.severity) \(.ruleId)"' build/concordia/results.json | sort | uniq -c
+```
+
+```output
+      6 active error CORE-BND-001
+      1 active error CORE-CYC-001
+     10 active error CORE-DECL-001
+      3 active error CORE-SEC-001
+      3 active error PAY-API-001
+      1 active error PAY-CYC-001
+      3 active error PAY-DB-001
+      1 active error PAY-NET-001
+      1 active error PAY-NET-002
+      2 active error PAY-PATH-001
+      1 active error PAY-RBAC-001
+      1 active error REV-APR-001
+      1 active info ASR-PRV-001
+      1 active info ASR-PRV-002
+      1 active info CORE-DECL-001
+      1 active info PAY-TLS-001
+```
+
+The 33 errors come from twelve rules, for example the import of fraud internals (`PAY-API-001`) and the open network path to the ledger database (`PAY-NET-002`). The four `info` findings report evidence that Concordia could not read. They never fail the build, because the workspace fails only on errors (`check.failOn: error`).
+
+## Accept the existing findings
+
+You record the errors as a baseline. A baseline lists the fingerprint of each accepted finding, with the time when you accepted it.
 
 ```bash
 cd /tmp/concordia-docs/brownfield && concordia baseline create
@@ -105,10 +98,12 @@ cd /tmp/concordia-docs/brownfield && concordia baseline create
 
 ```output
 warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-baseline written: 8 finding(s) -> /tmp/concordia-docs/brownfield/exceptions/concordia.baseline.json
+baseline written: 33 finding(s) -> /tmp/concordia-docs/brownfield/exceptions/concordia.baseline.json
 ```
 
-We keep a copy of the file outside the repository, so that we can prove later that new code never rewrites it.
+The baseline holds the 33 error findings. The warning line says that the CBM index has a kind of edge that Concordia does not use for rules. It does not change the result.
+
+You keep a copy of the baseline outside the repository. Later, you use it to prove that new code never rewrites the baseline.
 
 ```bash
 cd /tmp/concordia-docs/brownfield && cp exceptions/concordia.baseline.json /tmp/concordia-docs/brownfield-baseline-before.json
@@ -117,63 +112,90 @@ cd /tmp/concordia-docs/brownfield && cp exceptions/concordia.baseline.json /tmp/
 ```output
 ```
 
-We check again. Notice that the eight findings are now `baselined`, and no finding is active. The exit code is still not 0, though. It is 4, because the verdict of `CO-COV-001` is `unknown`: the rule watches excluded legacy code, and Concordia fails on unknown verdicts by default. A baseline accepts findings. It never turns an unknown verdict into a pass. See [verdicts and coverage](../explanation/verdicts-and-coverage.md) for the reason.
+You check again, with the same two summary lines.
 
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia check --no-color; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
+cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet | grep -E '^(Conformance|[0-9]+ active)'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
 ```
 
 ```output
-warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Conformance: violation (4 violation, 1 unknown, 8 findings)
-
-FAIL CO-BND-001 Billing uses Fulfillment contracts only
-  Why it matters: When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.
-  Owner: team-billing
-  Fix: Import from packages/fulfillment-contract instead.
-  3 baselined finding(s) not shown (use --verbose)
-
-UNKNOWN CO-COV-001 Legacy must not call Billing
-  Why it matters: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
-  Cannot judge: minimum coverage not met: 0.500 < 0.9 (CO-CON-021)
-  Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
-  Coverage: 50.0% (required 90.0%)
-
-FAIL CO-CYC-001 Services are acyclic
-  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
-  Coverage: 85.7% (required 90.0%)
-  Fix: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
-  1 baselined finding(s) not shown (use --verbose)
-
-FAIL CO-DECL-001 Dependencies are declared
-  Why it matters: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
-  Coverage: 85.7% (required 90.0%)
-  Fix: Add the relationship to the CALM model if it is intended, or remove the dependency.
-  3 baselined finding(s) not shown (use --verbose)
-
-FAIL CO-LYR-001 Billing sits above Fulfillment
-  Why it matters: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
-  Fix: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
-  1 baselined finding(s) not shown (use --verbose)
-
-Not configured: Deployment trace, ADR governance, Diagram currency, Assessment currency, Quality evaluation
-No environment declared: the deployment trace and environment-specific assurance need a declared environment.
-
-0 active error(s), 8 baselined, 0 waived, 0 expired waiver(s), 1 unknown
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 36 findings)
+0 active error(s), 4 active info(s), 33 baselined, 0 waived, 0 expired waiver(s), 5 unknown
 exit code: 4
 ```
 
-Now we simulate new work. We add a `Refund` class to the billing service. It imports the internals of the fulfillment service, which the policy forbids. We write the file, commit it, and index again, because Concordia refuses to check against a graph of a different commit.
+Now no error is active: all 33 are `baselined`. The exit code is still not 0, though. It is 4, which means that a rule that must not be `unknown` has the verdict `unknown`. You list the rules that Concordia could not judge, with their enforcement:
+
+```bash
+cd /tmp/concordia-docs/brownfield && jq -r '.rules[] | select(.verdict=="unknown") | "\(.ruleId) \(.enforcement)"' build/concordia/results.json
+```
+
+```output
+ASR-PRV-001 advisory
+ASR-PRV-002 advisory
+CORE-OBS-001 mandatory
+PAY-LEG-001 mandatory
+PAY-TLS-001 advisory
+```
+
+`PAY-LEG-001` and `CORE-OBS-001` are mandatory. Both need the code of the legacy core banking system, which is Kotlin and is not indexed. The advisory rules never change the exit code. A baseline accepts findings, but it never turns an unknown verdict into a pass. See [verdicts and coverage](../explanation/verdicts-and-coverage.md) for the reason.
+
+## Make the gate pass on day one
+
+The example fails on unknown verdicts on purpose: the workspace sets `check.unknown: fail`, and `PAY-LEG-001` sets `onUnknown: fail` in its own `evidence` block. The rule setting wins over the workspace setting. On the first day of adoption, the bank cannot index the legacy Kotlin code yet. So the architecture team decides to report unknown verdicts as warnings until it can. You change both settings to `warn`, and you look at the change:
+
+```bash
+cd /tmp/concordia-docs/brownfield && sed -i 's/^  unknown: fail$/  unknown: warn/' concordia.yaml && sed -i 's/onUnknown: fail/onUnknown: warn/' policies/payments.policy.yaml && git diff --stat && git diff -U0 | grep '^[-+] '
+```
+
+```output
+ concordia.yaml                | 2 +-
+ policies/payments.policy.yaml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+-  unknown: fail
++  unknown: warn
+-      onUnknown: fail
++      onUnknown: warn
+```
+
+This is a decision, so you commit it, as any other change to the workspace. Then you index again, because Concordia refuses to check against the graph of a different commit.
+
+```bash
+cd /tmp/concordia-docs/brownfield && git commit -q -am "Report unknown verdicts as warnings during adoption" && concordia index | grep -v '^generation'
+```
+
+```output
+project: payments-brownfield
+files: 14/15 covered (93.3%)
+excluded: 1, stale: 0, unindexed: 0
+coverage file: build/concordia/coverage.json
+```
+
+```bash
+cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet | grep -E '^(Conformance|[0-9]+ active)'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
+```
+
+```output
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 36 findings)
+0 active error(s), 4 active info(s), 33 baselined, 0 waived, 0 expired waiver(s), 5 unknown
+exit code: 0
+```
+
+The exit code is 0. The five unknown verdicts are still in the report, but they no longer fail the build. Later, when the legacy code is indexed, you set both values back to `fail`.
+
+## Catch a new violation
+
+Now you simulate new work. A developer adds refunds to the payments service. The new class imports the internal risk model of the fraud service, as `PaymentService.ts` already does. You write the file, commit it, and index again.
 
 ```bash
 cd /tmp/concordia-docs/brownfield
-cat > services/billing/src/Refund.ts <<'TS'
-import { ShipmentStore } from "../../fulfillment/src/internal/ShipmentStore";
+cat > services/payments-service/src/Refunds.ts <<'TS'
+import { RiskModel } from "../../fraud-service/src/internal/RiskModel";
 
-export class Refund {
-  refund(orderId: string): void {
-    const store = new ShipmentStore();
-    store.reserve(orderId);
+export class Refunds {
+  approve(paymentId: string, amountCents: number): boolean {
+    const model = new RiskModel();
+    return model.score(paymentId, amountCents) < 0.5;
   }
 }
 TS
@@ -196,80 +218,52 @@ cd /tmp/concordia-docs/brownfield && concordia index | grep -v '^generation'
 ```
 
 ```output
-project: commerce-brownfield
-files: 7/8 covered (87.5%)
+project: payments-brownfield
+files: 15/16 covered (93.8%)
 excluded: 1, stale: 0, unindexed: 0
 coverage file: build/concordia/coverage.json
 ```
 
-We run the check. Notice that the three findings in `Refund.ts` are `active`, and the exit code is 1. The eight old findings stay baselined. Only new violations fail the build: this is the ratchet.
+You run the check. This time the command also prints the report block of `PAY-API-001`, the rule that keeps payments on the published fraud API.
 
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
+cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet | sed -n '/^FAIL PAY-API-001/,/^$/p;/^Conformance/p;/active error/p'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
 ```
 
 ```output
-Conformance: violation (4 violation, 1 unknown, 11 findings)
-
-FAIL CO-BND-001 Billing uses Fulfillment contracts only
-  Why it matters: When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.
-  Owner: team-billing
-  billing-service -> fulfillment-service: 3 finding(s)
-    services/billing/src/Refund.ts:5  calls ShipmentStore in services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/Refund.ts    imports services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/Refund.ts:6  calls ShipmentStore.reserve in services/fulfillment/src/internal/ShipmentStore.ts
-  Fix: Import from packages/fulfillment-contract instead.
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 40 findings)
+FAIL PAY-API-001 Payments uses only the published fraud API
+  Why it matters: When the fraud team refactors its risk model, every caller of its internals breaks. A refactor of the risk model once stopped payment authorization in production. The fraud API is the part that the fraud team keeps stable.
+  Owner: team-payments
+  payments-service -> fraud-service: 3 finding(s)
+    services/payments-service/src/Refunds.ts    imports services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/Refunds.ts:6  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/Refunds.ts:5  calls RiskModel in services/fraud-service/src/internal/RiskModel.ts
+  Fix: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
   3 baselined finding(s) not shown (use --verbose)
 
-UNKNOWN CO-COV-001 Legacy must not call Billing
-  Why it matters: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
-  Cannot judge: minimum coverage not met: 0.667 < 0.9 (CO-CON-021)
-  Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
-  Coverage: 66.7% (required 90.0%)
-
-FAIL CO-CYC-001 Services are acyclic
-  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
-  Coverage: 87.5% (required 90.0%)
-  Fix: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
-  1 baselined finding(s) not shown (use --verbose)
-
-FAIL CO-DECL-001 Dependencies are declared
-  Why it matters: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
-  Coverage: 87.5% (required 90.0%)
-  Fix: Add the relationship to the CALM model if it is intended, or remove the dependency.
-  3 baselined finding(s) not shown (use --verbose)
-
-FAIL CO-LYR-001 Billing sits above Fulfillment
-  Why it matters: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
-  Fix: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
-  1 baselined finding(s) not shown (use --verbose)
-
-Not configured: Deployment trace, ADR governance, Diagram currency, Assessment currency, Quality evaluation
-No environment declared: the deployment trace and environment-specific assurance need a declared environment.
-
-3 active error(s), 8 baselined, 0 waived, 0 expired waiver(s), 1 unknown
+4 active error(s), 4 active info(s), 33 baselined, 0 waived, 0 expired waiver(s), 5 unknown
 exit code: 1
 ```
 
-We confirm this in the machine-readable results. `check` writes `build/concordia/results.json`. We list the disposition, rule and file of every finding, then compare the baseline with the copy that we kept. Notice that the two files are identical: adding code never rewrites the baseline.
+Notice that `Refunds.ts` has three new `PAY-API-001` findings: one import and two calls. The three old findings in `PaymentService.ts` stay baselined. The summary now has 4 active errors, and the exit code is 1. Only new violations fail the build: this is the ratchet.
+
+You find the fourth error in the results. The command lists the disposition, rule and file of every active error finding:
 
 ```bash
-cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | "\(.disposition) \(.ruleId) \(.location.path)"' build/concordia/results.json | sort
+cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | select(.disposition=="active" and .severity=="error") | "\(.disposition) \(.ruleId) \(.location.path)"' build/concordia/results.json | sort
 ```
 
 ```output
-active CO-BND-001 services/billing/src/Refund.ts
-active CO-BND-001 services/billing/src/Refund.ts
-active CO-BND-001 services/billing/src/Refund.ts
-baselined CO-BND-001 services/billing/src/InvoiceService.ts
-baselined CO-BND-001 services/billing/src/InvoiceService.ts
-baselined CO-BND-001 services/billing/src/InvoiceService.ts
-baselined CO-CYC-001 services/billing/src/InvoiceService.ts
-baselined CO-DECL-001 services/fulfillment/src/notify.ts
-baselined CO-DECL-001 services/fulfillment/src/notify.ts
-baselined CO-DECL-001 services/fulfillment/src/notify.ts
-baselined CO-LYR-001 services/fulfillment/src/notify.ts
+active CORE-BND-001 services/payments-service/src/Refunds.ts
+active PAY-API-001 services/payments-service/src/Refunds.ts
+active PAY-API-001 services/payments-service/src/Refunds.ts
+active PAY-API-001 services/payments-service/src/Refunds.ts
 ```
+
+The fourth error comes from `CORE-BND-001`, a rule of the built-in `core` pack. It forbids a service to import the code of another service. So the same new import breaks two rules.
+
+You compare the baseline with the copy that you kept. The two files are identical: new code never rewrites the baseline.
 
 ```bash
 cd /tmp/concordia-docs/brownfield && diff -s exceptions/concordia.baseline.json /tmp/concordia-docs/brownfield-baseline-before.json
@@ -279,75 +273,116 @@ cd /tmp/concordia-docs/brownfield && diff -s exceptions/concordia.baseline.json 
 Files exceptions/concordia.baseline.json and /tmp/concordia-docs/brownfield-baseline-before.json are identical
 ```
 
-Suppose the refund work is a planned migration. We waive the new import finding instead of baselining it. A waiver names one finding by its fingerprint, so first we read that fingerprint from the results:
+## Waive the new findings until a date
+
+Suppose that the refund work is part of a planned migration, and the payments team needs the import for one release. You waive the four new findings instead of baselining them. A waiver records an owner, a reason, and an expiry date, and it names one finding by its fingerprint. You list the fingerprints of the active errors:
 
 ```bash
-cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | select(.disposition=="active" and .edge.kind=="imports") | .fingerprint' build/concordia/results.json
+cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | select(.disposition=="active" and .severity=="error") | "\(.fingerprint) \(.ruleId)"' build/concordia/results.json
 ```
 
 ```output
-sha256:a26922d29928409536231c074ca000638bd358c73f2111f68f7e2a36d4a326c6
+sha256:c5bd2b0bfe8cb6abbf973f6830d7cc020f0547d22ca53c06bd63a3bd770fbf12 CORE-BND-001
+sha256:5db432403167c6d1d583f69ca60e569eeeeda338186b09af5a8d61d8868c3f87 PAY-API-001
+sha256:8f80cee53faab69ba74b2e520b4129995c5ca723fbe38e1fa3555e53afeabe16 PAY-API-001
+sha256:9ca10bfa401c4422f833b4f7109ee241f98e25bd72ab9b8fc2809ab519e6b449 PAY-API-001
 ```
 
-We copy that fingerprint into `waiver add`. A waiver records an owner, a reason and an expiry date. In a real project the expiry is the planned end of the migration; we pick a date far in the future so that this page works on any day.
+You add one waiver for each fingerprint. The loop reads the fingerprints with the same filter, so you do not copy them by hand. In a real project, the expiry is the planned end of the migration. Here you pick a date far in the future, so that this page works on any day. The example ships an empty `exceptions/waivers.yaml`, and each command adds a waiver to it.
 
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia waiver add --finding sha256:a26922d29928409536231c074ca000638bd358c73f2111f68f7e2a36d4a326c6 --owner team-billing --reason "Refund migration in progress" --expires 2099-12-31
+cd /tmp/concordia-docs/brownfield
+for fingerprint in $(jq -r '.findings[] | select(.disposition=="active" and .severity=="error") | .fingerprint' build/concordia/results.json); do
+  concordia waiver add --finding "$fingerprint" --owner team-payments --reason "Refund migration in progress" --expires 2099-12-31
+done
+
 ```
 
 ```output
 waiver WV-1 added to exceptions/waivers.yaml
+waiver WV-2 added to exceptions/waivers.yaml
+waiver WV-3 added to exceptions/waivers.yaml
+waiver WV-4 added to exceptions/waivers.yaml
 ```
 
 ```bash
-cd /tmp/concordia-docs/brownfield && cat exceptions/waivers.yaml
+cd /tmp/concordia-docs/brownfield && sed -n '1,7p' exceptions/waivers.yaml
 ```
 
 ```output
 waivers:
   - id: WV-1
-    finding: sha256:a26922d29928409536231c074ca000638bd358c73f2111f68f7e2a36d4a326c6
-    rule: CO-BND-001
-    owner: team-billing
+    finding: sha256:c5bd2b0bfe8cb6abbf973f6830d7cc020f0547d22ca53c06bd63a3bd770fbf12
+    rule: CORE-BND-001
+    owner: team-payments
     reason: Refund migration in progress
     expires: 2099-12-31
 ```
 
-Now we check again. Notice that the import finding is `waived`, and the two call findings are still `active`: the waiver covers only the finding that we named.
+Each entry has the rule, the owner, the reason, and the expiry. `waiver add` reads the rule from the results. The command shows only the first entry; the other three have the same form. You commit the waivers, and you check again.
 
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia check --format json | jq -r '.findings[] | select(.location.path=="services/billing/src/Refund.ts") | "\(.disposition) \(.edge.kind)"'
+cd /tmp/concordia-docs/brownfield && git add -A && git commit -q -m "Waive the refund findings until the migration ends" && concordia index | grep -v '^generation'
 ```
 
 ```output
-warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-active calls
-waived imports
-active calls
+project: payments-brownfield
+files: 15/16 covered (93.8%)
+excluded: 1, stale: 0, unindexed: 0
+coverage file: build/concordia/coverage.json
 ```
 
-A waiver is in force until the end of its `expires` day, in UTC. After that day, `check` reports the finding as `expired-waiver` and it fails the build again. `waiver validate` checks the waiver file itself, and `--at` evaluates it at another time. The day after the expiry, it reports the expired waiver as an error (`CO-EXC-006`) and exits with code 2:
-
 ```bash
-cd /tmp/concordia-docs/brownfield && concordia waiver validate --at 2100-01-01
+cd /tmp/concordia-docs/brownfield && concordia check --no-color --quiet | grep -E '^(Conformance|[0-9]+ active)'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
 ```
 
 ```output
-error CO-EXC-006: waiver expired: WV-1 (expired 2099-12-31) [exceptions/waivers.yaml]
-1 waiver(s) checked
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 40 findings)
+0 active error(s), 4 active info(s), 33 baselined, 4 waived, 0 expired waiver(s), 5 unknown
+exit code: 0
 ```
 
-We clean up the local state and the CBM project.
+The four new findings are `waived`, and the exit code is 0 again. The waiver covers only the four findings that you named. Another new violation still fails the build.
+
+## See a waiver expire
+
+A waiver is in force until the end of its `expires` day, in UTC. After that day, `check` reports the finding as `expired-waiver`, and the finding fails the build again. To see this today, you set the clock of Concordia with the `CONCORDIA_NOW` environment variable to the day after the expiry:
+
+```bash
+cd /tmp/concordia-docs/brownfield && CONCORDIA_NOW=2100-01-01T00:00:00Z concordia check --no-color --quiet | grep -E '^(Conformance|[0-9]+ active)'; jq -r '"exit code: \(.summary.exitCode)"' build/concordia/results.json
+```
+
+```output
+Conformance: violation (11 violation, 5 unknown, 1 pass, 4 notApplicable, 40 findings)
+0 active error(s), 4 active info(s), 33 baselined, 0 waived, 4 expired waiver(s), 5 unknown
+exit code: 1
+```
+
+```bash
+cd /tmp/concordia-docs/brownfield && jq -r '.findings[] | select(.location.path=="services/payments-service/src/Refunds.ts") | "\(.disposition) \(.ruleId)"' build/concordia/results.json | sort
+```
+
+```output
+expired-waiver CORE-BND-001
+expired-waiver PAY-API-001
+expired-waiver PAY-API-001
+expired-waiver PAY-API-001
+```
+
+The four findings are now `expired-waiver`, and the exit code is 1. The migration must end, or a person must extend the waiver on purpose. To get a warning before that day, run `concordia waiver validate --fail-expiring-within <days>` in CI.
+
+Finally, you remove the local state and the CBM project.
 
 ```bash
 cd /tmp/concordia-docs/brownfield && concordia clean --all --yes
 ```
 
 ```output
-removed: .concordia/, build/concordia/, CBM project 'commerce-brownfield'
+removed: .concordia/, build/concordia/, CBM project 'payments-brownfield'
 ```
 
-You have adopted Concordia on a codebase with existing violations: you baselined what exists, you let the ratchet catch new violations, and you waived one finding with an expiry date. Next steps:
+You adopted Concordia on a payments platform with existing violations. You baselined the findings that exist, you made the gate pass on day one, you let the ratchet catch a new import of fraud internals, and you waived the new findings until a fixed date. Next steps:
 
 - [Manage baselines and waivers](../how-to/manage-baselines-and-waivers.md) covers `baseline update`, pruning, and expiry warnings.
 - [Fingerprints, baselines and waivers](../explanation/fingerprints-baselines-waivers.md) explains why findings survive edits, and why waivers expire.
+- [Integrate through published APIs](../use-cases/integrate-through-published-apis.md) explains the `PAY-API-001` rule that caught the new import.

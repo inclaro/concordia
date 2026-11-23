@@ -1,12 +1,42 @@
 # Concordia documentation
 
-Concordia checks a codebase against its CALM architecture, its deployments, diagrams, decisions, assessments, and evidence, using a set of policies. **Start here:** [Getting started: your first architecture check](tutorials/getting-started.md).
+Concordia shows you where your systems drift from the architecture that you approved. It checks the code, the Kubernetes manifests, the Terraform plans, the decisions, and the security reviews of a repository against the CALM model and the rules of your team. It fails the build before the drift reaches production, and it says `unknown` when it cannot prove a result. **Start here:** [Getting started: your first architecture check](tutorials/getting-started.md).
+
+## Use cases
+
+Each page shows one rule on the bank payments example in `docs/examples/payments/`: the rule, the evidence that Concordia reads, how it decides, what you still declare, and how to make the rule block a merge.
+
+**Prevent outages:**
+
+- [Integrate through published APIs](use-cases/integrate-through-published-apis.md): stops a service from importing the internal code of another service, so a refactor of that code cannot break its callers.
+- [Keep services free of cycles](use-cases/keep-services-free-of-cycles.md): stops dependency cycles between services, so you can deploy and roll back each service alone.
+- [Keep critical paths isolated](use-cases/keep-critical-paths-isolated.md): stops a critical service from depending on a non-critical one, directly or through other services.
+
+**Prevent security issues:**
+
+- [Enforce trust boundaries in code](use-cases/enforce-trust-boundaries-in-code.md): stops an internet-facing service from reaching into the internals of a service that holds restricted data.
+- [Protect database ownership](use-cases/protect-database-ownership.md): stops any code other than the owning service from reading or writing a database.
+- [Block network paths in Kubernetes](use-cases/block-network-paths-in-kubernetes.md): finds the NetworkPolicy that opens a port between two workloads that must stay apart. The finding is advisory.
+- [Block network paths in the cloud](use-cases/block-network-paths-in-the-cloud.md): finds the security group rule in a Terraform plan that opens a database to a public load balancer. The finding is advisory.
+- [Limit Kubernetes permissions](use-cases/limit-kubernetes-permissions.md): finds the RoleBinding that lets one workload change another. The finding is advisory.
+- [Require encrypted connections](use-cases/require-encrypted-connections.md): checks that a service calls other services over HTTPS in production. On the example the result is `unknown`, and the page shows the missing evidence.
+- [Trace images to trusted builds](use-cases/trace-images-to-trusted-builds.md): stops an image without verified lineage from a trusted build from passing as traced. On the example the result is `unknown`, and the page shows the evidence to add.
+
+**Catch drift from the architecture:**
+
+- [Keep the model in sync with code](use-cases/keep-the-model-in-sync-with-code.md): finds code dependencies that the architecture model does not declare.
+- [Require a decision for significant changes](use-cases/require-a-decision-for-significant-changes.md): stops a change that adds a significant relationship, such as a new database dependency, without an architecture decision.
+- [Enforce architecture decisions](use-cases/enforce-architecture-decisions.md): finds decisions that are missing, no longer in force, or not enforced by any rule.
+
+**Catch drift from assumptions and controls:**
+
+- [Keep security reviews current](use-cases/keep-security-reviews-current.md): finds a security review that no longer matches the code it approved.
 
 ## Tutorials
 
-- [Getting started](tutorials/getting-started.md): check a small commerce codebase end to end.
-- [Brownfield adoption](tutorials/brownfield-adoption.md): accept today's violations and fail only on new ones.
-- [A tour of Concordia](tutorials/tour-of-concordia.md): take one repository from architecture rules to deployment traces, rendered evidence, quality scenarios, ADR governance, and a security review that goes stale when the code changes.
+- [Getting started](tutorials/getting-started.md): run your first architecture check on the code of a bank payments platform, and read a violation and an `unknown` result.
+- [Brownfield adoption](tutorials/brownfield-adoption.md): accept the bank's existing findings in a baseline, fail only on new ones, waive the new findings until a date, and see the waiver expire.
+- [A tour of Concordia](tutorials/tour-of-concordia.md): follow a refactor of the fraud risk model that broke payment authorization, find what else is waiting to break, find an open network path from the internet to the ledger database, enforce a decision, and see a security review go stale when the code changes.
 
 ## How-to guides
 

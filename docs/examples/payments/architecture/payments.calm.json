@@ -1,0 +1,168 @@
+{
+  "$schema": "https://calm.finos.org/release/1.2/meta/calm.json",
+  "nodes": [
+    {"unique-id": "payments-platform", "node-type": "system", "name": "Payments Platform", "description": "The retail bank payments platform."},
+    {
+      "unique-id": "public-load-balancer", "node-type": "service", "name": "Public Load Balancer",
+      "description": "The internet-facing load balancer in front of the channels.",
+      "concordia": {"owner": "team-platform", "tags": ["public"], "trust": {"dimensions": {"zone": "internet"}}}
+    },
+    {
+      "unique-id": "channels-api", "node-type": "service", "name": "Channels API",
+      "description": "The API that mobile and web banking call.",
+      "concordia": {"c4-level": "container", "owner": "team-channels", "tags": ["public"], "trust": {"dimensions": {"zone": "internet"}}}
+    },
+    {
+      "unique-id": "payments-service", "node-type": "service", "name": "Payments Service",
+      "description": "Authorizes and executes customer payments.",
+      "concordia": {"c4-level": "container", "owner": "team-payments", "tags": ["critical"], "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "fraud-service", "node-type": "service", "name": "Fraud Service",
+      "description": "Scores payments for fraud risk.",
+      "concordia": {"c4-level": "container", "owner": "team-fraud", "tags": ["critical"], "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "notifications-service", "node-type": "service", "name": "Notifications Service",
+      "description": "Sends alerts and customer messages.",
+      "concordia": {"c4-level": "container", "owner": "team-engagement", "tags": ["non-critical"], "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "ledger-service", "node-type": "service", "name": "Ledger Service",
+      "description": "Records every movement of money.",
+      "concordia": {"c4-level": "container", "owner": "team-ledger", "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "ledger-db", "node-type": "database", "name": "Ledger Database",
+      "description": "Stores the ledger entries.",
+      "concordia": {"owner": "team-ledger", "tags": ["restricted"], "trust": {"dimensions": {"zone": "internal"}, "classification": "restricted"}},
+      "controls": {
+        "ctl-ledger-ownership": {
+          "description": "Only the ledger service may access the ledger database.",
+          "requirements": [
+            {
+              "requirement-url": "https://example.org/concordia/controls/data-ownership/1.0/requirement.json",
+              "config": {
+                "control-id": "ctl-ledger-ownership",
+                "engine": "concordia",
+                "policy-ref": "../policies/payments.policy.yaml",
+                "rule-ids": ["PAY-DB-001"],
+                "unknown-disposition": "fail",
+                "minimum-policy-coverage": 0.9
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "customer-profile", "node-type": "service", "name": "Customer Profile",
+      "description": "Holds customer identity and contact data.",
+      "concordia": {"c4-level": "container", "owner": "team-customer", "tags": ["restricted"], "trust": {"dimensions": {"zone": "internal"}, "classification": "restricted"}}
+    },
+    {
+      "unique-id": "reporting-job", "node-type": "service", "name": "Reporting Job",
+      "description": "Builds the nightly finance reports.",
+      "concordia": {"owner": "team-finance", "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "legacy-core-banking", "node-type": "service", "name": "Legacy Core Banking",
+      "description": "The core banking system that the bank is retiring.",
+      "concordia": {"owner": "team-core-banking", "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "fraud-cache", "node-type": "database", "name": "Fraud Cache",
+      "description": "Caches recent risk scores.",
+      "concordia": {"owner": "team-fraud", "trust": {"dimensions": {"zone": "internal"}}}
+    },
+    {
+      "unique-id": "card-network", "node-type": "system", "name": "Card Network",
+      "description": "The external card scheme that authorizes card payments.",
+      "concordia": {"tags": ["external"], "trust": {"dimensions": {"zone": "external"}}}
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "payments-platform-composition",
+      "description": "The payments platform is composed of its services and databases.",
+      "relationship-type": {
+        "composed-of": {
+          "container": "payments-platform",
+          "nodes": [
+            "public-load-balancer", "channels-api", "payments-service", "fraud-service", "notifications-service",
+            "ledger-service", "ledger-db", "customer-profile", "reporting-job", "legacy-core-banking", "fraud-cache"
+          ]
+        }
+      }
+    },
+    {
+      "unique-id": "channels-to-payments",
+      "description": "The channels submit payments.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "channels-api"},
+          "destination": {"node": "payments-service"}
+        }
+      }
+    },
+    {
+      "unique-id": "payments-to-fraud",
+      "description": "Payments asks fraud to score each payment.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "payments-service"},
+          "destination": {"node": "fraud-service"}
+        }
+      },
+      "concordia": {
+        "observation": {"allowed-edge-kinds": ["IMPORTS", "CALLS"], "minimum-confidence": "syntactic", "required": true}
+      }
+    },
+    {
+      "unique-id": "payments-to-ledger",
+      "description": "Payments posts entries to the ledger.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "payments-service"},
+          "destination": {"node": "ledger-service"}
+        }
+      }
+    },
+    {
+      "unique-id": "ledger-to-database",
+      "description": "The ledger persists its entries.",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "ledger-service"},
+          "destination": {"node": "ledger-db"}
+        }
+      }
+    },
+    {
+      "unique-id": "fraud-to-cache",
+      "description": "Fraud caches recent scores.",
+      "protocol": "TCP",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "fraud-service"},
+          "destination": {"node": "fraud-cache"}
+        }
+      }
+    },
+    {
+      "unique-id": "payments-to-card-network",
+      "description": "Payments asks the card network to authorize card payments.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {"node": "payments-service"},
+          "destination": {"node": "card-network"}
+        }
+      }
+    }
+  ]
+}

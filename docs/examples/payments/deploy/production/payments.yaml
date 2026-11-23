@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-service
+  namespace: payments
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: payments-service
+  template:
+    metadata:
+      labels:
+        app: payments-service
+    spec:
+      containers:
+        - name: payments-service
+          image: registry.example.com/bank/payments-service:5.1.2
+          ports:
+            - containerPort: 8443

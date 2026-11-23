@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-cache
+  namespace: fraud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fraud-cache
+  template:
+    metadata:
+      labels:
+        app: fraud-cache
+    spec:
+      containers:
+        - name: redis
+          image: registry.example.com/bank/redis:7.2
+          ports:
+            - containerPort: 6379
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: fraud
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-fraud-service
+  namespace: fraud
+spec:
+  podSelector:
+    matchLabels:
+      app: fraud-cache
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: fraud-service
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+# Added during an incident so that operators could inspect the cache from the channels namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ops-debug
+  namespace: fraud
+spec:
+  podSelector:
+    matchLabels:
+      app: fraud-cache
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: channels
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-editor
+  namespace: fraud
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [get, patch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: channels-api-deployment-editor
+  namespace: fraud
+subjects:
+  - kind: ServiceAccount
+    name: channels-api
+    namespace: channels
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: deployment-editor
