@@ -127,6 +127,18 @@ const (
 	kindDrift        = "drift"
 )
 
+// familyKinds are the fingerprint kinds of the external families whose outcomes have no kind of their own.
+var familyKinds = map[policy.PredicateFamily]string{
+	policy.FamilyEffectiveAccess: kindIsolation,
+	policy.FamilyCheckResult:     kindVerification,
+}
+
+// claimKinds are the fingerprint kinds of the claims that have a kind other than their id.
+var claimKinds = map[claims.ID]string{
+	claims.ExactLineage: kindLineage,
+	claims.RuntimeDrift: kindDrift,
+}
+
 // kindOf gives the fingerprint kind of an outcome: its own, else the kind of the family of the rule (the claim id for
 // a claim that has no kind of its own).
 func kindOf(plan *policy.RulePlan, outcome *ExternalOutcome) string {
@@ -134,125 +146,140 @@ func kindOf(plan *policy.RulePlan, outcome *ExternalOutcome) string {
 		return outcome.Kind
 	}
 
-	switch plan.Predicate.Family {
-	case policy.FamilyEffectiveAccess:
-		return kindIsolation
-	case policy.FamilyCheckResult:
-		return kindVerification
-	case policy.FamilyAssuranceClaim:
-		switch id := claims.ID(plan.Predicate.AssuranceClaim.ID); id {
-		case claims.ExactLineage:
-			return kindLineage
-		case claims.RuntimeDrift:
-			return kindDrift
-		case claims.CompleteResourceSet, claims.ContainerOccurrenceVersions, claims.ResolvedSelections, claims.PlannedResources,
-			claims.DeployedDigest, claims.DeploymentSucceeded, claims.NetworkIsolation, claims.RBACGrants,
-			claims.CheckOutcome, claims.QualityScenarioVerdict:
-			return string(id)
-		default:
-			return string(id)
-		}
-	case policy.FamilyBoundary, policy.FamilyLayer, policy.FamilyDeclaredOnly, policy.FamilyObservedRequired,
-		policy.FamilyAcyclic, policy.FamilyDenyPath, policy.FamilyAllowOnly, policy.FamilyIndependent,
-		policy.FamilyPublicAPIOnly, policy.FamilyOwnership, policy.FamilyBudget, policy.FamilyRequireEdge,
-		policy.FamilyRequireEntity, policy.FamilyTyped, policy.FamilyView, policy.FamilyDecisionGovernance,
-		policy.FamilyAssessmentCurrency:
+	if plan.Predicate.Family == policy.FamilyAssuranceClaim {
+		return claimKind(claims.ID(plan.Predicate.AssuranceClaim.ID))
+	}
+
+	if kind, ok := familyKinds[plan.Predicate.Family]; ok {
+		return kind
 	}
 
 	return string(plan.Predicate.Family)
 }
 
+// claimKind gives the fingerprint kind of a claim: its own kind, else the claim id.
+func claimKind(id claims.ID) string {
+	if kind, ok := claimKinds[id]; ok {
+		return kind
+	}
+
+	return string(id)
+}
+
 // missingEvidenceReason gives the reason of a claim that has a loaded contract and no evidence: the claims that read
 // rendered documents say that rendered evidence is missing, the others that no evidence was supplied.
 func missingEvidenceReason(id string) UnknownReason {
-	switch claims.ID(id) {
-	case claims.CompleteResourceSet, claims.ContainerOccurrenceVersions, claims.ResolvedSelections:
+	if slices.Contains(renderedClaimIDs, claims.ID(id)) {
 		return ReasonRenderedEvidenceMissing
-	case claims.PlannedResources, claims.ExactLineage, claims.DeployedDigest, claims.DeploymentSucceeded, claims.RuntimeDrift,
-		claims.NetworkIsolation, claims.RBACGrants, claims.CheckOutcome, claims.QualityScenarioVerdict:
-		return ReasonNoEvidenceSupplied
-	default:
-		return ReasonNoEvidenceSupplied
 	}
+
+	return ReasonNoEvidenceSupplied
 }
 
 // outcomesOf gives the outcomes of an external rule and the severity of its findings. A claim that no loaded contract
 // enables is `unknown` with `claim-not-enabled`, whatever the evaluator could say; a claim of an experimental contract
 // caps the severity at `warning` (design D7). A rule that has no evaluator gets the default outcomes of its family.
 func (e *ExternalEvaluation) outcomesOf(plan *policy.RulePlan) ([]ExternalOutcome, policy.RuleSeverity) {
-	severity := plan.Severity
-
-	if claim := plan.Predicate.AssuranceClaim; plan.Predicate.Family == policy.FamilyAssuranceClaim && claim != nil {
-		found := e.registry().Lookup(claim.ID)
-		if !found.Enabled {
-			return []ExternalOutcome{{
-				Environment: claim.Environment, Verdict: VerdictUnknown, Reason: ReasonClaimNotEnabled, Detail: found.Detail,
-			}}, severity
-		}
-
-		severity = found.Severity(severity)
+	severity, notEnabled := e.claimSeverity(plan)
+	if notEnabled != nil {
+		return notEnabled, severity
 	}
 
-	if e != nil && e.Rule != nil {
-		if outcomes, evaluated := e.Rule(plan); evaluated {
-			return outcomes, severity
-		}
+	if outcomes, evaluated := e.ruleOutcomes(plan); evaluated {
+		return outcomes, severity
 	}
 
 	return defaultOutcomes(plan), severity
+}
+
+// claimSeverity gives the severity of a rule after the contract of its claim, and the `claim-not-enabled` outcome
+// when no loaded contract enables the claim. A rule of another family keeps its severity.
+func (e *ExternalEvaluation) claimSeverity(plan *policy.RulePlan) (policy.RuleSeverity, []ExternalOutcome) {
+	claim := plan.Predicate.AssuranceClaim
+	if plan.Predicate.Family != policy.FamilyAssuranceClaim || claim == nil {
+		return plan.Severity, nil
+	}
+
+	found := e.registry().Lookup(claim.ID)
+	if !found.Enabled {
+		return plan.Severity, []ExternalOutcome{{
+			Environment: claim.Environment, Verdict: VerdictUnknown, Reason: ReasonClaimNotEnabled, Detail: found.Detail,
+		}}
+	}
+
+	return found.Severity(plan.Severity), nil
+}
+
+// ruleOutcomes asks the evaluator of the external families, when there is one.
+func (e *ExternalEvaluation) ruleOutcomes(plan *policy.RulePlan) ([]ExternalOutcome, bool) {
+	if e == nil || e.Rule == nil {
+		return nil, false
+	}
+
+	return e.Rule(plan)
+}
+
+// familyDefaults build the default outcomes of each external family.
+var familyDefaults = map[policy.PredicateFamily]func(*policy.RulePlan) []ExternalOutcome{
+	policy.FamilyEffectiveAccess: accessDefaults,
+	policy.FamilyCheckResult:     checkDefaults,
+	policy.FamilyAssuranceClaim:  claimDefaults,
 }
 
 // defaultOutcomes are the `unknown` outcomes of a rule that has no evaluator or no evidence. Each family names the
 // input that is missing: an effective-access rule needs an evaluator, a check-result rule needs a result, and a claim
 // needs the evidence of its contract.
 func defaultOutcomes(plan *policy.RulePlan) []ExternalOutcome {
-	switch plan.Predicate.Family {
-	case policy.FamilyEffectiveAccess:
-		access := plan.Predicate.EffectiveAccess
-
-		var out []ExternalOutcome
-
-		for _, subject := range plan.Subjects {
-			for _, target := range plan.Targets {
-				out = append(out, ExternalOutcome{
-					Subject: subject, Target: target, Verdict: VerdictUnknown, Reason: ReasonNoEvaluatorAvailable,
-					Detail: fmt.Sprintf("no evaluator is enabled for effective %s access", access.Dimension),
-				})
-			}
-		}
-
-		return out
-	case policy.FamilyCheckResult:
-		check := plan.Predicate.CheckResult
-		detail := "no admissible result for check " + check.Check
-
-		if len(plan.Subjects) == 0 {
-			return []ExternalOutcome{{Environment: check.Environment, Verdict: VerdictUnknown, Reason: ReasonNoEvidenceSupplied, Detail: detail}}
-		}
-
-		out := make([]ExternalOutcome, 0, len(plan.Subjects))
-		for _, subject := range plan.Subjects {
-			out = append(out, ExternalOutcome{
-				Subject: subject, Environment: check.Environment, Verdict: VerdictUnknown, Reason: ReasonNoEvidenceSupplied, Detail: detail,
-			})
-		}
-
-		return out
-	case policy.FamilyAssuranceClaim:
-		claim := plan.Predicate.AssuranceClaim
-
-		return []ExternalOutcome{{
-			Environment: claim.Environment, Verdict: VerdictUnknown, Reason: missingEvidenceReason(claim.ID),
-			Detail: "no evidence was supplied for claim " + claim.ID,
-		}}
-	case policy.FamilyBoundary, policy.FamilyLayer, policy.FamilyDeclaredOnly, policy.FamilyObservedRequired,
-		policy.FamilyAcyclic, policy.FamilyDenyPath, policy.FamilyAllowOnly, policy.FamilyIndependent,
-		policy.FamilyPublicAPIOnly, policy.FamilyOwnership, policy.FamilyBudget, policy.FamilyRequireEdge,
-		policy.FamilyRequireEntity, policy.FamilyTyped, policy.FamilyView, policy.FamilyDecisionGovernance,
-		policy.FamilyAssessmentCurrency:
+	if build, ok := familyDefaults[plan.Predicate.Family]; ok {
+		return build(plan)
 	}
 
 	return nil
+}
+
+// accessDefaults gives each subject and target pair of an effective-access rule `no-evaluator-available`.
+func accessDefaults(plan *policy.RulePlan) []ExternalOutcome {
+	detail := fmt.Sprintf("no evaluator is enabled for effective %s access", plan.Predicate.EffectiveAccess.Dimension)
+	out := make([]ExternalOutcome, 0, len(plan.Subjects)*len(plan.Targets))
+
+	for _, subject := range plan.Subjects {
+		for _, target := range plan.Targets {
+			out = append(out, ExternalOutcome{
+				Subject: subject, Target: target, Verdict: VerdictUnknown, Reason: ReasonNoEvaluatorAvailable, Detail: detail,
+			})
+		}
+	}
+
+	return out
+}
+
+// checkDefaults gives a check-result rule `no-evidence-supplied`, once for each subject or once without one.
+func checkDefaults(plan *policy.RulePlan) []ExternalOutcome {
+	check := plan.Predicate.CheckResult
+	detail := "no admissible result for check " + check.Check
+
+	if len(plan.Subjects) == 0 {
+		return []ExternalOutcome{{Environment: check.Environment, Verdict: VerdictUnknown, Reason: ReasonNoEvidenceSupplied, Detail: detail}}
+	}
+
+	out := make([]ExternalOutcome, 0, len(plan.Subjects))
+	for _, subject := range plan.Subjects {
+		out = append(out, ExternalOutcome{
+			Subject: subject, Environment: check.Environment, Verdict: VerdictUnknown, Reason: ReasonNoEvidenceSupplied, Detail: detail,
+		})
+	}
+
+	return out
+}
+
+// claimDefaults gives a claim rule the reason that its missing evidence has.
+func claimDefaults(plan *policy.RulePlan) []ExternalOutcome {
+	claim := plan.Predicate.AssuranceClaim
+
+	return []ExternalOutcome{{
+		Environment: claim.Environment, Verdict: VerdictUnknown, Reason: missingEvidenceReason(claim.ID),
+		Detail: "no evidence was supplied for claim " + claim.ID,
+	}}
 }
 
 // normalize makes an outcome valid: a verdict outside the set, or an `unknown` with no closed reason, is an `error`
@@ -314,18 +341,25 @@ func (e *ExternalEvaluation) ruleResult(plan *policy.RulePlan, input *EvaluateIn
 	}
 
 	outcomes, severity := e.outcomesOf(plan)
-
-	// A finding about rendered documents that names no file points at the declared source of its environment. Other
-	// findings (check results, plans, quality) have no rendered source, so they keep their own location or none.
-	if e != nil && e.Locate != nil && ReadsRenderedEvidence(plan) {
-		for i := range outcomes {
-			if outcomes[i].Location == nil && outcomes[i].Environment != "" {
-				outcomes[i].Location = e.Locate(outcomes[i].Environment)
-			}
-		}
+	if ReadsRenderedEvidence(plan) {
+		e.locate(outcomes)
 	}
 
 	return outcomesResult(plan, severity, outcomes, input, nodesByID)
+}
+
+// locate points a finding about rendered documents that names no file at the declared source of its environment.
+// Other findings (check results, plans, quality) have no rendered source, so they keep their own location or none.
+func (e *ExternalEvaluation) locate(outcomes []ExternalOutcome) {
+	if e == nil || e.Locate == nil {
+		return
+	}
+
+	for i := range outcomes {
+		if outcomes[i].Location == nil && outcomes[i].Environment != "" {
+			outcomes[i].Location = e.Locate(outcomes[i].Environment)
+		}
+	}
 }
 
 // ReadsRenderedEvidence says whether the findings of a rule are about rendered documents: an effective-access rule,

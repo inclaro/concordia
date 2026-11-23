@@ -63,12 +63,12 @@ type Result struct {
 
 // Input is the evidence of one environment: the resources of all its plans.
 type Input struct {
-	// Resources are every resource of the plans of the environment, sorted by address.
-	Resources []plan.Resource
 	// Coverage is the worst coverage of the plans.
 	Coverage assurance.Coverage
 	// Digest is the digest of the evaluated plan bytes.
 	Digest string
+	// Resources are every resource of the plans of the environment, sorted by address.
+	Resources []plan.Resource
 }
 
 // nameKey finds an Azure resource by its type, `name`, and `resource_group_name`.
@@ -78,20 +78,20 @@ type nameKey struct {
 
 // Evaluator answers queries over one Input. It is safe for concurrent use after New.
 type Evaluator struct {
-	in *Input
-	// live are the resources that exist after apply, in input order (sorted by address).
-	live      []*plan.Resource
+	in        *Input
 	byAddress map[string]*plan.Resource
 	byID      map[string]*plan.Resource
 	byName    map[nameKey]*plan.Resource
 	// byConfig lists the instances of each configuration address (the address without instance keys).
 	byConfig map[string][]*plan.Resource
+	// live are the resources that exist after apply, in input order (sorted by address).
+	live []*plan.Resource
 }
 
 // New indexes the input. It does not fail: whatever the evaluator cannot use becomes a gap of the results that
 // depend on it. The input must not be changed while the evaluator is in use.
 func New(in *Input) *Evaluator {
-	e := &Evaluator{
+	evaluator := &Evaluator{
 		in:        in,
 		byAddress: map[string]*plan.Resource{},
 		byID:      map[string]*plan.Resource{},
@@ -100,32 +100,32 @@ func New(in *Input) *Evaluator {
 	}
 
 	for i := range in.Resources {
-		if r := &in.Resources[i]; exists(r) {
-			e.index(r)
+		if res := &in.Resources[i]; exists(res) {
+			evaluator.index(res)
 		}
 	}
 
-	return e
+	return evaluator
 }
 
 // exists reports whether the resource exists after apply: it is not a deposed object and it is not destroyed.
 func exists(r *plan.Resource) bool { return r.Deposed == "" && r.Values != nil }
 
-func (e *Evaluator) index(r *plan.Resource) {
-	e.live = append(e.live, r)
-	e.byAddress[r.Address] = r
-	config := plan.ConfigAddress(r.Address)
-	e.byConfig[config] = append(e.byConfig[config], r)
+func (e *Evaluator) index(res *plan.Resource) {
+	e.live = append(e.live, res)
+	e.byAddress[res.Address] = res
+	config := plan.ConfigAddress(res.Address)
+	e.byConfig[config] = append(e.byConfig[config], res)
 
-	if id, ok := attrString(r, "id"); ok && id != "" {
-		e.byID[id] = r
+	if id, ok := attrString(res, "id"); ok && id != "" {
+		e.byID[id] = res
 	}
 
-	name, hasName := attrString(r, "name")
-	group, hasGroup := attrString(r, "resource_group_name")
+	name, hasName := attrString(res, "name")
+	group, hasGroup := attrString(res, "resource_group_name")
 
 	if hasName && hasGroup {
-		e.byName[nameKey{typ: r.Type, name: name, group: group}] = r
+		e.byName[nameKey{typ: res.Type, name: name, group: group}] = res
 	}
 }
 

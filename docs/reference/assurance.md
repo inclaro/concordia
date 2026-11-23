@@ -12,6 +12,7 @@ A rule that needs a claim that no loaded contract enables is `unknown` with the 
 
 | Contract | Kind | Enabled claims | Not enabled | Experimental |
 |---|---|---|---|---|
+| `cloud-firewall` (1.0.0) | evaluator | `cloud-network-isolation` | `network-isolation`, `effective-encryption-in-transit`, `cloud-iam`, `routing-reachability` | yes |
 | `network-policy` (1.0.0) | evaluator | `network-isolation` | `effective-encryption-in-transit`, `cni-specific-policy-evaluation`, `rbac-grants` | yes |
 | `plan` (1.0.0) | adapter | `planned-resources` | `deployment-succeeded`, `runtime-drift`, `cloud-iam-evaluation`, `encryption-evaluation` | yes |
 | `provenance` (1.0.0) | adapter | `exact-lineage`, `deployed-digest`, `deployment-succeeded`, `runtime-drift` | `slsa-level`, `absence-of-vulnerabilities`, `absence-of-malicious-code`, `correct-runtime-behavior` | yes |
@@ -33,6 +34,7 @@ Each enabled claim needs evidence of a stated level, a complete input, and a min
 | `deployment-succeeded` | `provenance` | `deployment-execution` | `complete` | producer authenticated |
 | `runtime-drift` | `provenance` | `runtime-observation` | `complete` | producer authenticated |
 | `network-isolation` | `network-policy` | `rendered-or-evaluated` | `complete` | content verified by digest |
+| `cloud-network-isolation` | `cloud-firewall` | `rendered-or-evaluated` | `complete` | content not verified |
 | `rbac-grants` | `rbac` | `rendered-or-evaluated` | `complete` | content verified by digest |
 | `check-outcome` | `verification` | `not-applicable` | `complete` | producer authenticated |
 | `quality-scenario-verdict` | `quality` | `not-applicable` | `complete` | content not verified |
@@ -124,7 +126,7 @@ A Terraform or OpenTofu plan (`show -json`) is ingested as a file. Concordia doe
 
 Concordia reads the resource changes of the plan by address, with the planned values after apply. It accepts `format_version` `1.0`, `1.1`, and `1.2`. Any other version, a file that is not a plan (a state file, for example), a plan that errored, and a change without an address give `CO-PRV-008`, and no part of the plan is used. A plan that Terraform marks incomplete (deferred changes) has the coverage `partial` and the gap `incomplete-plan`. A missing or unusable plan file is the gap `plan-file-missing` or `plan-unusable`.
 
-An attribute that is unknown until apply is the gap `unknown-after-apply`, one for each attribute. Concordia never guesses a value. An attribute that the plan marks sensitive is replaced by a redaction marker and recorded as a redaction. Concordia reads no other copy of a value (`variables`, `planned_values`, `prior_state`, `configuration`), because those copies carry no marker for each attribute. A CALM node can bind to a plan address with an [`infraResource` binding](bindings.md), and the trace then shows the `rendered-or-evaluated` level.
+An attribute that is unknown until apply is the gap `unknown-after-apply`, one for each attribute. Concordia never guesses a value. An attribute that the plan marks sensitive is replaced by a redaction marker and recorded as a redaction. Concordia reads no other copy of a value (`variables`, `planned_values`, `prior_state`), because those copies carry no marker for each attribute. Of the `configuration` section, Concordia reads only the `references` lists. They hold resource addresses, not values, and they tell the [`cloud-firewall`](#cloud-firewall) evaluator which resource an unknown attribute will point to. Concordia never reads `constant_value`. A CALM node can bind to a plan address with an [`infraResource` binding](bindings.md), and the trace then shows the `rendered-or-evaluated` level.
 
 ### Binding to a revision
 
@@ -287,7 +289,7 @@ Concordia reports no SLSA level and makes no claim about vulnerabilities, malici
 
 ## Evaluators
 
-The built-in evaluators compute an effective result from the rendered manifests: `network-policy` for `networking.k8s.io/v1` NetworkPolicy, and `rbac` for roles and bindings. Selection edges and role references from the code graph are never evidence of isolation or access: the code graph has no edge for an empty `podSelector` or a `matchExpressions` selector. An evaluator runs for the environments that you list under [`assurance.evaluators`](workspace.md#assuranceevaluators). A rule asks for a result with `require.effectiveAccess`, which [policies](policies.md) describes. Each evaluator has a version, which results and digests record, and a contract that `concordia doctor` lists.
+The built-in evaluators compute an effective result from evidence that Concordia reads itself: `network-policy` for `networking.k8s.io/v1` NetworkPolicy and `rbac` for roles and bindings read the rendered manifests, and `cloud-firewall` reads the firewall rules of a Terraform or OpenTofu [plan](#plans). Selection edges and role references from the code graph are never evidence of isolation or access: the code graph has no edge for an empty `podSelector` or a `matchExpressions` selector. An evaluator runs for the environments that you list under [`assurance.evaluators`](workspace.md#assuranceevaluators). A rule asks for a result with `require.effectiveAccess`, which [policies](policies.md) describes. Each evaluator has a version, which results and digests record, and a contract that `concordia doctor` lists.
 
 ### network-policy
 
@@ -309,9 +311,107 @@ The evaluator answers whether a subject is `granted` a verb on a resource, with 
 
 For `require.effectiveAccess` with the dimension `authorization`, the subject is the ServiceAccount of the `from` element and the object is each rendered resource that the `to` element is bound to. Access exists when any of `get`, `list`, `watch`, `create`, `update`, `patch`, and `delete` is granted.
 
+### cloud-firewall
+
+The evaluator answers whether TCP or UDP traffic from one planned cloud resource to another, on one port, is `allowed`, `denied`, or `unknown`. It reads the firewall rules of the plans of the environment, declared under [`assurance.plans`](workspace.md#assuranceplans). It does not run Terraform, and it does not read the `.tf` files. It supports AWS security groups, Azure network security groups (NSGs), and GCP VPC firewall rules. The prefix of the resource type selects the provider: `aws_`, `azurerm_`, or `google_`.
+
+You choose the evaluator for each pair of a rule with your bindings:
+
+| The two CALM elements bind to | Evaluator |
+|---|---|
+| planned resources of the environment ([`infraResource`](bindings.md)), both | `cloud-firewall` |
+| rendered workloads, both | `network-policy` |
+| a planned resource and a rendered workload | none: `unknown`, `binding-gap`, "the pair mixes planned cloud resources and Kubernetes workloads" |
+
+When only one element binds to a planned resource and the other binds to nothing in the environment, Concordia uses `cloud-firewall`, and the result is a `binding-gap` for the unbound element. A pair of `cloud-firewall` does not need rendered manifests.
+
+#### Endpoints
+
+An endpoint is the plan address of a resource. The evaluator finds the rules that apply to it and its address set: one CIDR prefix, or unknown.
+
+| Provider | Endpoint type | Rules come from | Address set |
+|---|---|---|---|
+| AWS | `aws_instance`, `aws_network_interface` | the security groups in `vpc_security_group_ids` or `security_groups` | `private_ip` as a `/32`, else the `cidr_block` of the subnet |
+| AWS | `aws_lb`, `aws_ecs_service` (`network_configuration`), `aws_lambda_function` (`vpc_config`) | the security groups of the resource | the subnet `cidr_block` when all subnets have the same one, else unknown |
+| AWS | `aws_db_instance`, `aws_rds_cluster`, `aws_elasticache_cluster`, `aws_elasticache_replication_group` | the security groups of the resource | unknown |
+| AWS | `aws_security_group` | the group itself | unknown |
+| Azure | `azurerm_network_interface` | the NSG of the NIC and the NSG of its subnet | `ip_configuration[0].private_ip_address` as a `/32`, else the subnet |
+| Azure | `azurerm_linux_virtual_machine`, `azurerm_windows_virtual_machine` | as for its NIC. A VM with more than one NIC is not supported. | as for its NIC |
+| Azure | `azurerm_subnet`, `azurerm_private_endpoint` | the NSG of the subnet | `address_prefixes[0]` of the subnet |
+| GCP | `google_compute_instance`, `google_compute_instance_template` | the firewall rules of its network that target it | `network_interface[0].network_ip` as a `/32`, else the `ip_cidr_range` of the subnetwork |
+
+Any other type gives the gap `unsupported-resource-type`.
+
+#### Rule sources
+
+| Provider | Resources that the evaluator reads |
+|---|---|
+| AWS | `aws_security_group` (inline `ingress` and `egress`), `aws_security_group_rule`, `aws_vpc_security_group_ingress_rule`, `aws_vpc_security_group_egress_rule` |
+| Azure | `azurerm_network_security_group` (inline `security_rule`), `azurerm_network_security_rule`, `azurerm_subnet_network_security_group_association`, `azurerm_network_interface_security_group_association`, `azurerm_network_interface_application_security_group_association` |
+| GCP | `google_compute_firewall` |
+
+An attribute that is unknown until apply, such as the ID of a security group that the plan creates, resolves through the `references` of the plan's `configuration`. A reference to a resource with one instance resolves to that instance. A reference to a resource with more instances, to a data source, or to nothing gives the gap `unresolved-reference`. An unknown attribute that no reference resolves gives the gap `unknown-after-apply`.
+
+#### Semantics
+
+Traffic is `allowed` when the source side allows it outbound and the destination side allows it inbound. One side that says no makes it `denied`. Otherwise one side that cannot say makes it `unknown`.
+
+| Provider | How one side decides |
+|---|---|
+| AWS | Rules only allow. The union of the rules of all groups of the endpoint applies. A group with no rule for the direction denies it. Concordia does not add the AWS default egress rule, because Terraform removes it from the groups that it manages. An egress rule of a group of the source must match the destination, and an ingress rule of a group of the destination must match the source. A rule matches the peer through a referenced group, `self`, or a CIDR. When the whole inline `ingress` or `egress` list of a group is unknown until apply, the side is `unknown` with `unknown-after-apply`, unless another rule allows the traffic. |
+| Azure | Every NSG on the path must allow the traffic: the NIC NSG and the subnet NSG of the source (outbound), then the subnet NSG and the NIC NSG of the destination (inbound). An absent NSG allows. In each NSG, the rules of the direction run by ascending priority, and the first rule that matches decides. Concordia adds the Azure default rules at 65000, 65001, and 65500. So `AllowVnetInBound` allows traffic inside one virtual network unless a rule with a lower number denies it. A rule limited to source ports other than `*` matches as `unknown`, because a query has no source port. |
+| GCP | Egress is checked at the source against the destination address. Ingress is checked at the destination against the source address, network tags, and service account. A rule applies to an instance when it has no targets, or a target tag or target service account of the instance. Rules run by ascending priority, deny before allow at equal priority, and the first rule that matches decides. Concordia adds the implied rules at 65535: deny all ingress, allow all egress. The results name them with the address `implied`. Disabled rules are skipped. |
+
+A rule that may match, but that the evaluator cannot decide, before a rule that decides, makes the side `unknown`. Rule prefixes match the endpoint address set like this:
+
+| Rule prefix | Match |
+|---|---|
+| contains the endpoint prefix | yes |
+| does not overlap the endpoint prefix | no |
+| overlaps the endpoint prefix partly | `unknown`, `address-dependent-range` |
+| `0.0.0.0/0` or `::/0`, endpoint prefix unknown | yes |
+| any other prefix, endpoint prefix unknown | `unknown`, `address-dependent-range` |
+| does not parse | `unknown`, `invalid-address-range` |
+
+Protocols `-1`, `all`, and `*` match every protocol. ICMP and other protocols never match a TCP or UDP query. Azure service tags: `*` matches, `VirtualNetwork` matches when both endpoints are in one virtual network, `Internet` and `AzureLoadBalancer` do not match, and any other tag gives `unsupported-policy-kind`.
+
+The `RuleRef` of a result names each rule that decided it, as `<address> <rule>`: for example `aws_security_group.web ingress[0]`, `aws_vpc_security_group_ingress_rule.db rule`, `azurerm_network_security_group.app AllowHttps (priority 100)`, or `google_compute_firewall.db priority 1000 allow`.
+
+#### Assumption, integrity, and digest
+
+A `denied` result rests on the assumption `firewall-rules-complete-in-plan`: no firewall rule for the resources of the query exists outside the evaluated plans, for example in another Terraform state or in a change made in the console. Declare it under `assurance.evaluators[].assumes`. An `allowed` result needs no assumption.
+
+The plan does not need a signed statement. The claim `cloud-network-isolation` needs the integrity `content not verified`. Each evaluation in [`assurance.evaluations`](results.md#evaluations) records the plan digest in `inputDigest` and the integrity of the plan binding in `integrity`: `content not verified` for a plan without a statement, `producer authenticated` for a plan that a verified statement binds. With more plans in the environment, `inputDigest` is the digest of their sorted digests, and `integrity` is the lowest. `concordia export bundle` copies the plans, so a reader can check the bytes by digest.
+
+Without `ports`, Concordia queries TCP on every port that a firewall rule of the environment's plans names, and one port that no rule names.
+
+#### Gaps and limits
+
+| Gap | Meaning |
+|---|---|
+| `incomplete-plan` | A plan of the environment is not `complete` (it has deferred changes, or it could not be read). Every query is `unknown`. |
+| `workload-not-in-input` | An endpoint address is not a resource of the plans after apply. |
+| `mixed-providers` | The two endpoints belong to different providers. |
+| `unsupported-resource-type` | The endpoint type is not in the table above. |
+| `unresolved-reference` | A security group, NSG, subnet, or network that the evaluator needs does not resolve to one resource of the plan. |
+| `unknown-after-apply` | An attribute that the evaluator needs is unknown until apply, and no reference resolves it. |
+| `address-dependent-range`, `invalid-address-range` | A rule prefix overlaps the endpoint partly, needs an address that the plan does not know, or does not parse. |
+| `peering-not-evaluated` | Azure `VirtualNetwork` across two virtual networks, or two GCP instances in different networks. |
+| `unsupported-policy-kind` | An AWS prefix list, an Azure service tag or source port range, or a GCP firewall policy. Any `google_compute_network_firewall_policy*`, `google_compute_region_network_firewall_policy*`, or `google_compute_firewall_policy*` resource in the plan makes every GCP query `unknown`. |
+
+The contract states these limits on every result:
+
+- Network ACLs, route tables, and firewall appliances (AWS Network Firewall, Azure Firewall) are not evaluated.
+- VPC and VNet peering, transit gateways, and private links are not evaluated.
+- GCP hierarchical and network firewall policies are not evaluated.
+- Rules managed outside this plan are assumed absent, not observed.
+- A plan states what would be applied, not what is applied.
+
+The enabled claim is `cloud-network-isolation`. The evaluator does not enable `network-isolation`, `effective-encryption-in-transit`, `cloud-iam`, or `routing-reachability`.
+
 ### Assumptions
 
-A result that is `denied` or `not-granted` rests on an enforcement assumption: that the cluster's network plugin enforces NetworkPolicy (`network-policy-enforced`), or that the RBAC authorizer is enabled (`rbac-authorizer-enabled`). Concordia cannot see either, so the workspace declares them in `assurance.evaluators[].assumes`. Every result lists its assumptions and limits. An `allowed` or `granted` result needs no assumption, because an unenforced policy only allows more.
+A result that is `denied` or `not-granted` rests on an enforcement assumption: that the cluster's network plugin enforces NetworkPolicy (`network-policy-enforced`), that the RBAC authorizer is enabled (`rbac-authorizer-enabled`), or that the plans hold every firewall rule of the resources (`firewall-rules-complete-in-plan`). Concordia cannot see any of them, so the workspace declares them in `assurance.evaluators[].assumes`. Every result lists its assumptions and limits. An `allowed` or `granted` result needs no assumption, because an unenforced policy only allows more.
 
 ### The gates of a result
 
@@ -320,7 +420,7 @@ A `require.effectiveAccess` rule passes through three gates, in this order:
 | Gate | A failure gives |
 |---|---|
 | The workspace enables an evaluator of the kind for the environment. | `unknown`, `no-evaluator-available` |
-| The environment has rendered resources, and the namespaces that the result involves have `complete` coverage. A CALM element that is not bound to a rendered resource is a `binding-gap`. | `unknown`, `rendered-evidence-missing`, `coverage-incomplete`, or `binding-gap` |
+| The environment has the evidence of the evaluator: rendered resources for `network-policy` and `rbac`, a usable plan for `cloud-firewall`. The namespaces that the result involves have `complete` coverage. A CALM element that is not bound to a rendered resource or a planned resource is a `binding-gap`. | `unknown`, `rendered-evidence-missing`, `coverage-incomplete`, or `binding-gap` |
 | A `denied` or `not-granted` result has its assumption declared. | `unknown`, `enforcement-not-declared` |
 
 A rule that expects `denied` is violated by one open port, and is met when every port is closed. Without `ports`, Concordia queries the ports that the destination declares, every port that a policy rule names, and one port that no rule names. Each query appears in [`assurance.evaluations`](results.md#evaluations), with the evaluator, its version, the digest of the rendered input, the policies that decided it, the assumptions, the limits, and the gaps.

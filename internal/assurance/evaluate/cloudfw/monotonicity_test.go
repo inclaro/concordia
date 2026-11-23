@@ -30,6 +30,9 @@ const (
 	awsInstances = 4
 )
 
+// awsPortsQueried are the destination ports of the generated queries.
+var awsPortsQueried = []int{80, 81, 82, 443}
+
 // awsResource is one generated resource change of a `show -json` plan.
 type awsResource struct {
 	after   map[string]any
@@ -87,7 +90,7 @@ func (g awsGen) standalone(i int) awsResource {
 			after[key] = in[key]
 		}
 
-		if groups := in["security_groups"].([]any); len(groups) > 0 {
+		if groups, _ := in["security_groups"].([]any); len(groups) > 0 {
 			after["source_security_group_id"] = groups[0]
 		}
 
@@ -107,7 +110,7 @@ func (g awsGen) vpcRule(i int, kind, owner string, in map[string]any) awsResourc
 		"cidr_blocks": "cidr_ipv4", "ipv6_cidr_blocks": "cidr_ipv6", "security_groups": "referenced_security_group_id",
 		"prefix_list_ids": "prefix_list_id",
 	} {
-		if list := in[key].([]any); len(list) > 0 {
+		if list, _ := in[key].([]any); len(list) > 0 {
 			after[field] = list[0]
 		}
 	}
@@ -116,8 +119,10 @@ func (g awsGen) vpcRule(i int, kind, owner string, in map[string]any) awsResourc
 }
 
 func (g awsGen) blocks() []any {
-	out := []any{}
-	for range g.r.IntN(3) {
+	count := g.r.IntN(3)
+	out := make([]any, 0, count)
+
+	for range count {
 		out = append(out, g.inline())
 	}
 
@@ -174,7 +179,8 @@ func (g awsGen) withRule(w awsWorld) awsWorld {
 
 	group := out.groups[g.r.IntN(awsGroups)]
 	block := g.pick("ingress", "egress")
-	group[block] = append(append([]any(nil), group[block].([]any)...), g.inline())
+	blocks, _ := group[block].([]any)
+	group[block] = append(append([]any(nil), blocks...), g.inline())
 
 	return out
 }
@@ -244,10 +250,10 @@ func TestAWSMonotonicAddingAnAllowRule(t *testing.T) {
 
 // awsQueries are the queries between every pair of generated instances on a few ports.
 func awsQueries() []*cloudfw.Query {
-	var out []*cloudfw.Query
+	out := make([]*cloudfw.Query, 0, len(awsPortsQueried)*awsInstances*awsInstances)
 
 	for i := range awsInstances * awsInstances {
-		for _, port := range []int{80, 81, 82, 443} {
+		for _, port := range awsPortsQueried {
 			out = append(out, &cloudfw.Query{
 				From: cloudfw.Endpoint{Address: fmt.Sprintf("aws_instance.i%d", i/awsInstances)},
 				To:   cloudfw.Endpoint{Address: fmt.Sprintf("aws_instance.i%d", i%awsInstances)}, Port: port,

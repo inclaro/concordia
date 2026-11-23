@@ -13,13 +13,13 @@ import (
 	"github.com/inclaro/concordia/internal/policy"
 )
 
-func TestRegistryHasTheTwelveClaimsEachEnabledByOneContract(t *testing.T) {
+func TestRegistryHasTheThirteenClaimsEachEnabledByOneContract(t *testing.T) {
 	t.Parallel()
 
 	registry := claims.Default()
 
-	if got := len(claims.IDs()); got != 12 {
-		t.Fatalf("%d claim ids, want 12", got)
+	if got := len(claims.IDs()); got != 13 {
+		t.Fatalf("%d claim ids, want 13", got)
 	}
 
 	checkEveryClaimIsEnabled(t, registry)
@@ -36,7 +36,7 @@ func TestRegistryHasTheTwelveClaimsEachEnabledByOneContract(t *testing.T) {
 		ids = append(ids, contract.ID)
 	}
 
-	if want := []string{"network-policy", "plan", "provenance", "quality", "rbac", "rendering", "verification"}; !slices.Equal(ids, want) {
+	if want := []string{"cloud-firewall", "network-policy", "plan", "provenance", "quality", "rbac", "rendering", "verification"}; !slices.Equal(ids, want) {
 		t.Errorf("contract ids %v, want %v", ids, want)
 	}
 }

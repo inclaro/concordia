@@ -362,12 +362,12 @@
                 "type": "array",
                 "minItems": 1,
                 "uniqueItems": true,
-                "items": { "enum": ["network-policy", "rbac"] }
+                "items": { "enum": ["network-policy", "rbac", "cloud-firewall"] }
               },
               "assumes": {
                 "type": "array",
                 "uniqueItems": true,
-                "items": { "enum": ["network-policy-enforced", "rbac-authorizer-enabled"] }
+                "items": { "enum": ["network-policy-enforced", "rbac-authorizer-enabled", "firewall-rules-complete-in-plan"] }
               }
             }
           }

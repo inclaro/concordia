@@ -423,7 +423,7 @@
       ],
       "properties": {
         "environment": { "type": "string" },
-        "kind": { "enum": ["network-policy", "rbac"] },
+        "kind": { "enum": ["network-policy", "rbac", "cloud-firewall"] },
         "query": { "type": "string", "minLength": 1 },
         "verdict": { "enum": ["allowed", "denied", "granted", "not-granted", "unknown"] },
         "reason": { "type": "string" },
@@ -434,7 +434,8 @@
         "gaps": { "type": "array", "items": { "$ref": "#/$defs/assuranceGap" } },
         "evaluator": { "type": "string" },
         "evaluatorVersion": { "type": "string" },
-        "inputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        "inputDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "integrity": { "enum": ["content not verified", "content verified by digest", "producer authenticated"] }
       },
       "additionalProperties": false
     },

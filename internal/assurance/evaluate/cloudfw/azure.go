@@ -36,7 +36,7 @@ type azurePair struct {
 
 // azurePoint is one check point on the path: the NIC or the subnet NSG of one endpoint, in one direction.
 type azurePoint struct {
-	ep       *azureEndpoint
+	end      *azureEndpoint
 	nicLevel bool
 	outbound bool
 }
@@ -54,10 +54,10 @@ func (e *Evaluator) evaluateAzure(q *Query, from, to *plan.Resource) Result {
 
 	pair := &azurePair{q: q, from: src, to: dst}
 	points := []azurePoint{
-		{ep: src, nicLevel: true, outbound: true},
-		{ep: src, nicLevel: false, outbound: true},
-		{ep: dst, nicLevel: false, outbound: false},
-		{ep: dst, nicLevel: true, outbound: false},
+		{end: src, nicLevel: true, outbound: true},
+		{end: src, nicLevel: false, outbound: true},
+		{end: dst, nicLevel: false, outbound: false},
+		{end: dst, nicLevel: true, outbound: false},
 	}
 
 	sides := make([]*side, 0, len(points))
@@ -70,49 +70,49 @@ func (e *Evaluator) evaluateAzure(q *Query, from, to *plan.Resource) Result {
 
 // azureCheckPoint evaluates one check point. A point without an NSG allows the traffic.
 func (e *Evaluator) azureCheckPoint(pair *azurePair, point *azurePoint) *side {
-	s := &side{verdict: triYes}
+	report := &side{verdict: triYes}
 
-	nsg, known := e.azureNSGOf(point, s)
+	nsg, known := e.azureNSGOf(point, report)
 
 	switch {
 	case !known:
-		s.verdict = triMaybe
+		report.verdict = triMaybe
 	case nsg != nil:
-		e.azureCheckNSG(nsg, point.outbound, pair, s)
+		e.azureCheckNSG(nsg, point.outbound, pair, report)
 	}
 
-	return s
+	return report
 }
 
 // azureNSGOf is the NSG associated with the NIC or the subnet of the point, nil when there is none. known is false,
-// with the gaps in s, when an association does not resolve.
-func (e *Evaluator) azureNSGOf(point *azurePoint, s *side) (nsg *plan.Resource, known bool) {
-	target, assocType, idAttr := point.ep.subnet, azureSubnetNSGAssoc, azureSubnetIDAttr
+// with the gaps in report, when an association does not resolve.
+func (e *Evaluator) azureNSGOf(point *azurePoint, report *side) (nsg *plan.Resource, known bool) {
+	target, assocType, idAttr := point.end.subnet, azureSubnetNSGAssoc, azureSubnetIDAttr
 	if point.nicLevel {
-		target, assocType, idAttr = point.ep.nic, azureNICNSGAssoc, azureNICIDAttr
+		target, assocType, idAttr = point.end.nic, azureNICNSGAssoc, azureNICIDAttr
 	}
 
 	if target == nil {
 		return nil, true
 	}
 
-	assocs, known := e.azureAssociationsOf(target, assocType, idAttr, s)
+	assocs, known := e.azureAssociationsOf(target, assocType, idAttr, report)
 	if !known {
 		return nil, false
 	}
 
-	return e.azureAssociatedNSG(target, assocs, s)
+	return e.azureAssociatedNSG(target, assocs, report)
 }
 
 // azureAssociationsOf are the associations of the type whose idAttr names the target. known is false when the
 // idAttr of an association does not resolve: that association may name the target.
-func (e *Evaluator) azureAssociationsOf(target *plan.Resource, assocType, idAttr string, s *side) ([]*plan.Resource, bool) {
+func (e *Evaluator) azureAssociationsOf(target *plan.Resource, assocType, idAttr string, report *side) ([]*plan.Resource, bool) {
 	var out []*plan.Resource
 
 	known := true
 
 	for _, assoc := range e.ofType(assocType) {
-		owner, ok := e.ref(assoc, idAttr, s)
+		owner, ok := e.ref(assoc, idAttr, report)
 		known = known && ok
 
 		if ok && owner == target {
@@ -124,11 +124,11 @@ func (e *Evaluator) azureAssociationsOf(target *plan.Resource, assocType, idAttr
 }
 
 // azureAssociatedNSG is the one NSG that the associations of the target name.
-func (e *Evaluator) azureAssociatedNSG(target *plan.Resource, assocs []*plan.Resource, s *side) (*plan.Resource, bool) {
+func (e *Evaluator) azureAssociatedNSG(target *plan.Resource, assocs []*plan.Resource, report *side) (*plan.Resource, bool) {
 	var nsgs []*plan.Resource
 
 	for _, assoc := range assocs {
-		nsg, ok := e.ref(assoc, azureNSGIDAttr, s)
+		nsg, ok := e.ref(assoc, azureNSGIDAttr, report)
 		if !ok || nsg == nil {
 			return nil, false
 		}
@@ -137,7 +137,7 @@ func (e *Evaluator) azureAssociatedNSG(target *plan.Resource, assocs []*plan.Res
 	}
 
 	if len(nsgs) > 1 {
-		s.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s has %d associated network security groups", target.Address, len(nsgs)))
+		report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s has %d associated network security groups", target.Address, len(nsgs)))
 
 		return nil, false
 	}
@@ -159,22 +159,22 @@ func azureAppendUnique(list []*plan.Resource, r *plan.Resource) []*plan.Resource
 
 // azureCheckNSG evaluates the rules of one NSG for one direction in ascending priority: the first rule that matches
 // decides. A rule that may match before a decision makes the NSG result unknown.
-func (e *Evaluator) azureCheckNSG(nsg *plan.Resource, outbound bool, pair *azurePair, s *side) {
+func (e *Evaluator) azureCheckNSG(nsg *plan.Resource, outbound bool, pair *azurePair, report *side) {
 	for _, rule := range e.azureRulesOf(nsg, outbound) {
-		matched := e.azureMatch(&rule, pair, s)
+		matched := e.azureMatch(&rule, pair, report)
 		if matched == triNo {
 			continue
 		}
 
-		s.rule(rule.address, rule.label())
-		s.verdict = triMaybe
+		report.rule(rule.address, rule.label())
+		report.verdict = triMaybe
 
 		if matched == triYes {
-			s.verdict = rule.access()
+			report.verdict = rule.access()
 		}
 
 		return
 	}
 
-	s.verdict = triNo
+	report.verdict = triNo
 }

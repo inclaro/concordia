@@ -49,9 +49,9 @@ func (g *gcpSet) empty() bool { return len(g.vals) == 0 && len(g.gaps) == 0 }
 
 // evaluateGCP answers a query between two GCP instances or instance templates from the VPC firewall rules of the
 // plan: egress at the source, then ingress at the destination.
-func (e *Evaluator) evaluateGCP(q *Query, from, to *plan.Resource) Result {
-	src, gaps := e.gcpEndpointOf(from)
-	dst, more := e.gcpEndpointOf(to)
+func (e *Evaluator) evaluateGCP(query *Query, source, dest *plan.Resource) Result {
+	src, gaps := e.gcpEndpointOf(source)
+	dst, more := e.gcpEndpointOf(dest)
 
 	if gaps = append(gaps, more...); len(gaps) > 0 {
 		return unknownFrom(gaps)
@@ -61,7 +61,7 @@ func (e *Evaluator) evaluateGCP(q *Query, from, to *plan.Resource) Result {
 		return unknownFrom([]assurance.Gap{{
 			Kind: evaluate.GapPeeringNotEvaluated,
 			Detail: fmt.Sprintf("%s is in network %s and %s is in network %s",
-				from.Address, src.network, to.Address, dst.network),
+				source.Address, src.network, dest.Address, dst.network),
 		}})
 	}
 
@@ -70,95 +70,95 @@ func (e *Evaluator) evaluateGCP(q *Query, from, to *plan.Resource) Result {
 	}
 
 	return decide(
-		e.gcpSide(&gcpCheck{q: q, target: src, peer: dst}),
-		e.gcpSide(&gcpCheck{q: q, target: dst, peer: src, ingress: true}),
+		e.gcpSide(&gcpCheck{query: query, target: src, peer: dst}),
+		e.gcpSide(&gcpCheck{query: query, target: dst, peer: src, ingress: true}),
 	)
 }
 
 // gcpEndpointOf reads the network, addresses, tags, and service account of an endpoint.
-func (e *Evaluator) gcpEndpointOf(r *plan.Resource) (*gcpEndpoint, []assurance.Gap) {
-	if !slices.Contains(gcpEndpointTypes, r.Type) {
-		return nil, []assurance.Gap{unsupportedResource(r)}
+func (e *Evaluator) gcpEndpointOf(res *plan.Resource) (*gcpEndpoint, []assurance.Gap) {
+	if !slices.Contains(gcpEndpointTypes, res.Type) {
+		return nil, []assurance.Gap{unsupportedResource(res)}
 	}
 
-	s := &side{}
+	point := &side{}
 
-	network, ok := e.gcpNetworkOf(r, s)
+	network, ok := e.gcpNetworkOf(res, point)
 	if !ok {
-		return nil, s.gaps
+		return nil, point.gaps
 	}
 
 	return &gcpEndpoint{
 		network:  network,
-		addrs:    e.gcpAddrs(r),
-		tags:     e.gcpSetAt(r, "tags", ""),
-		accounts: e.gcpSetAt(r, gcpEmailPath, "email"),
+		addrs:    e.gcpAddrs(res),
+		tags:     e.gcpSetAt(res, "tags", ""),
+		accounts: e.gcpSetAt(res, gcpEmailPath, "email"),
 	}, nil
 }
 
 // gcpNetworkOf is the network of an endpoint. When the configuration does not name the network, the network of the
 // subnetwork applies.
-func (e *Evaluator) gcpNetworkOf(r *plan.Resource, s *side) (string, bool) {
-	_, known := attrString(r, gcpNetworkPath)
-	if !known && len(r.References[planPath(gcpNetworkPath)]) == 0 {
-		if sub := e.gcpSubnet(r); sub != nil {
-			return e.gcpNetworkKey(sub, "network", s)
+func (e *Evaluator) gcpNetworkOf(res *plan.Resource, point *side) (string, bool) {
+	_, known := attrString(res, gcpNetworkPath)
+	if !known && len(res.References[planPath(gcpNetworkPath)]) == 0 {
+		if sub := e.gcpSubnet(res); sub != nil {
+			return e.gcpNetworkKey(sub, "network", point)
 		}
 	}
 
-	return e.gcpNetworkKey(r, gcpNetworkPath, s)
+	return e.gcpNetworkKey(res, gcpNetworkPath, point)
 }
 
 // gcpNetworkKey is the name of the network at the path: the last segment of a known value (a name, an ID, or a self
 // link), or the `name` of the network that the configuration names.
-func (e *Evaluator) gcpNetworkKey(r *plan.Resource, path string, s *side) (string, bool) {
-	if v, ok := attrString(r, path); ok && v != "" {
-		return gcpName(v), true
+func (e *Evaluator) gcpNetworkKey(res *plan.Resource, path string, point *side) (string, bool) {
+	if value, ok := attrString(res, path); ok && value != "" {
+		return gcpName(value), true
 	}
 
-	target, ok := e.ref(r, path, s)
+	target, ok := e.ref(res, path, point)
 	if !ok {
 		return "", false
 	}
 
 	if target == nil {
-		s.gap(evaluate.GapUnknownAfterApply, r.Address+"."+planPath(path))
+		point.gap(evaluate.GapUnknownAfterApply, res.Address+"."+planPath(path))
 
 		return "", false
 	}
 
 	name, known := attrString(target, "name")
 	if !known {
-		s.gap(evaluate.GapUnknownAfterApply, target.Address+".name")
+		point.gap(evaluate.GapUnknownAfterApply, target.Address+".name")
 	}
 
 	return name, known
 }
 
 // gcpSubnet is the subnetwork of an endpoint, or nil when the plan does not give it.
-func (e *Evaluator) gcpSubnet(r *plan.Resource) *plan.Resource {
-	if v, ok := attrString(r, gcpSubnetworkPath); ok {
-		return e.gcpNamed(gcpSubnetworkType, v)
+func (e *Evaluator) gcpSubnet(res *plan.Resource) *plan.Resource {
+	if value, ok := attrString(res, gcpSubnetworkPath); ok {
+		return e.gcpNamed(gcpSubnetworkType, value)
 	}
 
-	target, _ := e.ref(r, gcpSubnetworkPath, &side{})
+	target, _ := e.ref(res, gcpSubnetworkPath, &side{})
 
 	return target
 }
 
 // gcpNamed is the resource of the type whose ID or name is the value (a name, an ID, or a self link), or nil.
 func (e *Evaluator) gcpNamed(typ, value string) *plan.Resource {
-	if r := e.resourceByID(value); r != nil && r.Type == typ {
-		return r
+	if byID := e.resourceByID(value); byID != nil && byID.Type == typ {
+		return byID
 	}
 
 	name := gcpName(value)
 	candidates := e.ofType(typ)
 
-	if i := slices.IndexFunc(candidates, func(c *plan.Resource) bool {
-		n, _ := attrString(c, "name")
+	if i := slices.IndexFunc(candidates, func(candidate *plan.Resource) bool {
+		got, _ := attrString(candidate, "name")
 
-		return n == name
+		return got == name
 	}); i >= 0 {
 		return candidates[i]
 	}
@@ -172,12 +172,12 @@ func gcpName(value string) string {
 }
 
 // gcpAddrs is the address set of an endpoint: its internal IP, else the range of its subnetwork.
-func (e *Evaluator) gcpAddrs(r *plan.Resource) addrSet {
-	if ip, ok := attrString(r, gcpIPPath); ok && ip != "" {
-		return hostSet(ip)
+func (e *Evaluator) gcpAddrs(res *plan.Resource) addrSet {
+	if addr, ok := attrString(res, gcpIPPath); ok && addr != "" {
+		return hostSet(addr)
 	}
 
-	if sub := e.gcpSubnet(r); sub != nil {
+	if sub := e.gcpSubnet(res); sub != nil {
 		if cidr, ok := attrString(sub, "ip_cidr_range"); ok {
 			return prefixSet(cidr)
 		}
@@ -188,38 +188,38 @@ func (e *Evaluator) gcpAddrs(r *plan.Resource) addrSet {
 
 // gcpSetAt reads the list at the path. An unknown part resolves through the configuration references to the field
 // of the named resources; field "" means the values cannot come from a reference.
-func (e *Evaluator) gcpSetAt(r *plan.Resource, path, field string) gcpSet {
-	set := gcpSet{vals: attrStrings(r, path)}
-	if !unknownAt(r, path) {
+func (e *Evaluator) gcpSetAt(res *plan.Resource, path, field string) gcpSet {
+	set := gcpSet{vals: attrStrings(res, path)}
+	if !unknownAt(res, path) {
 		return set
 	}
 
-	s := &side{}
+	point := &side{}
 
 	if field == "" {
-		s.gap(evaluate.GapUnknownAfterApply, r.Address+"."+planPath(path))
+		point.gap(evaluate.GapUnknownAfterApply, res.Address+"."+planPath(path))
 	} else {
-		set.vals = append(set.vals, e.gcpRefValues(r, path, field, s)...)
+		set.vals = append(set.vals, e.gcpRefValues(res, path, field, point)...)
 	}
 
-	set.gaps = s.gaps
+	set.gaps = point.gaps
 
 	return set
 }
 
 // gcpRefValues are the known values of the field of the resources that the configuration names at the path.
-func (e *Evaluator) gcpRefValues(r *plan.Resource, path, field string, s *side) []string {
+func (e *Evaluator) gcpRefValues(res *plan.Resource, path, field string, point *side) []string {
 	var vals []string
 
-	targets, _ := e.configRefs(r, planPath(path), s)
-	for _, t := range targets {
-		if v, ok := attrString(t, field); ok {
-			vals = append(vals, v)
+	targets, _ := e.configRefs(res, planPath(path), point)
+	for _, target := range targets {
+		if value, ok := attrString(target, field); ok {
+			vals = append(vals, value)
 
 			continue
 		}
 
-		s.gap(evaluate.GapUnknownAfterApply, t.Address+"."+field)
+		point.gap(evaluate.GapUnknownAfterApply, target.Address+"."+field)
 	}
 
 	return vals
@@ -229,10 +229,10 @@ func (e *Evaluator) gcpRefValues(r *plan.Resource, path, field string, s *side) 
 func (e *Evaluator) gcpPolicyGaps() []assurance.Gap {
 	var gaps []assurance.Gap
 
-	for _, r := range e.live {
-		if slices.ContainsFunc(gcpPolicyPrefixes, func(p string) bool { return strings.HasPrefix(r.Type, p) }) {
+	for _, res := range e.live {
+		if slices.ContainsFunc(gcpPolicyPrefixes, func(prefix string) bool { return strings.HasPrefix(res.Type, prefix) }) {
 			gaps = append(gaps, assurance.Gap{
-				Kind: evaluate.GapUnsupportedKind, Detail: fmt.Sprintf("%s: firewall policy %s", r.Address, r.Type),
+				Kind: evaluate.GapUnsupportedKind, Detail: fmt.Sprintf("%s: firewall policy %s", res.Address, res.Type),
 			})
 		}
 	}

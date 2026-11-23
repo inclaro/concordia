@@ -75,12 +75,12 @@ type Resource struct {
 	// Values are the planned attribute values after apply. Unknown attributes are absent, sensitive ones hold the
 	// redaction marker. Values is nil when the resource does not exist after apply (the action is `delete`).
 	Values map[string]any `json:"values,omitempty"`
-	// Unknown are the paths of the attributes that are unknown until apply, sorted, for example `input.owner`.
-	Unknown []string `json:"unknown,omitempty"`
 	// References are the resources that the configuration names in each attribute, by the attribute path in the form
 	// of Unknown (for example `ingress[0].security_groups`). Each address is absolute in the module tree and has no
 	// instance key; the lists are sorted and hold no duplicates. References is nil when the configuration names none.
 	References map[string][]string `json:"references,omitempty"`
+	// Unknown are the paths of the attributes that are unknown until apply, sorted, for example `input.owner`.
+	Unknown []string `json:"unknown,omitempty"`
 }
 
 // document is the part of the plan JSON that the reader uses. Fields that it does not use are not decoded.
@@ -118,10 +118,14 @@ type change struct {
 	Actions        []string `json:"actions"`
 }
 
-// reject is the result for a file that the reader cannot use.
-func reject(file, detail string) (*Plan, []diag.Diagnostic) {
-	return nil, []diag.Diagnostic{diag.New(diag.PRV008, diag.Detail(detail), diag.WithSource(diag.Source{URI: file}))}
+// reader reads one plan file. file is the workspace-relative path, used in diagnostics and records.
+type reader struct {
+	file string
+	data []byte
 }
+
+// rejection says why a file is not a plan that the reader can use. It is empty when the file is usable.
+type rejection string
 
 // Read reads the plan JSON of one file. file is the workspace-relative path, used in diagnostics and records.
 //
@@ -129,15 +133,21 @@ func reject(file, detail string) (*Plan, []diag.Diagnostic) {
 // version, JSON that is not a plan (a state file, for example), an errored plan, or a resource change without an
 // address. A partly unusable plan is never returned: dependent claims stay `unknown`.
 func Read(data []byte, file string) (*Plan, []diag.Diagnostic) {
-	doc, detail := decodeDocument(data)
-	if detail != "" {
-		return reject(file, detail)
+	r := reader{data: data, file: file}
+
+	return r.read()
+}
+
+func (r *reader) read() (*Plan, []diag.Diagnostic) {
+	doc, why := r.decode()
+	if why != "" {
+		return r.reject(why)
 	}
 
-	out := newPlan(data, &doc, file)
+	out := r.newPlan(&doc)
 
-	if detail = out.addChanges(doc.ResourceChanges, file); detail != "" {
-		return reject(file, detail)
+	if why = r.addChanges(out, doc.ResourceChanges); why != "" {
+		return r.reject(why)
 	}
 
 	out.addReferences(doc.Configuration)
@@ -147,46 +157,51 @@ func Read(data []byte, file string) (*Plan, []diag.Diagnostic) {
 	return out, nil
 }
 
-// decodeDocument decodes the plan JSON. detail says why it is not a plan that the reader can use, or "" when it is.
-func decodeDocument(data []byte) (doc document, detail string) {
-	dec := json.NewDecoder(bytes.NewReader(data))
+// reject is the result for a file that the reader cannot use.
+func (r *reader) reject(why rejection) (*Plan, []diag.Diagnostic) {
+	return nil, []diag.Diagnostic{diag.New(diag.PRV008, diag.Detail(string(why)), diag.WithSource(diag.Source{URI: r.file}))}
+}
+
+// decode decodes the plan JSON. why says why it is not a plan that the reader can use.
+func (r *reader) decode() (doc document, why rejection) {
+	dec := json.NewDecoder(bytes.NewReader(r.data))
 	dec.UseNumber()
 
 	if err := dec.Decode(&doc); err != nil {
-		return doc, "not valid JSON: " + err.Error()
+		return doc, rejection("not valid JSON: " + err.Error())
 	}
 
-	detail = checkDocument(&doc)
+	why = checkDocument(&doc)
 
-	return doc, detail
+	return doc, why
 }
 
 // newPlan is the plan of a document before its resource changes are read.
-func newPlan(data []byte, doc *document, file string) *Plan {
+func (r *reader) newPlan(doc *document) *Plan {
 	out := &Plan{
-		Digest: digest.OfBytes(data), FormatVersion: doc.FormatVersion, ToolVersion: doc.TerraformVersion,
+		Digest: digest.OfBytes(r.data), FormatVersion: doc.FormatVersion, ToolVersion: doc.TerraformVersion,
 		Coverage: assurance.CoverageComplete, Resources: []Resource{}, Gaps: []assurance.Gap{}, Redactions: []redact.Record{},
 	}
 
 	if doc.Complete != nil && !*doc.Complete {
 		out.Coverage = assurance.CoveragePartial
 		out.Gaps = append(out.Gaps, assurance.Gap{
-			Kind: GapIncompletePlan, Detail: "the plan is marked incomplete and has deferred changes", Path: file,
+			Kind: GapIncompletePlan, Detail: "the plan is marked incomplete and has deferred changes", Path: r.file,
 		})
 	}
 
 	return out
 }
 
-// addChanges reads the resource changes into the plan. detail says why one is unusable, or "" when all are usable.
-func (p *Plan) addChanges(changes []json.RawMessage, file string) (detail string) {
+// addChanges reads the resource changes into the plan. why says why one is unusable.
+func (r *reader) addChanges(p *Plan, changes []json.RawMessage) rejection {
 	for i, raw := range changes {
 		rc, ok := decodeResourceChange(raw)
 		if !ok {
-			return "resource_changes[" + strconv.Itoa(i) + "] has no address or no change"
+			return rejection("resource_changes[" + strconv.Itoa(i) + "] has no address or no change")
 		}
 
-		res, gaps, redactions := readResource(&rc, file)
+		res, gaps, redactions := r.readResource(&rc)
 		p.Resources = append(p.Resources, res)
 		p.Gaps = append(p.Gaps, gaps...)
 		p.Redactions = append(p.Redactions, redactions...)
@@ -220,13 +235,13 @@ func (p *Plan) sortEntries() {
 	slices.SortStableFunc(p.Redactions, func(a, b redact.Record) int { return canonjson.CompareUTF16(a.Property, b.Property) })
 }
 
-// checkDocument says why a decoded document is not a plan that the reader can use, or "" when it is.
-func checkDocument(doc *document) string {
+// checkDocument says why a decoded document is not a plan that the reader can use.
+func checkDocument(doc *document) rejection {
 	switch {
 	case doc.FormatVersion == "":
 		return "no format_version: not the output of `show -json`"
 	case !slices.Contains(SupportedFormatVersions, doc.FormatVersion):
-		return "format version " + doc.FormatVersion + " is not supported (supported: " + strings.Join(SupportedFormatVersions, ", ") + ")"
+		return rejection("format version " + doc.FormatVersion + " is not supported (supported: " + strings.Join(SupportedFormatVersions, ", ") + ")")
 	case doc.PlannedValues == nil && doc.ResourceChanges == nil:
 		if doc.Values != nil {
 			return "the file is a state (`show -json` without a plan file), not a plan"
@@ -241,7 +256,7 @@ func checkDocument(doc *document) string {
 }
 
 // readResource turns one resource change into a Resource, its gaps, and its redactions.
-func readResource(item *resourceChange, file string) (Resource, []assurance.Gap, []redact.Record) {
+func (r *reader) readResource(item *resourceChange) (Resource, []assurance.Gap, []redact.Record) {
 	res := Resource{
 		Address: item.Address, Module: item.ModuleAddress, Mode: item.Mode, Type: item.Type, Name: item.Name,
 		Provider: item.ProviderName, Deposed: item.Deposed, Actions: slices.Clone(item.Change.Actions),
@@ -257,7 +272,7 @@ func readResource(item *resourceChange, file string) (Resource, []assurance.Gap,
 		return res, nil, nil
 	}
 
-	walk := walker{address: item.Address, file: file}
+	walk := walker{address: item.Address, file: r.file}
 	res.Values = walk.object(after, &node{unknown: item.Change.AfterUnknown, sensitive: item.Change.AfterSensitive})
 
 	slices.SortFunc(walk.unknown, canonjson.CompareUTF16)
@@ -265,180 +280,8 @@ func readResource(item *resourceChange, file string) (Resource, []assurance.Gap,
 
 	gaps := make([]assurance.Gap, len(walk.unknown))
 	for i, path := range walk.unknown {
-		gaps[i] = assurance.Gap{Kind: GapUnknownAfterApply, Detail: item.Address + ": " + path + " is unknown until apply", Path: file}
+		gaps[i] = assurance.Gap{Kind: GapUnknownAfterApply, Detail: item.Address + ": " + path + " is unknown until apply", Path: r.file}
 	}
 
 	return res, gaps, walk.redactions
-}
-
-// walker walks the `after` value of one resource beside its `after_unknown` and `after_sensitive` mirrors.
-type walker struct {
-	address    string
-	file       string
-	unknown    []string
-	redactions []redact.Record
-}
-
-// mark gives the mirror entry for a key of an object: false when the mirror has none.
-func mark(mirror any, key string) any {
-	if m, ok := mirror.(map[string]any); ok {
-		return m[key]
-	}
-
-	return nil
-}
-
-// markAt gives the mirror entry for an index of an array.
-func markAt(mirror any, index int) any {
-	if m, ok := mirror.([]any); ok && index < len(m) {
-		return m[index]
-	}
-
-	return nil
-}
-
-func isTrue(v any) bool { b, ok := v.(bool); return ok && b }
-
-// node is one value of `after` with its entries in the `after_unknown` and `after_sensitive` mirrors. name is the
-// attribute name that the value belongs to; an array element has the name of its array.
-type node struct {
-	item      any
-	unknown   any
-	sensitive any
-	path      string
-	name      string
-}
-
-// child is the node for a key of an object.
-func (n *node) child(item any, key string) *node {
-	return &node{item: item, unknown: mark(n.unknown, key), sensitive: mark(n.sensitive, key), path: join(n.path, key), name: key}
-}
-
-// element is the node for an index of an array. An index beyond value has no item: only the mirror names it.
-func (n *node) element(value []any, index int) *node {
-	var item any
-	if index < len(value) {
-		item = value[index]
-	}
-
-	return &node{
-		item: item, unknown: markAt(n.unknown, index), sensitive: markAt(n.sensitive, index),
-		path: n.path + "[" + strconv.Itoa(index) + "]", name: n.name,
-	}
-}
-
-// object cleans the attributes of an object. Its node holds the mirrors of the object.
-func (w *walker) object(value map[string]any, n *node) map[string]any {
-	out := make(map[string]any, len(value))
-
-	for key, item := range value {
-		if cleaned, keep := w.value(n.child(item, key)); keep {
-			out[key] = cleaned
-		}
-	}
-
-	w.unknownKeys(value, n)
-
-	return out
-}
-
-// unknownKeys records the unknown attributes that are not in `after`; the mirror is the only place that names them.
-func (w *walker) unknownKeys(value map[string]any, parent *node) {
-	mirror, ok := parent.unknown.(map[string]any)
-	if !ok {
-		return
-	}
-
-	for key, u := range mirror {
-		if _, present := value[key]; present {
-			continue
-		}
-
-		w.value(&node{unknown: u, path: join(parent.path, key), name: key})
-	}
-}
-
-// array cleans the elements of an array. Its node holds the mirrors of the array.
-func (w *walker) array(value []any, n *node) []any {
-	count := len(value)
-	if m, ok := n.unknown.([]any); ok {
-		count = max(count, len(m))
-	}
-
-	out := make([]any, 0, len(value))
-
-	for i := range count {
-		cleaned, keep := w.value(n.element(value, i))
-		if keep && i < len(value) {
-			out = append(out, cleaned)
-		}
-	}
-
-	return out
-}
-
-// value cleans one value. keep is false when the value is unknown and so has no value to keep.
-func (w *walker) value(current *node) (cleaned any, keep bool) {
-	if isTrue(current.unknown) {
-		w.unknown = append(w.unknown, current.path)
-
-		return nil, false
-	}
-
-	if isTrue(current.sensitive) && current.item != nil {
-		w.redact(current.path, redact.ClassSecretData)
-
-		return redact.Marker(redact.ClassSecretData), true
-	}
-
-	switch typed := current.item.(type) {
-	case map[string]any:
-		return w.object(typed, current), true
-	case []any:
-		return w.array(typed, current), true
-	case string:
-		return w.text(typed, current), true
-	case nil:
-		w.partlyUnknown(current)
-
-		return nil, true
-	default:
-		return current.item, true
-	}
-}
-
-// text removes a credential from a string. The plan marks what Terraform knows to be sensitive; a credential in a
-// plain attribute is still removed.
-func (w *walker) text(value string, n *node) string {
-	text, records := redact.Default().RedactValue(n.name, value)
-	for _, r := range records {
-		w.redact(n.path, r.Class)
-	}
-
-	return text
-}
-
-// partlyUnknown handles a null value: `after` omits an object or a list that is unknown in part, and the mirror still
-// names the unknown parts.
-func (w *walker) partlyUnknown(n *node) {
-	rest := &node{unknown: n.unknown, path: n.path, name: n.name}
-
-	switch n.unknown.(type) {
-	case map[string]any:
-		w.object(nil, rest)
-	case []any:
-		w.array(nil, rest)
-	}
-}
-
-func (w *walker) redact(path, class string) {
-	w.redactions = append(w.redactions, redact.Record{File: w.file, Property: w.address + "." + path, Class: class})
-}
-
-func join(path, key string) string {
-	if path == "" {
-		return key
-	}
-
-	return path + "." + key
 }

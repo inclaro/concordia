@@ -3,6 +3,7 @@ package reporting_test
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -153,6 +154,68 @@ func TestPretty(t *testing.T) {
 			"0 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown",
 			"",
 		}, "\n"))
+	})
+}
+
+// accessRun is the sample run with CO-BND-001 as an effective-access rule, whose findings are network violations that
+// the evaluator observed in the plan of the production environment.
+func accessRun() *conformance.Run {
+	run := testutil.SampleRun()
+
+	rule := slices.IndexFunc(run.Rules, func(r conformance.RuleResult) bool { return r.RuleID == "CO-BND-001" })
+	run.Rules[rule].Family = policy.FamilyEffectiveAccess
+
+	for i := range run.Findings {
+		if run.Findings[i].RuleID == "CO-BND-001" {
+			setAccessEvidence(&run.Findings[i])
+		}
+	}
+
+	return run
+}
+
+// setAccessEvidence makes a finding a network violation that the evaluator observed in the plan of production.
+func setAccessEvidence(finding *conformance.Finding) {
+	finding.Location = &conformance.Location{Path: "deploy/production"}
+	finding.EvidencePath = []conformance.EvidenceStep{}
+	finding.Observed = "open: tcp/5432 from aws_lb.public to aws_db_instance.ledger " +
+		"(aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)"
+}
+
+func TestEffectiveAccessEvidence(t *testing.T) {
+	t.Parallel()
+
+	t.Run("an effective-access finding shows what is open under its location", func(t *testing.T) {
+		t.Parallel()
+
+		contains(t, reporting.RenderPretty(accessRun(), plain), strings.Join([]string{
+			"  billing-service -> fulfillment-service: 1 finding(s)",
+			"    deploy/production",
+			"      open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)",
+			"  Fix: Import from packages/fulfillment-contract.",
+		}, "\n"))
+	})
+
+	t.Run("--verbose keeps the fingerprint after the evidence", func(t *testing.T) {
+		t.Parallel()
+
+		contains(t, reporting.RenderPretty(accessRun(), reporting.PrettyOptions{Verbose: true}), strings.Join([]string{
+			"    deploy/production",
+			"      open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)",
+			"      fingerprint " + testutil.FPActive,
+		}, "\n"))
+	})
+
+	t.Run("a finding of another family does not show its observed text", func(t *testing.T) {
+		t.Parallel()
+
+		text := reporting.RenderPretty(testutil.SampleRun(), plain)
+		contains(t, text, strings.Join([]string{
+			"  billing-service -> fulfillment-service: 1 finding(s)",
+			"    services/billing/src/InvoiceService.ts:18  imports services/fulfillment/src/internal/ShipmentStore.ts",
+			"  Fix: Import from packages/fulfillment-contract.",
+		}, "\n"))
+		notContains(t, text, "IMPORTS edge between the two services")
 	})
 }
 

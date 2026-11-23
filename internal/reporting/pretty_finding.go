@@ -9,6 +9,7 @@ import (
 	"github.com/inclaro/concordia/internal/conformance"
 	"github.com/inclaro/concordia/internal/exceptions"
 	"github.com/inclaro/concordia/internal/observation"
+	"github.com/inclaro/concordia/internal/policy"
 )
 
 // shortName is the name of an observed node as a reader knows it: a file for a file or module node, else the qualified
@@ -259,14 +260,22 @@ func groupFindings(rule *conformance.RuleResult, findings []*conformance.Finding
 	return groups
 }
 
-// findingLines are the lines of one finding inside its group: the location and what the code does, aligned on the
-// width of the longest location of the group, then the lines that a finding of another kind carries (a view, a
-// decision), and with --verbose the fingerprint and the full evidence.
-func findingLines(run *conformance.Run, finding *conformance.Finding, width int, verbose bool) []string {
-	lines := locationLines(run, finding, width)
-	lines = append(lines, kindLines(finding)...)
+// findingLayout is how the findings of one group are shown: the family of their rule, the width of the longest
+// location of the group, and whether the output is --verbose.
+type findingLayout struct {
+	family  policy.PredicateFamily
+	width   int
+	verbose bool
+}
 
-	if verbose {
+// findingLines are the lines of one finding inside its group: the location and what the code does, aligned on the
+// width of the longest location of the group, then the lines that a finding of another kind carries (an effective
+// access, a view, a decision), and with --verbose the fingerprint and the full evidence.
+func findingLines(run *conformance.Run, finding *conformance.Finding, layout findingLayout) []string {
+	lines := locationLines(run, finding, layout.width)
+	lines = append(lines, kindLines(finding, layout.family)...)
+
+	if layout.verbose {
 		lines = append(lines, verboseLines(finding)...)
 	}
 
@@ -292,9 +301,15 @@ func locationLines(run *conformance.Run, finding *conformance.Finding, width int
 	return lines
 }
 
-// kindLines are the lines that a finding of another kind carries: the view of a diagram finding, the decision of a
-// governance finding.
-func kindLines(finding *conformance.Finding) []string {
+// kindLines are the lines that a finding of another kind carries: what the evaluator observed for an effective access
+// finding, the view of a diagram finding, the decision of a governance finding.
+func kindLines(finding *conformance.Finding, family policy.PredicateFamily) []string {
+	if family == policy.FamilyEffectiveAccess {
+		// The observed text states the access without the pair that the heading of the group already names:
+		// `open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (... rule)`.
+		return []string{"      " + finding.Observed}
+	}
+
 	if id := viewIDOf(finding); id != "" {
 		return []string{"      view " + id}
 	}

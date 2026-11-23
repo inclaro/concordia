@@ -39,21 +39,22 @@ const (
 	DeploymentSucceeded         ID = "deployment-succeeded"
 	RuntimeDrift                ID = "runtime-drift"
 	NetworkIsolation            ID = "network-isolation"
+	CloudNetworkIsolation       ID = "cloud-network-isolation"
 	RBACGrants                  ID = "rbac-grants"
 	CheckOutcome                ID = "check-outcome"
 	QualityScenarioVerdict      ID = "quality-scenario-verdict"
 )
 
-// IDs gives the twelve registered claims in registry order.
+// IDs gives the thirteen registered claims in registry order.
 func IDs() []ID {
 	return []ID{
 		CompleteResourceSet, ContainerOccurrenceVersions, ResolvedSelections, PlannedResources,
 		ExactLineage, DeployedDigest, DeploymentSucceeded, RuntimeDrift,
-		NetworkIsolation, RBACGrants, CheckOutcome, QualityScenarioVerdict,
+		NetworkIsolation, CloudNetworkIsolation, RBACGrants, CheckOutcome, QualityScenarioVerdict,
 	}
 }
 
-// Registered says whether the id is one of the twelve claims.
+// Registered says whether the id is one of the thirteen claims.
 func Registered(id ID) bool { return slices.Contains(IDs(), id) }
 
 // LevelNotApplicable is the evidence level of a claim that is not about a level of the deployment trace, such as the
@@ -125,7 +126,7 @@ type Registry struct {
 // ErrInvalidRegistry is wrapped by the error of New.
 var ErrInvalidRegistry = errors.New("claim registry not valid")
 
-// New builds a registry of the contracts. It refuses a duplicate contract id, a claim that is not one of the twelve,
+// New builds a registry of the contracts. It refuses a duplicate contract id, a claim that is not one of the thirteen,
 // and a claim that two contracts enable: each claim has one contract, so a rule can name the contract that gives it
 // meaning. The input is copied and sorted by contract id.
 func New(contracts []Contract) (*Registry, error) {
@@ -141,20 +142,32 @@ func New(contracts []Contract) (*Registry, error) {
 			return nil, fmt.Errorf("%w: contract %q appears two times", ErrInvalidRegistry, contract.ID)
 		}
 
-		for _, enabled := range contract.Enabled {
-			if !Registered(enabled.Claim) {
-				return nil, fmt.Errorf("%w: contract %q enables %q, which is not a registered claim", ErrInvalidRegistry, contract.ID, enabled.Claim)
-			}
-
-			if other, dup := byClaim[enabled.Claim]; dup {
-				return nil, fmt.Errorf("%w: claim %q is enabled by contracts %q and %q", ErrInvalidRegistry, enabled.Claim, sorted[other].ID, contract.ID)
-			}
-
-			byClaim[enabled.Claim] = i
+		if err := indexClaims(sorted, i, byClaim); err != nil {
+			return nil, err
 		}
 	}
 
 	return &Registry{contracts: sorted, byClaim: byClaim}, nil
+}
+
+// indexClaims records the claims that the contract at index i of sorted enables. It refuses a claim that is not
+// registered and a claim that an earlier contract enables.
+func indexClaims(sorted []Contract, i int, byClaim map[ID]int) error {
+	contract := &sorted[i]
+
+	for _, enabled := range contract.Enabled {
+		if !Registered(enabled.Claim) {
+			return fmt.Errorf("%w: contract %q enables %q, which is not a registered claim", ErrInvalidRegistry, contract.ID, enabled.Claim)
+		}
+
+		if other, dup := byClaim[enabled.Claim]; dup {
+			return fmt.Errorf("%w: claim %q is enabled by contracts %q and %q", ErrInvalidRegistry, enabled.Claim, sorted[other].ID, contract.ID)
+		}
+
+		byClaim[enabled.Claim] = i
+	}
+
+	return nil
 }
 
 // Contracts gives the loaded contracts sorted by id. The caller may change the result.

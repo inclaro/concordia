@@ -47,7 +47,7 @@ func (e *Evaluator) Evaluate(q *Query) Result {
 }
 
 // evaluate applies the gates in order (plan coverage, endpoints, providers) and then asks the provider.
-func (e *Evaluator) evaluate(q *Query) Result {
+func (e *Evaluator) evaluate(query *Query) Result {
 	if e.in.Coverage != assurance.CoverageComplete {
 		return unknownResult(evaluate.ReasonCoverageIncomplete, assurance.Gap{
 			Kind:   evaluate.GapIncompletePlan,
@@ -55,12 +55,12 @@ func (e *Evaluator) evaluate(q *Query) Result {
 		})
 	}
 
-	from, to, gaps := e.endpoints(q)
+	source, dest, gaps := e.endpoints(query)
 	if len(gaps) > 0 {
 		return unknownResult(evaluate.ReasonSubjectNotFound, gaps...)
 	}
 
-	return e.dispatch(q, from, to)
+	return e.dispatch(query, source, dest)
 }
 
 // endpoints looks both ends of the query up in the input.
@@ -73,7 +73,7 @@ func (e *Evaluator) endpoints(q *Query) (from, to *plan.Resource, gaps []assuran
 	}{{from, q.From.Address}, {to, q.To.Address}} {
 		if end.res == nil {
 			gaps = append(gaps, assurance.Gap{
-				Kind: evaluate.GapWorkloadMissing, Detail: fmt.Sprintf("%s is not a resource of the plan after apply", end.address),
+				Kind: evaluate.GapWorkloadMissing, Detail: end.address + " is not a resource of the plan after apply",
 			})
 		}
 	}
@@ -82,24 +82,24 @@ func (e *Evaluator) endpoints(q *Query) (from, to *plan.Resource, gaps []assuran
 }
 
 // dispatch hands the query to the provider of both ends.
-func (e *Evaluator) dispatch(q *Query, from, to *plan.Resource) Result {
-	fromProvider, toProvider := providerOf(from.Type), providerOf(to.Type)
+func (e *Evaluator) dispatch(query *Query, source, dest *plan.Resource) Result {
+	sourceProvider, destProvider := providerOf(source.Type), providerOf(dest.Type)
 
 	switch {
-	case fromProvider == "" || toProvider == "":
-		return unknownResult(evaluate.ReasonUnsupportedConstruct, unsupportedGap(from, to))
-	case fromProvider != toProvider:
+	case sourceProvider == "" || destProvider == "":
+		return unknownResult(evaluate.ReasonUnsupportedConstruct, unsupportedGap(source, dest))
+	case sourceProvider != destProvider:
 		return unknownResult(evaluate.ReasonUnsupportedConstruct, assurance.Gap{
 			Kind: evaluate.GapMixedProviders,
 			Detail: fmt.Sprintf("%s is a %s resource and %s is a %s resource",
-				from.Address, fromProvider, to.Address, toProvider),
+				source.Address, sourceProvider, dest.Address, destProvider),
 		})
-	case fromProvider == providerAWS:
-		return e.evaluateAWS(q, from, to)
-	case fromProvider == providerAzure:
-		return e.evaluateAzure(q, from, to)
+	case sourceProvider == providerAWS:
+		return e.evaluateAWS(query, source, dest)
+	case sourceProvider == providerAzure:
+		return e.evaluateAzure(query, source, dest)
 	default:
-		return e.evaluateGCP(q, from, to)
+		return e.evaluateGCP(query, source, dest)
 	}
 }
 

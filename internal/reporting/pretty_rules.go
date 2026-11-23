@@ -127,8 +127,10 @@ func groupLines(run *conformance.Run, rule *conformance.RuleResult, group *findi
 
 	lines := []string{head}
 
+	layout := findingLayout{width: width, family: rule.Family, verbose: verbose}
+
 	for _, f := range group.findings {
-		lines = append(lines, findingLines(run, f, width, verbose)...)
+		lines = append(lines, findingLines(run, f, layout)...)
 	}
 
 	if rule.Plan.Remediation == "" && group.next != "" {

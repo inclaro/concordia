@@ -48,7 +48,7 @@ func ConfigAddress(address string) string {
 		return address
 	}
 
-	var b strings.Builder
+	var out strings.Builder
 
 	for i := 0; i < len(address); {
 		if address[i] == '[' {
@@ -57,30 +57,30 @@ func ConfigAddress(address string) string {
 			continue
 		}
 
-		b.WriteByte(address[i])
+		out.WriteByte(address[i])
 		i++
 	}
 
-	return b.String()
+	return out.String()
 }
 
-// keyEnd is the index after the instance key that opens at start, or the end of s when the key is not closed. A
-// quoted key may hold `]` and `.`.
-func keyEnd(s string, start int) int {
+// keyEnd is the index after the instance key that opens at start, or the end of address when the key is not
+// closed. A quoted key may hold `]` and `.`.
+func keyEnd(address string, start int) int {
 	quoted := false
 
-	for i := start + 1; i < len(s); i++ {
+	for i := start + 1; i < len(address); i++ {
 		switch {
-		case quoted && s[i] == '\\':
+		case quoted && address[i] == '\\':
 			i++
-		case s[i] == '"':
+		case address[i] == '"':
 			quoted = !quoted
-		case !quoted && s[i] == ']':
+		case !quoted && address[i] == ']':
 			return i + 1
 		}
 	}
 
-	return len(s)
+	return len(address)
 }
 
 // addReferences reads the `references` lists of the configuration and attaches them to the resources whose address,
@@ -107,16 +107,7 @@ func (p *Plan) addReferences(raw json.RawMessage) {
 
 // collectModule adds the references of the resources of a module and of its module calls, by absolute address.
 func collectModule(module *configModule, prefix string, out map[string]map[string][]string) {
-	for i := range module.Resources {
-		res := &module.Resources[i]
-
-		refs := map[string][]string{}
-		collectBlock(res.Expressions, "", prefix, refs)
-
-		if len(refs) > 0 {
-			out[prefix+res.Address] = sortedRefs(refs)
-		}
-	}
+	collectResources(module.Resources, prefix, out)
 
 	for name, call := range module.ModuleCalls {
 		if call.Module != nil {
@@ -125,19 +116,38 @@ func collectModule(module *configModule, prefix string, out map[string]map[strin
 	}
 }
 
-// collectBlock adds the references of each expression of a block to refs, by attribute path.
-func collectBlock(exprs map[string]json.RawMessage, path, prefix string, refs map[string][]string) {
-	for key, raw := range exprs {
-		collectExpression(raw, join(path, key), prefix, refs)
+// collectResources adds the references of the resources of one module, by absolute address.
+func collectResources(resources []configResource, prefix string, out map[string]map[string][]string) {
+	for i := range resources {
+		refs := resourceRefs{prefix: prefix, byPath: map[string][]string{}}
+		refs.block(resources[i].Expressions, "")
+
+		if len(refs.byPath) > 0 {
+			out[prefix+resources[i].Address] = sortedRefs(refs.byPath)
+		}
 	}
 }
 
-// collectExpression adds the references of one expression. An array of objects is a nested block; its elements have
-// the path form of Resource.Unknown, for example `ingress[0].security_groups`.
-func collectExpression(raw json.RawMessage, path, prefix string, refs map[string][]string) {
+// resourceRefs collects the references of one resource. prefix is the module prefix of the resource; byPath holds
+// the absolute addresses by attribute path.
+type resourceRefs struct {
+	byPath map[string][]string
+	prefix string
+}
+
+// block adds the references of each expression of a block, by attribute path.
+func (r *resourceRefs) block(exprs map[string]json.RawMessage, path string) {
+	for key, raw := range exprs {
+		r.expression(raw, join(path, key))
+	}
+}
+
+// expression adds the references of one expression. An array of objects is a nested block; its elements have the
+// path form of Resource.Unknown, for example `ingress[0].security_groups`.
+func (r *resourceRefs) expression(raw json.RawMessage, path string) {
 	var expr expression
 	if json.Unmarshal(raw, &expr) == nil {
-		addRefs(expr.References, path, prefix, refs)
+		r.add(expr.References, path)
 
 		return
 	}
@@ -148,15 +158,15 @@ func collectExpression(raw json.RawMessage, path, prefix string, refs map[string
 	}
 
 	for i, block := range blocks {
-		collectBlock(block, path+"["+strconv.Itoa(i)+"]", prefix, refs)
+		r.block(block, path+"["+strconv.Itoa(i)+"]")
 	}
 }
 
-// addRefs adds the resource addresses that the reference strings name.
-func addRefs(references []string, path, prefix string, refs map[string][]string) {
+// add adds the resource addresses that the reference strings name.
+func (r *resourceRefs) add(references []string, path string) {
 	for _, ref := range references {
 		if address, ok := resourceOf(ref); ok {
-			refs[path] = append(refs[path], prefix+address)
+			r.byPath[path] = append(r.byPath[path], r.prefix+address)
 		}
 	}
 }

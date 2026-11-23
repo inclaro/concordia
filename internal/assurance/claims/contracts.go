@@ -5,6 +5,7 @@ import (
 
 	"github.com/inclaro/concordia/internal/assurance"
 	"github.com/inclaro/concordia/internal/assurance/evaluate"
+	"github.com/inclaro/concordia/internal/assurance/evaluate/cloudfw"
 	"github.com/inclaro/concordia/internal/assurance/evaluate/netpol"
 	"github.com/inclaro/concordia/internal/assurance/evaluate/rbac"
 	"github.com/inclaro/concordia/internal/deployment"
@@ -13,12 +14,14 @@ import (
 // Default is the registry of the contracts that ship with Concordia. It is built once and shared; its contracts are
 // copies, so a caller cannot change it.
 var Default = sync.OnceValue(func() *Registry {
-	networkPolicy, accessControl := netpol.Contract(), rbac.Contract()
+	networkPolicy, accessControl, cloudFirewall := netpol.Contract(), rbac.Contract(), cloudfw.Contract()
 
 	contracts := []Contract{
 		renderingContract(), planContract(), provenanceContract(), verificationContract(), qualityContract(),
-		evaluatorContract(&networkPolicy, "internal/assurance/evaluate/netpol"),
-		evaluatorContract(&accessControl, "internal/assurance/evaluate/rbac"),
+		evaluatorContract(&networkPolicy, "internal/assurance/evaluate/netpol", assurance.IntegrityDigest),
+		evaluatorContract(&accessControl, "internal/assurance/evaluate/rbac", assurance.IntegrityDigest),
+		// A plan needs no signed statement: its digest is recorded with each evaluation, and the bundle copies it.
+		evaluatorContract(&cloudFirewall, "internal/assurance/evaluate/cloudfw", assurance.IntegrityNotVerified),
 	}
 
 	registry, err := New(contracts)
@@ -155,11 +158,11 @@ func qualityContract() Contract {
 
 // evaluatorContract derives the claim contract of a built-in evaluator from its own contract, so the claims and the
 // evaluator cannot say different things. The contract id is the workspace evaluator kind, and dir is the package
-// directory whose tests are the fixtures of the evaluator.
-func evaluatorContract(source *evaluate.Contract, dir string) Contract {
+// directory whose tests are the fixtures of the evaluator. integrity is the integrity that the input must have.
+func evaluatorContract(source *evaluate.Contract, dir string, integrity assurance.Integrity) Contract {
 	enabled := make([]Enablement, 0, len(source.Enables))
 	for _, claim := range source.Enables {
-		enabled = append(enabled, Enablement{Claim: ID(claim), Requires: requires(source.RequiresEvidence, assurance.IntegrityDigest)})
+		enabled = append(enabled, Enablement{Claim: ID(claim), Requires: requires(source.RequiresEvidence, integrity)})
 	}
 
 	return Contract{

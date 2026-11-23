@@ -477,7 +477,7 @@ func TestDoctorJSONListsTheClaimContracts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !strings.HasPrefix(doc.Claims.Digest, "sha256:") || len(doc.Claims.Claims) != 12 {
+	if !strings.HasPrefix(doc.Claims.Digest, "sha256:") || len(doc.Claims.Claims) != 13 {
 		t.Fatalf("registry = %+v", doc.Claims)
 	}
 
@@ -489,8 +489,8 @@ func TestDoctorJSONListsTheClaimContracts(t *testing.T) {
 		}
 	}
 
-	if got := idx.evaluators(); got != 2 {
-		t.Errorf("evaluator contracts = %d, want the network and the access evaluator", got)
+	if got := idx.evaluators(); got != 3 {
+		t.Errorf("evaluator contracts = %d, want the network, the access, and the cloud firewall evaluator", got)
 	}
 
 	if !slices.Contains(idx.notEnabled["provenance"], "slsa-level") {

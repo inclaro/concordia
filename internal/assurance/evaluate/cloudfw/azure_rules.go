@@ -12,34 +12,64 @@ import (
 	"github.com/inclaro/concordia/internal/assurance/plan"
 )
 
+// Values of the rule fields that the evaluator compares, and the priorities of the default rules.
+const (
+	azureAllow            = "Allow"
+	azureInbound          = "Inbound"
+	azureOutbound         = "Outbound"
+	azureProtocolAttr     = "protocol"
+	azureVirtualNetwork   = "VirtualNetwork"
+	azurePriorityVNet     = 65000
+	azurePriorityPlatform = 65001
+	azurePriorityDenyAll  = 65500
+)
+
 // azureRule is one rule of an NSG. Its fields are read from res under the path prefix base: an inline
 // `security_rule` block of the NSG, an `azurerm_network_security_rule`, or a default rule.
 type azureRule struct {
-	res     *plan.Resource
-	base    string
-	address string
+	res       *plan.Resource
+	base      string
+	address   string
+	fixedGaps []assurance.Gap
 	// fixed is no when the rule is not a rule of the NSG, maybe when its owner or its priority, direction, or access
 	// is not known (fixedGaps say why), else yes.
-	fixed     tri
-	fixedGaps []assurance.Gap
+	fixed tri
 }
 
 // azureDefault is one of the default rules that Azure adds to every NSG.
 type azureDefault struct {
 	name                string
-	priority            int
 	direction           string
 	source, destination string
 	access              string
+	priority            int
 }
 
 var azureDefaults = []azureDefault{
-	{name: "AllowVnetInBound", priority: 65000, direction: "Inbound", source: "VirtualNetwork", destination: "VirtualNetwork", access: "Allow"},
-	{name: "AllowAzureLoadBalancerInBound", priority: 65001, direction: "Inbound", source: "AzureLoadBalancer", destination: "*", access: "Allow"},
-	{name: "DenyAllInBound", priority: 65500, direction: "Inbound", source: "*", destination: "*", access: "Deny"},
-	{name: "AllowVnetOutBound", priority: 65000, direction: "Outbound", source: "VirtualNetwork", destination: "VirtualNetwork", access: "Allow"},
-	{name: "AllowInternetOutBound", priority: 65001, direction: "Outbound", source: "*", destination: "Internet", access: "Allow"},
-	{name: "DenyAllOutBound", priority: 65500, direction: "Outbound", source: "*", destination: "*", access: "Deny"},
+	{
+		name: "AllowVnetInBound", priority: azurePriorityVNet, direction: azureInbound,
+		source: azureVirtualNetwork, destination: azureVirtualNetwork, access: azureAllow,
+	},
+	{
+		name: "AllowAzureLoadBalancerInBound", priority: azurePriorityPlatform, direction: azureInbound,
+		source: "AzureLoadBalancer", destination: protocolAny, access: azureAllow,
+	},
+	{
+		name: "DenyAllInBound", priority: azurePriorityDenyAll, direction: azureInbound,
+		source: protocolAny, destination: protocolAny, access: "Deny",
+	},
+	{
+		name: "AllowVnetOutBound", priority: azurePriorityVNet, direction: azureOutbound,
+		source: azureVirtualNetwork, destination: azureVirtualNetwork, access: azureAllow,
+	},
+	{
+		name: "AllowInternetOutBound", priority: azurePriorityPlatform, direction: azureOutbound,
+		source: protocolAny, destination: "Internet", access: azureAllow,
+	},
+	{
+		name: "DenyAllOutBound", priority: azurePriorityDenyAll, direction: azureOutbound,
+		source: protocolAny, destination: protocolAny, access: "Deny",
+	},
 }
 
 // azureDefaultResources hold the default rules in the shape of a rule resource, so that one matcher reads all rules.
@@ -51,7 +81,7 @@ func azureBuildDefaults() []*plan.Resource {
 	for _, d := range azureDefaults {
 		out = append(out, &plan.Resource{Address: "default rule " + d.name, Type: azureNSGRule, Values: map[string]any{
 			"name": d.name, "priority": strconv.Itoa(d.priority), "direction": d.direction, "access": d.access,
-			"protocol": "*", "destination_port_range": "*",
+			azureProtocolAttr: protocolAny, "destination_port_range": protocolAny,
 			"source_address_prefix": d.source, "destination_address_prefix": d.destination,
 		}})
 	}
@@ -125,16 +155,16 @@ func newAzureRule(res *plan.Resource, base, address string, owner tri) azureRule
 
 // azureRuleOwner is yes when the rule resource belongs to the NSG. It uses the configuration reference of
 // `network_security_group_name` first, then the name and resource group in the plan.
-func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, s *side) tri {
+func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, report *side) tri {
 	if refs := rule.References["network_security_group_name"]; len(refs) > 0 {
-		return e.azureOwnerByReference(refs, nsg, s)
+		return e.azureOwnerByReference(refs, nsg, report)
 	}
 
 	name, hasName := attrString(rule, "network_security_group_name")
 	group, hasGroup := attrString(rule, "resource_group_name")
 
 	if !hasName || !hasGroup {
-		s.gap(evaluate.GapUnknownAfterApply, rule.Address+".network_security_group_name")
+		report.gap(evaluate.GapUnknownAfterApply, rule.Address+".network_security_group_name")
 
 		return triMaybe
 	}
@@ -143,15 +173,15 @@ func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, s *side) tri {
 		return azureIf(owner == nsg)
 	}
 
-	return azureNamedLike(nsg, name, group, s)
+	return azureNamedLike(nsg, name, group, report)
 }
 
 // azureOwnerByReference is yes when a referenced NSG is the NSG, maybe when a reference does not resolve.
-func (e *Evaluator) azureOwnerByReference(refs []string, nsg *plan.Resource, s *side) tri {
+func (e *Evaluator) azureOwnerByReference(refs []string, nsg *plan.Resource, report *side) tri {
 	result := triNo
 
 	for _, config := range refs {
-		owner, ok := e.resolveConfig(config, s)
+		owner, ok := e.resolveConfig(config, report)
 		if !ok {
 			result = or(result, triMaybe)
 
@@ -166,12 +196,12 @@ func (e *Evaluator) azureOwnerByReference(refs []string, nsg *plan.Resource, s *
 
 // azureNamedLike decides for a rule whose NSG name no NSG of the plan has. When the name of the NSG is known, the
 // lookup would have found it, so the rule is not one of its rules. Otherwise it may be.
-func azureNamedLike(nsg *plan.Resource, name, group string, s *side) tri {
+func azureNamedLike(nsg *plan.Resource, name, group string, report *side) tri {
 	if azureHasName(nsg) {
 		return triNo
 	}
 
-	s.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("network security group %s/%s is not a resource of the plan", group, name))
+	report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("network security group %s/%s is not a resource of the plan", group, name))
 
 	return triMaybe
 }
@@ -193,9 +223,9 @@ func azureIf(b bool) tri {
 }
 
 func (r *azureRule) text(field string) string {
-	s, _ := attrString(r.res, r.base+field)
+	value, _ := attrString(r.res, r.base+field)
 
-	return s
+	return value
 }
 
 // priority is the priority of the rule; an unknown priority sorts first, where it makes the NSG result unknown.
@@ -211,12 +241,12 @@ func (r *azureRule) inDirection(outbound bool) bool {
 		return true
 	}
 
-	return strings.EqualFold(r.text("direction"), "Outbound") == outbound
+	return strings.EqualFold(r.text("direction"), azureOutbound) == outbound
 }
 
 // access is yes for an Allow rule and no for a Deny rule.
 func (r *azureRule) access() tri {
-	return azureIf(strings.EqualFold(r.text("access"), "Allow"))
+	return azureIf(strings.EqualFold(r.text("access"), azureAllow))
 }
 
 func (r *azureRule) label() string {

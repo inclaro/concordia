@@ -1,6 +1,7 @@
 package cloudfw_test
 
 import (
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -122,6 +123,13 @@ func azureUnknownScenarios() []azureScenario {
 			rules: "",
 			gaps:  evaluate.GapUnsupportedResource + ": " + azureVNet + ": resource type azurerm_virtual_network is not supported",
 		},
+		{
+			name: "deny limited to a source port at priority 100 before an allow at priority 200",
+			from: azureVM, to: azureDBNIC, port: 22, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonUnsupportedConstruct,
+			mutate: azureDenySSHFromSourcePort,
+			rules:  azureRules(azureDBNSG + " deny-ssh (priority 100)"),
+			gaps:   evaluate.GapUnsupportedKind + ": source port range",
+		},
 	}
 }
 
@@ -232,13 +240,20 @@ func azureWithoutReferences(address string) func(in *cloudfw.Input) {
 // azureWithoutDBRules drops the inline rules of the database NSG, so only the default rules apply.
 func azureWithoutDBRules(in *cloudfw.Input) {
 	nsg := azureResource(in, azureDBNSG)
-	values := make(map[string]any, len(nsg.Values))
-
-	for key, value := range nsg.Values {
-		values[key] = value
-	}
-
-	values["security_rule"] = []any{}
-	nsg.Values = values
+	nsg.Values = maps.Clone(nsg.Values)
+	nsg.Values["security_rule"] = []any{}
 	nsg.Unknown = slices.DeleteFunc(slices.Clone(nsg.Unknown), func(p string) bool { return strings.HasPrefix(p, "security_rule") })
+}
+
+// azureDenySSHFromSourcePort limits the deny-ssh rule (priority 100) of the database NSG to source port 1234.
+func azureDenySSHFromSourcePort(in *cloudfw.Input) {
+	nsg := azureResource(in, azureDBNSG)
+	list, _ := nsg.Values["security_rule"].([]any)
+	rules := slices.Clone(list)
+	first, _ := rules[0].(map[string]any)
+	denySSH := maps.Clone(first)
+	denySSH["source_port_range"] = "1234"
+	rules[0] = denySSH
+	nsg.Values = maps.Clone(nsg.Values)
+	nsg.Values["security_rule"] = rules
 }

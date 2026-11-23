@@ -23,6 +23,9 @@ var (
 // awsGroupRule is the type of the standalone rule resource that has a `type` of ingress or egress.
 const awsGroupRule = "aws_security_group_rule"
 
+// awsAttrProtocol is the protocol attribute of inline blocks and of aws_security_group_rule.
+const awsAttrProtocol = "protocol"
+
 // awsFields are the attribute names of one rule source.
 type awsFields struct {
 	protocol, groups, cidr4, cidr6, prefixLists string
@@ -30,11 +33,11 @@ type awsFields struct {
 
 var (
 	awsInlineFields = awsFields{
-		protocol: "protocol", groups: "security_groups", cidr4: "cidr_blocks", cidr6: "ipv6_cidr_blocks",
+		protocol: awsAttrProtocol, groups: awsAttrGroups, cidr4: "cidr_blocks", cidr6: "ipv6_cidr_blocks",
 		prefixLists: "prefix_list_ids",
 	}
 	awsGroupRuleFields = awsFields{
-		protocol: "protocol", groups: "source_security_group_id", cidr4: "cidr_blocks", cidr6: "ipv6_cidr_blocks",
+		protocol: awsAttrProtocol, groups: "source_security_group_id", cidr4: "cidr_blocks", cidr6: "ipv6_cidr_blocks",
 		prefixLists: "prefix_list_ids",
 	}
 	awsVPCRuleFields = awsFields{
@@ -56,27 +59,28 @@ type awsRule struct {
 	applies tri
 }
 
-func (r *awsRule) attr(field string) string { return r.path + field }
+func (rule *awsRule) attr(field string) string { return rule.path + field }
 
 // awsSide is the check of one endpoint in one direction against the peer: the union of the rules of all groups of
 // the endpoint. A group without a rule for the direction allows nothing; a group whose block list for the direction
 // is unknown until apply makes a side that no rule allows unknown.
-func (e *Evaluator) awsSide(q *Query, self, peer *awsEndpoint, dir *awsDirection) *side {
+func (e *Evaluator) awsSide(query *Query, self, peer *awsEndpoint, dir *awsDirection) *side {
 	var yes, maybe side
 
 	verdict := triNo
 
 	for _, rule := range e.awsRules(self, dir) {
 		scratch := &side{gaps: rule.gaps}
-		t := and(rule.applies, e.awsMatch(q, &rule, peer, scratch))
-		verdict = or(verdict, t)
+		match := and(rule.applies, e.awsMatch(query, &rule, peer, scratch))
+		verdict = or(verdict, match)
 
-		switch t {
+		switch match {
 		case triYes:
 			yes.rule(rule.res.Address, rule.name)
 		case triMaybe:
 			maybe.rule(rule.res.Address, rule.name)
 			maybe.gaps = append(maybe.gaps, scratch.gaps...)
+		case triNo:
 		}
 	}
 
@@ -90,6 +94,7 @@ func awsDecided(verdict tri, yes, maybe *side) *side {
 		return &side{verdict: verdict, rules: yes.rules}
 	case triMaybe:
 		return &side{verdict: verdict, rules: maybe.rules, gaps: maybe.gaps}
+	case triNo:
 	}
 
 	return &side{verdict: verdict}
@@ -97,15 +102,15 @@ func awsDecided(verdict tri, yes, maybe *side) *side {
 
 // awsRules lists the rules of the direction that may apply to the endpoint: the inline blocks of its groups, and
 // the rule resources whose owner group is one of its groups or does not resolve.
-func (e *Evaluator) awsRules(ep *awsEndpoint, dir *awsDirection) []awsRule {
+func (e *Evaluator) awsRules(endpoint *awsEndpoint, dir *awsDirection) []awsRule {
 	var rules []awsRule
 
-	for _, group := range ep.groups {
+	for _, group := range endpoint.groups {
 		rules = append(rules, awsInlineRules(group, dir)...)
 	}
 
 	for _, res := range e.ofType(awsGroupRule, dir.vpcType) {
-		if rule, ok := e.awsStandaloneRule(ep, res, dir); ok {
+		if rule, ok := e.awsStandaloneRule(endpoint, res, dir); ok {
 			rules = append(rules, rule)
 		}
 	}
@@ -137,26 +142,34 @@ func awsInlineRules(group *plan.Resource, dir *awsDirection) []awsRule {
 	return rules
 }
 
-// awsStandaloneRule reads a rule resource of the direction. ok is false when it does not apply to the endpoint.
-func (e *Evaluator) awsStandaloneRule(ep *awsEndpoint, res *plan.Resource, dir *awsDirection) (awsRule, bool) {
-	fields := &awsVPCRuleFields
-	if res.Type == awsGroupRule {
-		if kind, _ := attrString(res, "type"); kind != dir.block {
-			return awsRule{}, false
-		}
+// awsRuleFields are the fields of a rule resource. ok is false for an aws_security_group_rule of the other
+// direction.
+func awsRuleFields(res *plan.Resource, dir *awsDirection) (*awsFields, bool) {
+	if res.Type != awsGroupRule {
+		return &awsVPCRuleFields, true
+	}
 
-		fields = &awsGroupRuleFields
+	kind, _ := attrString(res, "type")
+
+	return &awsGroupRuleFields, kind == dir.block
+}
+
+// awsStandaloneRule reads a rule resource of the direction. ok is false when it does not apply to the endpoint.
+func (e *Evaluator) awsStandaloneRule(endpoint *awsEndpoint, res *plan.Resource, dir *awsDirection) (awsRule, bool) {
+	fields, ok := awsRuleFields(res, dir)
+	if !ok {
+		return awsRule{}, false
 	}
 
 	rule := awsRule{res: res, fields: fields, name: "rule"}
-	s := &side{}
+	check := &side{}
 
-	owner, ok := e.ref(res, "security_group_id", s)
+	owner, resolved := e.ref(res, "security_group_id", check)
 
 	switch {
-	case !ok:
-		rule.applies, rule.gaps = triMaybe, s.gaps
-	case owner != nil && ep.hasGroup(owner):
+	case !resolved:
+		rule.applies, rule.gaps = triMaybe, check.gaps
+	case owner != nil && endpoint.hasGroup(owner):
 		rule.applies, rule.owner = triYes, owner
 	default:
 		return awsRule{}, false
@@ -167,27 +180,27 @@ func (e *Evaluator) awsStandaloneRule(ep *awsEndpoint, res *plan.Resource, dir *
 
 // awsMatch matches one rule against the query and the peer endpoint. An unknown block list has no fields to match:
 // it may allow anything.
-func (e *Evaluator) awsMatch(q *Query, rule *awsRule, peer *awsEndpoint, s *side) tri {
+func (e *Evaluator) awsMatch(query *Query, rule *awsRule, peer *awsEndpoint, check *side) tri {
 	if rule.fields == nil {
 		return triMaybe
 	}
 
-	traffic := awsTraffic(q, rule, s)
+	traffic := awsTraffic(query, rule, check)
 	if traffic == triNo {
 		return triNo
 	}
 
-	return and(traffic, e.awsPeer(rule, peer, s))
+	return and(traffic, e.awsPeer(rule, peer, check))
 }
 
 // awsTraffic matches the protocol and the port range of a rule.
-func awsTraffic(q *Query, rule *awsRule, s *side) tri {
+func awsTraffic(query *Query, rule *awsRule, check *side) tri {
 	protocol, ok := attrString(rule.res, rule.attr(rule.fields.protocol))
 	if !ok {
-		return awsUnknownAttr(rule, rule.fields.protocol, s)
+		return awsUnknownAttr(rule, rule.fields.protocol, check)
 	}
 
-	if matchProtocol(protocol, q) == triNo {
+	if matchProtocol(protocol, query) == triNo {
 		return triNo
 	}
 
@@ -195,46 +208,46 @@ func awsTraffic(q *Query, rule *awsRule, s *side) tri {
 		return triYes
 	}
 
-	return awsPorts(q, rule, protocol, s)
+	return awsPorts(query, rule, protocol, check)
 }
 
 // awsPorts matches the destination port of the query against the port range of the rule.
-func awsPorts(q *Query, rule *awsRule, protocol string, s *side) tri {
+func awsPorts(query *Query, rule *awsRule, protocol string, check *side) tri {
 	from, fromOK := attrInt(rule.res, rule.attr("from_port"))
 	to, toOK := attrInt(rule.res, rule.attr("to_port"))
 
 	if !fromOK || !toOK {
-		return or(awsUnknownAttr(rule, "from_port", s), awsUnknownAttr(rule, "to_port", s))
+		return or(awsUnknownAttr(rule, "from_port", check), awsUnknownAttr(rule, "to_port", check))
 	}
 
-	return matchPortRange(protocol, from, to, q.Port)
+	return matchPortRange(protocol, from, to, query.Port)
 }
 
 // awsUnknownAttr is maybe, with a gap, when the attribute of the rule is unknown until apply, and no when it is
 // absent.
-func awsUnknownAttr(rule *awsRule, field string, s *side) tri {
+func awsUnknownAttr(rule *awsRule, field string, check *side) tri {
 	path := rule.attr(field)
 	if !unknownAt(rule.res, path) {
 		return triNo
 	}
 
-	s.gap(evaluate.GapUnknownAfterApply, rule.res.Address+"."+planPath(path))
+	check.gap(evaluate.GapUnknownAfterApply, rule.res.Address+"."+planPath(path))
 
 	return triMaybe
 }
 
 // awsPeer matches the peer endpoint against the sources (ingress) or destinations (egress) of a rule: a referenced
 // group, `self`, a CIDR, or a prefix list.
-func (e *Evaluator) awsPeer(rule *awsRule, peer *awsEndpoint, s *side) tri {
+func (e *Evaluator) awsPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
 	return or(
-		or(e.awsGroupPeer(rule, peer, s), awsSelfPeer(rule, peer)),
-		or(awsCIDRPeer(rule, peer, s), awsPrefixListPeer(rule, s)),
+		or(e.awsGroupPeer(rule, peer, check), awsSelfPeer(rule, peer)),
+		or(awsCIDRPeer(rule, peer, check), awsPrefixListPeer(rule, check)),
 	)
 }
 
 // awsGroupPeer is yes when a group that the rule references is a group of the peer.
-func (e *Evaluator) awsGroupPeer(rule *awsRule, peer *awsEndpoint, s *side) tri {
-	groups, ok := e.refs(rule.res, rule.attr(rule.fields.groups), s)
+func (e *Evaluator) awsGroupPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
+	groups, ok := e.refs(rule.res, rule.attr(rule.fields.groups), check)
 
 	switch {
 	case slices.ContainsFunc(groups, peer.hasGroup):
@@ -257,24 +270,24 @@ func awsSelfPeer(rule *awsRule, peer *awsEndpoint) tri {
 }
 
 // awsCIDRPeer matches the IPv4 and IPv6 ranges of the rule against the addresses of the peer.
-func awsCIDRPeer(rule *awsRule, peer *awsEndpoint, s *side) tri {
+func awsCIDRPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
 	ranges := slices.Concat(
 		attrStrings(rule.res, rule.attr(rule.fields.cidr4)), attrStrings(rule.res, rule.attr(rule.fields.cidr6)),
 	)
-	unknown := or(awsUnknownAttr(rule, rule.fields.cidr4, s), awsUnknownAttr(rule, rule.fields.cidr6, s))
+	unknown := or(awsUnknownAttr(rule, rule.fields.cidr4, check), awsUnknownAttr(rule, rule.fields.cidr6, check))
 
-	return or(anyPrefix(ranges, peer.addrs, s), unknown)
+	return or(anyPrefix(ranges, peer.addrs, check), unknown)
 }
 
 // awsPrefixListPeer is maybe, with a gap, when the rule names a prefix list: the evaluator does not read the entries
 // of prefix lists.
-func awsPrefixListPeer(rule *awsRule, s *side) tri {
+func awsPrefixListPeer(rule *awsRule, check *side) tri {
 	path := rule.attr(rule.fields.prefixLists)
 	if len(attrStrings(rule.res, path)) == 0 && !unknownAt(rule.res, path) {
 		return triNo
 	}
 
-	s.gap(evaluate.GapUnsupportedKind, "prefix list")
+	check.gap(evaluate.GapUnsupportedKind, "prefix list")
 
 	return triMaybe
 }
