@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/inclaro/concordia/internal/assurance"
+	"github.com/inclaro/concordia/internal/assurance/evaluate/cloudfw"
 	"github.com/inclaro/concordia/internal/assurance/evidence"
 	"github.com/inclaro/concordia/internal/assurance/plan"
 	"github.com/inclaro/concordia/internal/binding"
@@ -88,6 +89,27 @@ func TestCloudFirewallQueriesEveryProtocolInUse(t *testing.T) {
 	if got := onlyOutcome(t, run, rule); got.Verdict != VerdictViolation {
 		t.Errorf("outcome = %s %q %q, want a violation through TCP", got.Verdict, got.Reason, got.Detail)
 	}
+
+	if !hasAllowedTCPFromAppToDB(run.report.Evaluations) {
+		t.Errorf("no allowed TCP evaluation from the app to the database: %+v", run.report.Evaluations)
+	}
+}
+
+// hasAllowedTCPFromAppToDB reports whether an evaluation is an allowed TCP query from the app NIC to the database NIC.
+func hasAllowedTCPFromAppToDB(entries []EvaluationEntry) bool {
+	for i := range entries {
+		if isAllowedTCPFromAppToDB(&entries[i]) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isAllowedTCPFromAppToDB(e *EvaluationEntry) bool {
+	const ends = " from azurerm_network_interface.app to azurerm_network_interface.db"
+
+	return e.Verdict == string(cloudfw.VerdictAllowed) && strings.HasPrefix(e.Query, "tcp/") && strings.HasSuffix(e.Query, ends)
 }
 
 // Finding F: an address that two plans hold blocks the environment only when the evaluator reads that type.

@@ -71,10 +71,15 @@ type Resource struct {
 	Provider string `json:"provider,omitempty"`
 	// Deposed is the key of a deposed object that the plan destroys, empty otherwise.
 	Deposed string `json:"deposed,omitempty"`
+	// ProviderConfig is the `provider_config_key` of the configuration of the resource, for example `azurerm` or
+	// `azurerm.other`: the provider configuration, and so the account or subscription, that manages it. It is ""
+	// when the plan's configuration does not give it.
+	ProviderConfig string `json:"providerConfig,omitempty"`
 	// Actions are the planned actions: `create`, `update`, `delete`, `read`, `no-op`; a replacement is two of them.
 	Actions []string `json:"actions"`
-	// Values are the planned attribute values after apply. Unknown attributes are absent, sensitive ones hold the
-	// redaction marker. Values is nil when the resource does not exist after apply (the action is `delete`).
+	// Values are the planned attribute values after apply. Unknown attributes are absent, an unknown element of a list
+	// is null at its position, and sensitive ones hold the redaction marker. Values is nil when the resource does not
+	// exist after apply (the action is `delete`).
 	Values map[string]any `json:"values,omitempty"`
 	// References are the resources that the configuration names in each attribute, by the attribute path in the form
 	// of Unknown (for example `ingress[0].security_groups`). Each address is absolute in the module tree and has no

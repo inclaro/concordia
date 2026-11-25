@@ -35,30 +35,32 @@ type paymentsFinding struct {
 	Observed string `json:"observed"`
 }
 
-// paymentsRun is the state the payments subtests hand to each other.
+// paymentsRun is the index and check result that every payments subtest reads.
 type paymentsRun struct {
-	repo   *repo
-	doc    *checkDoc
-	stdout string
+	doc   *checkDoc
+	check cliResult
 }
 
-// The bank payments example that the documentation uses. The subtests run in sequence and share one repository.
+// The bank payments example that the documentation uses. TestPayments indexes and checks the example once,
+// before the subtests, so that a -run filter that selects one subtest still has the result.
 func TestPayments(t *testing.T) {
 	requireE2E(t)
 
-	run := &paymentsRun{repo: newRepo(t, repoSpec{source: "../../docs/examples/payments", oldName: "payments-example", project: paymentsProject, dirName: "payments"})}
+	repo := newRepo(t, repoSpec{source: "../../docs/examples/payments", oldName: "payments-example", project: paymentsProject, dirName: "payments"})
+
+	if res := repo.gu("index"); res.code != 0 {
+		t.Fatalf("index: exit %d: %s", res.code, res.stderr)
+	}
+
+	run := new(paymentsRun)
+	run.doc, run.check = repo.checkJSON(nil)
 
 	t.Run("index and check: every planted finding gives the documented verdict", run.checkVerdicts)
 	t.Run("check: the PAY-NET-002 finding names the security group rule that opens the port", run.cloudFirewallFinding)
 }
 
 func (p *paymentsRun) checkVerdicts(t *testing.T) {
-	if res := p.repo.gu("index"); res.code != 0 {
-		t.Fatalf("index: exit %d: %s", res.code, res.stderr)
-	}
-
-	doc, res := p.repo.checkJSON(nil)
-	p.doc, p.stdout = doc, res.stdout
+	doc, res := p.doc, p.check
 
 	if res.code != 1 {
 		t.Fatalf("exit %d, want 1: %s", res.code, res.stderr)
@@ -79,15 +81,11 @@ func (p *paymentsRun) checkVerdicts(t *testing.T) {
 }
 
 func (p *paymentsRun) cloudFirewallFinding(t *testing.T) {
-	if p.doc == nil {
-		t.Skip("the check subtest did not run")
-	}
-
 	var doc struct {
 		Findings []paymentsFinding `json:"findings"`
 	}
 
-	if err := json.Unmarshal([]byte(p.stdout), &doc); err != nil {
+	if err := json.Unmarshal([]byte(p.check.stdout), &doc); err != nil {
 		t.Fatal(err)
 	}
 

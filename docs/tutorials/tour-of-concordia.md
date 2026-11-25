@@ -5,7 +5,7 @@
 
 A retail bank runs its payments on a set of services. The payments service authorizes each card payment, and it asks the fraud service for a risk score first. Last quarter, the fraud team refactored its risk model, and payment authorization stopped in production. Every pull request had a review. Nobody saw that the payments service used a class inside the fraud service.
 
-In this tutorial, you run Concordia on a copy of the bank's code and ask the questions that the incident raised. Would Concordia have caught it? What else is waiting to break? Can the internet reach the ledger database? Is the decision about the ledger enforced? And when the ledger code changes, does the threat model still hold?
+In this tutorial, you run Concordia on a copy of the bank's code and ask the questions that the incident raised. Would Concordia have caught it? What else is waiting to break? Can the public load balancer reach the ledger database? Is the decision about the ledger enforced? And when the ledger code changes, does the threat model still hold?
 
 You need `concordia`, Codebase Memory 0.12.1 (`codebase-memory-mcp`), `git`, and `jq` on your `PATH`. Run every command from the root of a Concordia checkout. The tour takes about ten minutes.
 
@@ -46,7 +46,7 @@ services
 The workspace file, `concordia.yaml`, names the Codebase Memory (CBM) project that holds the code graph. You give the copy its own project name, so that it does not touch any other copy. The `observation` section also shows which code CBM indexes. The legacy core banking system is Kotlin, and this index does not read it.
 
 ```bash
-cd /tmp/concordia-docs/tour && sed -i 's/payments-example/payments-tour/' concordia.yaml && sed -n '/^observation:/,/^environments:/p' concordia.yaml
+cd /tmp/concordia-docs/tour && sed -i.bak 's/payments-example/payments-tour/' concordia.yaml && rm concordia.yaml.bak && sed -n '/^observation:/,/^environments:/p' concordia.yaml
 ```
 
 ```output
@@ -199,9 +199,9 @@ Each finding names the file and the line. Read them from the bottom:
 
 See [Keep critical paths isolated](../use-cases/keep-critical-paths-isolated.md), [Keep the model in sync with code](../use-cases/keep-the-model-in-sync-with-code.md), and [Keep services free of cycles](../use-cases/keep-services-free-of-cycles.md).
 
-## 4. Can the internet reach the ledger database?
+## 4. Can the public load balancer reach the ledger database?
 
-After the outage, the security team asks a second question. The ledger database holds the bank's record of every movement of money. Can anything on the internet side reach it? Rule `PAY-NET-002` says that the public load balancer must have no network path to the ledger database on port 5432.
+After the outage, the security team asks a second question. The ledger database holds the bank's record of every movement of money. The public load balancer faces the internet. Can it open a connection to the database? Rule `PAY-NET-002` says that the public load balancer must have no network path to the ledger database on port 5432. The rule checks only that one hop. It does not check whether the load balancer forwards internet traffic to port 5432, so a violation does not prove that the internet can reach the database. It shows that one control between them is missing.
 
 Concordia does not answer this from the model. The bindings map the load balancer to `aws_lb.public` and the database to `aws_db_instance.ledger` in a Terraform plan, the output of `terraform show -json`. The plan compares the Terraform code with the estate that is already deployed. Concordia reads the security groups and their rules from that plan.
 
@@ -238,6 +238,7 @@ no-op aws_security_group.gateway
 no-op aws_security_group.ledger_db
 no-op aws_subnet.public
 no-op aws_vpc.main
+no-op aws_vpc_ipv4_cidr_block_association.app
 no-op aws_vpc_security_group_egress_rule.gateway_out
 no-op aws_vpc_security_group_ingress_rule.ledger_from_app
 create aws_vpc_security_group_ingress_rule.ledger_from_gateway
@@ -250,14 +251,14 @@ cd /tmp/concordia-docs/tour && grep -n -A7 '"ledger_from_gateway"' infra/terrafo
 ```
 
 ```output
-72:resource "aws_vpc_security_group_ingress_rule" "ledger_from_gateway" {
-73-  security_group_id            = aws_security_group.ledger_db.id
-74-  description                  = "temporary debug access"
-75-  referenced_security_group_id = aws_security_group.gateway.id
-76-  ip_protocol                  = "tcp"
-77-  from_port                    = 5432
-78-  to_port                      = 5432
-79-}
+78:resource "aws_vpc_security_group_ingress_rule" "ledger_from_gateway" {
+79-  security_group_id            = aws_security_group.ledger_db.id
+80-  description                  = "temporary debug access"
+81-  referenced_security_group_id = aws_security_group.gateway.id
+82-  ip_protocol                  = "tcp"
+83-  from_port                    = 5432
+84-  to_port                      = 5432
+85-}
 ```
 
 Somebody added "temporary debug access". No code review of the services could see it. Concordia reports it from the plan, before Terraform applies it.
@@ -312,7 +313,7 @@ cd /tmp/concordia-docs/tour && jq '.assurance.evaluations[] | select(.kind == "c
     "aws_vpc_security_group_egress_rule.gateway_out rule",
     "aws_vpc_security_group_ingress_rule.ledger_from_gateway rule"
   ],
-  "inputDigest": "sha256:f39e6f816f9c0ce49e79dc6e909338b23cb34ce331a371c8145fb2d2d6539e0e",
+  "inputDigest": "sha256:67b42f88792047e1a066738e50b7cd686ccd191c09500cd3eb28c561fd602bdd",
   "integrity": "content not verified"
 }
 ```
@@ -372,7 +373,7 @@ ADR governance: pass (1 pass)
 The decision is committed, active (`accepted`), and enforced by `PAY-DB-001`. Now prove that the check means something. You remove the rule link from the register in the working tree, and run the rule again:
 
 ```bash
-cd /tmp/concordia-docs/tour && sed -i '/enforcedBy:/,$d' governance/decisions.yaml && concordia check --rule GOV-ADR-004 --no-color 2>&1 | sed -n '/^ADR governance/,/^Assessment currency/p' | sed '$d'
+cd /tmp/concordia-docs/tour && sed -i.bak '/enforcedBy:/,$d' governance/decisions.yaml && rm governance/decisions.yaml.bak && concordia check --rule GOV-ADR-004 --no-color 2>&1 | sed -n '/^ADR governance/,/^Assessment currency/p' | sed '$d'
 ```
 
 ```output
@@ -530,7 +531,7 @@ EOF
 ```output
 ```
 
-During the outage, the payments service retried failed authorizations, and the ledger posted some payments twice. So the ledger team changes the ledger API in the same release: `postEntry` now ignores a payment that it already posted. It is the right fix, and it changes the exact file that Alice reviewed.
+During the outage, the payments service retried failed authorizations, and the ledger posted some payments twice. So the ledger team changes the ledger API in the same release: `postEntry` now ignores a payment that it already posted. The example ledger keeps its rows in memory, so this check is only an illustration. In production, duplicate protection needs a durable uniqueness guarantee on the payment ID, written in the same transaction as the ledger insert, so that a repeated payment fails as a whole. What matters for this tour is that the change touches the exact file that Alice reviewed.
 
 ```bash
 cat > /tmp/concordia-docs/tour/services/ledger-service/src/api/index.ts <<'EOF'
@@ -619,7 +620,7 @@ Alice's approval still exists and still verifies, but it no longer covers the su
 |---|---|
 | Would Concordia have caught the outage? | `PAY-API-001` names the import and the two calls into the fraud service's internals. |
 | What else is waiting to break? | `PAY-PATH-001`, `PAY-CYC-001`, and `CORE-DECL-001` name the next dependencies that can stop payments. |
-| Can the internet reach the ledger database? | `PAY-NET-002` reads the Terraform plan and names the security group rule that opens port 5432. |
+| Can the public load balancer reach the ledger database? | `PAY-NET-002` reads the Terraform plan and names the security group rule that opens port 5432. |
 | Is the decision about the ledger enforced? | ADR governance: `ADR-0001` is committed, active, and linked to `PAY-DB-001`. `GOV-ADR-004` fails when the link goes. |
 | Does the threat model still hold? | Assessment currency: it did, until the reviewed ledger API changed. |
 

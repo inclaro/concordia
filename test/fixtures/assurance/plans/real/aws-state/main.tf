@@ -110,6 +110,10 @@ resource "aws_network_interface" "app_secondary" {
   }
 }
 
+# Intentional conflict: both `security_groups` and aws_network_interface_sg_attachment.ops manage the groups of
+# this interface, which the provider documents as conflicting. Every plan then removes the attached ops group. The
+# recorded plan keeps this conflict as the input of the realplans_test.go scenarios "interface update removes the
+# group of an sg attachment". Do not give the interface one owner without re-recording plan.json.
 resource "aws_network_interface" "ops" {
   subnet_id       = aws_subnet.app.id
   private_ips     = ["10.20.1.30"]

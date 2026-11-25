@@ -90,7 +90,7 @@ FAIL PAY-NET-002 The public load balancer has no network path to the ledger data
   Fix: Remove the security group rule that admits the load balancer group to the ledger database.
 ```
 
-The egress of the gateway group lets the load balancer send to any address. It shows as the inline `egress[0]` of the group and as the rule resource `gateway_out`. `ledger_from_gateway` lets the gateway group into the database on 5432. The other ingress rule, `ledger_from_app`, admits only `10.20.0.0/16`, which does not contain the load balancer subnet, so it is not in the list.
+The egress of the gateway group lets the load balancer send to any address. It shows as the inline `egress[0]` of the group and as the rule resource `gateway_out`. `ledger_from_gateway` lets the gateway group into the database on 5432. The other ingress rule, `ledger_from_app`, admits only `10.20.0.0/16`, the secondary VPC range of the application tier. That range does not contain the load balancer subnet `10.16.1.0/24`, so the rule is not in the list.
 
 Read the evaluation that decided it:
 
@@ -107,7 +107,7 @@ jq '.assurance.evaluations[] | {query, verdict, policies, inputDigest, integrity
     "aws_vpc_security_group_egress_rule.gateway_out rule",
     "aws_vpc_security_group_ingress_rule.ledger_from_gateway rule"
   ],
-  "inputDigest": "sha256:f39e6f816f9c0ce49e79dc6e909338b23cb34ce331a371c8145fb2d2d6539e0e",
+  "inputDigest": "sha256:67b42f88792047e1a066738e50b7cd686ccd191c09500cd3eb28c561fd602bdd",
   "integrity": "content not verified"
 }
 ```

@@ -128,10 +128,10 @@ cd /tmp/concordia-docs/getting-started && concordia bind validate
 ```
 
 ```output
-bindings valid: 11 binding(s), 60/242 observed node(s) bound, 0 unbound file(s)
+bindings valid: 11 binding(s), 60/246 observed node(s) bound, 0 unbound file(s)
 ```
 
-All 11 bindings are valid. `0 unbound file(s)` means that every file CBM read belongs to an architecture node, so no code escapes the rules.
+All 11 bindings are valid. `0 unbound file(s)` means that every file CBM read belongs to an architecture node. This does not mean that every rule checks every file. Each rule checks only its own scope: for example, `PAY-API-001` checks only the access from the payments service to the fraud service.
 
 Now run three rules. `--rule` selects one rule, and you can give it more than once:
 

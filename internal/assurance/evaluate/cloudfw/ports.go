@@ -79,6 +79,10 @@ func matchPortSpec(spec string, port int, s *side) tri {
 	return matchPortRange("", from, to, port)
 }
 
+// maxPort is the highest port that a rule can name.
+const maxPort = 65535
+
+// parsePortSpec reads `80` or `1000-2000`. ok is false for text that does not parse, and for a port outside 0-65535.
 func parsePortSpec(spec string) (from, to int, ok bool) {
 	low, high, isRange := strings.Cut(spec, "-")
 
@@ -87,13 +91,14 @@ func parsePortSpec(spec string) (from, to int, ok bool) {
 		return 0, 0, false
 	}
 
-	if !isRange {
-		return from, from, true
+	to = from
+	if isRange {
+		if to, err = strconv.Atoi(strings.TrimSpace(high)); err != nil {
+			return 0, 0, false
+		}
 	}
 
-	to, err = strconv.Atoi(strings.TrimSpace(high))
-
-	return from, to, err == nil && from <= to
+	return from, to, inRange(0, to, from) && to <= maxPort
 }
 
 // anyPortSpec is the or of matchPortSpec over the port texts. An empty list matches no port.

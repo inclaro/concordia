@@ -56,7 +56,7 @@ See [Plans](../reference/assurance.md#plans).
 
 The evaluator gives `unknown` with a named gap when the plan cannot prove the answer. It never guesses. These cases are `unknown` by design in this release:
 
-- Network ACLs, route tables, firewall appliances, peering, transit gateways, private links, and GCP hierarchical and network firewall policies. Concordia does not evaluate them.
+- A GCP firewall policy resource (`google_compute_network_firewall_policy*`, `google_compute_region_network_firewall_policy*`, or `google_compute_firewall_policy*`) in the plan. Every GCP query is then `unknown` with `unsupported-policy-kind`.
 - IPv6 ranges, unless an IPv4 rule decides first.
 - The two endpoints belong to different providers (`mixed-providers`), or to two Azure virtual networks or two GCP networks (`peering-not-evaluated`).
 - An AWS prefix list, an Azure service tag other than `*`, `VirtualNetwork`, `Internet`, and `AzureLoadBalancer`, and an Azure source port range (`unsupported-policy-kind`).
@@ -68,6 +68,18 @@ The evaluator gives `unknown` with a named gap when the plan cannot prove the an
 The [gaps and limits](../reference/assurance.md#gaps-and-limits) and the [known limits of this release](../reference/assurance.md#known-limits-of-this-release) list every case.
 
 The evaluator is tested against plans that Terraform 1.17.0 recorded for `hashicorp/aws` 6.74.0, `hashicorp/google` 8.12.0, and `hashicorp/azurerm` 5.15.0, without edits. The plans and how they were recorded are in `test/fixtures/assurance/plans/real`.
+
+## What the evaluator does not see
+
+Some features are outside the evaluator. They do not make a result `unknown`: a result can be `allowed` or `denied` without them. The contract states these limits on every result:
+
+- Network ACLs, route tables, and firewall appliances (AWS Network Firewall, Azure Firewall) are not evaluated.
+- VPC and VNet peering, transit gateways, and private links are not evaluated.
+- GCP hierarchical and network firewall policies are not evaluated.
+- Rules managed outside the plan are assumed absent, not observed. A `denied` result rests on the assumption `firewall-rules-complete-in-plan` for this reason.
+- A plan states what would be applied, not what is applied.
+
+An `allowed` result therefore does not show that a packet gets through: a network ACL, a route table, or a firewall appliance can still block it. See [Gaps and limits](../reference/assurance.md#gaps-and-limits).
 
 ## Enforcement
 

@@ -217,17 +217,48 @@ func (e *Evaluator) azureOwnerByName(nsg *plan.Resource, name, group string, rep
 	}
 }
 
-// azureOwnerByReference is yes when a referenced NSG is the NSG, maybe when a reference does not resolve to an NSG.
+// azureOwnerByReference is yes when the one referenced NSG is the NSG and the rule is in its resource group, maybe
+// when a reference does not resolve to an NSG, names several NSGs, or names an NSG of another or unknown resource
+// group: Azure finds the NSG of a rule by its name in the rule's resource group.
 func (e *Evaluator) azureOwnerByReference(rule *plan.Resource, refs []string, nsg *plan.Resource, report *side) tri {
 	found, resolved := e.resolveAll(rule, refs, report)
 	owners, typed := keepTypes(attrRef{res: rule, path: "network_security_group_name"}, found, report, []string{azureNSG})
 
 	result := azureIf(slices.Contains(owners, nsg))
 	if !resolved || !typed {
-		result = or(result, triMaybe)
+		return or(result, triMaybe)
+	}
+
+	if doubt := azureReferenceDoubt(rule, owners); doubt != "" {
+		report.gap(evaluate.GapUnresolvedReference, rule.Address+".network_security_group_name: "+doubt)
+
+		return triMaybe
 	}
 
 	return result
+}
+
+// azureReferenceDoubt says why the referenced NSGs do not establish the owner of the rule, or is "".
+func azureReferenceDoubt(rule *plan.Resource, owners []*plan.Resource) string {
+	if len(owners) > 1 {
+		return fmt.Sprintf("the configuration names %d network security groups", len(owners))
+	}
+
+	if len(owners) == 0 {
+		return ""
+	}
+
+	ruleGroup, ruleKnown := attrString(rule, "resource_group_name")
+	nsgGroup, nsgKnown := attrString(owners[0], "resource_group_name")
+
+	switch {
+	case !ruleKnown || !nsgKnown:
+		return "the resource group of the rule or of " + owners[0].Address + " is not known"
+	case !strings.EqualFold(ruleGroup, nsgGroup):
+		return fmt.Sprintf("the rule is in resource group %s and %s is in %s", ruleGroup, owners[0].Address, nsgGroup)
+	}
+
+	return ""
 }
 
 // azureNamedLike decides for a rule whose NSG name no NSG of the plan has. When the name of the NSG is known, the

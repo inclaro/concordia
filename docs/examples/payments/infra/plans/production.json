@@ -153,9 +153,26 @@
           "values": {
             "id": "vpc-0a1b2c3d4e5f60718",
             "arn": "arn:aws:ec2:eu-west-1:123456789012:vpc/vpc-0a1b2c3d4e5f60718",
-            "cidr_block": "10.16.0.0/12",
+            "cidr_block": "10.16.0.0/16",
             "default_security_group_id": "sg-0e5f60718293a4b5c",
             "tags": null
+          },
+          "sensitive_values": {}
+        },
+        {
+          "address": "aws_vpc_ipv4_cidr_block_association.app",
+          "mode": "managed",
+          "type": "aws_vpc_ipv4_cidr_block_association",
+          "name": "app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "id": "vpc-cidr-assoc-0a2b4c6d8e0f13579",
+            "cidr_block": "10.20.0.0/16",
+            "vpc_id": "vpc-0a1b2c3d4e5f60718",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "timeouts": null
           },
           "sensitive_values": {}
         },
@@ -497,16 +514,47 @@
         "before": {
           "id": "vpc-0a1b2c3d4e5f60718",
           "arn": "arn:aws:ec2:eu-west-1:123456789012:vpc/vpc-0a1b2c3d4e5f60718",
-          "cidr_block": "10.16.0.0/12",
+          "cidr_block": "10.16.0.0/16",
           "default_security_group_id": "sg-0e5f60718293a4b5c",
           "tags": null
         },
         "after": {
           "id": "vpc-0a1b2c3d4e5f60718",
           "arn": "arn:aws:ec2:eu-west-1:123456789012:vpc/vpc-0a1b2c3d4e5f60718",
-          "cidr_block": "10.16.0.0/12",
+          "cidr_block": "10.16.0.0/16",
           "default_security_group_id": "sg-0e5f60718293a4b5c",
           "tags": null
+        },
+        "after_unknown": {},
+        "before_sensitive": {},
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "aws_vpc_ipv4_cidr_block_association.app",
+      "mode": "managed",
+      "type": "aws_vpc_ipv4_cidr_block_association",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "no-op"
+        ],
+        "before": {
+          "id": "vpc-cidr-assoc-0a2b4c6d8e0f13579",
+          "cidr_block": "10.20.0.0/16",
+          "vpc_id": "vpc-0a1b2c3d4e5f60718",
+          "ipv4_ipam_pool_id": null,
+          "ipv4_netmask_length": null,
+          "timeouts": null
+        },
+        "after": {
+          "id": "vpc-cidr-assoc-0a2b4c6d8e0f13579",
+          "cidr_block": "10.20.0.0/16",
+          "vpc_id": "vpc-0a1b2c3d4e5f60718",
+          "ipv4_ipam_pool_id": null,
+          "ipv4_netmask_length": null,
+          "timeouts": null
         },
         "after_unknown": {},
         "before_sensitive": {},
@@ -640,7 +688,26 @@
           "provider_config_key": "aws",
           "expressions": {
             "cidr_block": {
-              "constant_value": "10.16.0.0/12"
+              "constant_value": "10.16.0.0/16"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_vpc_ipv4_cidr_block_association.app",
+          "mode": "managed",
+          "type": "aws_vpc_ipv4_cidr_block_association",
+          "name": "app",
+          "provider_config_key": "aws",
+          "expressions": {
+            "cidr_block": {
+              "constant_value": "10.20.0.0/16"
+            },
+            "vpc_id": {
+              "references": [
+                "aws_vpc.main.id",
+                "aws_vpc.main"
+              ]
             }
           },
           "schema_version": 0

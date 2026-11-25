@@ -35,7 +35,7 @@ var gcpPolicyPrefixes = []string{
 // gcpEndpoint is one end of a GCP query: its network (by name), its addresses, its network tags, its service
 // account, and whether the plan proves that it has IPv4 addresses only.
 type gcpEndpoint struct {
-	network  string
+	network  gcpNet
 	addrs    addrSet
 	tags     gcpSet
 	accounts gcpSet
@@ -60,12 +60,20 @@ func (e *Evaluator) evaluateGCP(query *Query, source, dest *plan.Resource) Resul
 		return unknownFrom(gaps)
 	}
 
-	if src.network != dst.network {
+	switch src.network.same(dst.network) {
+	case triNo:
 		return unknownFrom([]assurance.Gap{{
 			Kind: evaluate.GapPeeringNotEvaluated,
 			Detail: fmt.Sprintf("%s is in network %s and %s is in network %s",
 				source.Address, src.network, dest.Address, dst.network),
 		}})
+	case triMaybe:
+		return unknownFrom([]assurance.Gap{{
+			Kind: evaluate.GapPeeringNotEvaluated,
+			Detail: fmt.Sprintf("%s and %s are in networks named %s, and the plan does not show that they are in one "+
+				"project", source.Address, dest.Address, src.network.name),
+		}})
+	case triYes:
 	}
 
 	if gaps = e.gcpPolicyGaps(); len(gaps) > 0 {
@@ -78,10 +86,15 @@ func (e *Evaluator) evaluateGCP(query *Query, source, dest *plan.Resource) Resul
 	)
 }
 
-// gcpEndpointOf reads the network, addresses, tags, and service account of an endpoint.
+// gcpEndpointOf reads the network, addresses, tags, and service account of an endpoint. An instance with more than
+// one network interface is not supported: each interface is in its own network and has its own address.
 func (e *Evaluator) gcpEndpointOf(res *plan.Resource) (*gcpEndpoint, []assurance.Gap) {
 	if !slices.Contains(gcpEndpointTypes, res.Type) {
 		return nil, []assurance.Gap{unsupportedResource(res)}
+	}
+
+	if gap, ok := gcpOneInterface(res); !ok {
+		return nil, []assurance.Gap{gap}
 	}
 
 	point := &side{}
@@ -100,9 +113,25 @@ func (e *Evaluator) gcpEndpointOf(res *plan.Resource) (*gcpEndpoint, []assurance
 	}, nil
 }
 
+// gcpOneInterface reports whether the plan shows exactly one network interface of the instance; the gap says why
+// not.
+func gcpOneInterface(res *plan.Resource) (assurance.Gap, bool) {
+	switch count := blockCount(res, gcpInterfaceList); {
+	case listUnknown(res, gcpInterfaceList):
+		return assurance.Gap{Kind: evaluate.GapUnknownAfterApply, Detail: res.Address + "." + gcpInterfaceList}, false
+	case count > 1:
+		return assurance.Gap{
+			Kind:   evaluate.GapUnsupportedResource,
+			Detail: fmt.Sprintf("%s: an instance with %d network interfaces is not supported", res.Address, count),
+		}, false
+	}
+
+	return assurance.Gap{}, true
+}
+
 // gcpNetworkOf is the network of an endpoint. When the configuration does not name the network, the network of the
 // subnetwork applies.
-func (e *Evaluator) gcpNetworkOf(res *plan.Resource, point *side) (string, bool) {
+func (e *Evaluator) gcpNetworkOf(res *plan.Resource, point *side) (gcpNet, bool) {
 	_, known := attrString(res, gcpNetworkPath)
 	if !known && len(res.References[planPath(gcpNetworkPath)]) == 0 {
 		if sub := e.gcpSubnet(res); sub != nil {
@@ -113,57 +142,43 @@ func (e *Evaluator) gcpNetworkOf(res *plan.Resource, point *side) (string, bool)
 	return e.gcpNetworkKey(res, gcpNetworkPath, point)
 }
 
-// gcpNetworkKey is the name of the network at the path: the last segment of a known value (a name, an ID, or a self
-// link), or the `name` of the network that the configuration names.
-func (e *Evaluator) gcpNetworkKey(res *plan.Resource, path string, point *side) (string, bool) {
+// gcpNetworkKey is the network at the path: a known value (a name, an ID, or a self link), or the network resource
+// that the configuration names.
+func (e *Evaluator) gcpNetworkKey(res *plan.Resource, path string, point *side) (gcpNet, bool) {
 	if value, ok := attrString(res, path); ok && value != "" {
-		return gcpName(value), true
+		return e.gcpNetOfValue(res, value), true
 	}
 
 	target, ok := e.refOfType(res, path, point, gcpNetworkType)
 	if !ok {
-		return "", false
+		return gcpNet{}, false
 	}
 
 	if target == nil {
 		point.gap(evaluate.GapUnknownAfterApply, res.Address+"."+planPath(path))
 
-		return "", false
+		return gcpNet{}, false
 	}
 
 	name, known := attrString(target, "name")
 	if !known {
 		point.gap(evaluate.GapUnknownAfterApply, target.Address+".name")
+
+		return gcpNet{}, false
 	}
 
-	return name, known
+	return e.gcpNetOfResource(target, name), true
 }
 
 // gcpSubnet is the subnetwork of an endpoint, or nil when the plan does not give it.
 func (e *Evaluator) gcpSubnet(res *plan.Resource) *plan.Resource {
 	if value, ok := attrString(res, gcpSubnetworkPath); ok {
-		return e.gcpNamed(gcpSubnetworkType, value)
+		return e.gcpSubnetNamed(res, value)
 	}
 
 	target, _ := e.refOfType(res, gcpSubnetworkPath, &side{}, gcpSubnetworkType)
 
 	return target
-}
-
-// gcpNamed is the resource of the type whose ID or name is the value (a name, an ID, or a self link), or nil when
-// none or more than one resource of the plans has the name.
-func (e *Evaluator) gcpNamed(typ, value string) *plan.Resource {
-	if byID := e.resourceByID(value); byID != nil && byID.Type == typ {
-		return byID
-	}
-
-	name := gcpName(value)
-
-	return only(slices.DeleteFunc(e.ofType(typ), func(candidate *plan.Resource) bool {
-		got, _ := attrString(candidate, "name")
-
-		return got != name
-	}))
 }
 
 // gcpName is the last segment of a GCP name, ID, or self link.

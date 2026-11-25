@@ -15,7 +15,13 @@ provider "aws" {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block = "10.16.0.0/12"
+  cidr_block = "10.16.0.0/16"
+}
+
+# The application subnets use a secondary range of the VPC. The rule ledger_from_app admits this range.
+resource "aws_vpc_ipv4_cidr_block_association" "app" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = "10.20.0.0/16"
 }
 
 resource "aws_subnet" "public" {

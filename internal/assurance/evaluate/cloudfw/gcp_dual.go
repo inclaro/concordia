@@ -94,22 +94,10 @@ func (e *Evaluator) gcpByRange(firewall *plan.Resource, check *gcpCheck) bool {
 		return true
 	}
 
-	ranges := e.gcpSetAt(firewall, "source_ranges", "")
+	ranges := e.gcpRangesAt(firewall, "source_ranges")
+	own := e.gcpRangesAt(firewall, "destination_ranges")
 	identities := e.gcpSetAt(firewall, "source_tags", "")
 	accounts := e.gcpSetAt(firewall, "source_service_accounts", "email")
 
-	return !ranges.empty() || e.gcpOwnRangesSet(firewall) || gcpAllEmpty(&identities, &accounts)
-}
-
-// gcpOwnRangesSet reports whether an ingress rule may limit its destination ranges: they are not empty, and not
-// the provider default of a configuration that does not set them.
-func (e *Evaluator) gcpOwnRangesSet(firewall *plan.Resource) bool {
-	const path = "destination_ranges"
-	if unsetComputed(firewall, path) {
-		return false
-	}
-
-	own := e.gcpSetAt(firewall, path, "")
-
-	return !own.empty()
+	return !ranges.empty() || !own.empty() || gcpAllEmpty(&identities, &accounts)
 }

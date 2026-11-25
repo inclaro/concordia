@@ -29,14 +29,14 @@ func azureChangedRuleScenarios() []azureScenario {
 		{
 			name: "deleted rule resource of the NSG before the change",
 			from: azureVM, to: azureDBNIC, port: 22, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
-			mutate: azureDeletedRule(azurePriorOwner("NSG-DB", "rg-pay")),
+			mutate: azureDeletedRule(map[string]string{"network_security_group_name": "NSG-DB", "resource_group_name": "rg-pay"}),
 			rules:  azureRules(azureDBNSG + " deny-ssh (priority 100)"),
 			gaps:   evaluate.GapUnknownAfterApply + ": " + azureDBNSG + ".security_rule may repeat a rule that the plan changes",
 		},
 		{
 			name: "deleted rule resource of another NSG before the change",
 			from: azureVM, to: azureDBNIC, port: 22, want: cloudfw.VerdictDenied,
-			mutate: azureDeletedRule(azurePriorOwner("nsg-db", "rg-other")),
+			mutate: azureDeletedRule(map[string]string{"network_security_group_name": "nsg-db", "resource_group_name": "rg-other"}),
 			rules:  azureRules(azureDBNSG + " deny-ssh (priority 100)"),
 		},
 		{
@@ -55,6 +55,78 @@ func azureChangedRuleScenarios() []azureScenario {
 	}
 }
 
+// azureReviewRound1Scenarios are review round 1 findings 7, 8, 27, and 28.
+func azureReviewRound1Scenarios() []azureScenario {
+	https := azureRules(azureVNetOut, azureVNetNICIn, azureHTTPSRule+" allow-https (priority 340)")
+
+	return []azureScenario{
+		{
+			name: "rule owner by reference in the resource group of the NSG", from: azureVM, to: azureDBNIC, port: 8443,
+			want: cloudfw.VerdictAllowed, mutate: azureOwnerByReferenceOnly(azureOwnerRef{"rg-pay", []string{azureDBNSG}}),
+			rules: https,
+		},
+		{
+			name: "finding 7: rule owner by reference in another resource group", from: azureVM, to: azureDBNIC,
+			port: 8443, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
+			mutate: azureOwnerByReferenceOnly(azureOwnerRef{"rg-other", []string{azureDBNSG}}),
+			rules:  azureRules(azureHTTPSRule + " allow-https (priority 340)"),
+			gaps: evaluate.GapUnresolvedReference + ": " + azureHTTPSRule + ".network_security_group_name: the rule is in " +
+				"resource group rg-other and " + azureDBNSG + " is in rg-pay",
+		},
+		{
+			name: "finding 28: rule owner by a reference that names two NSGs", from: azureVM, to: azureDBNIC, port: 8443,
+			want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
+			mutate: azureOwnerByReferenceOnly(azureOwnerRef{"rg-pay", []string{azureDBNSG, azureAppNSG}}),
+			rules:  azureRules(azureHTTPSRule + " allow-https (priority 340)"),
+			gaps: evaluate.GapUnresolvedReference + ": " + azureHTTPSRule + ".network_security_group_name: the " +
+				"configuration names 2 network security groups",
+		},
+		{
+			name: "finding 8: subnets of two provider configurations", from: azureVM, to: azureDBNIC, port: 8443,
+			want: cloudfw.VerdictUnknown, reason: evaluate.ReasonUnsupportedConstruct,
+			mutate: func(in *cloudfw.Input) { azureResource(in, azureDBSubnet).ProviderConfig = "azurerm.other" },
+			rules:  azureRules(azureVNetOut, azureVNetNICIn),
+			gaps: azureRules(
+				evaluate.GapPeeringNotEvaluated + ": VirtualNetwork: " + azureVM + " and " + azureDBNIC + " are not in one virtual " +
+					"network of the plan",
+			),
+		},
+		{
+			name: "finding 27: private endpoint subnet without network policies and an unresolved NSG association",
+			from: azureVM, to: azureDBPE, port: 9999, want: cloudfw.VerdictAllowed, rules: azureRules(azureVNetOut),
+			mutate: azureMutations(azureSubnetValue(map[string]any{"private_endpoint_network_policies": "Disabled"}),
+				azureUnresolvedNSGAssociation),
+		},
+	}
+}
+
+// azureOwnerRef is the resource group of the https rule and the NSGs that its configuration names as its owner.
+type azureOwnerRef struct {
+	group string
+	nsgs  []string
+}
+
+// azureOwnerByReferenceOnly makes the NSG name of the https rule unknown until apply, so that only its
+// configuration references name its owner, and puts the rule in the resource group.
+func azureOwnerByReferenceOnly(ref azureOwnerRef) func(in *cloudfw.Input) {
+	return func(in *cloudfw.Input) {
+		rule := azureResource(in, azureHTTPSRule)
+		delete(rule.Values, "network_security_group_name")
+		rule.Values["resource_group_name"] = ref.group
+		rule.Unknown = append(rule.Unknown, "network_security_group_name")
+		rule.References = map[string][]string{"network_security_group_name": ref.nsgs}
+	}
+}
+
+// azureUnresolvedNSGAssociation makes the NSG of the NSG association of the database subnet unknown until apply,
+// without a configuration reference.
+func azureUnresolvedNSGAssociation(in *cloudfw.Input) {
+	assoc := azureResource(in, azureDBAssoc)
+	delete(assoc.Values, "network_security_group_id")
+	delete(assoc.References, "network_security_group_id")
+	assoc.Unknown = append(assoc.Unknown, "network_security_group_id")
+}
+
 // azureHTTPSRule is the standalone rule resource of the database NSG that the NSG name finds.
 const azureHTTPSRule = "azurerm_network_security_rule.https"
 
@@ -62,11 +134,6 @@ const azureHTTPSRule = "azurerm_network_security_rule.https"
 // `network_security_group_name = var.nsg_name` does; the plan still knows the name.
 func azureOwnerThroughVariable(in *cloudfw.Input) {
 	azureResource(in, azureHTTPSRule).References = map[string][]string{"network_security_group_name": {"var.nsg_name"}}
-}
-
-// azurePriorOwner is the owner of a rule resource before the change, as the plan reader keeps it.
-func azurePriorOwner(name, group string) map[string]string {
-	return map[string]string{"network_security_group_name": name, "resource_group_name": group}
 }
 
 // azureIPv4DenyRules are the rules of the IPv4 deny scenarios.

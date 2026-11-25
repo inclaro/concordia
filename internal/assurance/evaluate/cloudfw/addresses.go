@@ -77,7 +77,9 @@ func containedIn(endpoint, p netip.Prefix) bool {
 	return p.Bits() <= endpoint.Bits() && p.Contains(endpoint.Addr())
 }
 
-// parseRange reads a CIDR or a single IP address, masked.
+// parseRange reads a CIDR or a single IP address, masked. A CIDR keeps its address family: an IPv4-mapped IPv6
+// prefix such as `::ffff:10.0.0.0/104` is an IPv6 prefix, whose bits count from the start of the IPv6 address. A
+// single IPv4-mapped address is the IPv4 host.
 func parseRange(text string) (netip.Prefix, bool) {
 	text = strings.TrimSpace(text)
 	if !strings.Contains(text, "/") {
@@ -94,7 +96,7 @@ func parseRange(text string) (netip.Prefix, bool) {
 		return netip.Prefix{}, false
 	}
 
-	return netip.PrefixFrom(p.Addr().Unmap(), p.Bits()).Masked(), true
+	return p.Masked(), true
 }
 
 // matchPrefix matches a rule prefix (a CIDR or an IP) against the address set of an endpoint. The evaluator evaluates

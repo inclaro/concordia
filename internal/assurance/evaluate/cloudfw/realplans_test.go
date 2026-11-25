@@ -20,11 +20,11 @@ type realScenario struct {
 	from, to string
 	// gap is a gap kind that the result must have; empty for none checked.
 	gap string
-	// skip names a documented limit of the evaluator on real plans; the scenario keeps the verdict of the
-	// provider's real semantics.
-	skip string
-	want cloudfw.Verdict
-	port int
+	// limit names a documented limit of the evaluator on real plans: the evaluator answers `unknown` with gap, while
+	// want keeps the verdict of the provider's real semantics.
+	limit string
+	want  cloudfw.Verdict
+	port  int
 }
 
 // realEvaluator reads a recorded plan through the plan reader and indexes it.
@@ -63,8 +63,8 @@ func realRun(t *testing.T, setup string, scenarios []realScenario) {
 		t.Run(sc.name, func(t *testing.T) {
 			t.Parallel()
 
-			if sc.skip != "" {
-				t.Skip("documented limit: " + sc.skip)
+			if sc.limit != "" {
+				t.Logf("documented limit: %s; the provider's semantics give %s", sc.limit, sc.want)
 			}
 
 			res := ev.Evaluate(&cloudfw.Query{
@@ -79,8 +79,13 @@ func realRun(t *testing.T, setup string, scenarios []realScenario) {
 func realAssert(t *testing.T, sc *realScenario, res *cloudfw.Result) {
 	t.Helper()
 
-	if res.Verdict != sc.want {
-		t.Fatalf("verdict = %s (reason %q, rules %v, gaps %v), want %s", res.Verdict, res.Reason, res.Rules, res.Gaps, sc.want)
+	want := sc.want
+	if sc.limit != "" {
+		want = cloudfw.VerdictUnknown
+	}
+
+	if res.Verdict != want {
+		t.Fatalf("verdict = %s (reason %q, rules %v, gaps %v), want %s", res.Verdict, res.Reason, res.Rules, res.Gaps, want)
 	}
 
 	if sc.gap != "" && !slices.ContainsFunc(res.Gaps, func(g assurance.Gap) bool { return g.Kind == sc.gap }) {
@@ -123,19 +128,23 @@ func TestRealPlanAWSCreate(t *testing.T) {
 		},
 		{
 			name: "inline block names one group with an unknown id", from: "aws_network_interface.ops",
-			to: "aws_elasticache_cluster.cache", port: 6379, want: cloudfw.VerdictAllowed, skip: limitMergedInlineRefs,
+			to: "aws_elasticache_cluster.cache", port: 6379, want: cloudfw.VerdictAllowed, limit: limitMergedInlineRefs,
+			gap: "unresolved-reference",
 		},
 		{
 			name: "instance source and inline block naming its group", from: "aws_instance.app",
-			to: "aws_elasticache_cluster.cache", port: 6379, want: cloudfw.VerdictAllowed, skip: limitMergedInlineRefs,
+			to: "aws_elasticache_cluster.cache", port: 6379, want: cloudfw.VerdictAllowed, limit: limitMergedInlineRefs,
+			gap: "unresolved-reference",
 		},
 		{
 			name: "group without inline or standalone ingress rules", from: "aws_network_interface.ops",
-			to: "aws_lb.public", port: 443, want: cloudfw.VerdictDenied, skip: limitDynamicBlocks,
+			to: "aws_lb.public", port: 443, want: cloudfw.VerdictDenied, limit: limitDynamicBlocks,
+			gap: "unknown-after-apply",
 		},
 		{
 			name: "instance in a group with empty inline lists", from: "aws_network_interface.ops",
-			to: "aws_instance.locked", port: 443, want: cloudfw.VerdictDenied, skip: limitDynamicBlocks,
+			to: "aws_instance.locked", port: 443, want: cloudfw.VerdictDenied, limit: limitDynamicBlocks,
+			gap: "unknown-after-apply",
 		},
 		{
 			name: "instance whose interface comes from a network_interface block", from: "aws_network_interface.ops",
@@ -147,7 +156,8 @@ func TestRealPlanAWSCreate(t *testing.T) {
 		},
 		{
 			name: "group list concatenated with an empty variable", from: "aws_lb.public",
-			to: "aws_db_instance.reports", port: 5432, want: cloudfw.VerdictAllowed, skip: limitKnownVariable,
+			to: "aws_db_instance.reports", port: 5432, want: cloudfw.VerdictAllowed, limit: limitKnownVariable,
+			gap: "unresolved-reference",
 		},
 	})
 }
@@ -267,7 +277,8 @@ func TestRealPlanAzureCreate(t *testing.T) {
 		},
 		{
 			name: "inline rule allows an application security group", from: "azurerm_linux_virtual_machine.app",
-			to: "azurerm_network_interface.ledger", port: 5432, want: cloudfw.VerdictAllowed, skip: limitMergedInlineRefs,
+			to: "azurerm_network_interface.ledger", port: 5432, want: cloudfw.VerdictAllowed, limit: limitMergedInlineRefs,
+			gap: "unresolved-reference",
 		},
 		{
 			name: "NIC outside the application security group", from: "azurerm_network_interface.batch",

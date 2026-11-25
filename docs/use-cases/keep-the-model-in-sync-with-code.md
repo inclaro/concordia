@@ -46,7 +46,7 @@ The result comes from the code. A relationship in the model never hides an edge,
 
 ## Try it on the example
 
-You need `concordia`, CBM, and `git` on your `PATH`. See [install Concordia](../how-to/install.md). Run the commands from the root of a Concordia checkout.
+You need `concordia`, CBM, `git`, and `jq` on your `PATH`. See [install Concordia](../how-to/install.md). Run the commands from the root of a Concordia checkout.
 
 Copy the example to a scratch Git repository and index it:
 

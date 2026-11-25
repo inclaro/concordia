@@ -49,9 +49,27 @@ type moduleCall struct {
 	Module *configModule `json:"module"`
 }
 
+// configResource is one resource of the configuration: its address, its provider configuration key
+// (`provider_config_key`), and its expressions.
 type configResource struct {
-	Expressions map[string]json.RawMessage `json:"expressions"`
-	Address     string                     `json:"address"`
+	Expressions       map[string]json.RawMessage
+	Address           string
+	ProviderConfigKey string
+}
+
+// UnmarshalJSON reads the three keys that the reader uses; the key names are those of the Terraform JSON format.
+func (c *configResource) UnmarshalJSON(data []byte) error {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	// A key that is absent or of another type leaves its field empty, as for any other partial configuration.
+	_ = json.Unmarshal(raw["expressions"], &c.Expressions)
+	_ = json.Unmarshal(raw["address"], &c.Address)
+	_ = json.Unmarshal(raw["provider_config_key"], &c.ProviderConfigKey)
+
+	return nil
 }
 
 // expression is an expression of the configuration, of which only the references are read.
@@ -126,6 +144,7 @@ func (p *Plan) addConfiguration(raw json.RawMessage) {
 		if refs, ok := byAddress[ConfigAddress(p.Resources[i].Address)]; ok {
 			p.Resources[i].References = refs.references()
 			p.Resources[i].Configured = slices.Clone(refs.configured)
+			p.Resources[i].ProviderConfig = refs.providerConfig
 		}
 	}
 }
@@ -144,7 +163,10 @@ func collectModule(module *configModule, prefix modulePath, out map[string]*reso
 // collectResources adds the configuration of the resources of one module, by absolute address.
 func collectResources(resources []configResource, prefix modulePath, out map[string]*resourceRefs) {
 	for i := range resources {
-		refs := &resourceRefs{prefix: prefix, byPath: map[string][]string{}, configured: []string{}}
+		refs := &resourceRefs{
+			prefix: prefix, byPath: map[string][]string{}, configured: []string{},
+			providerConfig: resources[i].ProviderConfigKey,
+		}
 		refs.block(resources[i].Expressions, "")
 		slices.SortFunc(refs.configured, canonjson.CompareUTF16)
 
@@ -155,9 +177,10 @@ func collectResources(resources []configResource, prefix modulePath, out map[str
 // resourceRefs collects the configuration of one resource. prefix is the module prefix of the resource; byPath holds
 // the absolute addresses by attribute path; configured holds the paths of the keys that the configuration sets.
 type resourceRefs struct {
-	byPath     map[string][]string
-	prefix     modulePath
-	configured []string
+	byPath         map[string][]string
+	prefix         modulePath
+	providerConfig string
+	configured     []string
 }
 
 // references are the sorted reference lists, or nil when the configuration names no resource.
@@ -178,12 +201,14 @@ func (r *resourceRefs) block(exprs map[string]json.RawMessage, path attrPath) {
 	}
 }
 
-// expression adds the references of one expression. An array of objects is a nested block; its elements have the
-// path form of Resource.Unknown, for example `ingress[0].security_groups`.
+// expression adds the references of one expression. An object with `references` or `constant_value` is an
+// expression; any other object is a nested block written once (a single or a map block), whose attributes have the
+// path `<block>.<attribute>`; an array of objects is a nested block list, whose elements have the path form of
+// Resource.Unknown, for example `ingress[0].security_groups`. The value of `constant_value` is never decoded.
 func (r *resourceRefs) expression(raw json.RawMessage, path attrPath) {
-	var expr expression
-	if json.Unmarshal(raw, &expr) == nil {
-		r.add(expr.References, path)
+	var object map[string]json.RawMessage
+	if json.Unmarshal(raw, &object) == nil {
+		r.object(object, raw, path)
 
 		return
 	}
@@ -195,6 +220,23 @@ func (r *resourceRefs) expression(raw json.RawMessage, path attrPath) {
 
 	for i, block := range blocks {
 		r.block(block, path+attrPath("["+strconv.Itoa(i)+"]"))
+	}
+}
+
+// object adds the references of an expression object, or the keys and references of a nested block object.
+func (r *resourceRefs) object(object map[string]json.RawMessage, raw json.RawMessage, path attrPath) {
+	_, hasRefs := object["references"]
+	_, hasConstant := object["constant_value"]
+
+	if !hasRefs && !hasConstant {
+		r.block(object, path)
+
+		return
+	}
+
+	var expr expression
+	if json.Unmarshal(raw, &expr) == nil {
+		r.add(expr.References, path)
 	}
 }
 

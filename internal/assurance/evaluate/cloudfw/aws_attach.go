@@ -195,8 +195,14 @@ func awsAttachedByID(link *awsLink) bool {
 }
 
 // awsAttachedByReference reports whether the configuration of an `attachment` block of the network interface names
-// the instance. The blocks are a set, so every block's references count.
+// the instance. The blocks are a set, so every block's references count. When the plan knows the instance of every
+// block, the known values decide (awsAttachedByID) and the references do not: an expression can name an instance
+// that its value does not take.
 func (e *Evaluator) awsAttachedByReference(link *awsLink, out *awsAttached) bool {
+	if !listUnknown(link.res, awsNICAttachments.list) && unknownElements(link.res, awsNICAttachments) == 0 {
+		return false
+	}
+
 	for _, key := range slices.Sorted(maps.Keys(link.res.References)) {
 		if !strings.HasPrefix(key, "attachment[") || !strings.HasSuffix(key, "].instance") {
 			continue
@@ -273,7 +279,7 @@ var awsManagedGroups = map[string]string{awsNetworkInterface: awsAttrGroups, aws
 // removes the attached group, and the next apply of the attachment may add it again. A group attribute that the
 // configuration does not set is computed, so it never removes the attached group.
 func (e *Evaluator) awsDroppedBy(attachment, group *plan.Resource, interfaces []*plan.Resource) *plan.Resource {
-	groupID, hasID := attrString(group, "id")
+	groupID, hasID := attrString(group, attrID)
 
 	for _, nic := range interfaces {
 		path := awsManagedGroups[nic.Type]
@@ -321,7 +327,7 @@ func awsSetsKnownList(res *plan.Resource, path string) bool {
 func awsIDs(res *plan.Resource) []string {
 	var ids []string
 
-	for _, path := range []string{"id", "primary_network_interface_id"} {
+	for _, path := range []string{attrID, "primary_network_interface_id"} {
 		if id, ok := attrString(res, path); ok && id != "" {
 			ids = append(ids, id)
 		}

@@ -1,6 +1,6 @@
 # Trace images to trusted builds
 
-The bank reviews the code of the payments service before each release. But the cluster runs an image, not the code. If the image tag `5.1.2` was pushed again from a laptop, or built from a branch that nobody reviewed, production runs code that no reviewer saw. Nothing in the manifests shows the difference.
+The bank reviews the code of the payments service before each release. But the cluster runs an image, not the code. If the image tag `5.1.2` was pushed again from a laptop, or built by a pipeline that the bank does not trust, production runs an image that no trusted build produced. Nothing in the manifests shows the difference.
 
 ## The rule
 
@@ -34,7 +34,7 @@ Concordia does not treat a tag as a version. A static link from an image to a Do
 2. With the contract loaded, Concordia evaluates each container occurrence of the rendered manifests.
 3. An image without a digest is `unknown` with the reason `no-evidence-supplied`: a tag links to no build.
 4. For an image with a digest, Concordia looks for an admissible provenance statement with the integrity `producer authenticated` that names the digest. None gives `unknown`, `no-evidence-supplied`.
-5. The builder of the statement must be in `builders`, and one resolved dependency must be a Git source in `sourceRepositories`. Then the occurrence is `pass`.
+5. The builder of the statement must be in `builders`, and one resolved dependency must be a Git source in `sourceRepositories`. Then the occurrence is `pass`. A `pass` shows that the image traces to a trusted build of a declared repository. It does not show that the source revision was reviewed.
 6. An authenticated statement whose builder is not in your list is a `violation`.
 
 ## What you still declare
@@ -43,8 +43,9 @@ Concordia does not treat a tag as a version. A static link from an image to a Do
 - **The producer's signing identity** under `assurance.producers`, with `cosign-key` or `cosign-keyless`. An unsigned statement is `content not verified` and cannot support this claim.
 - **Image pins by digest** in your manifests. A tag-only image stays `unknown`.
 - **The source of the statements.** Your build pipeline writes and signs them. Concordia only reads them.
+- **The review of the source.** Lineage stops at the source revision. If only reviewed code may run, make your trusted builder build only reviewed revisions, for example only the protected `main` branch.
 
-The example declares none of these. On the example, the rule is `unknown` with the reason `claim-not-enabled`.
+The example has no provenance settings, producers, or digest pins. On the example, the rule is `unknown` with the reason `claim-not-enabled`.
 
 ## Try it on the example
 
@@ -110,10 +111,11 @@ concordia check --rule ASR-PRV-001 --no-color 2>/dev/null | grep 'Cannot judge'
   Cannot judge: no provenance for this digest (no-evidence-supplied)
 ```
 
-The payments service now has a digest, and the only missing piece is a provenance statement for it. To get a `pass`, add these, which need your build pipeline and a signing key or identity:
+The payments service now has a digest, and the only missing piece for it is a provenance statement. The channels API and the fraud cache still use tags, so the rule stays `unknown` until every container has both. To get a `pass`, do this for each of the three images, which needs your build pipeline and a signing key or identity:
 
-1. A producer under `assurance.producers` with the claim `build-provenance` and its `cosign-key` or `cosign-keyless` authentication.
-2. A SLSA provenance v1 statement for the image digest, signed by that producer, in `build/attestations/`. Its builder ID must be in `builders`, and its resolved dependencies must name the Git source in `sourceRepositories`.
+1. Pin the image by digest in its manifest.
+2. Declare a producer under `assurance.producers` with the claim `build-provenance` and its `cosign-key` or `cosign-keyless` authentication. One producer can sign for all images.
+3. Add a SLSA provenance v1 statement for the image digest, signed by that producer, in `build/attestations/`. Its builder ID must be in `builders`, and its resolved dependencies must name the Git source in `sourceRepositories`.
 
 [Add signed statements](../how-to/add-stronger-evidence.md#add-signed-statements) shows how to declare the producer and sign a statement in GitHub Actions. [Trace from source to the running image](../how-to/add-stronger-evidence.md#trace-from-source-to-the-running-image) shows the provenance keys.
 

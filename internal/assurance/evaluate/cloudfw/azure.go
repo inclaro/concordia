@@ -75,14 +75,19 @@ func (e *Evaluator) evaluateAzure(q *Query, from, to *plan.Resource) Result {
 func (e *Evaluator) azureCheckPoint(pair *azurePair, point *azurePoint) *side {
 	report := &side{verdict: triYes}
 
-	nsg, known := e.azureNSGOf(point, report)
 	applies := point.nsgApplies()
+	if applies == triNo {
+		// The NSG of the point does not apply to the endpoint, whichever it is: it allows the traffic.
+		return report
+	}
+
+	nsg, known := e.azureNSGOf(point, report)
 
 	switch {
 	case !known:
 		report.verdict = triMaybe
-	case nsg == nil || applies == triNo:
-		// No NSG applies at this point: it allows the traffic.
+	case nsg == nil:
+		// No NSG at this point: it allows the traffic.
 	case applies == triMaybe:
 		report.gaps = append(report.gaps, point.end.policyGaps...)
 		report.verdict = triMaybe

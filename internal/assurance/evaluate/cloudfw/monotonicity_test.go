@@ -100,7 +100,8 @@ func (g awsGen) standalone(i int) awsResource {
 	return g.vpcRule(i, kind, owner, in)
 }
 
-// vpcRule is the aws_vpc_security_group_*_rule form of an inline block.
+// vpcRule is the aws_vpc_security_group_*_rule form of an inline block. The VPC rule resources have no `self`: a
+// block that names its own group references the owner group.
 func (g awsGen) vpcRule(i int, kind, owner string, in map[string]any) awsResource {
 	after := map[string]any{
 		"security_group_id": owner, "ip_protocol": in["protocol"], "from_port": in["from_port"], "to_port": in["to_port"],
@@ -113,6 +114,10 @@ func (g awsGen) vpcRule(i int, kind, owner string, in map[string]any) awsResourc
 		if list, _ := in[key].([]any); len(list) > 0 {
 			after[field] = list[0]
 		}
+	}
+
+	if self, _ := in["self"].(bool); self {
+		after["referenced_security_group_id"] = owner
 	}
 
 	return awsResource{address: fmt.Sprintf("aws_vpc_security_group_%s_rule.r%d", kind, i), after: after}

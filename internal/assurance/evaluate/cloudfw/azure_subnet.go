@@ -97,34 +97,47 @@ func azurePolicyBool(subnet *plan.Resource, attribute string, report *side, appl
 	return azureIf(flag == appliesWhen), true
 }
 
-// azureVNet identifies the virtual network of the subnet of an endpoint by its resource group and name, or by its
-// address when only the configuration reference names it. It is "" when the network is not known; a reference that
-// does not resolve to one virtual network leaves a gap in report.
+// azureVNet identifies the virtual network of the subnet of an endpoint: the plan and the provider configuration of
+// the subnet, which fix its subscription, and the resource group and name of the network, or the network's address
+// when only the configuration reference names it. It is "" when the network is not known, or when the plan does not
+// give the provider configuration of the subnet: two networks with one name can be in two subscriptions. A
+// reference that does not resolve to one virtual network leaves a gap in report.
 func (e *Evaluator) azureVNet(end *azureEndpoint, report *side) string {
-	if end.subnet == nil {
+	if end.subnet == nil || end.subnet.ProviderConfig == "" {
 		return ""
 	}
 
-	if key, ok := azureNameKey(end.subnet, "virtual_network_name"); ok {
+	network := e.azureVNetOf(end.subnet, report)
+	if network == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("plan %d, provider %s: %s", e.planOf[end.subnet], end.subnet.ProviderConfig, network)
+}
+
+// azureVNetOf identifies the virtual network of the subnet by its resource group and name, or by its address when
+// only the configuration reference names it, or is "".
+func (e *Evaluator) azureVNetOf(subnet *plan.Resource, report *side) string {
+	if key, ok := azureNameKey(subnet, "virtual_network_name"); ok {
 		return key
 	}
 
-	refs := end.subnet.References["virtual_network_name"]
+	refs := subnet.References["virtual_network_name"]
 	if len(refs) == 0 {
 		return ""
 	}
 
-	found, ok := e.resolveAll(end.subnet, refs, report)
+	found, ok := e.resolveAll(subnet, refs, report)
 	if !ok || len(found) != 1 {
 		return ""
 	}
 
-	return e.azureVNetKey(found[0], end.subnet, report)
+	return azureVNetKey(found[0], subnet, report)
 }
 
 // azureVNetKey is the key of the virtual network that a subnet references: its resource group and name, else its
-// address in its plan, because two plans can hold different networks at one address.
-func (e *Evaluator) azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
+// address.
+func azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
 	if vnet.Type != azureVNetType {
 		report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s.virtual_network_name names %s, a %s, not a %s",
 			subnet.Address, vnet.Address, vnet.Type, azureVNetType))
@@ -136,7 +149,7 @@ func (e *Evaluator) azureVNetKey(vnet, subnet *plan.Resource, report *side) stri
 		return key
 	}
 
-	return fmt.Sprintf("plan %d: %s", e.planOf[vnet], vnet.Address)
+	return vnet.Address
 }
 
 // azureNameKey is `<resource group>/<name>` when both are known.

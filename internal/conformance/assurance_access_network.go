@@ -76,11 +76,6 @@ func (s *portSet) collect(ports []netpol.Port) {
 	}
 }
 
-// covered says whether a rule names the number or a range holds it.
-func (s *portSet) covered(number int) bool {
-	return s.named[number] || slices.ContainsFunc(s.ranges, func(r [2]int) bool { return number >= r[0] && number <= r[1] })
-}
-
 // destinationPorts gives the ports to query when the rule names none: the ports that the destination declares, every
 // number that a policy rule names (the ends of ranges included), and one port that no rule names, which stands for
 // "every other port". Without the last one a rule that allows all ports would not be seen when the destination
@@ -119,13 +114,33 @@ func (s *portSet) addUnnamedProbe() {
 
 // addUnnamedProbeFor adds the lowest port of the protocol that no rule names and no range covers.
 func (s *portSet) addUnnamedProbeFor(protocol string) {
-	for number := 1; number <= maxPortNumber; number++ {
-		if !s.covered(number) {
-			s.seen[portKey{protocol, number}] = true
-
-			return
-		}
+	if number, ok := s.firstUncovered(); ok {
+		s.seen[portKey{protocol, number}] = true
 	}
+}
+
+// firstUncovered gives the lowest port that no rule names and no range covers, and false when every port is covered.
+// It walks the named ports and the ranges sorted by their first port, so its cost depends on the number of ranges,
+// not on the number of ports.
+func (s *portSet) firstUncovered() (int, bool) {
+	spans := slices.Clone(s.ranges)
+	for number := range s.named {
+		spans = append(spans, [2]int{number, number})
+	}
+
+	slices.SortFunc(spans, func(a, b [2]int) int { return cmp.Compare(a[0], b[0]) })
+
+	candidate := 1
+
+	for _, span := range spans {
+		if span[0] > candidate {
+			break
+		}
+
+		candidate = max(candidate, span[1]+1)
+	}
+
+	return candidate, candidate <= maxPortNumber
 }
 
 // sorted lists the collected ports by protocol, then number.

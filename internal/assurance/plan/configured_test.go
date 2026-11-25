@@ -2,6 +2,7 @@ package plan_test
 
 import (
 	"os"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -55,5 +56,52 @@ func TestConfiguredHoldsNoValueAndIsNilWithoutConfiguration(t *testing.T) {
 		`"name":"c","change":{"actions":["create"],"after":{},"after_unknown":{},"after_sensitive":{}}}]}`)
 	if got := bare.Resources[0].Configured; got != nil {
 		t.Errorf("configured without a configuration section = %v, want nil", got)
+	}
+}
+
+// A block written once (a single or a map nested block) is an object in the configuration: its attributes and their
+// references are read with the path `<block>.<attribute>` (review round 1, finding 12). The reader also keeps the
+// provider configuration of the resource.
+func TestConfigurationReadsSingleNestedBlocks(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2","resource_changes":[{"address":"a_b.c","mode":"managed","type":"a_b",
+		"name":"c","change":{"actions":["create"],"after":{"settings":{}},"after_unknown":{"settings":{"group_id":true}},
+		"after_sensitive":{}}}],"configuration":{"root_module":{"resources":[{"address":"a_b.c","provider_config_key":"a",
+		"expressions":{"settings":{"group_id":{"references":["aws_security_group.web.id","aws_security_group.web"]},
+		"note":{"constant_value":"hunter2"}}}}]}}}`)
+
+	res := p.Resources[0]
+	if got := res.References["settings.group_id"]; !slices.Equal(got, []string{"aws_security_group.web"}) {
+		t.Errorf("references = %v", res.References)
+	}
+
+	if want := []string{"settings", "settings.group_id", "settings.note"}; !slices.Equal(res.Configured, want) {
+		t.Errorf("configured = %v, want %v", res.Configured, want)
+	}
+
+	if res.ProviderConfig != "a" {
+		t.Errorf("provider config = %q, want a", res.ProviderConfig)
+	}
+
+	assertNoneIn(t, marshal(t, p), "hunter2")
+}
+
+// An element of a list that is unknown until apply keeps its position as null, so that the known elements keep
+// their indexes (review round 1, finding 13).
+func TestUnknownListElementKeepsItsPosition(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2","resource_changes":[{"address":"a_b.c","mode":"managed","type":"a_b",
+		"name":"c","change":{"actions":["create"],"after":{"ids":[null,"sg-known"]},
+		"after_unknown":{"ids":[true,false]},"after_sensitive":{}}}]}`)
+
+	res := p.Resources[0]
+	if got := res.Values["ids"]; !reflect.DeepEqual(got, []any{nil, "sg-known"}) {
+		t.Errorf("ids = %#v, want [nil sg-known]", got)
+	}
+
+	if !slices.Equal(res.Unknown, []string{"ids[0]"}) {
+		t.Errorf("unknown = %v, want [ids[0]]", res.Unknown)
 	}
 }

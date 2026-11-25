@@ -93,7 +93,9 @@ func (w *walker) unknownKeys(value map[string]any, parent *node) {
 	}
 }
 
-// array cleans the elements of an array. Its node holds the mirrors of the array.
+// array cleans the elements of an array. Its node holds the mirrors of the array. An element that is unknown until
+// apply keeps its position as null, so that the indexes of the other elements still match their paths; an index
+// that only the mirror names adds no element.
 func (w *walker) array(value []any, n *node) []any {
 	count := len(value)
 	if m, ok := n.unknown.([]any); ok {
@@ -103,8 +105,8 @@ func (w *walker) array(value []any, n *node) []any {
 	out := make([]any, 0, len(value))
 
 	for i := range count {
-		cleaned, keep := w.value(n.element(value, i))
-		if keep && i < len(value) {
+		cleaned, _ := w.value(n.element(value, i))
+		if i < len(value) {
 			out = append(out, cleaned)
 		}
 	}

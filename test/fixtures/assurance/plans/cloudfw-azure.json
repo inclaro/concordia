@@ -324,6 +324,7 @@
         {
           "address": "azurerm_subnet.app",
           "mode": "managed",
+          "provider_config_key": "azurerm",
           "type": "azurerm_subnet",
           "name": "app",
           "expressions": {
@@ -334,6 +335,7 @@
         {
           "address": "azurerm_subnet.db",
           "mode": "managed",
+          "provider_config_key": "azurerm",
           "type": "azurerm_subnet",
           "name": "db",
           "expressions": {

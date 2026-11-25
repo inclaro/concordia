@@ -170,8 +170,8 @@ func unknownAt(r *plan.Resource, path string) bool {
 }
 
 // listHasUnknownElements reports whether Unknown marks a whole element of the list at the path, for example
-// `ingress[1]`. The plan reader leaves such an element out of Values, so the indexes of Values no longer line up with
-// the indexes of Unknown: a provider treats the list as unknown.
+// `ingress[1]`. The plan reader keeps such an element as null in Values; its rule or interface is not known, so a
+// provider treats the list as unknown.
 func listHasUnknownElements(r *plan.Resource, path string) bool {
 	list := pathTokens(path)
 

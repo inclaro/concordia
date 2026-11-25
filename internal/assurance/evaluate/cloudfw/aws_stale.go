@@ -68,7 +68,7 @@ func awsOwnedBefore(rule, group *plan.Resource) bool {
 		return true
 	}
 
-	groupID, hasID := attrString(group, "id")
+	groupID, hasID := attrString(group, attrID)
 
 	return !hasID || groupID == ownerID
 }

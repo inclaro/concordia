@@ -156,12 +156,15 @@ func (e *Evaluator) index(res *plan.Resource, p int) {
 	config := configKey{plan: p, address: plan.ConfigAddress(res.Address)}
 	e.byConfig[config] = append(e.byConfig[config], res)
 
-	if id, ok := attrString(res, "id"); ok && id != "" {
+	if id, ok := attrString(res, attrID); ok && id != "" {
 		e.byID[id] = append(e.byID[id], res)
 	}
 
 	e.indexName(res)
 }
+
+// attrID is the attribute that holds the ID of a resource.
+const attrID = "id"
 
 // InputDigest is the digest of the evaluated input.
 func (e *Evaluator) InputDigest() string { return e.in.Digest }

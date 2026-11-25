@@ -388,7 +388,7 @@ For `dimension: network`, the bindings of each pair select the evaluator:
 | `infraResource` bindings for the environment, both, whether or not the plan holds the bound address | `cloud-firewall`, which reads the plans in [`assurance.plans`](workspace.md#assuranceplans). An address that the plan does not hold is `unknown`. |
 | an `infraResource` binding on one end, and a rendered workload on the other | none: `unknown` with `binding-gap` and the detail `the pair mixes planned cloud resources and Kubernetes workloads` |
 
-A pair with an `infraResource` binding on one end and no binding in the environment on the other goes to `cloud-firewall`, which reports a `binding-gap` for the unbound end. In the payments example, `public-load-balancer` binds to `aws_lb.public` and `ledger-db` binds to `aws_db_instance.ledger`, so `cloud-firewall` answers PAY-NET-002. See [cloud-firewall](assurance.md#cloud-firewall).
+A pair with an `infraResource` binding on one end and no binding in the environment on the other goes to `cloud-firewall`, which reports a `binding-gap` for the unbound end. An element with both an `infraResource` binding and a `workload` binding follows the first row that fits, in this order: both ends planned gives `cloud-firewall`, both ends workloads gives `network-policy`, otherwise the pair is mixed. In the payments example, `public-load-balancer` binds to `aws_lb.public` and `ledger-db` binds to `aws_db_instance.ledger`, so `cloud-firewall` answers PAY-NET-002. See [cloud-firewall](assurance.md#cloud-firewall).
 
 | Field | Type | Description |
 |---|---|---|

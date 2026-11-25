@@ -149,22 +149,26 @@ func awsInlineRules(group *plan.Resource, dir *awsDirection) []awsRule {
 	return rules
 }
 
-// awsRuleFields are the fields of a rule resource. ok is false for an aws_security_group_rule of the other
-// direction.
-func awsRuleFields(res *plan.Resource, dir *awsDirection) (*awsFields, bool) {
+// awsRuleFields are the fields of a rule resource, and whether it is a rule of the direction: no for an
+// aws_security_group_rule of the other direction, maybe for one whose `type` is unknown until apply.
+func awsRuleFields(res *plan.Resource, dir *awsDirection) (*awsFields, tri) {
 	if res.Type != awsGroupRule {
-		return &awsVPCRuleFields, true
+		return &awsVPCRuleFields, triYes
+	}
+
+	if unknownAt(res, "type") {
+		return &awsGroupRuleFields, triMaybe
 	}
 
 	kind, _ := attrString(res, "type")
 
-	return &awsGroupRuleFields, kind == dir.block
+	return &awsGroupRuleFields, azureIf(kind == dir.block)
 }
 
 // awsStandaloneRule reads a rule resource of the direction. ok is false when it does not apply to the endpoint.
 func (e *Evaluator) awsStandaloneRule(endpoint *awsEndpoint, res *plan.Resource, dir *awsDirection) (awsRule, bool) {
-	fields, ok := awsRuleFields(res, dir)
-	if !ok {
+	fields, direction := awsRuleFields(res, dir)
+	if direction == triNo {
 		return awsRule{}, false
 	}
 
@@ -182,7 +186,21 @@ func (e *Evaluator) awsStandaloneRule(endpoint *awsEndpoint, res *plan.Resource,
 		return awsRule{}, false
 	}
 
+	rule.limitTo(direction)
+
 	return rule, true
+}
+
+// limitTo limits the rule to the direction match: a rule whose `type` is unknown until apply applies maybe.
+func (rule *awsRule) limitTo(direction tri) {
+	if direction != triMaybe {
+		return
+	}
+
+	rule.applies = and(rule.applies, triMaybe)
+	rule.gaps = append(slices.Clip(rule.gaps), assurance.Gap{
+		Kind: evaluate.GapUnknownAfterApply, Detail: rule.res.Address + ".type",
+	})
 }
 
 // awsMatch matches one rule against the query and the peer endpoint. An unknown block list has no fields to match:
@@ -281,11 +299,29 @@ func (e *Evaluator) awsRuleGroups(rule *awsRule, check *side) ([]*plan.Resource,
 
 // awsSelfPeer is yes when the rule names its own group and that group is a group of the peer. A rule whose owner
 // does not resolve (its gaps are on the rule), or a peer that an unresolved attachment may add the group to, gives
-// maybe.
+// maybe. A `self` that is unknown until apply gives at most maybe, with a gap.
 func awsSelfPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
-	switch {
-	case !attrBool(rule.res, rule.attr("self")):
+	path := rule.attr("self")
+	unknown := unknownAt(rule.res, path)
+
+	if !unknown && !attrBool(rule.res, path) {
 		return triNo
+	}
+
+	match := awsOwnerIsPeer(rule, peer, check)
+	if !unknown || match == triNo {
+		return match
+	}
+
+	check.gap(evaluate.GapUnknownAfterApply, rule.res.Address+"."+planPath(path))
+
+	return triMaybe
+}
+
+// awsOwnerIsPeer is yes when the owner group of the rule is a group of the peer, maybe when the owner does not
+// resolve or an unresolved attachment may add it to the peer.
+func awsOwnerIsPeer(rule *awsRule, peer *awsEndpoint, check *side) tri {
+	switch {
 	case rule.owner == nil:
 		return triMaybe
 	case peer.hasGroup(rule.owner):

@@ -26,7 +26,7 @@ const (
 // evidence that the evaluator did not read.
 func azureReviewScenarios() []azureScenario {
 	return slices.Concat(azureReferenceScenarios(), azureRuleListScenarios(), azurePolicyScenarios(),
-		azureChangedRuleScenarios(), azureDualStackScenarios())
+		azureChangedRuleScenarios(), azureDualStackScenarios(), azureReviewRound1Scenarios())
 }
 
 // azureReferenceScenarios are references that name the wrong resource (findings 1, 2, 13) and address sets

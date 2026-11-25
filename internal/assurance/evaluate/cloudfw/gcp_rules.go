@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/inclaro/concordia/internal/assurance/evaluate"
 	"github.com/inclaro/concordia/internal/assurance/plan"
 )
 
@@ -71,18 +72,21 @@ func gcpRulePorts(rule *gcpRule, query *Query, point *side) tri {
 	return gcpPorts(rule.res, rule.action(), query, point)
 }
 
-// gcpInNetwork is whether the firewall rule belongs to the network.
-func (e *Evaluator) gcpInNetwork(firewall *plan.Resource, network string, point *side) tri {
+// gcpInNetwork is whether the firewall rule belongs to the network: maybe, with a gap, when the plan does not show
+// that the network of the rule and the network of the instance are in one project.
+func (e *Evaluator) gcpInNetwork(firewall *plan.Resource, network gcpNet, point *side) tri {
 	key, ok := e.gcpNetworkKey(firewall, "network", point)
-
-	switch {
-	case !ok:
+	if !ok {
 		return triMaybe
-	case key == network:
-		return triYes
 	}
 
-	return triNo
+	same := key.same(network)
+	if same == triMaybe {
+		point.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s.network: the plan does not show that network %s "+
+			"is in the project of the network of the instance", firewall.Address, key))
+	}
+
+	return same
 }
 
 // gcpTargets is whether the rule applies to the instance of the check point: it has no targets, or a target tag or
@@ -110,11 +114,7 @@ func (e *Evaluator) gcpOwnRanges(firewall *plan.Resource, check *gcpCheck, point
 		path = "destination_ranges"
 	}
 
-	if unsetComputed(firewall, path) {
-		return triYes
-	}
-
-	ranges := e.gcpSetAt(firewall, path, "")
+	ranges := e.gcpRangesAt(firewall, path)
 	if ranges.empty() {
 		return triYes
 	}
@@ -126,7 +126,7 @@ func (e *Evaluator) gcpOwnRanges(firewall *plan.Resource, check *gcpCheck, point
 // accounts for ingress. A rule without a peer matches every address.
 func (e *Evaluator) gcpPeer(firewall *plan.Resource, check *gcpCheck, point *side) tri {
 	if !check.ingress {
-		ranges := e.gcpSetAt(firewall, "destination_ranges", "")
+		ranges := e.gcpRangesAt(firewall, "destination_ranges")
 		if ranges.empty() {
 			ranges.vals = []string{gcpAllAddresses}
 		}
@@ -134,7 +134,7 @@ func (e *Evaluator) gcpPeer(firewall *plan.Resource, check *gcpCheck, point *sid
 		return gcpRanges(&ranges, check.peer.addrs, point)
 	}
 
-	ranges := e.gcpSetAt(firewall, "source_ranges", "")
+	ranges := e.gcpRangesAt(firewall, "source_ranges")
 	tags := e.gcpSetAt(firewall, "source_tags", "")
 	accounts := e.gcpSetAt(firewall, "source_service_accounts", "email")
 
@@ -145,6 +145,16 @@ func (e *Evaluator) gcpPeer(firewall *plan.Resource, check *gcpCheck, point *sid
 	identity := or(gcpOverlap(&tags, &check.peer.tags, point), gcpOverlap(&accounts, &check.peer.accounts, point))
 
 	return or(gcpRanges(&ranges, check.peer.addrs, point), identity)
+}
+
+// gcpRangesAt is the range list at the path. The provider computes `source_ranges` and `destination_ranges` when
+// the configuration does not set them; the plan then shows them unknown, and they are no ranges.
+func (e *Evaluator) gcpRangesAt(firewall *plan.Resource, path string) gcpSet {
+	if unsetComputed(firewall, path) {
+		return gcpSet{}
+	}
+
+	return e.gcpSetAt(firewall, path, "")
 }
 
 func gcpAllEmpty(sets ...*gcpSet) bool {

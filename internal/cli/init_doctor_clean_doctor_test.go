@@ -453,17 +453,19 @@ func indexClaimContracts(doc *doctorClaims) claimContractIndex {
 	return idx
 }
 
-// evaluators is the number of contracts of the kind evaluator.
-func (idx claimContractIndex) evaluators() int {
-	count := 0
+// evaluators are the ids of the contracts of the kind evaluator, sorted.
+func (idx claimContractIndex) evaluators() []string {
+	var ids []string
 
-	for _, kind := range idx.kinds {
+	for id, kind := range idx.kinds {
 		if kind == "evaluator" {
-			count++
+			ids = append(ids, id)
 		}
 	}
 
-	return count
+	slices.Sort(ids)
+
+	return ids
 }
 
 // listsEnabledAndNotEnabled reports whether the contract says what it enables and what it does not enable.
@@ -506,8 +508,8 @@ func TestDoctorJSONListsTheClaimContracts(t *testing.T) {
 		}
 	}
 
-	if got := idx.evaluators(); got != 3 {
-		t.Errorf("evaluator contracts = %d, want the network, the access, and the cloud firewall evaluator", got)
+	if got, want := idx.evaluators(), []string{"cloud-firewall", "network-policy", "rbac"}; !slices.Equal(got, want) {
+		t.Errorf("evaluator contracts = %v, want %v", got, want)
 	}
 
 	if !slices.Contains(idx.notEnabled["provenance"], "slsa-level") {

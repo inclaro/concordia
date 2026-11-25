@@ -29,7 +29,45 @@ type gcpAttr struct {
 // apply, and the ranges of the rule for the instance that it applies to.
 func gcpReviewScenarios() []gcpScenario {
 	return slices.Concat(gcpTypedScenarios(), gcpUnknownRuleScenarios(), gcpOwnRangeScenarios(), gcpDualStackScenarios(),
-		gcpIPv6SettingScenarios())
+		gcpIPv6SettingScenarios(), gcpReviewRound1Scenarios())
+}
+
+// gcpReviewRound1Scenarios are review round 1 findings 10, 11, and 29.
+func gcpReviewRound1Scenarios() []gcpScenario {
+	return []gcpScenario{
+		{
+			name: "finding 11: networks of one name in two projects", from: gcpWeb, to: gcpDB, port: 5432,
+			mutate: gcpAll(gcpNetworkLink(gcpWeb, "projects/a/global/networks/vpc"),
+				gcpNetworkLink(gcpDB, "projects/b/global/networks/vpc")),
+			want: cloudfw.VerdictUnknown, gap: evaluate.GapPeeringNotEvaluated, rules: "",
+		},
+		{
+			name: "finding 10: instance with two network interfaces", from: gcpWeb, to: gcpDB, port: 5432,
+			mutate: gcpEdit(gcpWeb, func(res *plan.Resource) {
+				nics, _ := res.Values[gcpInterfaces].([]any)
+				res.Values[gcpInterfaces] = append(nics, map[string]any{"network_ip": "10.40.0.5"})
+			}),
+			want: cloudfw.VerdictUnknown, gap: evaluate.GapUnsupportedResource, rules: "",
+		},
+		{
+			name: "finding 29: egress deny whose destination ranges the configuration does not set", from: gcpWeb,
+			to: gcpDB, port: 3306, want: cloudfw.VerdictDenied, rules: gcpFirewall + "deny_web_mysql_out priority 1000 deny",
+			mutate: gcpEdit(gcpFirewall+"deny_web_mysql_out", func(res *plan.Resource) {
+				delete(res.Values, "destination_ranges")
+				res.Unknown = append(res.Unknown, "destination_ranges")
+				res.Configured = []string{"deny", "direction", "name", "network", "target_tags"}
+			}),
+		},
+	}
+}
+
+// gcpNetworkLink makes the plan know the network of the first interface of the instance as a self link.
+func gcpNetworkLink(address, link string) func(in *cloudfw.Input) {
+	return gcpEdit(address, func(res *plan.Resource) {
+		nic, _ := res.Values[gcpInterfaces].([]any)[0].(map[string]any)
+		nic["network"] = link
+		res.Unknown = slices.DeleteFunc(res.Unknown, func(path string) bool { return path == "network_interface[0].network" })
+	})
 }
 
 // gcpDualStackScenarios are denies through address ranges: they decide only when the plan proves that an endpoint is
