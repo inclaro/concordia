@@ -114,16 +114,17 @@ func (e *Evaluator) azureVNet(end *azureEndpoint, report *side) string {
 		return ""
 	}
 
-	found, ok := e.resolveAll(refs, report)
+	found, ok := e.resolveAll(end.subnet, refs, report)
 	if !ok || len(found) != 1 {
 		return ""
 	}
 
-	return azureVNetKey(found[0], end.subnet, report)
+	return e.azureVNetKey(found[0], end.subnet, report)
 }
 
-// azureVNetKey is the key of the virtual network that a subnet references.
-func azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
+// azureVNetKey is the key of the virtual network that a subnet references: its resource group and name, else its
+// address in its plan, because two plans can hold different networks at one address.
+func (e *Evaluator) azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
 	if vnet.Type != azureVNetType {
 		report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s.virtual_network_name names %s, a %s, not a %s",
 			subnet.Address, vnet.Address, vnet.Type, azureVNetType))
@@ -135,7 +136,7 @@ func azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
 		return key
 	}
 
-	return vnet.Address
+	return fmt.Sprintf("plan %d: %s", e.planOf[vnet], vnet.Address)
 }
 
 // azureNameKey is `<resource group>/<name>` when both are known.

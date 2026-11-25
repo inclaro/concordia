@@ -101,11 +101,17 @@ func (e *Evaluator) gcpTargets(firewall *plan.Resource, check *gcpCheck, point *
 	return and(targeted, e.gcpOwnRanges(firewall, check, point))
 }
 
-// gcpOwnRanges matches the ranges of the rule for the instance of the check point. No ranges means every address.
+// gcpOwnRanges matches the ranges of the rule for the instance of the check point. No ranges means every address. The
+// provider computes these ranges when the configuration does not set them; the plan then shows them unknown, and GCP
+// applies the rule to every address.
 func (e *Evaluator) gcpOwnRanges(firewall *plan.Resource, check *gcpCheck, point *side) tri {
 	path := "source_ranges"
 	if check.ingress {
 		path = "destination_ranges"
+	}
+
+	if unsetComputed(firewall, path) {
+		return triYes
 	}
 
 	ranges := e.gcpSetAt(firewall, path, "")

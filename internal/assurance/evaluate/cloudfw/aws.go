@@ -1,6 +1,7 @@
 package cloudfw
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/inclaro/concordia/internal/assurance"
@@ -79,6 +80,42 @@ func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.G
 		return nil, []assurance.Gap{unsupportedResource(res)}
 	}
 
+	viaInterfaces := awsGroupsFromInterfaces(res)
+
+	groups, gaps := e.awsOwnGroups(res, &spec, viaInterfaces)
+	if len(gaps) > 0 {
+		return nil, gaps
+	}
+
+	attached := e.awsAttachments(res)
+	endpoint := &awsEndpoint{
+		groups: sortResources(slices.Concat(groups, attached.groups)), pending: attached.pending,
+		addrs: e.awsEndpointAddrs(res, &spec, attached.nics, viaInterfaces),
+	}
+
+	if viaInterfaces && endpoint.namesNothing() {
+		return nil, []assurance.Gap{awsNoGroup(res)}
+	}
+
+	return endpoint, nil
+}
+
+// awsOwnGroups resolves the groups that the endpoint names itself. An instance whose groups come from its
+// `network_interface` blocks names none, and needs exactly one block that is known to be its primary interface.
+// Otherwise an endpoint that names no group is a gap: the default group of the VPC is not in the plan.
+func (e *Evaluator) awsOwnGroups(res *plan.Resource, spec *awsEndpointSpec, viaInterfaces bool) ([]*plan.Resource, []assurance.Gap) {
+	if viaInterfaces && !awsPrimaryBlock(res) {
+		return nil, []assurance.Gap{{
+			Kind: evaluate.GapUnresolvedReference,
+			Detail: res.Address + " has no network_interface block whose device_index is known to be 0, so its " +
+				"primary interface is not known",
+		}}
+	}
+
+	if viaInterfaces {
+		return nil, nil
+	}
+
 	check := &side{}
 
 	groups, resolved := e.refsOfType(res, spec.groups, check, awsGroupTypes...)
@@ -87,52 +124,49 @@ func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.G
 	}
 
 	if len(groups) == 0 {
-		check.gap(evaluate.GapUnresolvedReference,
-			res.Address+" names no security group; the default group of the VPC is not in the plan")
-
-		return nil, check.gaps
+		return nil, []assurance.Gap{awsNoGroup(res)}
 	}
 
-	attached := e.awsAttachments(res)
-	endpoint := &awsEndpoint{
-		groups: sortResources(slices.Concat(groups, attached.groups)), addrs: e.awsAddrs(res, &spec), pending: attached.pending,
-	}
-
-	// A second network interface gives the endpoint a second address.
-	if attached.interfaces > 0 {
-		endpoint.addrs = unknownAddrs
-	}
-
-	return endpoint, nil
+	return groups, nil
 }
 
-// awsAddrs is the address set of an endpoint: its private IP when it is known, else the CIDR that all its subnets
-// share, else unknown.
-func (e *Evaluator) awsAddrs(res *plan.Resource, spec *awsEndpointSpec) addrSet {
-	// An endpoint type without an IP attribute, or an IP unknown until apply, gives no host set.
-	ip, _ := attrString(res, spec.ip)
-	if set := hostSet(ip); set.known {
-		return set
+// awsNoGroup is the gap of an endpoint that names no security group.
+func awsNoGroup(res *plan.Resource) assurance.Gap {
+	return assurance.Gap{
+		Kind:   evaluate.GapUnresolvedReference,
+		Detail: res.Address + " names no security group; the default group of the VPC is not in the plan",
+	}
+}
+
+// awsPrimaryBlock reports whether exactly one `network_interface` block of the instance has a known `device_index`
+// of 0. Without it, the primary interface has groups and an address that the blocks do not give.
+func awsPrimaryBlock(res *plan.Resource) bool {
+	primaries := 0
+
+	for i := range blockCount(res, awsInstanceNICs.list) {
+		if index, ok := attrInt(res, fmt.Sprintf("%s[%d].device_index", awsInstanceNICs.list, i)); ok && index == 0 {
+			primaries++
+		}
 	}
 
-	if spec.subnets == "" {
-		return unknownAddrs
+	return primaries == 1
+}
+
+// awsGroupsFromInterfaces reports whether the groups of an instance are those of the network interfaces of its
+// `network_interface` blocks: the plan lists those blocks, and the configuration, which covers the instance, does not
+// set `vpc_security_group_ids`. That attribute is then computed from the primary interface, and the plan shows it
+// unknown or empty.
+func awsGroupsFromInterfaces(res *plan.Resource) bool {
+	if res.Type != awsInstance || !leavesUnset(res, awsAttrVPCGroups) {
+		return false
 	}
 
-	// A subnet that does not resolve leaves the addresses unknown; a rule prefix that depends on them then gives
-	// the gap address-dependent-range.
-	subnets, ok := e.refsOfType(res, spec.subnets, &side{}, awsSubnet)
-	if !ok {
-		return unknownAddrs
-	}
+	return !listUnknown(res, awsInstanceNICs.list) && blockCount(res, awsInstanceNICs.list) > 0
+}
 
-	sets := make([]addrSet, 0, len(subnets))
-	for _, subnet := range subnets {
-		cidr, _ := attrString(subnet, "cidr_block")
-		sets = append(sets, prefixSet(cidr))
-	}
-
-	return commonSet(sets...)
+// namesNothing reports whether the endpoint has no group and no attachment that may add one.
+func (endpoint *awsEndpoint) namesNothing() bool {
+	return len(endpoint.groups) == 0 && len(endpoint.pending) == 0
 }
 
 // hasGroup reports whether the group is one of the groups of the endpoint.

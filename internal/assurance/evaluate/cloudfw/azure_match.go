@@ -133,8 +133,13 @@ func (e *Evaluator) azurePeer(rule *azureRule, fields *azurePeerFields, pair *az
 	return or(result, e.azureGroups(rule, fields.groups, end, report))
 }
 
-// azureGroups matches the application security groups of one end of the rule against the endpoint.
+// azureGroups matches the application security groups of one end of the rule against the endpoint. An endpoint
+// whose NIC is known to be in no ASG never matches, whichever ASGs the rule names.
 func (e *Evaluator) azureGroups(rule *azureRule, path string, end *azureEndpoint, report *side) tri {
+	if end.inNoASG() {
+		return triNo
+	}
+
 	asgs, ok := e.azureRuleASGs(rule, path, report)
 
 	switch {
@@ -145,6 +150,11 @@ func (e *Evaluator) azureGroups(rule *azureRule, path string, end *azureEndpoint
 	}
 
 	return azureInGroups(end, asgs, report)
+}
+
+// inNoASG reports whether the endpoint has a NIC that is known to be in no application security group.
+func (end *azureEndpoint) inNoASG() bool {
+	return end.nic != nil && len(end.asgs) == 0 && len(end.asgGaps) == 0
 }
 
 // azureRuleASGs resolves the ASG list of a rule. The list of an inline rule resolves through the references of

@@ -57,7 +57,7 @@ func (e *Evaluator) evaluate(query *Query) Result {
 
 	source, dest, gaps := e.endpoints(query)
 	if len(gaps) > 0 {
-		return unknownResult(evaluate.ReasonSubjectNotFound, gaps...)
+		return unknownResult(endpointReason(gaps), gaps...)
 	}
 
 	return e.dispatch(query, source, dest)
@@ -65,20 +65,38 @@ func (e *Evaluator) evaluate(query *Query) Result {
 
 // endpoints looks both ends of the query up in the input.
 func (e *Evaluator) endpoints(q *Query) (from, to *plan.Resource, gaps []assurance.Gap) {
-	from, to = e.resource(q.From.Address), e.resource(q.To.Address)
-
-	for _, end := range []struct {
-		res     *plan.Resource
-		address string
-	}{{from, q.From.Address}, {to, q.To.Address}} {
-		if end.res == nil {
-			gaps = append(gaps, assurance.Gap{
-				Kind: evaluate.GapWorkloadMissing, Detail: end.address + " is not a resource of the plan after apply",
-			})
-		}
-	}
+	from, gaps = e.endpoint(q.From.Address, gaps)
+	to, gaps = e.endpoint(q.To.Address, gaps)
 
 	return from, to, gaps
+}
+
+// endpoint is the one resource at the address. An address that no plan holds after apply, or that more than one plan
+// of the environment holds, adds a gap.
+func (e *Evaluator) endpoint(address string, gaps []assurance.Gap) (*plan.Resource, []assurance.Gap) {
+	switch found := e.byAddress[address]; len(found) {
+	case 1:
+		return found[0], gaps
+	case 0:
+		return nil, append(gaps, assurance.Gap{
+			Kind: evaluate.GapWorkloadMissing, Detail: address + " is not a resource of the plan after apply",
+		})
+	default:
+		return nil, append(gaps, assurance.Gap{
+			Kind:   evaluate.GapUnresolvedReference,
+			Detail: fmt.Sprintf("%s is in %d plans of environment %s", address, len(found), e.in.Environment),
+		})
+	}
+}
+
+// endpointReason is the reason of the endpoint gaps: subject-not-found when an endpoint is missing, else incomplete
+// coverage, because an address that several plans hold names more than one resource.
+func endpointReason(gaps []assurance.Gap) string {
+	if slices.ContainsFunc(gaps, func(g assurance.Gap) bool { return g.Kind == evaluate.GapWorkloadMissing }) {
+		return evaluate.ReasonSubjectNotFound
+	}
+
+	return evaluate.ReasonCoverageIncomplete
 }
 
 // dispatch hands the query to the provider of both ends.

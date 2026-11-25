@@ -20,7 +20,7 @@ const (
 func coreEvaluator(resources ...plan.Resource) *Evaluator {
 	slices.SortFunc(resources, func(a, b plan.Resource) int { return strings.Compare(a.Address, b.Address) })
 
-	return New(&Input{Coverage: assurance.CoverageComplete, Resources: resources})
+	return New(&Input{Coverage: assurance.CoverageComplete, Plans: []Plan{{File: "plan.json", Resources: resources}}})
 }
 
 func resourceOf(address, typ string, values map[string]any) plan.Resource {

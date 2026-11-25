@@ -60,7 +60,7 @@ func azureReferenceScenarios() []azureScenario {
 			from: azureVM, to: azureDBNIC, port: 6379, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonUnsupportedConstruct,
 			mutate: azureTwoPrefixes,
 			rules:  azureRules(azureDBNSG + " allow-redis (priority 310)"),
-			gaps:   evaluate.GapAddressDependent + ": 10.1.1.0/24 against an endpoint whose addresses are not known before apply",
+			gaps:   evaluate.GapAddressDependent + ": 10.1.1.0/24 covers only part of 10.1.1.0/24, 10.1.3.0/24",
 		},
 		{
 			name: "finding 13: VirtualNetwork through a reference to a network with two instances",
@@ -222,7 +222,7 @@ func azureTwoVNetInstances(in *cloudfw.Input) {
 func azureAddCopy(in *cloudfw.Input, copyOf azureCopy) {
 	res := *azureResource(in, copyOf.from)
 	res.Address = copyOf.to
-	in.Resources = append(in.Resources, res)
+	in.Plans[0].Resources = append(in.Plans[0].Resources, res)
 }
 
 // azureRuleValues are the values of one inline rule of an NSG.

@@ -180,32 +180,46 @@ func newAzureRule(res *plan.Resource, base, address string, owner tri) azureRule
 	return rule
 }
 
-// azureRuleOwner is yes when the rule resource belongs to the NSG. It uses the configuration reference of
-// `network_security_group_name` first, then the name and resource group in the plan.
+// azureRuleOwner is yes when the rule resource belongs to the NSG. It uses the known name and resource group of the
+// NSG first, then the configuration reference of `network_security_group_name` when the name is unknown.
 func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, report *side) tri {
+	name, hasName := attrString(rule, "network_security_group_name")
+	group, hasGroup := attrString(rule, "resource_group_name")
+
+	if hasName && hasGroup {
+		return e.azureOwnerByName(nsg, name, group, report)
+	}
+
 	if refs := rule.References["network_security_group_name"]; len(refs) > 0 {
 		return e.azureOwnerByReference(rule, refs, nsg, report)
 	}
 
-	name, hasName := attrString(rule, "network_security_group_name")
-	group, hasGroup := attrString(rule, "resource_group_name")
+	report.gap(evaluate.GapUnknownAfterApply, rule.Address+".network_security_group_name")
 
-	if !hasName || !hasGroup {
-		report.gap(evaluate.GapUnknownAfterApply, rule.Address+".network_security_group_name")
+	return triMaybe
+}
+
+// azureOwnerByName is yes when the NSG is the one NSG of the plans with the name and resource group, maybe when
+// several NSGs of the plans have them and the NSG is one of them.
+func (e *Evaluator) azureOwnerByName(nsg *plan.Resource, name, group string, report *side) tri {
+	switch owners := e.named(newNameKey(azureNSG, name, group)); {
+	case len(owners) == 1:
+		return azureIf(owners[0] == nsg)
+	case len(owners) == 0:
+		return azureNamedLike(nsg, name, group, report)
+	case !slices.Contains(owners, nsg):
+		return triNo
+	default:
+		report.gap(evaluate.GapUnresolvedReference,
+			fmt.Sprintf("network security group %s/%s names %d resources of the plans", group, name, len(owners)))
 
 		return triMaybe
 	}
-
-	if owner := e.named(azureNSG, name, group); owner != nil {
-		return azureIf(owner == nsg)
-	}
-
-	return azureNamedLike(nsg, name, group, report)
 }
 
 // azureOwnerByReference is yes when a referenced NSG is the NSG, maybe when a reference does not resolve to an NSG.
 func (e *Evaluator) azureOwnerByReference(rule *plan.Resource, refs []string, nsg *plan.Resource, report *side) tri {
-	found, resolved := e.resolveAll(refs, report)
+	found, resolved := e.resolveAll(rule, refs, report)
 	owners, typed := keepTypes(attrRef{res: rule, path: "network_security_group_name"}, found, report, []string{azureNSG})
 
 	result := azureIf(slices.Contains(owners, nsg))

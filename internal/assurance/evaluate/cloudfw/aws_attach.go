@@ -19,13 +19,23 @@ const (
 	awsNICAttachment    = "aws_network_interface_attachment"
 )
 
-// awsAttached are the groups that other resources attach to the network interfaces of an endpoint, the number of
-// network interfaces attached besides the endpoint's own, and a pending rule for each attachment that may concern
-// the endpoint but does not resolve.
+// Attributes and names of attachments.
+const (
+	// awsAttrNICID is the attribute that names a network interface by its ID.
+	awsAttrNICID = "network_interface_id"
+	// awsAttachmentList is the `attachment` block list of a network interface.
+	awsAttachmentList = "attachment"
+	// awsAttachmentRule names the pending rule of an attachment.
+	awsAttachmentRule = "attachment"
+)
+
+// awsAttached are the groups that other resources attach to the network interfaces of an endpoint, the network
+// interfaces attached besides the endpoint's own, and a pending rule for each attachment that may concern the
+// endpoint but does not resolve.
 type awsAttached struct {
-	groups     []*plan.Resource
-	pending    []awsRule
-	interfaces int
+	groups  []*plan.Resource
+	pending []awsRule
+	nics    []*plan.Resource
 }
 
 // awsLink asks whether an attribute of an attachment names one of the targets: by a configuration reference to a
@@ -46,9 +56,9 @@ func (e *Evaluator) awsAttachments(endpoint *plan.Resource) *awsAttached {
 	}
 
 	interfaces := e.awsInterfaces(endpoint, out)
-	out.interfaces = len(interfaces) - 1
+	out.nics = interfaces[1:]
 
-	for _, nic := range interfaces[1:] {
+	for _, nic := range out.nics {
 		e.awsInterfaceGroups(nic, endpoint, out)
 	}
 
@@ -73,7 +83,7 @@ func (e *Evaluator) awsInterfaces(endpoint *plan.Resource, out *awsAttached) []*
 }
 
 // awsInstanceNICs is the `network_interface` block list of an instance, which attaches network interfaces by ID.
-var awsInstanceNICs = blockElement{list: "network_interface", field: "network_interface_id"}
+var awsInstanceNICs = blockElement{list: "network_interface", field: awsAttrNICID}
 
 // awsInstanceBlockInterfaces adds the network interfaces of the `network_interface` blocks of the instance. A block
 // list that is unknown until apply, or a block whose interface does not resolve, makes the instance pending.
@@ -144,7 +154,7 @@ func (e *Evaluator) awsBlockInterface(link *awsLink, interfaces []*plan.Resource
 }
 
 // awsNICAttachments is the `attachment` block list of a network interface, which names the instance it is attached to.
-var awsNICAttachments = blockElement{list: "attachment", field: "instance"}
+var awsNICAttachments = blockElement{list: awsAttachmentList, field: "instance"}
 
 // awsAttachmentUnknown reports whether an `attachment` block of the network interface names an instance that is
 // unknown until apply and that no configuration reference names: the list, or a whole block, is unknown, or more
@@ -162,9 +172,9 @@ func awsAttachmentUnknown(nic *plan.Resource) bool {
 func (e *Evaluator) awsAttachedInterface(link *awsLink, interfaces []*plan.Resource, out *awsAttached) []*plan.Resource {
 	check := &side{}
 
-	nic, ok := e.refOfType(link.res, "network_interface_id", check, awsNetworkInterface)
+	nic, ok := e.refOfType(link.res, awsAttrNICID, check, awsNetworkInterface)
 	if !ok || nic == nil {
-		out.pend(link, "network_interface_id", check.gaps)
+		out.pend(link, awsAttrNICID, check.gaps)
 
 		return interfaces
 	}
@@ -175,7 +185,7 @@ func (e *Evaluator) awsAttachedInterface(link *awsLink, interfaces []*plan.Resou
 // awsAttachedByID reports whether a known `instance` of an `attachment` block of the network interface is the
 // instance.
 func awsAttachedByID(link *awsLink) bool {
-	for i := range blockCount(link.res, "attachment") {
+	for i := range blockCount(link.res, awsAttachmentList) {
 		if id, ok := attrString(link.res, fmt.Sprintf("attachment[%d].instance", i)); ok && slices.Contains(link.ids, id) {
 			return true
 		}
@@ -204,19 +214,27 @@ func (e *Evaluator) awsAttachedByReference(link *awsLink, out *awsAttached) bool
 // awsInterfaceGroups adds the groups of a network interface that is attached to the endpoint.
 func (e *Evaluator) awsInterfaceGroups(nic, endpoint *plan.Resource, out *awsAttached) {
 	check := &side{}
+	link := &awsLink{res: nic, subject: endpoint.Address}
 
 	groups, ok := e.refsOfType(nic, awsAttrGroups, check, awsGroupTypes...)
-	if !ok {
-		out.pend(&awsLink{res: nic, subject: endpoint.Address}, awsAttrGroups, check.gaps)
+
+	switch {
+	case !ok:
+		out.pend(link, awsAttrGroups, check.gaps)
+	case len(groups) == 0:
+		// An interface without a group of its own gets the default group of the VPC, which is not in the plan.
+		out.pending = append(out.pending, awsRule{
+			res: nic, name: awsAttachmentRule, applies: triMaybe, gaps: []assurance.Gap{awsNoGroup(nic)},
+		})
 	}
 
 	out.groups = append(out.groups, groups...)
 }
 
 // awsGroupAttachments adds the group of each aws_network_interface_sg_attachment that names a network interface of
-// the endpoint.
+// the endpoint. A group that the planned groups of that interface do not list is not added: see awsDroppedBy.
 func (e *Evaluator) awsGroupAttachments(endpoint *plan.Resource, interfaces []*plan.Resource, out *awsAttached) {
-	link := &awsLink{subject: endpoint.Address, targets: interfaces, path: "network_interface_id"}
+	link := &awsLink{subject: endpoint.Address, targets: interfaces, path: awsAttrNICID}
 	for _, nic := range interfaces {
 		link.ids = append(link.ids, awsIDs(nic)...)
 	}
@@ -236,8 +254,66 @@ func (e *Evaluator) awsGroupAttachments(endpoint *plan.Resource, interfaces []*p
 			continue
 		}
 
+		if nic := e.awsDroppedBy(attachment, group, interfaces); nic != nil {
+			out.pending = append(out.pending, awsConflictRule(attachment, group, nic))
+
+			continue
+		}
+
 		out.groups = append(out.groups, group)
 	}
+}
+
+// awsManagedGroups is the attribute by which a network interface or an instance sets the groups of its interface.
+var awsManagedGroups = map[string]string{awsNetworkInterface: awsAttrGroups, awsInstance: awsAttrVPCGroups}
+
+// awsDroppedBy is the interface of the endpoint that the attachment attaches the group to while the configuration
+// sets the groups of that interface and their planned value, known in full, does not list the group, or nil. The
+// interface and the attachment then both manage its groups and conflict: the apply that sets the interface's groups
+// removes the attached group, and the next apply of the attachment may add it again. A group attribute that the
+// configuration does not set is computed, so it never removes the attached group.
+func (e *Evaluator) awsDroppedBy(attachment, group *plan.Resource, interfaces []*plan.Resource) *plan.Resource {
+	groupID, hasID := attrString(group, "id")
+
+	for _, nic := range interfaces {
+		path := awsManagedGroups[nic.Type]
+		if !awsSetsKnownList(nic, path) {
+			continue
+		}
+
+		if hasID && slices.Contains(attrStrings(nic, path), groupID) {
+			continue
+		}
+
+		link := &awsLink{res: attachment, path: awsAttrNICID, targets: []*plan.Resource{nic}, ids: awsIDs(nic)}
+		if e.awsConcerns(link, &awsAttached{}) {
+			return nic
+		}
+	}
+
+	return nil
+}
+
+// awsConflictRule is the pending rule of an attachment whose group the planned groups of the interface do not list:
+// the group may or may not be on the interface after apply.
+func awsConflictRule(attachment, group, nic *plan.Resource) awsRule {
+	return awsRule{res: attachment, name: awsAttachmentRule, applies: triMaybe, gaps: []assurance.Gap{{
+		Kind: evaluate.GapUnresolvedReference,
+		Detail: fmt.Sprintf("%s attaches %s to %s, whose planned %s does not list it: the two resources conflict, "+
+			"and an apply may remove the group", attachment.Address, group.Address, nic.Address, awsManagedGroups[nic.Type]),
+	}}}
+}
+
+// awsSetsKnownList reports whether the configuration may set the list attribute (it sets it, or the plan has no
+// configuration for the resource) and the plan knows the whole list.
+func awsSetsKnownList(res *plan.Resource, path string) bool {
+	if leavesUnset(res, path) {
+		return false
+	}
+
+	_, isList := attr(res, path).([]any)
+
+	return isList && !unknownAt(res, path)
 }
 
 // awsIDs are the known IDs by which an attachment can name the resource: its `id`, and the
@@ -281,7 +357,7 @@ func (e *Evaluator) awsNamesTarget(link *awsLink, addresses []string, out *awsAt
 		return false
 	}
 
-	found, ok := e.resolveAll(addresses, check)
+	found, ok := e.resolveAll(link.res, addresses, check)
 	if slices.ContainsFunc(found, func(res *plan.Resource) bool { return slices.Contains(link.targets, res) }) {
 		return true
 	}
@@ -301,7 +377,7 @@ func (out *awsAttached) pend(link *awsLink, path string, gaps []assurance.Gap) {
 		Detail: fmt.Sprintf("%s.%s does not resolve, so it may attach a security group to %s",
 			link.res.Address, planPath(path), link.subject),
 	})
-	out.pending = append(out.pending, awsRule{res: link.res, name: "attachment", applies: triMaybe, gaps: gaps})
+	out.pending = append(out.pending, awsRule{res: link.res, name: awsAttachmentRule, applies: triMaybe, gaps: gaps})
 }
 
 // mayHaveGroup is maybe when an unresolved attachment may add a group to the endpoint, with the gaps of the

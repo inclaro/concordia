@@ -61,7 +61,8 @@
         "after": {
           "name": "app",
           "ip_cidr_range": "10.10.0.0/24",
-          "region": "europe-west1"
+          "region": "europe-west1",
+          "stack_type": "IPV4_ONLY"
         },
         "after_unknown": {
           "id": true,
@@ -84,7 +85,8 @@
         "after": {
           "name": "data",
           "ip_cidr_range": "10.20.0.0/24",
-          "region": "europe-west1"
+          "region": "europe-west1",
+          "stack_type": "IPV4_ONLY"
         },
         "after_unknown": {
           "id": true,
@@ -110,7 +112,9 @@
             "web"
           ],
           "network_interface": [
-            {}
+            {
+              "stack_type": "IPV4_ONLY"
+            }
           ],
           "service_account": [
             {
@@ -159,7 +163,8 @@
           ],
           "network_interface": [
             {
-              "network_ip": "10.20.0.5"
+              "network_ip": "10.20.0.5",
+              "stack_type": "IPV4_ONLY"
             }
           ],
           "service_account": [
@@ -208,7 +213,8 @@
             {
               "network": "other",
               "subnetwork": "other-sub",
-              "network_ip": "10.30.0.5"
+              "network_ip": "10.30.0.5",
+              "stack_type": "IPV4_ONLY"
             }
           ]
         },
@@ -238,7 +244,9 @@
             "batch"
           ],
           "network_interface": [
-            {}
+            {
+              "stack_type": "IPV4_ONLY"
+            }
           ]
         },
         "after_unknown": {

@@ -195,12 +195,12 @@ func gcpLoad(t *testing.T) *cloudfw.Input {
 		t.Fatalf("plan rejected: %v", diags)
 	}
 
-	return &cloudfw.Input{Resources: p.Resources, Coverage: p.Coverage, Digest: p.Digest}
+	return planInput(p, "cloudfw-gcp.json")
 }
 
 // gcpAddFirewallPolicy adds a network firewall policy, a construct that the evaluator does not read.
 func gcpAddFirewallPolicy(in *cloudfw.Input) {
-	in.Resources = append(in.Resources, plan.Resource{
+	in.Plans[0].Resources = append(in.Plans[0].Resources, plan.Resource{
 		Address: "google_compute_network_firewall_policy.main", Mode: "managed",
 		Type: "google_compute_network_firewall_policy", Name: "main", Actions: []string{"create"},
 		Values: map[string]any{"name": "main"},

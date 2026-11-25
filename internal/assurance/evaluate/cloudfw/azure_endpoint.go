@@ -26,6 +26,8 @@ type azureEndpoint struct {
 	// subnetNSG is yes when the NSG of the subnet applies to inbound traffic of the endpoint, no when it does not
 	// (a private endpoint whose subnet disables network policies), and maybe when the plan does not say.
 	subnetNSG tri
+	// ipv4Only is true when the plan proves that the endpoint has IPv4 addresses only.
+	ipv4Only bool
 }
 
 // azureEndpointKinds reads the NIC and subnet of each supported endpoint type.
@@ -52,6 +54,7 @@ func (e *Evaluator) azureEndpointOf(r *plan.Resource, report *side) (*azureEndpo
 	}
 
 	end.addrs = azureAddrs(end)
+	end.ipv4Only = azureProvenIPv4Only(end)
 	e.azureMembership(end)
 
 	return end, true
@@ -111,22 +114,25 @@ func (e *Evaluator) azureWithNIC(end *azureEndpoint, nic *plan.Resource, report 
 	return ok
 }
 
-// azureAddrs is the address set of the endpoint: its private IP, else the prefix of its subnet. A subnet with more
-// than one prefix gives an unknown set, because the endpoint can have an address in any of them.
+// azureAddrs is the address set of the endpoint: its private IP, else the prefixes of its subnet. The endpoint can
+// have an address in any prefix of its subnet.
 func azureAddrs(end *azureEndpoint) addrSet {
 	if end.ip != "" {
 		return hostSet(end.ip)
 	}
 
-	if end.subnet == nil {
+	if end.subnet == nil || unknownAt(end.subnet, "address_prefixes") {
 		return unknownAddrs
 	}
 
-	if prefixes := attrStrings(end.subnet, "address_prefixes"); len(prefixes) == 1 {
-		return prefixSet(prefixes[0])
+	prefixes := attrStrings(end.subnet, "address_prefixes")
+	sets := make([]addrSet, 0, len(prefixes))
+
+	for _, prefix := range prefixes {
+		sets = append(sets, prefixSet(prefix))
 	}
 
-	return unknownAddrs
+	return unionSet(sets...)
 }
 
 // azureMembership reads the application security groups of the NIC of the endpoint.

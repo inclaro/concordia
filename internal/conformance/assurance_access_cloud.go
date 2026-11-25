@@ -194,8 +194,9 @@ func (a *accessAsk) cloud(pairs [][2]string) []ExternalOutcome {
 	}
 
 	plans := a.environmentPlans()
-	if cause, blocked := planGate(plans, scope.environment); blocked {
-		return a.unknownAll(pairs, cause)
+	if !slices.ContainsFunc(plans, func(p *evidence.Plan) bool { return p.Plan != nil }) {
+		return a.unknownAll(pairs, unknownCause{ReasonRenderedEvidenceMissing,
+			fmt.Sprintf("environment %s has no usable plan (assurance.plans)", scope.environment)})
 	}
 
 	ask := *a
@@ -210,88 +211,6 @@ func (a *accessAsk) cloud(pairs [][2]string) []ExternalOutcome {
 	return outcomes
 }
 
-// planGate gives the cause of the `unknown` outcomes of an environment whose plans the evaluator cannot read as one
-// input: no usable plan, or an address of a provider resource that two plans hold. The evaluator indexes resources by
-// address, so it would read one of the two resources and drop the other; it does not report which resources an
-// answer read, so no pair of the environment can be shown not to depend on the dropped one. Resources of other
-// providers (`random_id`, say) are never read as firewall evidence: a reference to one gives a gap, so their shared
-// addresses do not count.
-func planGate(plans []*evidence.Plan, environment string) (unknownCause, bool) {
-	if !slices.ContainsFunc(plans, func(p *evidence.Plan) bool { return p.Plan != nil }) {
-		return unknownCause{ReasonRenderedEvidenceMissing, fmt.Sprintf("environment %s has no usable plan (assurance.plans)", environment)}, true
-	}
-
-	if address, count := sharedAddress(plans); count > 1 {
-		return unknownCause{ReasonCoverageIncomplete, fmt.Sprintf("%s: %s is in %d plans of environment %s",
-			evaluate.GapUnresolvedReference, address, count, environment)}, true
-	}
-
-	return unknownCause{}, false
-}
-
-// sharedAddress gives the first address, in sorted order, that more than one usable plan holds, and the number of
-// plans that hold it; a count below two means that every address is in one plan. Deposed objects do not count.
-func sharedAddress(plans []*evidence.Plan) (address string, count int) {
-	counts := addressCounts(plans)
-
-	var shared []string
-
-	for candidate, n := range counts {
-		if n > 1 {
-			shared = append(shared, candidate)
-		}
-	}
-
-	if len(shared) == 0 {
-		return "", 0
-	}
-
-	address = slices.MinFunc(shared, canonjson.CompareUTF16)
-
-	return address, counts[address]
-}
-
-// addressCounts gives the number of plans that hold each address.
-func addressCounts(plans []*evidence.Plan) map[string]int {
-	counts := map[string]int{}
-
-	for _, declared := range plans {
-		for _, address := range planAddresses(declared.Plan) {
-			counts[address]++
-		}
-	}
-
-	return counts
-}
-
-// cloudTypePrefixes are the type prefixes of the providers whose resources the evaluator reads.
-var cloudTypePrefixes = []string{"aws_", "azurerm_", "google_"}
-
-// planAddresses gives the addresses of the provider resources of a plan that are not deposed, without duplicates. A
-// plan that was not read has none.
-func planAddresses(p *plan.Plan) []string {
-	if p == nil {
-		return nil
-	}
-
-	out := make([]string, 0, len(p.Resources))
-
-	for i := range p.Resources {
-		if r := &p.Resources[i]; r.Deposed == "" && isCloudType(r.Type) {
-			out = append(out, r.Address)
-		}
-	}
-
-	slices.Sort(out)
-
-	return slices.Compact(out)
-}
-
-// isCloudType reports whether a resource type belongs to a provider that the evaluator reads.
-func isCloudType(typ string) bool {
-	return slices.ContainsFunc(cloudTypePrefixes, func(prefix string) bool { return strings.HasPrefix(typ, prefix) })
-}
-
 // cloudAsker holds the evaluator of one environment for the queries of one rule.
 type cloudAsker struct {
 	ask       *accessAsk
@@ -302,32 +221,42 @@ type cloudAsker struct {
 }
 
 func newCloudAsker(ask *accessAsk, plans []*evidence.Plan) *cloudAsker {
-	input := cloudInput(plans)
+	input := cloudInput(plans, ask.model.environment)
 
 	ports := ask.rulePorts()
 	if len(ports) == 0 {
-		ports = planPorts(input.Resources)
+		ports = planPorts(inputResources(input))
 	}
 
 	return &cloudAsker{ask: ask, evaluator: cloudfw.New(input), integrity: lowestIntegrity(plans), ports: ports}
 }
 
-// cloudInput builds the evaluator input from the plans of the environment: the resources of the usable plans, the
-// worst coverage of all of them (a plan that could not be read may hold rules), and the digest of the plan bytes.
-func cloudInput(plans []*evidence.Plan) *cloudfw.Input {
-	input := &cloudfw.Input{Digest: plansDigest(plans)}
+// cloudInput builds the evaluator input from the plans of the environment: the resources of each usable plan, kept
+// apart so that the evaluator resolves configuration references inside one plan and finds an address that several
+// plans hold; the worst coverage of all of them (a plan that could not be read may hold rules); and the digest of
+// the plan bytes.
+func cloudInput(plans []*evidence.Plan, environment string) *cloudfw.Input {
+	input := &cloudfw.Input{Environment: environment, Digest: plansDigest(plans)}
 
 	for _, declared := range plans {
 		input.Coverage = worse(input.Coverage, declared.Coverage)
 
 		if declared.Plan != nil {
-			input.Resources = append(input.Resources, declared.Plan.Resources...)
+			input.Plans = append(input.Plans, cloudfw.Plan{File: declared.Declared.File, Resources: declared.Plan.Resources})
 		}
 	}
 
-	slices.SortStableFunc(input.Resources, func(x, y plan.Resource) int { return canonjson.CompareUTF16(x.Address, y.Address) })
-
 	return input
+}
+
+// inputResources gives the resources of all plans of the input.
+func inputResources(input *cloudfw.Input) []plan.Resource {
+	var out []plan.Resource
+	for _, p := range input.Plans {
+		out = append(out, p.Resources...)
+	}
+
+	return out
 }
 
 // plansDigest is the digest of the one usable plan, or the digest of the sorted digests of more usable plans.

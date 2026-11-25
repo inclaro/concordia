@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/inclaro/concordia/internal/assurance/evaluate"
 	"github.com/inclaro/concordia/internal/assurance/plan"
@@ -72,15 +73,22 @@ func (e *Evaluator) blockConfigRefs(r *plan.Resource, el blockElement, into *sid
 		return nil, false
 	}
 
-	return e.resolveAll(addresses, into)
+	return e.resolveAll(r, addresses, into)
 }
 
 // blockReferences is the one reference set that every element of the list with references names for the attribute.
+// A list whose configuration has one merged reference list for all its blocks (as Terraform writes the inline rule
+// lists `ingress`, `egress`, and `security_rule`) never resolves: the merged list does not say which block names
+// which resource, and the blocks of a `dynamic` block, whose references the plan does not show, may name others.
 func blockReferences(r *plan.Resource, el blockElement, into *side) ([]string, bool) {
 	sets := referenceSets(r, el)
 	where := r.Address + "." + el.wildcard()
 
 	switch unknown := unknownElements(r, el); {
+	case len(sets) == 0 && len(r.References[planPath(el.list)]) > 0:
+		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s: the configuration has one reference list for all "+
+			"blocks of %s (%s), which does not say which block names which resource, and a dynamic block may name "+
+			"others", where, planPath(el.list), strings.Join(r.References[planPath(el.list)], ", ")))
 	case len(sets) == 0:
 		into.gap(evaluate.GapUnknownAfterApply, r.Address+"."+el.path())
 	case !allEqual(sets):

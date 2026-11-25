@@ -55,7 +55,15 @@ func awsFixtureBytes(t *testing.T) []byte {
 
 // awsEvaluator is the evaluator over the resources of one plan.
 func awsEvaluator(p *plan.Plan) *cloudfw.Evaluator {
-	return cloudfw.New(&cloudfw.Input{Resources: p.Resources, Coverage: p.Coverage, Digest: p.Digest})
+	return cloudfw.New(planInput(p, "cloudfw-aws.json"))
+}
+
+// planInput is the input of one plan file of the environment `production`.
+func planInput(p *plan.Plan, file string) *cloudfw.Input {
+	return &cloudfw.Input{
+		Environment: "production", Coverage: p.Coverage, Digest: p.Digest,
+		Plans: []cloudfw.Plan{{File: file, Resources: p.Resources}},
+	}
 }
 
 // awsQuery is the query of a scenario; the protocol is TCP unless the scenario names one.

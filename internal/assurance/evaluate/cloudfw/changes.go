@@ -24,6 +24,17 @@ func changesRule(res *plan.Resource) bool {
 	return slices.ContainsFunc(res.Actions, func(action string) bool { return action == "delete" || action == "update" })
 }
 
+// removesRule reports whether the plan deletes the rule resource, alone or as a part of a replacement. Its inline
+// copy then belongs to the owner that it had before the change.
+func removesRule(res *plan.Resource) bool { return slices.Contains(res.Actions, "delete") }
+
+// priorOwner is the known value of an owner attribute of the rule resource before the change (plan.Resource.Prior).
+func priorOwner(res *plan.Resource, key string) (string, bool) {
+	value, ok := res.Prior[key]
+
+	return value, ok
+}
+
 // changedOfType are the rule resources of the types that the plan deletes or updates.
 func (e *Evaluator) changedOfType(types ...string) []*plan.Resource {
 	var out []*plan.Resource

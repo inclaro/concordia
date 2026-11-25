@@ -6,6 +6,7 @@ import (
 	"github.com/inclaro/concordia/internal/assurance"
 	"github.com/inclaro/concordia/internal/assurance/evaluate/netpol"
 	"github.com/inclaro/concordia/internal/assurance/plan"
+	"github.com/inclaro/concordia/internal/canonjson"
 )
 
 // Protocols of a query.
@@ -61,30 +62,45 @@ type Result struct {
 	Gaps []assurance.Gap `json:"gaps"`
 }
 
-// Input is the evidence of one environment: the resources of all its plans.
+// Input is the evidence of one environment: the resources of each of its plans.
 type Input struct {
+	// Environment names the environment in gaps.
+	Environment string
 	// Coverage is the worst coverage of the plans.
 	Coverage assurance.Coverage
 	// Digest is the digest of the evaluated plan bytes.
 	Digest string
-	// Resources are every resource of the plans of the environment, sorted by address.
+	// Plans are the usable plans of the environment.
+	Plans []Plan
+}
+
+// Plan is the resources of one plan file. A configuration reference resolves only inside the plan of the resource
+// that holds it; a known ID or name resolves across all plans of the input.
+type Plan struct {
+	// File is the workspace-relative path of the plan file.
+	File string
+	// Resources are the resources of the plan, sorted by address.
 	Resources []plan.Resource
 }
 
-// nameKey finds an Azure resource by its type, `name`, and `resource_group_name`.
-type nameKey struct {
-	typ, name, group string
+// configKey finds the instances of a configuration address (the address without instance keys) in one plan.
+type configKey struct {
+	address string
+	plan    int
 }
 
 // Evaluator answers queries over one Input. It is safe for concurrent use after New.
 type Evaluator struct {
-	in        *Input
-	byAddress map[string]*plan.Resource
-	byID      map[string]*plan.Resource
-	byName    map[nameKey]*plan.Resource
-	// byConfig lists the instances of each configuration address (the address without instance keys).
-	byConfig map[string][]*plan.Resource
-	// live are the resources that exist after apply, in input order (sorted by address).
+	in *Input
+	// byAddress, byID, and byName list the resources of all plans with the address, known `id`, or known name: more
+	// than one when several plans hold one.
+	byAddress map[string][]*plan.Resource
+	byID      map[string][]*plan.Resource
+	byName    map[nameKey][]*plan.Resource
+	byConfig  map[configKey][]*plan.Resource
+	// planOf is the index in Input.Plans of the plan of each resource.
+	planOf map[*plan.Resource]int
+	// live are the resources that exist after apply, sorted by address.
 	live []*plan.Resource
 	// changed are the rule resources that the plan deletes or updates, including those that do not exist after apply.
 	changed []*plan.Resource
@@ -95,63 +111,81 @@ type Evaluator struct {
 func New(in *Input) *Evaluator {
 	evaluator := &Evaluator{
 		in:        in,
-		byAddress: map[string]*plan.Resource{},
-		byID:      map[string]*plan.Resource{},
-		byName:    map[nameKey]*plan.Resource{},
-		byConfig:  map[string][]*plan.Resource{},
+		byAddress: map[string][]*plan.Resource{},
+		byID:      map[string][]*plan.Resource{},
+		byName:    map[nameKey][]*plan.Resource{},
+		byConfig:  map[configKey][]*plan.Resource{},
+		planOf:    map[*plan.Resource]int{},
 	}
 
-	for i := range in.Resources {
-		res := &in.Resources[i]
+	for p := range in.Plans {
+		evaluator.indexPlan(p)
+	}
+
+	byAddress := func(a, b *plan.Resource) int { return canonjson.CompareUTF16(a.Address, b.Address) }
+	slices.SortStableFunc(evaluator.live, byAddress)
+	slices.SortStableFunc(evaluator.changed, byAddress)
+
+	return evaluator
+}
+
+// indexPlan indexes the resources of the plan at index p of the input.
+func (e *Evaluator) indexPlan(p int) {
+	resources := e.in.Plans[p].Resources
+
+	for i := range resources {
+		res := &resources[i]
+		e.planOf[res] = p
+
 		if exists(res) {
-			evaluator.index(res)
+			e.index(res, p)
 		}
 
 		if changesRule(res) {
-			evaluator.changed = append(evaluator.changed, res)
+			e.changed = append(e.changed, res)
 		}
 	}
-
-	return evaluator
 }
 
 // exists reports whether the resource exists after apply: it is not a deposed object and it is not destroyed.
 func exists(r *plan.Resource) bool { return r.Deposed == "" && r.Values != nil }
 
-func (e *Evaluator) index(res *plan.Resource) {
+func (e *Evaluator) index(res *plan.Resource, p int) {
 	e.live = append(e.live, res)
-	e.byAddress[res.Address] = res
-	config := plan.ConfigAddress(res.Address)
+	e.byAddress[res.Address] = append(e.byAddress[res.Address], res)
+	config := configKey{plan: p, address: plan.ConfigAddress(res.Address)}
 	e.byConfig[config] = append(e.byConfig[config], res)
 
 	if id, ok := attrString(res, "id"); ok && id != "" {
-		e.byID[id] = res
+		e.byID[id] = append(e.byID[id], res)
 	}
 
-	name, hasName := attrString(res, "name")
-	group, hasGroup := attrString(res, "resource_group_name")
-
-	if hasName && hasGroup {
-		e.byName[nameKey{typ: res.Type, name: name, group: group}] = res
-	}
+	e.indexName(res)
 }
 
 // InputDigest is the digest of the evaluated input.
 func (e *Evaluator) InputDigest() string { return e.in.Digest }
 
-// resource is the resource at the plan address, or nil.
-func (e *Evaluator) resource(address string) *plan.Resource { return e.byAddress[address] }
+// resource is the one resource at the plan address, or nil when no plan or more than one plan holds it.
+func (e *Evaluator) resource(address string) *plan.Resource { return only(e.byAddress[address]) }
 
-// resourceByID is the resource whose known `id` is id, or nil.
-func (e *Evaluator) resourceByID(id string) *plan.Resource { return e.byID[id] }
+// resourceByID is the one resource whose known `id` is id, or nil when none or more than one has it.
+func (e *Evaluator) resourceByID(id string) *plan.Resource { return only(e.byID[id]) }
 
-// named is the resource of the type with the known `name` and `resource_group_name`, or nil.
-func (e *Evaluator) named(typ, name, group string) *plan.Resource {
-	return e.byName[nameKey{typ: typ, name: name, group: group}]
+// instances are the resources of a configuration address (without instance keys) in the plan of the resource from,
+// sorted by address.
+func (e *Evaluator) instances(from *plan.Resource, config string) []*plan.Resource {
+	return e.byConfig[configKey{plan: e.planOf[from], address: config}]
 }
 
-// instances are the resources of a configuration address (without instance keys), sorted by address.
-func (e *Evaluator) instances(config string) []*plan.Resource { return e.byConfig[config] }
+// only is the single resource of the list, or nil.
+func only(found []*plan.Resource) *plan.Resource {
+	if len(found) != 1 {
+		return nil
+	}
+
+	return found[0]
+}
 
 // ofType lists the resources of the given types, sorted by address.
 func (e *Evaluator) ofType(types ...string) []*plan.Resource {

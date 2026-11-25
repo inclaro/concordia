@@ -222,14 +222,15 @@ func azureLoad(t *testing.T) *cloudfw.Input {
 		t.Fatalf("plan not read: %v", diags)
 	}
 
-	return &cloudfw.Input{Resources: p.Resources, Coverage: p.Coverage, Digest: p.Digest}
+	return planInput(p, "cloudfw-azure.json")
 }
 
 // azureResource is the resource at the address of the input.
 func azureResource(in *cloudfw.Input, address string) *plan.Resource {
-	i := slices.IndexFunc(in.Resources, func(r plan.Resource) bool { return r.Address == address })
+	resources := in.Plans[0].Resources
+	i := slices.IndexFunc(resources, func(r plan.Resource) bool { return r.Address == address })
 
-	return &in.Resources[i]
+	return &resources[i]
 }
 
 // azureWithoutReferences drops the configuration references of a resource.

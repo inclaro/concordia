@@ -5,8 +5,9 @@
 // Two kinds of attribute never become values. An attribute that is unknown until apply is a gap, never a guess. An
 // attribute that the plan marks sensitive is replaced by a redaction marker and recorded as a redaction; the plan's
 // other copies of the value (`variables`, `planned_values`, `prior_state`) are never read, because they carry no
-// marker per attribute. Of the `configuration` section only the `references` lists are read, which hold addresses and
-// not values; `constant_value` is never read.
+// marker per attribute. Of the values before a change (`change.before`), only the owner attributes of a firewall rule
+// resource that the plan deletes or replaces are read (see Resource.Prior). Of the `configuration` section only the
+// `references` lists are read, which hold addresses and not values; `constant_value` is never read.
 package plan
 
 import (
@@ -79,8 +80,18 @@ type Resource struct {
 	// of Unknown (for example `ingress[0].security_groups`). Each address is absolute in the module tree and has no
 	// instance key; the lists are sorted and hold no duplicates. References is nil when the configuration names none.
 	References map[string][]string `json:"references,omitempty"`
+	// Prior holds, for a firewall rule resource that the plan deletes or replaces, the attributes that named its
+	// security group or network security group before the change: `security_group_id`, `network_security_group_name`,
+	// and `resource_group_name`, when they were known strings that need no redaction. Prior is nil for every other
+	// resource, and it never holds another attribute.
+	Prior map[string]string `json:"prior,omitempty"`
 	// Unknown are the paths of the attributes that are unknown until apply, sorted, for example `input.owner`.
 	Unknown []string `json:"unknown,omitempty"`
+	// Configured are the paths of the attribute and block keys that the configuration of the resource sets, sorted,
+	// in the form of References (for example `vpc_id` or `network_interface[0].device_index`). Only key names are
+	// read, never a value. A `dynamic` block does not appear in the configuration of a plan, so a block key that is
+	// absent may still be set by one. Configured is nil when the plan's configuration does not cover the resource.
+	Configured []string `json:"configured,omitempty"`
 }
 
 // document is the part of the plan JSON that the reader uses. Fields that it does not use are not decoded.
@@ -114,8 +125,12 @@ type change struct {
 	After        any `json:"after"`
 	AfterUnknown any `json:"after_unknown"`
 	// AfterSensitive mirrors After: true marks a value (or a whole subtree) as sensitive.
-	AfterSensitive any      `json:"after_sensitive"`
-	Actions        []string `json:"actions"`
+	AfterSensitive any `json:"after_sensitive"`
+	// Before and BeforeSensitive are the values before the change and their sensitivity mirror. They are decoded
+	// only for the owner attributes of a deleted or replaced firewall rule (see priorOwner).
+	Before          json.RawMessage `json:"before"`
+	BeforeSensitive json.RawMessage `json:"before_sensitive"`
+	Actions         []string        `json:"actions"`
 }
 
 // reader reads one plan file. file is the workspace-relative path, used in diagnostics and records.
@@ -150,7 +165,7 @@ func (r *reader) read() (*Plan, []diag.Diagnostic) {
 		return r.reject(why)
 	}
 
-	out.addReferences(doc.Configuration)
+	out.addConfiguration(doc.Configuration)
 
 	out.sortEntries()
 
@@ -266,13 +281,16 @@ func (r *reader) readResource(item *resourceChange) (Resource, []assurance.Gap, 
 		res.Actions = []string{}
 	}
 
+	prior, redactions := r.priorOwner(item)
+	res.Prior = prior
+
 	// An object that is destroyed has no `after`: it has no planned values and so no gaps.
 	after, exists := item.Change.After.(map[string]any)
 	if !exists {
-		return res, nil, nil
+		return res, nil, redactions
 	}
 
-	walk := walker{address: item.Address, file: r.file}
+	walk := walker{address: item.Address, file: r.file, redactions: redactions}
 	res.Values = walk.object(after, &node{unknown: item.Change.AfterUnknown, sensitive: item.Change.AfterSensitive})
 
 	slices.SortFunc(walk.unknown, canonjson.CompareUTF16)

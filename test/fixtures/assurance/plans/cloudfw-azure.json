@@ -67,7 +67,9 @@
         "after": {
           "name": "nic-app",
           "resource_group_name": "rg-pay",
-          "ip_configuration": [{ "name": "internal", "private_ip_address_allocation": "Dynamic" }]
+          "ip_configuration": [
+            { "name": "internal", "private_ip_address_allocation": "Dynamic", "private_ip_address_version": "IPv4" }
+          ]
         },
         "after_unknown": { "id": true, "ip_configuration": [{ "subnet_id": true, "private_ip_address": true }] },
         "after_sensitive": { "ip_configuration": [{}] }
@@ -85,7 +87,10 @@
           "name": "nic-db",
           "resource_group_name": "rg-pay",
           "ip_configuration": [
-            { "name": "internal", "private_ip_address_allocation": "Static", "private_ip_address": "10.1.2.10" }
+            {
+              "name": "internal", "private_ip_address_allocation": "Static", "private_ip_address": "10.1.2.10",
+              "private_ip_address_version": "IPv4"
+            }
           ]
         },
         "after_unknown": { "id": true, "ip_configuration": [{ "subnet_id": true }] },

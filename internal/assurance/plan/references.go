@@ -106,9 +106,10 @@ func (a keyedAddress) keyEnd(start int) int {
 	return len(a)
 }
 
-// addReferences reads the `references` lists of the configuration and attaches them to the resources whose address,
-// without instance keys, is the configuration address. A missing or malformed configuration attaches nothing.
-func (p *Plan) addReferences(raw json.RawMessage) {
+// addConfiguration reads the configuration of each resource: the `references` lists, and the attribute and block
+// keys that the configuration sets (Resource.Configured). It attaches them to the resources whose address, without
+// instance keys, is the configuration address. A missing or malformed configuration attaches nothing.
+func (p *Plan) addConfiguration(raw json.RawMessage) {
 	if len(raw) == 0 {
 		return
 	}
@@ -118,18 +119,19 @@ func (p *Plan) addReferences(raw json.RawMessage) {
 		return
 	}
 
-	byAddress := map[string]map[string][]string{}
+	byAddress := map[string]*resourceRefs{}
 	collectModule(&config.RootModule, "", byAddress)
 
 	for i := range p.Resources {
 		if refs, ok := byAddress[ConfigAddress(p.Resources[i].Address)]; ok {
-			p.Resources[i].References = refs
+			p.Resources[i].References = refs.references()
+			p.Resources[i].Configured = slices.Clone(refs.configured)
 		}
 	}
 }
 
-// collectModule adds the references of the resources of a module and of its module calls, by absolute address.
-func collectModule(module *configModule, prefix modulePath, out map[string]map[string][]string) {
+// collectModule adds the configuration of the resources of a module and of its module calls, by absolute address.
+func collectModule(module *configModule, prefix modulePath, out map[string]*resourceRefs) {
 	collectResources(module.Resources, prefix, out)
 
 	for name, call := range module.ModuleCalls {
@@ -139,29 +141,40 @@ func collectModule(module *configModule, prefix modulePath, out map[string]map[s
 	}
 }
 
-// collectResources adds the references of the resources of one module, by absolute address.
-func collectResources(resources []configResource, prefix modulePath, out map[string]map[string][]string) {
+// collectResources adds the configuration of the resources of one module, by absolute address.
+func collectResources(resources []configResource, prefix modulePath, out map[string]*resourceRefs) {
 	for i := range resources {
-		refs := resourceRefs{prefix: prefix, byPath: map[string][]string{}}
+		refs := &resourceRefs{prefix: prefix, byPath: map[string][]string{}, configured: []string{}}
 		refs.block(resources[i].Expressions, "")
+		slices.SortFunc(refs.configured, canonjson.CompareUTF16)
 
-		if len(refs.byPath) > 0 {
-			out[string(prefix)+resources[i].Address] = sortedRefs(refs.byPath)
-		}
+		out[string(prefix)+resources[i].Address] = refs
 	}
 }
 
-// resourceRefs collects the references of one resource. prefix is the module prefix of the resource; byPath holds
-// the absolute addresses by attribute path.
+// resourceRefs collects the configuration of one resource. prefix is the module prefix of the resource; byPath holds
+// the absolute addresses by attribute path; configured holds the paths of the keys that the configuration sets.
 type resourceRefs struct {
-	byPath map[string][]string
-	prefix modulePath
+	byPath     map[string][]string
+	prefix     modulePath
+	configured []string
 }
 
-// block adds the references of each expression of a block, by attribute path.
+// references are the sorted reference lists, or nil when the configuration names no resource.
+func (r *resourceRefs) references() map[string][]string {
+	if len(r.byPath) == 0 {
+		return nil
+	}
+
+	return sortedRefs(r.byPath)
+}
+
+// block adds the keys and the references of each expression of a block, by attribute path.
 func (r *resourceRefs) block(exprs map[string]json.RawMessage, path attrPath) {
 	for key, raw := range exprs {
-		r.expression(raw, attrPath(join(string(path), key)))
+		keyPath := attrPath(join(string(path), key))
+		r.configured = append(r.configured, string(keyPath))
+		r.expression(raw, keyPath)
 	}
 }
 

@@ -114,3 +114,30 @@ func TestCloudFirewallSharedAddressOfAnotherProviderDoesNotBlock(t *testing.T) {
 		t.Errorf("outcome = %s %q %q, want the violation of the first plan", got.Verdict, got.Reason, got.Detail)
 	}
 }
+
+// Review 4, step 5a: an address of a provider resource that two plans hold makes only the pairs that bind it
+// `unknown`. Here the second plan holds another `aws_security_group.gateway`; the pair binds the load balancer and
+// the database of the first plan, whose configuration references resolve inside that plan, so the violation stands.
+func TestCloudFirewallSharedGroupAddressDoesNotBlockOtherPairs(t *testing.T) {
+	t.Parallel()
+
+	second := evidence.Plan{
+		Plan: &plan.Plan{
+			Digest: "sha256:" + strings.Repeat("c", 64), Coverage: assurance.CoverageComplete,
+			Resources: []plan.Resource{planned("aws_security_group.gateway", map[string]any{
+				"id": "sg-gateway-other-state", "ingress": []any{}, "egress": []any{},
+			})},
+		},
+		Coverage: assurance.CoverageComplete,
+		Declared: workspace.AssurancePlan{Environment: cloudEnvironment, Tool: "terraform", File: "infra/plans/edge.json"},
+	}
+
+	first := cloudPlan(t)
+	run := cloudRun(&first, cloudEvaluator(workspace.AssumeFirewallRulesInPlan))
+	run.ev.Plans = append(run.ev.Plans, second)
+
+	got := onlyOutcome(t, run, cloudRule("ledger-db"))
+	if got.Verdict != VerdictViolation || !strings.Contains(got.Detail, "aws_vpc_security_group_ingress_rule.ledger_from_gateway") {
+		t.Errorf("outcome = %s %q %q, want the violation of the first plan", got.Verdict, got.Reason, got.Detail)
+	}
+}

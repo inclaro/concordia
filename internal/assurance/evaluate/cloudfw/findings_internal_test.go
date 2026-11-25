@@ -125,6 +125,54 @@ func TestChangedRuleResourceMirroredInline(t *testing.T) {
 	})
 }
 
+// TestDeletedRuleTaintsOnlyItsOwner is review 4, step 5b: a rule resource that the plan deletes or replaces makes the
+// inline list of the group that owned it before the change stale, and no other group. Without a known owner before
+// the change, every group may hold it.
+func TestDeletedRuleTaintsOnlyItsOwner(t *testing.T) {
+	t.Parallel()
+
+	removed := func(actions []string, values map[string]any, prior map[string]string) []plan.Resource {
+		rule := resourceOf("aws_security_group_rule.old", "aws_security_group_rule", values)
+		rule.Actions, rule.Prior = actions, prior
+
+		return []plan.Resource{
+			group(reviewApp, idApp, []any{}, []any{allTraffic()}),
+			group(reviewDB, idDB, []any{postgresFrom(map[string]any{"security_groups": []any{idApp}})}, []any{}),
+			group(reviewExtra, idExtra, []any{}, []any{}),
+			rule,
+		}
+	}
+	stale := []string{evaluate.GapUnknownAfterApply + ": " + reviewDB + ".ingress may repeat a rule that the plan changes"}
+	elsewhere := map[string]any{"type": "ingress", "security_group_id": idExtra, "protocol": "tcp"}
+	deleted := []string{"delete"}
+	replaced := []string{"delete", "create"}
+
+	runReviewCases(t, []reviewCase{
+		{
+			name: "deleted from another group", resources: removed(deleted, nil, map[string]string{"security_group_id": idExtra}),
+			from: reviewApp, to: reviewDB, want: VerdictAllowed,
+		},
+		{
+			name: "deleted from the group", resources: removed(deleted, nil, map[string]string{"security_group_id": idDB}),
+			from: reviewApp, to: reviewDB, want: VerdictUnknown, gaps: stale,
+		},
+		{
+			name: "deleted without a known owner", resources: removed(deleted, nil, nil),
+			from: reviewApp, to: reviewDB, want: VerdictUnknown, gaps: stale,
+		},
+		{
+			name:      "replaced, moving from the group to another",
+			resources: removed(replaced, elsewhere, map[string]string{"security_group_id": idDB}),
+			from:      reviewApp, to: reviewDB, want: VerdictUnknown, gaps: stale,
+		},
+		{
+			name:      "replaced within another group",
+			resources: removed(replaced, elsewhere, map[string]string{"security_group_id": idExtra}),
+			from:      reviewApp, to: reviewDB, want: VerdictAllowed,
+		},
+	})
+}
+
 // TestInstanceNetworkInterfaceBlocks is finding D: the `network_interface` blocks of an instance attach interfaces
 // whose groups count.
 func TestInstanceNetworkInterfaceBlocks(t *testing.T) {
@@ -156,6 +204,97 @@ func TestInstanceNetworkInterfaceBlocks(t *testing.T) {
 				"does not resolve, so it may attach a security group to " + reviewWeb},
 		},
 	})
+}
+
+// TestInstancePrimaryInterfaceBlock is review 4 (limits to record): an instance takes the groups and addresses of
+// its `network_interface` blocks only when exactly one block is known to be its primary interface (device index 0).
+// Otherwise its primary interface has groups that the blocks do not give.
+func TestInstancePrimaryInterfaceBlock(t *testing.T) {
+	t.Parallel()
+
+	resources := func(index any) []plan.Resource {
+		block := map[string]any{"network_interface_id": "eni-extra"}
+
+		web := resourceOf(reviewWeb, "aws_instance", map[string]any{"vpc_security_group_ids": []any{}})
+		web.Configured = []string{"network_interface", "network_interface[0].device_index",
+			"network_interface[0].network_interface_id"}
+
+		if index == nil {
+			web.Unknown = []string{"network_interface[0].device_index"}
+		} else {
+			block["device_index"] = index
+		}
+
+		web.Values["network_interface"] = []any{block}
+
+		return []plan.Resource{
+			web, group(reviewExtra, idExtra, []any{}, []any{allTraffic()}), openDB(),
+			resourceOf(reviewNIC, awsNetworkInterface, map[string]any{"id": "eni-extra", "security_groups": []any{idExtra}}),
+		}
+	}
+	noPrimary := []string{evaluate.GapUnresolvedReference + ": " + reviewWeb + " has no network_interface block whose " +
+		"device_index is known to be 0, so its primary interface is not known"}
+
+	runReviewCases(t, []reviewCase{
+		{name: "primary block", resources: resources(json.Number("0")), from: reviewWeb, to: reviewDB, want: VerdictAllowed},
+		{
+			name: "secondary block only", resources: resources(json.Number("1")), from: reviewWeb, to: reviewDB,
+			want: VerdictUnknown, gaps: noPrimary,
+		},
+		{
+			name: "device index unknown until apply", resources: resources(nil), from: reviewWeb, to: reviewDB,
+			want: VerdictUnknown, gaps: noPrimary,
+		},
+	})
+}
+
+// TestAttachedInterfaceWithoutGroup is review 5: a network interface attached to an instance that names no group
+// of its own gets the default group of the VPC, which is not in the plan, so a side that no rule allows is unknown.
+func TestAttachedInterfaceWithoutGroup(t *testing.T) {
+	t.Parallel()
+
+	resources := func(nicGroups []any) []plan.Resource {
+		return []plan.Resource{
+			resourceOf(reviewWeb, "aws_instance", map[string]any{"id": "i-web", "vpc_security_group_ids": []any{idApp}}),
+			group(reviewApp, idApp, []any{}, []any{}),
+			group(reviewDB, idDB, []any{}, []any{allTraffic()}),
+			group(reviewExtra, idExtra, []any{}, []any{}),
+			resourceOf(reviewNIC, awsNetworkInterface, map[string]any{
+				"id": "eni-extra", "security_groups": nicGroups, "attachment": []any{map[string]any{"instance": "i-web"}},
+			}),
+		}
+	}
+
+	runReviewCases(t, []reviewCase{
+		{
+			name: "attached interface with no group", resources: resources([]any{}), from: reviewDB, to: reviewWeb,
+			want: VerdictUnknown, gaps: []string{evaluate.GapUnresolvedReference + ": " + reviewNIC +
+				" names no security group; the default group of the VPC is not in the plan"},
+		},
+		{
+			name: "attached interface with a closed group", resources: resources([]any{idExtra}), from: reviewDB,
+			to: reviewWeb, want: VerdictDenied,
+		},
+	})
+}
+
+// TestEndpointInSeveralPrefixes is review 5: the address set of an endpoint in several subnets holds every subnet,
+// so a rule prefix that contains all of them matches, one that overlaps some is unknown, and one that overlaps none
+// does not match.
+func TestEndpointInSeveralPrefixes(t *testing.T) {
+	t.Parallel()
+
+	two := unionSet(prefixSet("10.0.1.0/24"), prefixSet("10.0.2.0/24"))
+
+	for rule, want := range map[string]tri{"10.0.0.0/16": triYes, "10.0.1.0/24": triMaybe, "10.9.0.0/16": triNo} {
+		if got := matchPrefix(rule, two, &side{}); got != want {
+			t.Errorf("matchPrefix(%s) = %v, want %v", rule, got, want)
+		}
+	}
+
+	if got := unionSet(two, unknownAddrs); got.known() {
+		t.Errorf("union with an unknown set = %v, want unknown", got)
+	}
 }
 
 // TestAttachmentBlockWithUnknownInstance is finding E: a network interface whose `attachment` names an instance

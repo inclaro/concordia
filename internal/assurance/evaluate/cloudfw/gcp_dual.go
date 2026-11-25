@@ -11,46 +11,75 @@ const gcpStackPath = "network_interface.0.stack_type"
 // gcpIPv4Only is the stack type of an interface or a subnetwork that has no IPv6 addresses.
 const gcpIPv4Only = "IPV4_ONLY"
 
-// gcpDualStack reports whether the plan shows that the instance may have IPv6 addresses: its interface or its
-// subnetwork states a stack type other than IPV4_ONLY.
-func (e *Evaluator) gcpDualStack(res *plan.Resource) bool {
-	if gcpStacked(res, gcpStackPath) {
+// gcpProvenIPv4Only reports whether the plan proves that the instance has IPv4 addresses only: the stack type of its
+// interface is IPV4_ONLY, or the interface states none and the stack type of its subnetwork in the plan is
+// IPV4_ONLY. A stack type is IPV4_ONLY when it is known as such, or when it is unknown until apply only because the
+// configuration does not set it: the provider then uses IPV4_ONLY. Any other unknown stack type proves nothing.
+func (e *Evaluator) gcpProvenIPv4Only(res *plan.Resource) bool {
+	if gcpDefaultInterfaceStack(res) {
 		return true
+	}
+
+	if stack, ok := attrString(res, gcpStackPath); ok {
+		return stack == gcpIPv4Only
+	}
+
+	if unknownAt(res, gcpStackPath) {
+		return false
 	}
 
 	sub := e.gcpSubnet(res)
 
-	return sub != nil && gcpStacked(sub, "stack_type")
+	return sub != nil && gcpSubnetIPv4Only(sub)
 }
 
-// gcpStacked reports whether the stack type at the path is known and is not IPV4_ONLY.
-func gcpStacked(res *plan.Resource, path string) bool {
-	stack, ok := attrString(res, path)
-
-	return ok && stack != "" && stack != gcpIPv4Only
+// gcpDefaultInterfaceStack reports whether the stack type of the first interface is the provider default: unknown
+// and not set by the configuration, whose interface blocks are all static, and the interface has no IPv6 setting.
+func gcpDefaultInterfaceStack(res *plan.Resource) bool {
+	return staticBlocks(res, gcpInterfaceList) && unsetComputed(res, gcpStackPath) && gcpInterfaceWithoutIPv6(res)
 }
+
+// gcpSubnetIPv4Only reports whether the stack type of the subnetwork is IPV4_ONLY, known, or by default when the
+// subnetwork has no IPv6 setting.
+func gcpSubnetIPv4Only(sub *plan.Resource) bool {
+	if unsetComputed(sub, gcpStackAttr) {
+		return gcpWithoutIPv6(sub, gcpSubnetIPv6)
+	}
+
+	stack, ok := attrString(sub, gcpStackAttr)
+
+	return ok && stack == gcpIPv4Only
+}
+
+// Attributes of the stack type.
+const (
+	gcpInterfaceList = "network_interface"
+	gcpStackAttr     = "stack_type"
+)
 
 // gcpDecision is the result of a rule that matches: its action, or maybe when a deny of a firewall rule decided
-// through address ranges and an endpoint may be dual-stack, because the deny then holds for IPv4 only.
+// through address ranges and the plan does not prove that an endpoint is IPv4-only, because the deny then holds for
+// IPv4 only and IPv6 traffic falls through to a later rule.
 func (e *Evaluator) gcpDecision(rule *gcpRule, check *gcpCheck, point *side) tri {
-	if !e.gcpDualStackDeny(rule, check) {
+	if !e.gcpUnprovenDeny(rule, check) {
 		return rule.verdict()
 	}
 
 	point.gap(evaluate.GapAddressDependent, rule.res.Address+" "+rule.name+
-		": an IPv4 deny decided, and the endpoints may be dual-stack")
+		": an IPv4 deny decided, and the stack type of neither endpoint is known to be "+gcpIPv4Only)
 
 	return triMaybe
 }
 
-// gcpDualStackDeny reports whether the rule is a deny of a firewall rule that matched through address ranges while an
-// endpoint may be dual-stack.
-func (e *Evaluator) gcpDualStackDeny(rule *gcpRule, check *gcpCheck) bool {
+// gcpUnprovenDeny reports whether the rule is a deny of a firewall rule that matched through address ranges while
+// neither endpoint is proven IPv4-only. IPv6 traffic between the two needs an IPv6 address at both ends, so one
+// IPv4-only end is enough for the deny to decide.
+func (e *Evaluator) gcpUnprovenDeny(rule *gcpRule, check *gcpCheck) bool {
 	if !rule.deny || rule.res == nil {
 		return false
 	}
 
-	if !check.target.dualStack && !check.peer.dualStack {
+	if check.target.ipv4Only || check.peer.ipv4Only {
 		return false
 	}
 
@@ -66,9 +95,21 @@ func (e *Evaluator) gcpByRange(firewall *plan.Resource, check *gcpCheck) bool {
 	}
 
 	ranges := e.gcpSetAt(firewall, "source_ranges", "")
-	own := e.gcpSetAt(firewall, "destination_ranges", "")
 	identities := e.gcpSetAt(firewall, "source_tags", "")
 	accounts := e.gcpSetAt(firewall, "source_service_accounts", "email")
 
-	return !ranges.empty() || !own.empty() || gcpAllEmpty(&identities, &accounts)
+	return !ranges.empty() || e.gcpOwnRangesSet(firewall) || gcpAllEmpty(&identities, &accounts)
+}
+
+// gcpOwnRangesSet reports whether an ingress rule may limit its destination ranges: they are not empty, and not
+// the provider default of a configuration that does not set them.
+func (e *Evaluator) gcpOwnRangesSet(firewall *plan.Resource) bool {
+	const path = "destination_ranges"
+	if unsetComputed(firewall, path) {
+		return false
+	}
+
+	own := e.gcpSetAt(firewall, path, "")
+
+	return !own.empty()
 }

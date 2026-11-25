@@ -73,7 +73,7 @@ func (e *Evaluator) knownRefs(a attrRef, s *side) (found []*plan.Resource, ok bo
 			continue
 		}
 
-		missingID(a, id, s)
+		missingID(a, id, len(e.byID[id]), s)
 
 		ok = false
 	}
@@ -81,18 +81,26 @@ func (e *Evaluator) knownRefs(a attrRef, s *side) (found []*plan.Resource, ok bo
 	return found, ok
 }
 
-// missingID records the gap of a known ID that no resource of the plan has: a data source when the configuration
-// names one, else an unresolved reference.
-func missingID(a attrRef, id string, s *side) {
-	configured := a.configured()
-	if data := slices.IndexFunc(configured, isDataSource); data >= 0 {
-		s.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(dataSourceFormat, configured[data]))
+// missingID records the gap of a known ID that not exactly one resource of the plans has: the plans of the
+// environment hold more than one resource with the ID, the configuration names a data source, or the ID is not in
+// the plans.
+func missingID(ref attrRef, known string, holders int, into *side) {
+	if holders > 1 {
+		into.gap(evaluate.GapUnresolvedReference,
+			fmt.Sprintf("%s.%s: %s is the id of %d resources of the plans", ref.res.Address, ref.path, known, holders))
 
 		return
 	}
 
-	s.gap(evaluate.GapUnresolvedReference,
-		fmt.Sprintf("%s.%s: %s is not the id of a resource in the plan", a.res.Address, a.path, id))
+	configured := ref.configured()
+	if data := slices.IndexFunc(configured, isDataSource); data >= 0 {
+		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(dataSourceFormat, configured[data]))
+
+		return
+	}
+
+	into.gap(evaluate.GapUnresolvedReference,
+		fmt.Sprintf("%s.%s: %s is not the id of a resource in the plan", ref.res.Address, ref.path, known))
 }
 
 // configRefs resolves an unknown attribute through the configuration references of the resource.
@@ -104,15 +112,16 @@ func (e *Evaluator) configRefs(r *plan.Resource, path string, into *side) (found
 		return nil, false
 	}
 
-	return e.resolveAll(addresses, into)
+	return e.resolveAll(r, addresses, into)
 }
 
-// resolveAll resolves each configuration address to its single instance. ok is false when one does not resolve.
-func (e *Evaluator) resolveAll(addresses []string, into *side) (found []*plan.Resource, ok bool) {
+// resolveAll resolves each configuration address that the resource from names to its single instance in the plan
+// of from. ok is false when one does not resolve.
+func (e *Evaluator) resolveAll(from *plan.Resource, addresses []string, into *side) (found []*plan.Resource, ok bool) {
 	ok = true
 
 	for _, config := range addresses {
-		target, resolved := e.resolveConfig(config, into)
+		target, resolved := e.resolveConfig(from, config, into)
 		if !resolved {
 			ok = false
 
@@ -125,10 +134,11 @@ func (e *Evaluator) resolveAll(addresses []string, into *side) (found []*plan.Re
 	return found, ok
 }
 
-// resolveConfig resolves a configuration address (without instance keys) to its single instance in the plan. A data
+// resolveConfig resolves a configuration address (without instance keys) that the resource from names to its single
+// instance in the plan of from: the configuration of one plan says nothing about the resources of another. A data
 // source, or an opaque `var.`, `local.`, or `each.value` entry whose value may hold any resource, does not resolve.
-func (e *Evaluator) resolveConfig(config string, into *side) (*plan.Resource, bool) {
-	switch inst := e.instances(config); {
+func (e *Evaluator) resolveConfig(from *plan.Resource, config string, into *side) (*plan.Resource, bool) {
+	switch inst := e.instances(from, config); {
 	case isDataSource(config):
 		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(dataSourceFormat, config))
 	case plan.IsOpaqueReference(config):

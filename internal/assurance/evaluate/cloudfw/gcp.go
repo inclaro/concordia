@@ -33,13 +33,13 @@ var gcpPolicyPrefixes = []string{
 }
 
 // gcpEndpoint is one end of a GCP query: its network (by name), its addresses, its network tags, its service
-// account, and whether the plan shows that it may have IPv6 addresses.
+// account, and whether the plan proves that it has IPv4 addresses only.
 type gcpEndpoint struct {
-	network   string
-	addrs     addrSet
-	tags      gcpSet
-	accounts  gcpSet
-	dualStack bool
+	network  string
+	addrs    addrSet
+	tags     gcpSet
+	accounts gcpSet
+	ipv4Only bool
 }
 
 // gcpSet is a list of values of an attribute. gaps is not empty when a part of the list is not known.
@@ -92,11 +92,11 @@ func (e *Evaluator) gcpEndpointOf(res *plan.Resource) (*gcpEndpoint, []assurance
 	}
 
 	return &gcpEndpoint{
-		network:   network,
-		addrs:     e.gcpAddrs(res),
-		tags:      e.gcpSetAt(res, "tags", ""),
-		accounts:  e.gcpSetAt(res, gcpEmailPath, "email"),
-		dualStack: e.gcpDualStack(res),
+		network:  network,
+		addrs:    e.gcpAddrs(res),
+		tags:     e.gcpSetAt(res, "tags", ""),
+		accounts: e.gcpSetAt(res, gcpEmailPath, "email"),
+		ipv4Only: e.gcpProvenIPv4Only(res),
 	}, nil
 }
 
@@ -150,24 +150,20 @@ func (e *Evaluator) gcpSubnet(res *plan.Resource) *plan.Resource {
 	return target
 }
 
-// gcpNamed is the resource of the type whose ID or name is the value (a name, an ID, or a self link), or nil.
+// gcpNamed is the resource of the type whose ID or name is the value (a name, an ID, or a self link), or nil when
+// none or more than one resource of the plans has the name.
 func (e *Evaluator) gcpNamed(typ, value string) *plan.Resource {
 	if byID := e.resourceByID(value); byID != nil && byID.Type == typ {
 		return byID
 	}
 
 	name := gcpName(value)
-	candidates := e.ofType(typ)
 
-	if i := slices.IndexFunc(candidates, func(candidate *plan.Resource) bool {
+	return only(slices.DeleteFunc(e.ofType(typ), func(candidate *plan.Resource) bool {
 		got, _ := attrString(candidate, "name")
 
-		return got == name
-	}); i >= 0 {
-		return candidates[i]
-	}
-
-	return nil
+		return got != name
+	}))
 }
 
 // gcpName is the last segment of a GCP name, ID, or self link.
