@@ -72,11 +72,6 @@ func (c *configResource) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// expression is an expression of the configuration, of which only the references are read.
-type expression struct {
-	References []reference `json:"references"`
-}
-
 // ConfigAddress is the address without its instance keys, for example `module.net.aws_security_group.web` for
 // `module.net["a"].aws_security_group.web[0]`. It is the form that the configuration of a plan uses.
 func ConfigAddress(address string) string {
@@ -208,7 +203,7 @@ func (r *resourceRefs) block(exprs map[string]json.RawMessage, path attrPath) {
 func (r *resourceRefs) expression(raw json.RawMessage, path attrPath) {
 	var object map[string]json.RawMessage
 	if json.Unmarshal(raw, &object) == nil {
-		r.object(object, raw, path)
+		r.object(object, path)
 
 		return
 	}
@@ -223,21 +218,31 @@ func (r *resourceRefs) expression(raw json.RawMessage, path attrPath) {
 	}
 }
 
-// object adds the references of an expression object, or the keys and references of a nested block object.
-func (r *resourceRefs) object(object map[string]json.RawMessage, raw json.RawMessage, path attrPath) {
-	_, hasRefs := object["references"]
-	_, hasConstant := object["constant_value"]
-
-	if !hasRefs && !hasConstant {
+// object adds the references of an expression object, or the keys and references of a nested block object. An
+// object is an expression when it has `constant_value`, or a `references` key whose value is a list; a block or an
+// attribute that is itself named `references` holds an object, so its object is walked as nested block content.
+func (r *resourceRefs) object(object map[string]json.RawMessage, path attrPath) {
+	refs, isExpression := expressionRefs(object)
+	if !isExpression {
 		r.block(object, path)
 
 		return
 	}
 
-	var expr expression
-	if json.Unmarshal(raw, &expr) == nil {
-		r.add(expr.References, path)
+	r.add(refs, path)
+}
+
+// expressionRefs are the references of an expression object; isExpression is false for any other object. The value
+// of `constant_value` is never decoded.
+func expressionRefs(object map[string]json.RawMessage) (refs []reference, isExpression bool) {
+	raw, hasRefs := object["references"]
+	if hasRefs && json.Unmarshal(raw, &refs) == nil {
+		return refs, true
 	}
+
+	_, hasConstant := object["constant_value"]
+
+	return nil, hasConstant
 }
 
 // add adds the resource addresses that the reference strings name.

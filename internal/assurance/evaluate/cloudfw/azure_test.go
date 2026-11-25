@@ -41,7 +41,18 @@ type azureScenario struct {
 }
 
 func azureScenarios() []azureScenario {
-	return slices.Concat(azureAllowScenarios(), azureDenyScenarios(), azureUnknownScenarios(), azureReviewScenarios())
+	return slices.Concat(azureAllowScenarios(), azureDenyScenarios(), azureUnknownScenarios(), azureReferenceScenarios(),
+		azureRuleListScenarios(), azurePolicyScenarios(), azureChangedRuleScenarios(), azureDualStackScenarios(),
+		azureRuleOwnerScenarios())
+}
+
+// azureMutations applies the mutations in order.
+func azureMutations(mutations ...func(in *cloudfw.Input)) func(in *cloudfw.Input) {
+	return func(in *cloudfw.Input) {
+		for _, mutate := range mutations {
+			mutate(in)
+		}
+	}
 }
 
 func azureAllowScenarios() []azureScenario {

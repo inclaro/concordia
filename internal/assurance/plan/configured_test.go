@@ -60,7 +60,7 @@ func TestConfiguredHoldsNoValueAndIsNilWithoutConfiguration(t *testing.T) {
 }
 
 // A block written once (a single or a map nested block) is an object in the configuration: its attributes and their
-// references are read with the path `<block>.<attribute>` (review round 1, finding 12). The reader also keeps the
+// references are read with the path `<block>.<attribute>`. The reader also keeps the
 // provider configuration of the resource.
 func TestConfigurationReadsSingleNestedBlocks(t *testing.T) {
 	t.Parallel()
@@ -87,8 +87,28 @@ func TestConfigurationReadsSingleNestedBlocks(t *testing.T) {
 	assertNoneIn(t, marshal(t, p), "hunter2")
 }
 
+// A block or an attribute named `references` holds an object, not a list of references, so it is nested block
+// content and not an expression marker.
+func TestConfigurationReadsABlockNamedReferences(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2","resource_changes":[{"address":"a_b.c","mode":"managed","type":"a_b",
+		"name":"c","change":{"actions":["create"],"after":{},"after_unknown":{},"after_sensitive":{}}}],
+		"configuration":{"root_module":{"resources":[{"address":"a_b.c","expressions":{"settings":{"references":
+		{"group_id":{"references":["aws_security_group.web.id","aws_security_group.web"]}}}}}]}}}`)
+
+	res := p.Resources[0]
+	if got := res.References["settings.references.group_id"]; !slices.Equal(got, []string{"aws_security_group.web"}) {
+		t.Errorf("references = %v", res.References)
+	}
+
+	if want := []string{"settings", "settings.references", "settings.references.group_id"}; !slices.Equal(res.Configured, want) {
+		t.Errorf("configured = %v, want %v", res.Configured, want)
+	}
+}
+
 // An element of a list that is unknown until apply keeps its position as null, so that the known elements keep
-// their indexes (review round 1, finding 13).
+// their indexes.
 func TestUnknownListElementKeepsItsPosition(t *testing.T) {
 	t.Parallel()
 

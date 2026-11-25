@@ -38,7 +38,9 @@ type gcpScenario struct {
 func TestGCPFirewallSemantics(t *testing.T) {
 	t.Parallel()
 
-	for _, sc := range slices.Concat(gcpVerdictScenarios(), gcpUnknownScenarios(), gcpReviewScenarios()) {
+	for _, sc := range slices.Concat(gcpVerdictScenarios(), gcpUnknownScenarios(), gcpTypedScenarios(),
+		gcpUnknownRuleScenarios(), gcpOwnRangeScenarios(), gcpDualStackScenarios(), gcpIPv6SettingScenarios(),
+		gcpNetworkScenarios(), gcpUnsetRangeScenarios()) {
 		t.Run(sc.name, func(t *testing.T) {
 			t.Parallel()
 
