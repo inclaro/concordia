@@ -103,8 +103,8 @@ FAIL PAY-API-001 Payments uses only the published fraud API
   Owner: team-payments
   payments-service -> fraud-service: 3 finding(s)
     services/payments-service/src/PaymentService.ts    imports services/fraud-service/src/internal/RiskModel.ts
-    services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
     services/payments-service/src/PaymentService.ts:6  calls RiskModel in services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
   Fix: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
 
 ```
@@ -155,22 +155,22 @@ Conformance: violation (3 violation, 14 findings)
 
 FAIL CORE-DECL-001 Dependencies between services, databases, and web clients are declared
   Why it matters: An architecture model is only a source of truth when it shows every dependency that exists in the code. A hidden dependency is a coupling that nobody decided on.
-  payments-service: 1 finding(s)
-    services/payments-service/src/PaymentService.ts:5  http_calls __route__ANY__http://card-network.example.com/authorize
+  channels-api -> customer-profile: 3 finding(s)
+    services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
+    services/channels-api/src/accounts.ts:9   calls ProfileStore in services/customer-profile/src/internal/ProfileStore.ts
+    services/channels-api/src/accounts.ts:10  calls ProfileStore.load in services/customer-profile/src/internal/ProfileStore.ts
+  fraud-service -> notifications-service: 2 finding(s)
+    services/fraud-service/src/alerts.ts    imports services/notifications-service/src/api/index.ts
+    services/fraud-service/src/alerts.ts:4  calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
   ledger-service -> payments-service: 2 finding(s)
     services/ledger-service/src/settlement.ts    imports services/payments-service/src/api/index.ts
     services/ledger-service/src/settlement.ts:4  calls services.payments-service.src.api.paymentStatus in services/payments-service/src/api/index.ts
+  payments-service: 1 finding(s)
+    services/payments-service/src/PaymentService.ts:5  http_calls __route__ANY__http://card-network.example.com/authorize
   reporting-job -> ledger-db: 3 finding(s)
     jobs/reporting/src/nightly.ts    imports services/ledger-service/src/db/schema.ts
-    jobs/reporting/src/nightly.ts:5  calls LedgerTable.totals in services/ledger-service/src/db/schema.ts
     jobs/reporting/src/nightly.ts:4  calls LedgerTable in services/ledger-service/src/db/schema.ts
-  fraud-service -> notifications-service: 2 finding(s)
-    services/fraud-service/src/alerts.ts:4  calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
-    services/fraud-service/src/alerts.ts    imports services/notifications-service/src/api/index.ts
-  channels-api -> customer-profile: 3 finding(s)
-    services/channels-api/src/accounts.ts:10  calls ProfileStore.load in services/customer-profile/src/internal/ProfileStore.ts
-    services/channels-api/src/accounts.ts:9   calls ProfileStore in services/customer-profile/src/internal/ProfileStore.ts
-    services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
+    jobs/reporting/src/nightly.ts:5  calls LedgerTable.totals in services/ledger-service/src/db/schema.ts
   Fix: Remove the dependency from the code, or declare it as a relationship in the architecture model. Edges of kind HTTP_CALLS and ASYNC_CALLS are heuristic in the CBM adapter, so lower evidence.minimumConfidence to heuristic with a rule override to check them.
 
 FAIL PAY-CYC-001 Services are free of cycles

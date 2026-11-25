@@ -116,10 +116,10 @@ FAIL PAY-PATH-001 Critical services do not depend on non-critical services
   Why it matters: Payment authorization must keep working when a non-critical service such as notifications is down. A path from a critical service to a non-critical one, direct or through other code, lets a minor outage stop payments.
   Owner: team-architecture
   fraud-service -> notifications-service: 3 finding(s)
-    services/fraud-service/src/internal/RiskModel.ts:9  calls raiseFraudAlert in services/fraud-service/src/alerts.ts
-                                                        then raiseFraudAlert calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
     services/fraud-service/src/alerts.ts                imports services/notifications-service/src/api/index.ts
     services/fraud-service/src/alerts.ts:4              calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
+    services/fraud-service/src/internal/RiskModel.ts:9  calls raiseFraudAlert in services/fraud-service/src/alerts.ts
+                                                        then raiseFraudAlert calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
   payments-service -> notifications-service: 1 finding(s)
     services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
                                                        then RiskModel.score calls raiseFraudAlert in services/fraud-service/src/alerts.ts

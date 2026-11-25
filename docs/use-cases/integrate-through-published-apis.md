@@ -81,8 +81,8 @@ FAIL PAY-API-001 Payments uses only the published fraud API
   Owner: team-payments
   payments-service -> fraud-service: 3 finding(s)
     services/payments-service/src/PaymentService.ts    imports services/fraud-service/src/internal/RiskModel.ts
-    services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
     services/payments-service/src/PaymentService.ts:6  calls RiskModel in services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
   Fix: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
 3 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown
 exit code: 1

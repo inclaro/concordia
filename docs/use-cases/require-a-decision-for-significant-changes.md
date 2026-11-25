@@ -114,13 +114,13 @@ ADR governance: violation (1 violation, 1 findings)
 FAIL GOV-ADR-006 An architecturally significant change has a decision (full scope)
   Why it matters: A change that raises a configured trigger (paths, node types, tags, or architecture changes) is architecturally significant and should be recorded in a decision.
   TRG-DATA-OWNERSHIP: 1 finding(s)
-    (no source location)
+    architecture/payments.calm.json
   Fix: Add or update a decision that governs the changed subjects in the same change set, or adjust the trigger if the change is not significant.
 1 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 0 unknown
 exit code: 1
 ```
 
-The trigger is raised and no decision satisfies it, so the rule fails and `check` exits with code 1. `results.json` shows which change raised the trigger:
+The trigger is raised and no decision satisfies it, so the rule fails and `check` exits with code 1. The finding names the CALM file, `architecture/payments.calm.json`, because a change in the model raised the trigger. `results.json` shows the exact change:
 
 ```bash
 cd /tmp/concordia-usecases/require-a-decision-for-significant-changes && jq -c '.decisionSummary.triggers[]' build/concordia/results.json

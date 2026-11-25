@@ -97,3 +97,4 @@ Each page shows one rule on the bank payments example in `docs/examples/payments
 - [CBM build pin](release-notes/cbm-build-pin.md): the digest of the CBM executable in the lock, `doctor`, and `results.json`, and the warning when it differs.
 - [CBM session](release-notes/cbm-session.md): one CBM process for each command, time-outs and restarts, and the message for two CBM builds.
 - [CBM pinned install](release-notes/cbm-pinned-install.md): the pinned CBM build, `concordia cbm install`, the installers, and the `doctor` check.
+- [Cloud firewall and use cases](release-notes/cloud-firewall-and-use-cases.md): the `cloud-firewall` evaluator for Terraform and OpenTofu plans, base-model and export-bundle fixes for `check --changed` and `diff`, a stable order of grouped `check` output, and the use-case pages on the payments example.

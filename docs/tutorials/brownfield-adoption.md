@@ -237,8 +237,8 @@ FAIL PAY-API-001 Payments uses only the published fraud API
   Owner: team-payments
   payments-service -> fraud-service: 3 finding(s)
     services/payments-service/src/Refunds.ts    imports services/fraud-service/src/internal/RiskModel.ts
-    services/payments-service/src/Refunds.ts:6  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
     services/payments-service/src/Refunds.ts:5  calls RiskModel in services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/Refunds.ts:6  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
   Fix: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
   3 baselined finding(s) not shown (use --verbose)
 

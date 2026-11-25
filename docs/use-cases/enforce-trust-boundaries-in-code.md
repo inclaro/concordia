@@ -73,9 +73,9 @@ FAIL CORE-SEC-001 Public and external code does not access restricted nodes dire
   Why it matters: A node tagged public or external is exposed to untrusted callers. A direct access from it to a restricted node removes the control point between them.
   Owner: team-channels
   channels-api -> customer-profile: 3 finding(s)
+    services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
     services/channels-api/src/accounts.ts:9   calls ProfileStore in services/customer-profile/src/internal/ProfileStore.ts
     services/channels-api/src/accounts.ts:10  calls ProfileStore.load in services/customer-profile/src/internal/ProfileStore.ts
-    services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
   Fix: Route the access through a node that checks authorization, for example a gateway or an application service, and tag that node as neither public nor external.
 ```
 
