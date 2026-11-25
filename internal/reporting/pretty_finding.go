@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"cmp"
 	"fmt"
 	"path"
 	"slices"
@@ -238,6 +239,9 @@ type findingGroup struct {
 	findings []*conformance.Finding
 }
 
+// groupFindings groups the findings of a rule by their two ends and their next action. The groups are sorted by their
+// ends then their next action, and the findings of a group by location then message, so the order depends only on
+// what the output shows: not on the fingerprints, which change with the provider's project names.
 func groupFindings(rule *conformance.RuleResult, findings []*conformance.Finding) []findingGroup {
 	var groups []findingGroup
 
@@ -257,7 +261,41 @@ func groupFindings(rule *conformance.RuleResult, findings []*conformance.Finding
 		groups[i].findings = append(groups[i].findings, finding)
 	}
 
+	for i := range groups {
+		slices.SortStableFunc(groups[i].findings, compareShownFindings)
+	}
+
+	slices.SortStableFunc(groups, func(a, b findingGroup) int {
+		return cmp.Or(strings.Compare(a.ends, b.ends), strings.Compare(a.next, b.next))
+	})
+
 	return groups
+}
+
+// compareShownFindings orders the findings of one group: located findings by path then line, those without a location
+// last, then by message, and by fingerprint when they would print the same.
+func compareShownFindings(a, b *conformance.Finding) int {
+	return cmp.Or(compareLocations(a.Location, b.Location), strings.Compare(a.Message, b.Message),
+		strings.Compare(a.Fingerprint, b.Fingerprint))
+}
+
+// compareLocations orders locations by path then line; a missing location comes last.
+func compareLocations(a, b *conformance.Location) int {
+	switch {
+	case a == nil || b == nil:
+		return cmp.Compare(boolRank(a == nil), boolRank(b == nil))
+	default:
+		return cmp.Or(strings.Compare(a.Path, b.Path), cmp.Compare(a.Line, b.Line))
+	}
+}
+
+// boolRank is 1 for true and 0 for false.
+func boolRank(v bool) int {
+	if v {
+		return 1
+	}
+
+	return 0
 }
 
 // findingLayout is how the findings of one group are shown: the family of their rule, the width of the longest

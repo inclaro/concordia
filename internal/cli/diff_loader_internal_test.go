@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/inclaro/concordia/internal/intent"
@@ -107,5 +109,93 @@ func TestDiffGitRefSideReadsTheMappedFilesOfTheRevision(t *testing.T) {
 	got, err := os.ReadFile(filepath.Join(loader.tmps[0], filepath.FromSlash(diffRequirement)))
 	if err != nil || string(got) != diffTrustFiles[diffRequirement] {
 		t.Fatalf("mapped requirement of the revision = %q, %v", got, err)
+	}
+}
+
+// A bundle written before bundles held the URL mapping has the workspace key but not the file: its architecture loads
+// with an empty mapping, as before.
+func TestDiffBundleSideWithoutTheMappingFileLoads(t *testing.T) {
+	t.Parallel()
+
+	dir := t.TempDir()
+	testutil.WriteTree(t, dir, map[string]string{"architecture/a.calm.json": diffTrustFiles["architecture/a.calm.json"]})
+
+	wsp := &workspace.Workspace{
+		Root:         dir,
+		Architecture: workspace.Architecture{Source: "architecture/a.calm.json", URLMapping: "architecture/url-mapping.json"},
+		Trust:        &workspace.Trust{Classifications: []string{"public", "internal", "restricted"}},
+	}
+
+	model, err := bundleModel(context.Background(), wsp)
+	if err != nil {
+		t.Fatalf("bundle side: %v", err)
+	}
+
+	wantRestricted(t, "bundle", model)
+}
+
+// bundlePatternURL is the `$schema` pattern URL of the CALM document of a bundle in the confinement cases.
+const bundlePatternURL = "https://example.org/patterns/bundle.json"
+
+// bundlePattern is a CALM pattern that accepts any document.
+const bundlePattern = `{"$schema": "https://calm.finos.org/release/1.2/meta/calm.json", "$id": "` + bundlePatternURL + `", "type": "object"}`
+
+// bundleWithMappedPattern writes a bundle workspace below a directory whose file outside.json, outside the bundle,
+// holds the pattern as a sentinel, and maps the pattern URL with the entry that entry gives for the sentinel path.
+func bundleWithMappedPattern(t *testing.T, entry func(outside string) string) *workspace.Workspace {
+	t.Helper()
+
+	outer := t.TempDir()
+	outside := filepath.Join(outer, "outside.json")
+	testutil.WriteTree(t, outer, map[string]string{"outside.json": bundlePattern})
+
+	root := filepath.Join(outer, "bundle")
+	testutil.WriteTree(t, root, map[string]string{
+		"architecture/a.calm.json":          `{"$schema": "` + bundlePatternURL + `", "nodes": [{"unique-id": "a", "node-type": "service", "name": "A", "description": "A"}], "relationships": []}`,
+		"architecture/url-mapping.json":     `{"` + bundlePatternURL + `": ` + strconv.Quote(entry(outside)) + `}`,
+		"architecture/patterns/inside.json": bundlePattern,
+	})
+
+	return &workspace.Workspace{
+		Root:         root,
+		Architecture: workspace.Architecture{Source: "architecture/a.calm.json", URLMapping: "architecture/url-mapping.json"},
+	}
+}
+
+// A bundle is untrusted input: a mapping entry that leaves the bundle (absolute or `..`) is not read, so its URL stays
+// unmapped and the CALM document that needs it does not load. An entry inside the bundle still resolves.
+func TestDiffBundleSideReadsNoMappedFileOutsideTheBundle(t *testing.T) {
+	t.Parallel()
+
+	outsideEntries := map[string]func(string) string{
+		"absolute": func(outside string) string { return outside },
+		"dot-dot":  func(string) string { return "../../outside.json" },
+	}
+
+	for name, entry := range outsideEntries {
+		wantUnmapped(t, name, bundleWithMappedPattern(t, entry))
+	}
+
+	inside := bundleWithMappedPattern(t, func(string) string { return "patterns/inside.json" })
+	if _, err := bundleModel(context.Background(), inside); err != nil {
+		t.Fatalf("an entry inside the bundle: %v", err)
+	}
+
+	linked := bundleWithMappedPattern(t, func(string) string { return "patterns/link.json" })
+	if err := os.Symlink(filepath.Join(filepath.Dir(linked.Root), "outside.json"),
+		filepath.Join(linked.Root, "architecture", "patterns", "link.json")); err != nil {
+		t.Skipf("no symbolic links: %v", err)
+	}
+
+	wantUnmapped(t, "symbolic link", linked)
+}
+
+// wantUnmapped reports a bundle side that loads: its mapping entry leaves the bundle, so the pattern URL is unmapped.
+func wantUnmapped(t *testing.T, name string, wsp *workspace.Workspace) {
+	t.Helper()
+
+	_, err := bundleModel(context.Background(), wsp)
+	if err == nil || !strings.Contains(err.Error(), "has no entry in architecture.urlMapping") {
+		t.Errorf("%s entry: err = %v, want the URL unmapped", name, err)
 	}
 }

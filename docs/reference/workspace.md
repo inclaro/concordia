@@ -482,8 +482,8 @@ The workspace `test/fixtures/views/concordia.yaml` in the repository holds this 
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `minimumCoverage` | number 0..1 | `0.95` | Required file coverage. `--minimum-coverage` overrides it. |
-| `unknown` | `fail`, `warn`, `ignore` | `fail` | What an unknown rule verdict does. `--unknown` overrides it. |
+| `minimumCoverage` | number 0..1 | `0.95` | Required file coverage of a rule that sets no `minimumCoverage` and has no CALM control that sets it. `--minimum-coverage` overrides it, and also the value of every rule and control. |
+| `unknown` | `fail`, `warn`, `ignore` | `fail` | What an unknown rule verdict does, for a rule that sets no `onUnknown` and has no CALM control that sets it. `--unknown` overrides it, and also the value of every rule and control. See [the `evidence` block](policies.md#the-evidence-block). |
 | `failOn` | `error`, `warning`, `info` | `error` | Minimum active severity that yields failure. `--fail-on` overrides it. |
 | `enforcement` | list | none | The enforcement mode by rule family, pack, or rule, and environment. See [check.enforcement](#checkenforcement). |
 | `rollback` | object | none | Runs the typed, decision-governance, and review rules as `shadow` until a date. See [check.rollback](#checkrollback). |

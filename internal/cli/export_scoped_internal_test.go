@@ -11,6 +11,34 @@ import (
 	"github.com/inclaro/concordia/internal/workspace"
 )
 
+// scopedBundleFiles gives the files of the bundle of the run by their path, with every input of the run present.
+func scopedBundleFiles(t *testing.T, run *conformance.Run) map[string]string {
+	t.Helper()
+
+	dir := t.TempDir()
+	tree := map[string]string{}
+
+	for _, ref := range inputRefsOf(&run.Inputs) {
+		tree[ref.Path] = "x\n"
+	}
+
+	testutil.WriteTree(t, dir, tree)
+
+	job := &exportJob{app: &Context{}, wsp: &workspace.Workspace{Root: dir}, run: run, opts: &exportBundleOptions{snippets: snippetsNone}}
+
+	entries, _, _, err := bundleEntries(t.Context(), job)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	out := map[string]string{}
+	for _, e := range entries {
+		out[e.Path] = string(e.Data)
+	}
+
+	return out
+}
+
 // Scenario: Bundle records waivers.
 func TestExportBundleHoldsTheScopedWaivers(t *testing.T) {
 	t.Parallel()
@@ -24,37 +52,18 @@ func TestExportBundleHoldsTheScopedWaivers(t *testing.T) {
 		CompensatingEvidence: []exceptions.EvidenceResult{}, CoveredFindings: []string{testutil.FPWaived},
 	}}
 
-	files := func(run *conformance.Run) map[string]string {
-		dir := t.TempDir()
-		tree := map[string]string{}
-
-		for _, ref := range inputRefsOf(&run.Inputs) {
-			tree[ref.Path] = "x\n"
-		}
-
-		testutil.WriteTree(t, dir, tree)
-
-		entries, _, _, err := bundleEntries(t.Context(), &Context{}, &workspace.Workspace{Root: dir}, run, &exportBundleOptions{snippets: snippetsNone})
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		out := map[string]string{}
-		for _, e := range entries {
-			out[e.Path] = string(e.Data)
-		}
-
-		return out
+	scoped, ok := scopedBundleFiles(t, run)[bundle.ScopedWaiversPath]
+	if !ok {
+		t.Fatal("the bundle lacks the scoped waivers")
 	}
 
-	got := files(run)
-
-	scoped, ok := got[bundle.ScopedWaiversPath]
-	if !ok || !strings.Contains(scoped, `"WV-12"`) || !strings.Contains(scoped, testutil.FPWaived) || !strings.Contains(scoped, `"verified": true`) {
-		t.Errorf("the bundle lacks the scoped waivers: %v", scoped)
+	for _, want := range []string{`"WV-12"`, testutil.FPWaived, `"verified": true`} {
+		if !strings.Contains(scoped, want) {
+			t.Errorf("the scoped waivers lack %s: %v", want, scoped)
+		}
 	}
 
-	if _, ok := files(testutil.SampleRun())[bundle.ScopedWaiversPath]; ok {
+	if _, ok := scopedBundleFiles(t, testutil.SampleRun())[bundle.ScopedWaiversPath]; ok {
 		t.Error("a run without a scoped waiver has no scoped waiver file")
 	}
 }

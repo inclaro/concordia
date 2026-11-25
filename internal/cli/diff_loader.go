@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -390,15 +391,61 @@ func (l *diffLoader) bundle(ctx context.Context, arg, abs string) (*diffSide, er
 	return side, err
 }
 
-// bundleModel loads the local architecture of the workspace that a bundle holds. A bundle does not hold the URL
-// mapping file or the files it maps, so the mapping is empty.
+// bundleModel loads the local architecture of the workspace that a bundle holds, with the URL mapping file and the
+// mapped files that the bundle holds. A bundle without the mapping file (one written before bundles held it) loads
+// with an empty mapping.
 func bundleModel(ctx context.Context, wsp *workspace.Workspace) (*intent.ArchitectureModel, error) {
 	source := wsp.Architecture.Source
 	if source == "" || strings.HasPrefix(source, "https://") {
 		return nil, diag.Fail(diag.WRK010, diag.Detail("the bundle has no local architecture.source"))
 	}
 
-	return loadModelFile(ctx, wsp.ResolveInRoot(source), modelLoadContext(wsp, map[string]string{}), nil)
+	urlMapping := map[string]string{}
+
+	if bundleHasFile(wsp, wsp.Architecture.URLMapping) {
+		mapping, err := intent.LoadURLMapping(wsp)
+		if err != nil {
+			return nil, fmt.Errorf("load the url mapping of the bundle: %w", err)
+		}
+
+		urlMapping = confinedMapping(wsp.Root, mapping)
+	}
+
+	return loadModelFile(ctx, wsp.ResolveInRoot(source), modelLoadContext(wsp, urlMapping), nil)
+}
+
+// bundleHasFile says whether the workspace-relative path is a file that the bundle holds below the root of its
+// workspace, also after symbolic links.
+func bundleHasFile(wsp *workspace.Workspace, rel string) bool {
+	if rel == "" {
+		return false
+	}
+
+	abs, err := fsutil.Confine(wsp.Root, filepath.ToSlash(rel))
+
+	return err == nil && isFile(abs)
+}
+
+// confinedMapping keeps the entries of a bundle's URL mapping whose file stays below the root of the bundle. A bundle
+// is untrusted input: an absolute entry, a `..` entry, or a symbolic link that leaves the root is dropped, so its URL
+// stays unmapped and nothing outside the bundle is read.
+func confinedMapping(root string, mapping map[string]string) map[string]string {
+	out := make(map[string]string, len(mapping))
+
+	for url, abs := range mapping {
+		rel, err := filepath.Rel(root, abs)
+		if err != nil || !filepath.IsLocal(rel) {
+			continue
+		}
+
+		if _, err := fsutil.Confine(root, filepath.ToSlash(rel)); errors.Is(err, fsutil.ErrOutsideRoot) {
+			continue
+		}
+
+		out[url] = abs
+	}
+
+	return out
 }
 
 // bundleWorkspace loads the workspace that a bundle holds among its inputs.

@@ -1,6 +1,7 @@
 package reporting_test
 
 import (
+	"cmp"
 	"fmt"
 	"regexp"
 	"slices"
@@ -217,6 +218,74 @@ func TestEffectiveAccessEvidence(t *testing.T) {
 		}, "\n"))
 		notContains(t, text, "IMPORTS edge between the two services")
 	})
+}
+
+// orderRun is the sample run with CO-BND-001 findings of several ends and locations, in the given order of
+// fingerprints. The fingerprints change with the provider's project names, so they must not decide what prints first.
+func orderRun(fingerprints []string) *conformance.Run {
+	run := testutil.SampleRun()
+	template := run.Findings[slices.IndexFunc(run.Findings, func(f conformance.Finding) bool { return f.Fingerprint == testutil.FPActive })]
+
+	specs := []struct {
+		location       *conformance.Location
+		source, target string
+	}{
+		{&conformance.Location{Path: "services/payments/src/PaymentService.ts", Line: 5}, "payments-service", ""},
+		{&conformance.Location{Path: "services/ledger/src/settlement.ts", Line: 4}, "ledger-service", "payments-service"},
+		{&conformance.Location{Path: "services/ledger/src/settlement.ts"}, "ledger-service", "payments-service"},
+		{nil, "channels-api", "customer-profile"},
+		{&conformance.Location{Path: "services/channels/src/accounts.ts", Line: 9}, "channels-api", "customer-profile"},
+	}
+
+	findings := slices.DeleteFunc(slices.Clone(run.Findings), func(f conformance.Finding) bool { return f.RuleID == "CO-BND-001" })
+
+	for i, s := range specs {
+		f := template
+		f.Fingerprint = fingerprints[i]
+		f.Source = conformance.Endpoint{ArchitectureID: s.source}
+		f.Target = conformance.Endpoint{ArchitectureID: s.target}
+		f.Location = s.location
+		findings = append(findings, f)
+	}
+
+	slices.SortStableFunc(findings, func(a, b conformance.Finding) int {
+		return cmp.Or(strings.Compare(a.RuleID, b.RuleID), strings.Compare(a.Fingerprint, b.Fingerprint))
+	})
+	run.Findings = findings
+
+	return run
+}
+
+// The groups of a failing rule print sorted by their ends, and the findings of a group by location (a finding without
+// one last), whatever the fingerprints and so the order of the findings in the run.
+func TestPrettyGroupOrderDoesNotDependOnFingerprints(t *testing.T) {
+	t.Parallel()
+
+	ascending := []string{"sha256:1", "sha256:2", "sha256:3", "sha256:4", "sha256:5"}
+	descending := slices.Clone(ascending)
+	slices.Reverse(descending)
+
+	text := reporting.RenderPretty(orderRun(ascending), plain)
+	equal(t, reporting.RenderPretty(orderRun(descending), plain), text)
+
+	_, block, _ := strings.Cut(text, "FAIL CO-BND-001")
+	block, _, _ = strings.Cut(block, "  Fix:")
+
+	var heads []string
+
+	for _, line := range strings.Split(block, "\n") {
+		if strings.HasSuffix(line, "finding(s)") {
+			heads = append(heads, strings.TrimSpace(line))
+		}
+	}
+
+	equal(t, strings.Join(heads, "|"), strings.Join([]string{
+		"channels-api -> customer-profile: 2 finding(s)",
+		"ledger-service -> payments-service: 2 finding(s)",
+		"payments-service: 1 finding(s)",
+	}, "|"))
+	contains(t, block, "  channels-api -> customer-profile: 2 finding(s)\n    services/channels/src/accounts.ts:9")
+	contains(t, block, "  ledger-service -> payments-service: 2 finding(s)\n    services/ledger/src/settlement.ts    ")
 }
 
 // unknownAreaRun is a run whose conformance area passes while a later area is `unknown`.

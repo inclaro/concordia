@@ -157,7 +157,7 @@ type exportJob struct {
 
 // exportArchive gives the bytes of the bundle of the run.
 func exportArchive(ctx context.Context, job *exportJob) ([]byte, error) {
-	entries, records, viewEntries, err := bundleEntries(ctx, job.app, job.wsp, job.run, job.opts)
+	entries, records, viewEntries, err := bundleEntries(ctx, job)
 	if err != nil {
 		return nil, err
 	}

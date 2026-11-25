@@ -46,7 +46,8 @@ func triggerReasonText(trig *conformance.TriggerResult, verdict conformance.Rule
 		"trigger " + trig.ID + " (" + trig.Category + ") is raised by " + strings.Join(trig.RaisedBy, ", ") + " and no such decision changed"
 }
 
-// raisedLocation is the first file that raises the trigger and is in the change set; nil when there is none.
+// raisedLocation is where the trigger is raised: the first raising file that is in the change set, else the
+// architecture file when an architecture change raises it (the model keeps no line positions); nil otherwise.
 func (e *engine) raisedLocation(trig *conformance.TriggerResult) *conformance.Location {
 	if e.input.Changed == nil {
 		return nil
@@ -58,5 +59,16 @@ func (e *engine) raisedLocation(trig *conformance.TriggerResult) *conformance.Lo
 		}
 	}
 
+	if e.input.Model != nil && slices.ContainsFunc(trig.RaisedBy, isArchitectureChange) {
+		return &conformance.Location{Path: e.input.Model.SourceURI}
+	}
+
 	return nil
+}
+
+// isArchitectureChange reports whether a raisedBy entry is an architecture change (`<kind>:<id>`).
+func isArchitectureChange(raised string) bool {
+	kind, _, ok := strings.Cut(raised, ":")
+
+	return ok && slices.Contains([]string{kindNodeAdded, kindNodeRemoved, kindRelationshipAdded, kindRelationshipRemoved}, kind)
 }
