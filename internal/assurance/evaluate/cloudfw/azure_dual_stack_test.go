@@ -53,6 +53,12 @@ func azureDualStackScenarios() []azureScenario {
 			mutate: azureDenySSHByPrefix,
 			rules:  azureIPv4DenyRules,
 		},
+		{
+			name: "IPv4 deny that covers one of two IP configurations of the source NIC",
+			from: azureVM, to: azureDBNIC, port: 22, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonUnsupportedConstruct,
+			mutate: azureMutations(azureDenySSHByPrefix, azureSecondIPv4(azureAppNIC)),
+			rules:  azureIPv4DenyRules, gaps: evaluate.GapAddressDependent + ": 10.1.1.0/24 covers only part of 10.1.1.0/24, 10.1.9.5/32",
+		},
 	}
 }
 
@@ -98,11 +104,26 @@ func azureDenySSHByPrefix(in *cloudfw.Input) {
 	azureRuleValues(azureResource(in, azureDBNSG), 0)["source_address_prefix"] = "10.1.1.0/24"
 }
 
-// azureDualStackNIC gives the NIC a second, IPv6 IP configuration.
+// azureDualStackNIC gives the NIC a second, IPv6 IP configuration in the subnet of its first one, with an address
+// that is unknown until apply.
 func azureDualStackNIC(address string) func(in *cloudfw.Input) {
 	return func(in *cloudfw.Input) {
 		nic := azureResource(in, address)
 		configs, _ := nic.Values["ip_configuration"].([]any)
 		nic.Values["ip_configuration"] = append(configs, map[string]any{"name": "v6", azureIPVersion: "IPv6"})
+		nic.Unknown = append(nic.Unknown, "ip_configuration[1].private_ip_address", "ip_configuration[1].subnet_id")
+		nic.References["ip_configuration[1].subnet_id"] = nic.References["ip_configuration[0].subnet_id"]
+	}
+}
+
+// azureSecondIPv4 gives the NIC a second IPv4 IP configuration with a static address outside its subnet's first
+// prefix.
+func azureSecondIPv4(address string) func(in *cloudfw.Input) {
+	return func(in *cloudfw.Input) {
+		nic := azureResource(in, address)
+		configs, _ := nic.Values["ip_configuration"].([]any)
+		nic.Values["ip_configuration"] = append(configs, map[string]any{
+			"name": "second", "private_ip_address": "10.1.9.5", azureIPVersion: "IPv4",
+		})
 	}
 }

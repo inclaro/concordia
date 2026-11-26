@@ -72,6 +72,19 @@ func azureReferenceScenarios() []azureScenario {
 					"network of the plan",
 			),
 		},
+		{
+			name: "VirtualNetwork through references from subnets in two resource groups", from: azureVM, to: azureDBNIC,
+			port: 5432, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
+			mutate: azureMutations(azureUnknownSubnetValue(azureAttr{address: azureAppSubnet, path: azureVNetName}),
+				azureUnknownSubnetValue(azureAttr{address: azureDBSubnet, path: azureVNetName}),
+				func(in *cloudfw.Input) { azureResource(in, azureAppSubnet).Values["resource_group_name"] = "rg-other" }),
+			rules: azureRules(azureVNetOut, azureVNetNICIn),
+			gaps: azureRules(
+				evaluate.GapPeeringNotEvaluated+": VirtualNetwork: "+azureVM+" and "+azureDBNIC+" are not in one virtual network of the plan",
+				evaluate.GapUnresolvedReference+": "+azureAppSubnet+".virtual_network_name names "+azureVNet+", but the plan "+
+					"does not show that the two are in one resource group",
+			),
+		},
 	}
 }
 

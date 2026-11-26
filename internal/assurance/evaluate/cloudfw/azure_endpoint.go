@@ -16,9 +16,10 @@ type azureEndpoint struct {
 	res    *plan.Resource
 	nic    *plan.Resource
 	subnet *plan.Resource
-	ip     string
-	addrs  addrSet
-	asgs   []*plan.Resource
+	// hosts is the address set of the NIC (azureNICAddrs).
+	hosts addrSet
+	addrs addrSet
+	asgs  []*plan.Resource
 	// asgGaps say why the ASG membership of the endpoint is not fully known.
 	asgGaps []assurance.Gap
 	// policyGaps say why subnetNSG is maybe.
@@ -105,27 +106,57 @@ func (e *Evaluator) azurePrivateEndpoint(end *azureEndpoint, report *side) bool 
 	return ok
 }
 
-// azureWithNIC reads the subnet and the private IP of the NIC of the endpoint.
+// azureWithNIC reads the subnet and the addresses of the NIC of the endpoint.
 func (e *Evaluator) azureWithNIC(end *azureEndpoint, nic *plan.Resource, report *side) bool {
 	subnet, ok := e.refOfType(nic, azureNICSubnetAttr, report, azureSubnet)
 	end.nic, end.subnet = nic, subnet
-	end.ip, _ = attrString(nic, azureNICPrivateIPAttr)
+	end.hosts = e.azureNICAddrs(nic)
 
 	return ok
 }
 
-// azureAddrs is the address set of the endpoint: its private IP, else the prefixes of its subnet. The endpoint can
-// have an address in any prefix of its subnet.
-func azureAddrs(end *azureEndpoint) addrSet {
-	if end.ip != "" {
-		return hostSet(end.ip)
-	}
-
-	if end.subnet == nil || unknownAt(end.subnet, "address_prefixes") {
+// azureNICAddrs is the address set of a NIC: for every IP configuration, its private IP, else the prefixes of its
+// subnet. A NIC can have several IP configurations, and traffic can use the address of any of them.
+func (e *Evaluator) azureNICAddrs(nic *plan.Resource) addrSet {
+	if listUnknown(nic, azureIPConfigurations) {
 		return unknownAddrs
 	}
 
-	prefixes := attrStrings(end.subnet, "address_prefixes")
+	count := blockCount(nic, azureIPConfigurations)
+	sets := make([]addrSet, 0, count)
+
+	for i := range count {
+		config := fmt.Sprintf("%s[%d].", azureIPConfigurations, i)
+		if ip, known := attrString(nic, config+"private_ip_address"); known && ip != "" {
+			sets = append(sets, hostSet(ip))
+
+			continue
+		}
+
+		subnet, _ := e.refOfType(nic, config+"subnet_id", &side{}, azureSubnet)
+		sets = append(sets, azureSubnetAddrs(subnet))
+	}
+
+	return unionSet(sets...)
+}
+
+// azureAddrs is the address set of the endpoint: the addresses of its NIC, else the prefixes of its subnet. The
+// endpoint can have an address in any prefix of its subnet.
+func azureAddrs(end *azureEndpoint) addrSet {
+	if end.nic != nil {
+		return end.hosts
+	}
+
+	return azureSubnetAddrs(end.subnet)
+}
+
+// azureSubnetAddrs is the set of the address prefixes of the subnet, or unknown.
+func azureSubnetAddrs(subnet *plan.Resource) addrSet {
+	if subnet == nil || unknownAt(subnet, "address_prefixes") {
+		return unknownAddrs
+	}
+
+	prefixes := attrStrings(subnet, "address_prefixes")
 	sets := make([]addrSet, 0, len(prefixes))
 
 	for _, prefix := range prefixes {

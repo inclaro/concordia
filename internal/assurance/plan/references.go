@@ -10,15 +10,20 @@ import (
 )
 
 // droppedRoots are the first segments of references that cannot carry a resource ID: the index of `count`, files
-// of `path`, the resource's own attributes through `self`, and workspace facts of `terraform`. `each.key` is a key
-// and is dropped too. `var.`, `local.` and `each.value` can carry an ID and are kept as opaque entries.
+// of `path`, the resource's own attributes through `self`, and workspace facts of `terraform`. `var.`, `local.`,
+// `each.key` and `each.value` can carry an ID and are kept as opaque entries.
 var droppedRoots = []string{"count", "path", "self", "terraform"}
 
 // opaqueRoots are the first segments of the opaque entries that keep their name: `var.<name>` and `local.<name>`.
 var opaqueRoots = []string{"var", "local"}
 
-// eachValue is the opaque entry of a reference through `each.value`.
-const eachValue = "each.value"
+// eachEntries are the opaque entries of references through `each.key` and `each.value`.
+var eachEntries = []string{"each.key", "each.value"}
+
+// identityAttrs are the attributes that identify the resource that holds them: a reference that reads one of them
+// names the resource. A reference that reads any other attribute (`aws_security_group.a.tags["peer"]`) gives a value
+// that the plan does not tie to the resource, and is kept as an attribute entry (see IsAttributeReference).
+var identityAttrs = []string{"id", "arn", "name", "self_link", "email", "primary_network_interface_id"}
 
 const moduleRoot = "module."
 
@@ -255,42 +260,77 @@ func (r *resourceRefs) add(references []reference, path attrPath) {
 }
 
 // resourceOf is the address of the resource, data source or module call that a reference names, or the opaque entry
-// of a variable, a local or `each.value`, without the attribute after it and without instance keys. It reports
-// false for a reference that cannot carry a resource ID.
+// of a variable, a local, `each.key` or `each.value`, without instance keys. A reference that reads an attribute of
+// a resource that does not identify it keeps that attribute (see identityAttrs); any other attribute is cut. It
+// reports false for a reference that cannot carry a resource ID.
 func resourceOf(ref reference) (string, bool) {
-	parts := strings.Split(ConfigAddress(string(ref)), ".")
+	parts := refParts(strings.Split(ConfigAddress(string(ref)), "."))
 
 	switch {
 	case slices.Contains(droppedRoots, parts[0]):
 		return "", false
 	case parts[0] == "each":
-		return eachOf(parts)
+		return parts.each()
 	case parts[0] == "data" && len(parts) >= 3:
 		return strings.Join(parts[:3], "."), true
 	case parts[0] != "data" && len(parts) >= 2:
-		return strings.Join(parts[:2], "."), true
+		return parts.managed(), true
 	}
 
 	return "", false
 }
 
-// eachOf keeps a reference through `each.value` as its opaque entry and drops `each.key`.
-func eachOf(parts []string) (string, bool) {
-	if len(parts) >= 2 && parts[1] == "value" {
-		return eachValue, true
+// refParts are the dot-separated parts of a reference without instance keys.
+type refParts []string
+
+// managed is the address of a managed resource or module call, or the opaque entry of a variable or a local, with
+// the attribute that the reference reads when it is a resource attribute that does not identify the resource.
+func (parts refParts) managed() string {
+	if parts.readsAttribute() {
+		return strings.Join(parts[:3], ".")
 	}
 
-	return "", false
+	return strings.Join(parts[:2], ".")
+}
+
+// readsAttribute reports whether the parts name a managed resource and an attribute of it that does not identify it.
+func (parts refParts) readsAttribute() bool {
+	resource := parts[0] != "module" && !slices.Contains(opaqueRoots, parts[0])
+
+	return resource && len(parts) >= 3 && !slices.Contains(identityAttrs, parts[2])
+}
+
+// each keeps a reference through `each.key` or `each.value` as its opaque entry.
+func (parts refParts) each() (string, bool) {
+	if len(parts) < 2 {
+		return "", false
+	}
+
+	entry := parts[0] + "." + parts[1]
+
+	return entry, slices.Contains(eachEntries, entry)
 }
 
 // IsOpaqueReference reports whether an entry of Resource.References is a variable (`var.<name>`), a local
-// (`local.<name>`) or `each.value`, after any `module.<name>.` prefixes. Such an entry may carry a resource ID that
-// the plan does not name, so a list that holds one is not fully resolved.
+// (`local.<name>`), `each.key` or `each.value`, after any `module.<name>.` prefixes. Such an entry may carry a
+// resource ID that the plan does not name, so a list that holds one is not fully resolved.
 func IsOpaqueReference(address string) bool {
 	rest := string(refEntry(address).withoutModules())
 	root, _, _ := strings.Cut(rest, ".")
 
-	return rest == eachValue || slices.Contains(opaqueRoots, root)
+	return slices.Contains(eachEntries, rest) || slices.Contains(opaqueRoots, root)
+}
+
+// IsAttributeReference reports whether an entry of Resource.References names a managed resource together with an
+// attribute that does not identify it, for example `aws_security_group.a.tags`. The value of that attribute may be
+// the ID of any resource, so a list that holds the entry is not fully resolved.
+func IsAttributeReference(address string) bool {
+	rest := string(refEntry(address).withoutModules())
+	if IsOpaqueReference(rest) || strings.HasPrefix(rest, "data.") {
+		return false
+	}
+
+	return strings.Count(rest, ".") >= 2
 }
 
 // refEntry is one entry of Resource.References, for example `module.net.var.extra`.

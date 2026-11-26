@@ -4,7 +4,7 @@ Concordia shows you where your systems drift from the architecture that you appr
 
 ## Use cases
 
-Each page shows one rule on the bank payments example in `docs/examples/payments/`: the rule, the evidence that Concordia reads, how it decides, what you still declare, and how to make the rule block a merge.
+Each page shows one rule on the bank payments example in `docs/examples/payments/`: the rule, the evidence that Concordia reads, how it decides, what you still declare, and whether and how the rule can block a merge. The effective-access and provenance rules are advisory in this release and cannot block a merge; their pages say how to review the findings instead.
 
 **Prevent outages:**
 

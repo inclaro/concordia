@@ -114,6 +114,16 @@ jq '.assurance.evaluations[] | {query, verdict, policies, inputDigest, integrity
 
 `inputDigest` is the SHA-256 of the plan bytes that Concordia evaluated. `integrity` says that no signed statement binds the plan. `concordia export bundle` copies the plan, so a reviewer can check the bytes against the digest later.
 
+The rule fails, but the run exits with 0, because the rule is advisory:
+
+```bash
+concordia check --rule PAY-NET-002 > /dev/null 2>&1; echo "exit code: $?"
+```
+
+```text
+exit code: 0
+```
+
 Now remove the debug rule, as the fix would. This `jq` command deletes every object with the rule's address, which removes it from `planned_values`, `resource_changes`, and `configuration`:
 
 ```bash
@@ -148,15 +158,7 @@ The port is now `denied`, and the result rests on the declared assumption `firew
 
 ## Make it block a merge
 
-This rule is advisory only. Even when it fails, the `FAIL` line says `advisory: does not change the exit code`, and the run exits with 0:
-
-```bash
-concordia check --rule PAY-NET-002 > /dev/null 2>&1; echo "exit code: $?"
-```
-
-```text
-exit code: 0
-```
+This rule is advisory only. In the run before the fix, the `FAIL` line says `advisory: does not change the exit code`, and the run exits with 0 although the rule fails.
 
 The contract of the `effective-access` family is experimental in this release, so the rule cannot be `mandatory`. Try it: add an enforcement entry to the `check` key, which is the last key of `concordia.yaml`, and run the check again.
 

@@ -163,3 +163,105 @@ func TestKnownAttachmentInstanceWins(t *testing.T) {
 		},
 	}})
 }
+
+// TestAttachmentThatMayNameAnotherTarget: an attachment whose unknown target the configuration takes from one of
+// several resources may attach to any of them, so it does not attach to the endpoint for certain.
+func TestAttachmentThatMayNameAnotherTarget(t *testing.T) {
+	t.Parallel()
+
+	world := func(attachment plan.Resource) []plan.Resource {
+		return []plan.Resource{
+			resourceOf(awsWebInstance, awsInstance, map[string]any{"vpc_security_group_ids": []any{idApp}, "private_ip": "10.0.0.5"}),
+			resourceOf(otherInstance, awsInstance, map[string]any{"vpc_security_group_ids": []any{idApp}}),
+			resourceOf(awsExtraNIC, awsNetworkInterface, map[string]any{"id": "eni-extra", "security_groups": []any{idExtra}}),
+			group(awsAppGroup, idApp, []any{}, []any{}),
+			group(awsExtraGroup, idExtra, []any{}, []any{allTraffic()}),
+			openDB(), attachment,
+		}
+	}
+
+	nicAttachment := resourceOf("aws_network_interface_attachment.extra", awsNICAttachment, map[string]any{
+		awsAttrNICID: "eni-extra", "device_index": "1",
+	})
+	nicAttachment.Unknown = []string{"instance_id"}
+	nicAttachment.References = map[string][]string{"instance_id": {awsWebInstance, otherInstance}}
+
+	sgAttachment := resourceOf("aws_network_interface_sg_attachment.extra", awsSGAttachment, map[string]any{
+		"security_group_id": idExtra,
+	})
+	sgAttachment.Unknown = []string{awsAttrNICID}
+	sgAttachment.References = map[string][]string{awsAttrNICID: {awsWebInstance, otherInstance}}
+
+	runQueryCases(t, []queryCase{
+		{
+			name: "interface attachment to one of two instances", resources: world(nicAttachment),
+			from: awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnresolvedReference + ": aws_network_interface_attachment.extra.instance_id names 2 resources"},
+		},
+		{
+			name: "group attachment to one of two instances", resources: world(sgAttachment),
+			from: awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnresolvedReference + ": aws_network_interface_sg_attachment.extra.network_interface_id " +
+				"names 2 resources"},
+		},
+	})
+}
+
+// TestUnresolvedInterfaceKeepsAddressesOpen: an attachment that does not resolve may attach another network
+// interface to the instance, whose address may be in a range that a rule allows.
+func TestUnresolvedInterfaceKeepsAddressesOpen(t *testing.T) {
+	t.Parallel()
+
+	attachment := resourceOf("aws_network_interface_attachment.floating", awsNICAttachment, map[string]any{
+		"instance_id": "i-web", "device_index": "1",
+	})
+	attachment.Unknown = []string{awsAttrNICID}
+
+	runQueryCases(t, []queryCase{{
+		name: "interface attachment that does not resolve", from: awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+		resources: []plan.Resource{
+			resourceOf(awsWebInstance, awsInstance, map[string]any{
+				"id": "i-web", "vpc_security_group_ids": []any{idApp}, "private_ip": "10.0.1.10",
+			}),
+			group(awsAppGroup, idApp, []any{}, []any{allTraffic()}),
+			group(awsDBGroup, idDB, []any{postgresFrom(map[string]any{"cidr_blocks": []any{"10.0.2.0/24"}})}, []any{}),
+			attachment,
+		},
+		gaps: []string{evaluate.GapAddressDependent + ": 10.0.2.0/24 against an endpoint whose addresses are not known before apply"},
+	}})
+}
+
+// TestSeveralInterfacesNeedOnePair: traffic leaves through one network interface, so the egress rule and the
+// ingress rule that allow it must hold for the groups of the same interface.
+func TestSeveralInterfacesNeedOnePair(t *testing.T) {
+	t.Parallel()
+
+	world := func(dbAllows string) []plan.Resource {
+		return []plan.Resource{
+			resourceOf(awsWebInstance, awsInstance, map[string]any{
+				"id": "i-web", "vpc_security_group_ids": []any{idApp}, "private_ip": "10.0.1.10",
+			}),
+			resourceOf(awsExtraNIC, awsNetworkInterface, map[string]any{
+				"id": "eni-extra", "security_groups": []any{idExtra}, "private_ip": "10.0.1.11",
+				"attachment": []any{map[string]any{"instance": "i-web"}},
+			}),
+			group(awsAppGroup, idApp, []any{}, []any{}),
+			group(awsExtraGroup, idExtra, []any{}, []any{allTraffic()}),
+			group(awsDBGroup, idDB, []any{postgresFrom(map[string]any{"security_groups": []any{dbAllows}})}, []any{}),
+		}
+	}
+
+	runQueryCases(t, []queryCase{
+		{
+			name: "egress on one interface and ingress for the other", resources: world(idApp),
+			from: awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnsupportedResource + ": " + awsWebInstance + " to " + awsDBGroup + ": the groups " +
+				"of several network interfaces together allow the traffic, but no one pair of network interfaces is shown " +
+				"to allow it"},
+		},
+		{
+			name: "egress and ingress for the same interface", resources: world(idExtra),
+			from: awsWebInstance, to: awsDBGroup, want: VerdictAllowed,
+		},
+	})
+}

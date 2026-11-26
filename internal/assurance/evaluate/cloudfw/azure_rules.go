@@ -180,9 +180,34 @@ func newAzureRule(res *plan.Resource, base, address string, owner tri) azureRule
 	return rule
 }
 
-// azureRuleOwner is yes when the rule resource belongs to the NSG. It uses the known name and resource group of the
-// NSG first, then the configuration reference of `network_security_group_name` when the name is unknown.
+// azureRuleOwner is yes when the rule resource belongs to the NSG: azureOwnerOf finds the owner, and azureInScope
+// keeps it only within one subscription.
 func (e *Evaluator) azureRuleOwner(rule, nsg *plan.Resource, report *side) tri {
+	return e.azureInScope(rule, nsg, e.azureOwnerOf(rule, nsg, report), report)
+}
+
+// azureInScope keeps a yes owner only when the rule and the NSG are in one plan and one provider configuration,
+// which fix their subscription: Azure finds the NSG of a rule by name and resource group within the rule's
+// subscription, and another subscription can have an NSG with the same name and resource group.
+func (e *Evaluator) azureInScope(rule, nsg *plan.Resource, owner tri, report *side) tri {
+	if owner != triYes || e.azureOneSubscription(rule, nsg) {
+		return owner
+	}
+
+	report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s names %s, but the plan does not show that the two are "+
+		"in one subscription (one plan and one provider configuration)", rule.Address, nsg.Address))
+
+	return triMaybe
+}
+
+// azureOneSubscription reports whether the two resources are in one plan and have one provider configuration.
+func (e *Evaluator) azureOneSubscription(a, b *plan.Resource) bool {
+	return a.ProviderConfig != "" && a.ProviderConfig == b.ProviderConfig && e.planOf[a] == e.planOf[b]
+}
+
+// azureOwnerOf is yes when the rule resource names the NSG. It uses the known name and resource group of the NSG
+// first, then the configuration reference of `network_security_group_name` when the name is unknown.
+func (e *Evaluator) azureOwnerOf(rule, nsg *plan.Resource, report *side) tri {
 	name, hasName := attrString(rule, "network_security_group_name")
 	group, hasGroup := attrString(rule, "resource_group_name")
 
@@ -219,15 +244,17 @@ func (e *Evaluator) azureOwnerByName(nsg *plan.Resource, name, group string, rep
 
 // azureOwnerByReference is yes when the one referenced NSG is the NSG and the rule is in its resource group, maybe
 // when a reference does not resolve to an NSG, names several NSGs, or names an NSG of another or unknown resource
-// group: Azure finds the NSG of a rule by its name in the rule's resource group.
+// group: Azure finds the NSG of a rule by its name in the rule's resource group. A reference list that resolves only
+// in part may take its value from the part that does not resolve, so it names no owner for certain.
 func (e *Evaluator) azureOwnerByReference(rule *plan.Resource, refs []string, nsg *plan.Resource, report *side) tri {
 	found, resolved := e.resolveAll(rule, refs, report)
 	owners, typed := keepTypes(attrRef{res: rule, path: "network_security_group_name"}, found, report, []string{azureNSG})
 
-	result := azureIf(slices.Contains(owners, nsg))
 	if !resolved || !typed {
-		return or(result, triMaybe)
+		return triMaybe
 	}
+
+	result := azureIf(slices.Contains(owners, nsg))
 
 	if doubt := azureReferenceDoubt(rule, owners); doubt != "" {
 		report.gap(evaluate.GapUnresolvedReference, rule.Address+".network_security_group_name: "+doubt)

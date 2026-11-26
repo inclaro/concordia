@@ -186,8 +186,20 @@ func gcpName(value string) string {
 	return value[strings.LastIndex(value, "/")+1:]
 }
 
-// gcpAddrs is the address set of an endpoint: its internal IP, else the range of its subnetwork.
+// gcpAddrs is the address set of an endpoint: the addresses of its first network interface and its alias IP ranges,
+// which traffic can also come from. Alias ranges that the plan does not give leave the set unknown.
 func (e *Evaluator) gcpAddrs(res *plan.Resource) addrSet {
+	aliases, known := gcpAliasAddrs(res)
+	if !known {
+		return unknownAddrs
+	}
+
+	return unionSet(append(aliases, e.gcpPrimaryAddrs(res))...)
+}
+
+// gcpPrimaryAddrs is the address set of the first network interface: its internal IP, else the range of its
+// subnetwork.
+func (e *Evaluator) gcpPrimaryAddrs(res *plan.Resource) addrSet {
 	if addr, ok := attrString(res, gcpIPPath); ok && addr != "" {
 		return hostSet(addr)
 	}

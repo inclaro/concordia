@@ -53,7 +53,7 @@ func azureChangedRuleScenarios() []azureScenario {
 // priority of the inline deny-ssh rule, which still holds the old Deny.
 func azureUpdatedSSHRule(in *cloudfw.Input) {
 	in.Plans[0].Resources = append(in.Plans[0].Resources, plan.Resource{
-		Address: azureSSHRule, Mode: "managed", Type: "azurerm_network_security_rule", Name: "ssh",
+		Address: azureSSHRule, Mode: "managed", Type: "azurerm_network_security_rule", Name: "ssh", ProviderConfig: "azurerm",
 		Actions: []string{"update"}, Values: map[string]any{
 			"name": "deny-ssh", "priority": "100", "direction": "Inbound", "access": "Allow", "protocol": "Tcp",
 			"source_port_range": "*", "destination_port_range": "22", "source_address_prefix": "*",

@@ -123,10 +123,11 @@ func attrStrings(r *plan.Resource, path string) []string {
 	return out
 }
 
+// scalarText is the text of a known scalar. A redacted text is not known.
 func scalarText(v any) (string, bool) {
 	switch typed := v.(type) {
 	case string:
-		return typed, true
+		return typed, !isRedacted(typed)
 	case json.Number:
 		return typed.String(), true
 	case float64:
@@ -162,20 +163,22 @@ func blockCount(r *plan.Resource, path string) int {
 	return len(list)
 }
 
-// unknownAt reports whether the attribute at the path, a part of it, or a value that holds it is unknown until apply.
+// unknownAt reports whether the attribute at the path, a part of it, or a value that holds it is unknown until apply
+// or redacted.
 func unknownAt(r *plan.Resource, path string) bool {
 	steps := pathTokens(path)
 
-	return slices.ContainsFunc(r.Unknown, func(u string) bool { return related(pathTokens(u), steps) })
+	return redactedAt(r, path) || slices.ContainsFunc(r.Unknown, func(u string) bool { return related(pathTokens(u), steps) })
 }
 
 // listHasUnknownElements reports whether Unknown marks a whole element of the list at the path, for example
-// `ingress[1]`. The plan reader keeps such an element as null in Values; its rule or interface is not known, so a
-// provider treats the list as unknown.
+// `ingress[1]`, or whether the list or a whole element of it is redacted. The plan reader keeps an unknown element
+// as null in Values and a redacted one as its marker; its rule or interface is not known, so a provider treats the
+// list as unknown.
 func listHasUnknownElements(r *plan.Resource, path string) bool {
 	list := pathTokens(path)
 
-	return slices.ContainsFunc(r.Unknown, func(u string) bool { return isElementOf(pathTokens(u), list) })
+	return listRedacted(r, path) || slices.ContainsFunc(r.Unknown, func(u string) bool { return isElementOf(pathTokens(u), list) })
 }
 
 // listUnknown reports whether the list at the path is unknown until apply as a whole or in whole elements.

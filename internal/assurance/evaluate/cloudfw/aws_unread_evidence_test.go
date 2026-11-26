@@ -46,7 +46,9 @@ func awsInlineBlockScenarios() []awsScenario {
 			name: "group reference to a resource that is not a security group", from: "aws_instance.f2_default",
 			to: "aws_lb.public", port: 443, want: cloudfw.VerdictUnknown, reason: awsIncomplete,
 			gaps: "unresolved-reference: aws_instance.f2_default.vpc_security_group_ids names aws_vpc.main, a aws_vpc, " +
-				"not one of aws_security_group, aws_default_security_group",
+				"not one of aws_security_group, aws_default_security_group; unresolved-reference: " +
+				"aws_vpc.main.default_security_group_id is an attribute that does not identify its resource; the " +
+				"resource it names is not known from the plan",
 		},
 	}
 }

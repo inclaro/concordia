@@ -25,7 +25,26 @@ func gcpNetworkScenarios() []gcpScenario {
 			}),
 			want: cloudfw.VerdictUnknown, gap: evaluate.GapUnsupportedResource, rules: "",
 		},
+		{
+			name: "egress deny whose destination ranges hold the internal IP but not the alias range", from: gcpWeb,
+			to: gcpDB, port: 3306, mutate: gcpAliasRange(gcpDB, "10.30.0.0/24"),
+			want: cloudfw.VerdictUnknown, gap: evaluate.GapAddressDependent,
+			rules: gcpFirewall + "deny_web_mysql_out priority 1000 deny",
+		},
+		{
+			name: "egress deny for an alias range that the provider allocates", from: gcpWeb, to: gcpDB, port: 3306,
+			mutate: gcpAliasRange(gcpDB, "/24"), want: cloudfw.VerdictUnknown, gap: evaluate.GapAddressDependent,
+			rules: gcpFirewall + "deny_web_mysql_out priority 1000 deny",
+		},
 	}
+}
+
+// gcpAliasRange gives the first network interface of the instance an alias IP range.
+func gcpAliasRange(address, cidr string) func(in *cloudfw.Input) {
+	return gcpEdit(address, func(res *plan.Resource) {
+		nic, _ := res.Values[gcpInterfaces].([]any)[0].(map[string]any)
+		nic["alias_ip_range"] = []any{map[string]any{"ip_cidr_range": cidr}}
+	})
 }
 
 // gcpNetworkLink makes the plan know the network of the first interface of the instance as a self link.

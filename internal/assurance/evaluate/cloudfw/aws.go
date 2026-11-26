@@ -25,11 +25,13 @@ const (
 	awsAttrGroupIDs  = "security_group_ids"
 )
 
-// awsEndpoint is one end of an AWS query: its security groups, its address set, and the pending rules of
-// attachments that may add groups to it but do not resolve.
+// awsEndpoint is one end of an AWS query: its security groups, its address set, the pending rules of attachments
+// that may add groups to it but do not resolve, and a view of each of its network interfaces (see
+// awsInterfaceViews).
 type awsEndpoint struct {
 	groups  []*plan.Resource
 	pending []awsRule
+	ifaces  []*awsEndpoint
 	addrs   addrSet
 }
 
@@ -55,16 +57,31 @@ var awsEndpointSpecs = map[string]awsEndpointSpec{
 }
 
 // evaluateAWS answers a query between two AWS resources: an egress rule of a group of the source must allow the
-// destination, and an ingress rule of a group of the destination must allow the source.
-func (e *Evaluator) evaluateAWS(q *Query, from, to *plan.Resource) Result {
-	src, srcGaps := e.awsEndpoint(from)
-	dst, dstGaps := e.awsEndpoint(to)
+// destination, and an ingress rule of a group of the destination must allow the source. Between endpoints with
+// several network interfaces, `allowed` also needs one pair of interfaces that allows the traffic.
+func (e *Evaluator) evaluateAWS(query *Query, source, target *plan.Resource) Result {
+	src, srcGaps := e.awsEndpoint(source)
+	dst, dstGaps := e.awsEndpoint(target)
 
 	if gaps := slices.Concat(srcGaps, dstGaps); len(gaps) > 0 {
 		return unknownFrom(gaps)
 	}
 
-	return decide(e.awsSide(q, src, dst, &awsEgress), e.awsSide(q, dst, src, &awsIngress))
+	res := decide(e.awsSide(query, src, dst, &awsEgress), e.awsSide(query, dst, src, &awsIngress))
+	if res.Verdict != VerdictAllowed || awsOneInterfaceEach(src, dst) {
+		return res
+	}
+
+	if pair, found := e.awsInterfacePair(query, src, dst); found {
+		return pair
+	}
+
+	return unknownFrom([]assurance.Gap{awsNoInterfacePair(source, target)})
+}
+
+// awsOneInterfaceEach reports whether neither endpoint has more than one network interface.
+func awsOneInterfaceEach(src, dst *awsEndpoint) bool {
+	return !src.severalInterfaces() && !dst.severalInterfaces()
 }
 
 // awsEndpoint resolves the security groups and the address set of an endpoint. The gaps say why the groups are not
@@ -90,7 +107,8 @@ func (e *Evaluator) awsEndpoint(res *plan.Resource) (*awsEndpoint, []assurance.G
 	attached := e.awsAttachments(res)
 	endpoint := &awsEndpoint{
 		groups: sortResources(slices.Concat(groups, attached.groups)), pending: attached.pending,
-		addrs: e.awsEndpointAddrs(res, &spec, attached.nics, viaInterfaces),
+		addrs:  e.awsEndpointAddrs(res, &spec, attached, viaInterfaces),
+		ifaces: e.awsInterfaceViews(res, &spec, groups, attached, viaInterfaces),
 	}
 
 	if viaInterfaces && endpoint.namesNothing() {

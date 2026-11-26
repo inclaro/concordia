@@ -392,7 +392,7 @@ An entry holds digests, counts, names, and reasons, never a rendered value, a se
 Three shared values:
 
 - `coverage` is `complete`, `partial`, or `failed`. A source over a limit is `partial` or `failed`; Concordia never cuts the output to fit.
-- `integrity` is `content-not-verified`, `content-verified-by-digest`, or `producer-authenticated`, in this order. See [Statements](assurance.md#statements).
+- `integrity` in `plans`, `statements`, `lineage`, and `checkResults` is `content-not-verified`, `content-verified-by-digest`, or `producer-authenticated`, in this order. See [Statements](assurance.md#statements). The `integrity` of an entry in [`evaluations`](#evaluations) uses the same levels as text with spaces: `content not verified`, `content verified by digest`, or `producer authenticated`.
 - A gap is `{kind, detail}` with an optional `path`. It says what the evidence lacks, for example an unknown value after apply.
 
 ### `rendered`

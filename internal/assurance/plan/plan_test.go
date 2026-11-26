@@ -333,9 +333,9 @@ func TestReferencesAreNilWithoutAUsableConfiguration(t *testing.T) {
 	}
 }
 
-// A reference through a variable, a local or `each.value` can carry a resource ID that the plan does not name, so it
-// stays in the list as an opaque entry: a consumer must not take the rest of the list for the whole of it.
-func TestReferencesKeepOpaqueVariableLocalAndEachValueEntries(t *testing.T) {
+// A reference through a variable, a local, `each.key` or `each.value` can carry a resource ID that the plan does not
+// name, so it stays in the list as an opaque entry: a consumer must not take the rest of the list for the whole of it.
+func TestReferencesKeepOpaqueVariableLocalAndEachEntries(t *testing.T) {
 	t.Parallel()
 
 	p := readInline(t, `{"format_version":"1.2",
@@ -349,10 +349,50 @@ func TestReferencesKeepOpaqueVariableLocalAndEachValueEntries(t *testing.T) {
 			}}]}}}}}}`)
 
 	want := map[string][]string{"vpc_security_group_ids": {
-		"module.net.aws_security_group.this", "module.net.each.value", "module.net.local.groups", "module.net.var.extra_security_group_ids",
+		"module.net.aws_security_group.this", "module.net.each.key", "module.net.each.value", "module.net.local.groups",
+		"module.net.var.extra_security_group_ids",
 	}}
 	if got := p.Resources[0].References; !reflect.DeepEqual(got, want) {
 		t.Errorf("references = %v, want %v", got, want)
+	}
+}
+
+// A reference that reads an attribute that does not identify its resource, such as a tag, gives a value that may be
+// the ID of any resource: the reader keeps the attribute in the entry. An identifying attribute (`id`, `name`) is cut.
+func TestReferencesKeepNonIdentityAttributes(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2",
+		"resource_changes":[{"address":"aws_instance.app","mode":"managed","type":"aws_instance","name":"app",
+			"change":{"actions":["create"],"after":{},"after_unknown":{"vpc_security_group_ids":true},"after_sensitive":{}}}],
+		"configuration":{"root_module":{"resources":[{"address":"aws_instance.app","expressions":{
+			"vpc_security_group_ids":{"references":["aws_security_group.a.tags[\"peer_id\"]","aws_security_group.a.tags",
+				"aws_security_group.a","aws_security_group.b.id","aws_security_group.b","var.x.id","local.y.z"]}
+		}}]}}}`)
+
+	want := map[string][]string{"vpc_security_group_ids": {
+		"aws_security_group.a", "aws_security_group.a.tags", "aws_security_group.b", "local.y", "var.x",
+	}}
+	if got := p.Resources[0].References; !reflect.DeepEqual(got, want) {
+		t.Errorf("references = %v, want %v", got, want)
+	}
+}
+
+func TestReferencesNameAttributeEntries(t *testing.T) {
+	t.Parallel()
+
+	for address, want := range map[string]bool{
+		"aws_security_group.a.tags":            true,
+		"module.net.aws_security_group.a.tags": true,
+		"aws_security_group.a":                 false,
+		"data.aws_vpc.main.tags":               false,
+		"var.extra":                            false,
+		"each.key":                             false,
+		"module.net":                           false,
+	} {
+		if got := plan.IsAttributeReference(address); got != want {
+			t.Errorf("IsAttributeReference(%q) = %v, want %v", address, got, want)
+		}
 	}
 }
 
@@ -366,6 +406,7 @@ func TestReferencesNameOpaqueEntries(t *testing.T) {
 		{"var.extra", true},
 		{"local.groups", true},
 		{"each.value", true},
+		{"each.key", true},
 		{"module.net.var.extra", true},
 		{"module.a.module.b.local.groups", true},
 		{"module.net.each.value", true},

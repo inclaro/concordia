@@ -46,6 +46,23 @@ func azureRuleOwnerScenarios() []azureScenario {
 			mutate: azureOwnerThroughVariable,
 			rules:  azureRules(azureVNetOut, azureVNetNICIn, azureHTTPSRule+" allow-https (priority 340)"),
 		},
+		{
+			name: "deny rule owner by a reference list that resolves only in part", from: azureVM, to: azureDBNIC, port: 8443,
+			want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
+			mutate: azureMutations(azureOwnerByReferenceOnly(azureOwnerRef{"rg-pay", []string{azureDBNSG, "var.nsg_name"}}),
+				func(in *cloudfw.Input) { azureResource(in, azureHTTPSRule).Values["access"] = "Deny" }),
+			rules: azureRules(azureHTTPSRule + " allow-https (priority 340)"),
+			gaps: evaluate.GapUnresolvedReference + ": var.nsg_name is a variable or local value; the resource it names " +
+				"is not known from the plan",
+		},
+		{
+			name: "rule with the name of the NSG in another provider configuration", from: azureVM, to: azureDBNIC,
+			port: 8443, want: cloudfw.VerdictUnknown, reason: evaluate.ReasonCoverageIncomplete,
+			mutate: func(in *cloudfw.Input) { azureResource(in, azureHTTPSRule).ProviderConfig = "azurerm.other" },
+			rules:  azureRules(azureHTTPSRule + " allow-https (priority 340)"),
+			gaps: evaluate.GapUnresolvedReference + ": " + azureHTTPSRule + " names " + azureDBNSG + ", but the plan does " +
+				"not show that the two are in one subscription (one plan and one provider configuration)",
+		},
 	}
 }
 

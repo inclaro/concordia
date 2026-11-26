@@ -4,6 +4,7 @@ import (
 	"github.com/inclaro/concordia/internal/assurance/evaluate"
 	"github.com/inclaro/concordia/internal/assurance/evaluate/cloudfw"
 	"github.com/inclaro/concordia/internal/assurance/plan"
+	"github.com/inclaro/concordia/internal/redact"
 )
 
 const (
@@ -67,6 +68,8 @@ func gcpUnknownRuleScenarios() []gcpScenario {
 			mutate: gcpUnknownElement(gcpAttr{gcpRedisDeny, "deny"}),
 		},
 		{name: "unknown source tags", from: gcpWeb, port: 5432, mutate: gcpUnknownTop(gcpAttr{gcpWebToDB, "source_tags"})},
+		{name: "redacted target tags", from: gcpWeb, port: 5432, mutate: gcpRedactTop(gcpAttr{gcpWebToDB, "target_tags"})},
+		{name: "redacted source tags", from: gcpWeb, port: 5432, mutate: gcpRedactTop(gcpAttr{gcpWebToDB, "source_tags"})},
 	}
 
 	for i := range scenarios {
@@ -123,6 +126,12 @@ func gcpUnknownTop(attr gcpAttr) func(in *cloudfw.Input) {
 		delete(res.Values, attr.path)
 		res.Unknown = append(res.Unknown, attr.path)
 	})
+}
+
+// gcpRedactTop puts the redaction marker that the plan reader writes for a sensitive value in place of a top-level
+// attribute.
+func gcpRedactTop(attr gcpAttr) func(in *cloudfw.Input) {
+	return gcpEdit(attr.address, func(res *plan.Resource) { res.Values[attr.path] = redact.Marker(redact.ClassSecretData) })
 }
 
 // gcpUnknownField makes a field of the first block of the list unknown until apply.

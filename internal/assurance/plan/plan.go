@@ -83,7 +83,9 @@ type Resource struct {
 	Values map[string]any `json:"values,omitempty"`
 	// References are the resources that the configuration names in each attribute, by the attribute path in the form
 	// of Unknown (for example `ingress[0].security_groups`). Each address is absolute in the module tree and has no
-	// instance key; the lists are sorted and hold no duplicates. References is nil when the configuration names none.
+	// instance key; the lists are sorted and hold no duplicates. An entry can also be opaque (IsOpaqueReference) or
+	// name an attribute that does not identify its resource (IsAttributeReference). References is nil when the
+	// configuration names none.
 	References map[string][]string `json:"references,omitempty"`
 	// Prior holds, for a firewall rule resource that the plan deletes or replaces, the attributes that named its
 	// security group or network security group before the change: `security_group_id`, `network_security_group_name`,

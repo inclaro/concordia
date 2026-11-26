@@ -186,6 +186,45 @@ func TestOpaqueReferences(t *testing.T) {
 	})
 }
 
+// TestReferencesThatHideTheGroup: an unknown group list whose configuration reads a tag of a group, or `each.key`,
+// may hold the ID of any group. The group that the reference names must not stand for the whole list.
+func TestReferencesThatHideTheGroup(t *testing.T) {
+	t.Parallel()
+
+	world := func(references string) []plan.Resource {
+		return readPlanDoc(t, &planDoc{
+			changes: []planChange{
+				{address: awsWebInstance, after: `{"ami": "ami-1"}`, unknown: `{"vpc_security_group_ids": true}`},
+				{address: awsAppGroup, after: `{"id": "sg-app", "ingress": [], "egress": [{"protocol": "-1",
+					"from_port": 0, "to_port": 0, "cidr_blocks": ["0.0.0.0/0"]}]}`},
+				{address: awsDBGroup, after: `{"id": "sg-db", "egress": [], "ingress": [{"protocol": "tcp",
+					"from_port": 5432, "to_port": 5432, "cidr_blocks": ["0.0.0.0/0"]}]}`},
+			},
+			config: []configResource{{address: awsWebInstance, expressions: `{"vpc_security_group_ids": {"references": ` +
+				references + `}}`}},
+		})
+	}
+
+	runQueryCases(t, []queryCase{
+		{
+			name:      "tag of a group",
+			resources: world(`["aws_security_group.app.tags[\"peer_id\"]", "aws_security_group.app.tags", "aws_security_group.app"]`),
+			from:      awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnresolvedReference + ": " + fmt.Sprintf(attributeFormat, awsAppGroup+".tags")},
+		},
+		{
+			name:      "each.key beside a group",
+			resources: world(`["aws_security_group.app.id", "aws_security_group.app", "each.key"]`),
+			from:      awsWebInstance, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnresolvedReference + ": " + fmt.Sprintf(opaqueFormat, "each.key")},
+		},
+		{
+			name: "id of a group", resources: world(`["aws_security_group.app.id", "aws_security_group.app"]`),
+			from: awsWebInstance, to: awsDBGroup, want: VerdictAllowed,
+		},
+	})
+}
+
 // planChange is one resource that a plan JSON creates: its planned values and its `after_unknown` ("" for none).
 type planChange struct {
 	address, after, unknown string

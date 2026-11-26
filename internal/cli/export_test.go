@@ -60,7 +60,8 @@ const patternURL = "https://example.org/patterns/demo.json"
 
 // mappedPatternFiles make the architecture of the check workspace depend on its URL mapping: the `$schema` of the
 // CALM document is a pattern URL that the mapping maps to a file of the workspace. The mapping also has an entry
-// outside the workspace and one for a missing file.
+// outside the workspace, one for a missing file, and an absolute entry whose path, joined to the mapping directory,
+// would name a workspace file.
 func mappedPatternFiles() map[string]string {
 	return map[string]string{
 		"concordia.yaml": strings.Replace(chkWorkspaceText(""), "architecture: {source: architecture/a.calm.json}",
@@ -68,9 +69,11 @@ func mappedPatternFiles() map[string]string {
 		"architecture/a.calm.json": strings.Replace(chkArch(), "https://calm.finos.org/release/1.2/meta/calm.json", patternURL, 1),
 		"architecture/url-mapping.json": `{"` + patternURL + `": "patterns/demo.json",
   "https://example.org/shared.json": "../../shared.json",
+  "https://example.org/absolute.json": "/absolute/abs.json",
   "https://example.org/missing.json": "patterns/missing.json"}`,
 		"architecture/patterns/demo.json": `{"$schema": "https://calm.finos.org/release/1.2/meta/calm.json", "$id": "` +
 			patternURL + `", "type": "object"}`,
+		"architecture/absolute/abs.json": `{"description": "not the file of the absolute entry"}`,
 	}
 }
 
@@ -112,7 +115,7 @@ func TestExportBundleCarriesTheURLMappingForDiff(t *testing.T) {
 	}
 
 	exportTestWantBundleFiles(t, manifest, "inputs/architecture/url-mapping.json", "inputs/architecture/patterns/demo.json")
-	exportTestWantNoFile(t, manifest, "shared.json", "missing.json")
+	exportTestWantNoFile(t, manifest, "shared.json", "missing.json", "abs.json")
 
 	res := exportTestRun(t, s, 0, "diff", "--from", exportTestBundlePath(s), "--to", "worktree", "--kind", "intent", "--no-color")
 	if strings.Contains(res.Stderr, "CO-INT-012") {

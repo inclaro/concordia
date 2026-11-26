@@ -34,8 +34,8 @@ The result comes from the code. A relationship in the model never hides an edge,
 2. Concordia takes every edge of a listed kind from the index. It keeps the edges whose two ends belong to two different nodes of type `service`, `database`, or `webclient`.
 3. For each such edge, Concordia looks for a declared relationship between the two nodes in the model.
 4. No relationship gives an `undeclared` finding. A relationship that does not allow the edge kind gives a `contradiction` finding.
-5. Each edge has a confidence level. An edge below the minimum confidence of the rule (`syntactic` by default) is counted as sub-threshold and is not reported. An edge to a target that no binding covers gives a `binding-gap` finding instead of a verdict on that edge.
-6. One finding makes the rule a `violation`.
+5. Each edge has a confidence level. A dependency edge below the minimum confidence of the rule (`syntactic` by default) is counted as sub-threshold and gives no `undeclared` or `contradiction` finding. A `binding-gap` finding is a separate outcome: an edge to a target that no binding covers gives a `binding-gap` finding instead of a verdict on that edge, also when the edge is below the minimum confidence. The example shows one for a `heuristic` HTTP call.
+6. One `undeclared` or `contradiction` finding makes the rule a `violation`. Without such a finding, a `binding-gap` finding or missing coverage makes the rule `unknown`, not `pass`. In the example, when all four pairs are declared, the rule is `unknown`: the binding gap remains, and the excluded Kotlin code misses the language coverage (`CO-CON-026`).
 
 ## What you still declare
 
@@ -150,7 +150,7 @@ The pair `fraud-service -> notifications-service` is gone. The other three pairs
 
 ## Make it block a merge
 
-The rule fails the build as shipped. Its severity is `error`, the workspace sets `check.failOn: error`, and a rule over code edges is `mandatory` by default. Every active finding makes `check` exit with code 1.
+The rule fails the build as shipped. Its severity is `error`, the workspace sets `check.failOn: error`, and a rule over code edges is `mandatory` by default. Every active finding at or above `check.failOn` makes `check` exit with code 1. An active finding below that level, such as the `info` binding gap in the example, does not. An `unknown` verdict still blocks: the workspace sets `check.unknown: fail`, so `check` exits with code 4 when the rule is `unknown` and has no violation.
 
 On an existing system you may have many undeclared dependencies on the first run. Record them in a baseline, so that only new ones fail the build. See [manage baselines and waivers](../how-to/manage-baselines-and-waivers.md). To show the findings without failing the build for a while, set the mode of the rule to `advisory` under `check.enforcement`:
 

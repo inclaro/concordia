@@ -92,7 +92,8 @@ func awsPeerScenarios() []awsScenario {
 			rules: "aws_security_group.workers egress[0], aws_security_group.workers ingress[0]",
 		},
 		{
-			name: "self rule does not allow other groups", from: "aws_instance.app", to: "aws_instance.worker_b", port: 7000,
+			name: "self rule does not allow other groups", from: "aws_instance.existing_app", to: "aws_instance.worker_b",
+			port: 7000,
 			want: cloudfw.VerdictDenied,
 		},
 	}

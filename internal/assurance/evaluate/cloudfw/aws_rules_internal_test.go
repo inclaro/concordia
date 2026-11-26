@@ -120,3 +120,37 @@ func TestInlineRuleWithUnknownSelf(t *testing.T) {
 		gaps: []string{evaluate.GapUnknownAfterApply + ": " + awsDBGroup + ".ingress[0].self"},
 	}})
 }
+
+// TestChangedRuleOwnerAndDirection: a rule resource that the plan replaces with a new `type` may have been a rule of
+// the other direction of its old group, whose inline list may still copy it; a changed rule whose known group ID is
+// another group's does not make the inline list of this group stale.
+func TestChangedRuleOwnerAndDirection(t *testing.T) {
+	t.Parallel()
+
+	world := func(actions []string, values map[string]any, prior map[string]string) []plan.Resource {
+		rule := resourceOf("aws_security_group_rule.moved", awsGroupRule, values)
+		rule.Actions, rule.Prior = actions, prior
+
+		return []plan.Resource{
+			group(awsAppGroup, idApp, []any{}, []any{allTraffic()}),
+			group(awsDBGroup, idDB, []any{postgresFrom(map[string]any{"security_groups": []any{idApp}})}, []any{}),
+			rule,
+		}
+	}
+	egress := map[string]any{"type": "egress", "security_group_id": idDB, "protocol": "tcp"}
+	elsewhere := map[string]any{"type": "ingress", "security_group_id": "sg-other", "protocol": "tcp"}
+
+	runQueryCases(t, []queryCase{
+		{
+			name:      "replaced from ingress to egress of the group",
+			resources: world([]string{"delete", "create"}, egress, map[string]string{"security_group_id": idDB}),
+			from:      awsAppGroup, to: awsDBGroup, want: VerdictUnknown,
+			gaps: []string{evaluate.GapUnknownAfterApply + ": " + awsDBGroup + ".ingress may repeat a rule that the plan changes"},
+		},
+		{
+			name:      "updated rule of a group outside the plan",
+			resources: world([]string{"update"}, elsewhere, nil),
+			from:      awsAppGroup, to: awsDBGroup, want: VerdictAllowed,
+		},
+	})
+}

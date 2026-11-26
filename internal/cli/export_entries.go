@@ -106,7 +106,12 @@ func addURLMapping(app *Context, wsp *workspace.Workspace, byPath map[string][]b
 	}
 
 	for _, entry := range entries {
-		if err := addMappedFile(app, wsp, path.Join(path.Dir(name), filepath.ToSlash(entry)), byPath); err != nil {
+		rel, ok := mappedPath(path.Dir(name), entry)
+		if !ok {
+			continue
+		}
+
+		if err := addMappedFile(app, wsp, rel, byPath); err != nil {
 			return err
 		}
 	}
@@ -114,12 +119,22 @@ func addURLMapping(app *Context, wsp *workspace.Workspace, byPath map[string][]b
 	return nil
 }
 
-// addMappedFile adds one mapped file of the URL mapping when it is a file of the workspace.
-func addMappedFile(app *Context, wsp *workspace.Workspace, rel string, byPath map[string][]byte) error {
-	if path.IsAbs(rel) || !filepath.IsLocal(filepath.FromSlash(rel)) {
-		return nil
+// mappedPath gives the workspace-relative path of a mapping entry, resolved against the directory of the mapping
+// file. An absolute entry (checked before the join, which would make it relative) or one that leaves the workspace
+// gives false.
+func mappedPath(dir, entry string) (string, bool) {
+	slashed := filepath.ToSlash(entry)
+	if filepath.IsAbs(entry) || path.IsAbs(slashed) {
+		return "", false
 	}
 
+	rel := path.Join(dir, slashed)
+
+	return rel, filepath.IsLocal(filepath.FromSlash(rel))
+}
+
+// addMappedFile adds one mapped file of the URL mapping; a file that does not exist is left out.
+func addMappedFile(app *Context, wsp *workspace.Workspace, rel string, byPath map[string][]byte) error {
 	err := addConfined(app, wsp, rel, "mapped file", byPath)
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil

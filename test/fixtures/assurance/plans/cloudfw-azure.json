@@ -412,6 +412,7 @@
         {
           "address": "azurerm_network_security_group.db",
           "mode": "managed",
+          "provider_config_key": "azurerm",
           "type": "azurerm_network_security_group",
           "name": "db",
           "expressions": {
@@ -447,6 +448,7 @@
         {
           "address": "azurerm_network_security_rule.https",
           "mode": "managed",
+          "provider_config_key": "azurerm",
           "type": "azurerm_network_security_rule",
           "name": "https",
           "expressions": {

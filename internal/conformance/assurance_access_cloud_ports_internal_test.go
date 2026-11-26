@@ -27,7 +27,7 @@ func portTexts(ports []portKey) []string {
 }
 
 // Without ports in the rule, the queries cover every port that a firewall rule of the plan names, the ports next to
-// it, and one port that no rule names.
+// it, and one port that no rule names. The Azure resource also adds a UDP port, for the Azure default rules.
 func TestPlanPortsIncludeAProbeOutsideEveryRule(t *testing.T) {
 	t.Parallel()
 
@@ -40,7 +40,7 @@ func TestPlanPortsIncludeAProbeOutsideEveryRule(t *testing.T) {
 
 	want := []string{
 		"tcp/1", "tcp/2", "tcp/3", "tcp/4", "tcp/442", "tcp/443", "tcp/444", "tcp/5431", "tcp/5432", "tcp/5433",
-		"tcp/8079", "tcp/8080", "tcp/8081",
+		"tcp/8079", "tcp/8080", "tcp/8081", "udp/1",
 	}
 	if got := portTexts(planPorts(resources)); !slices.Equal(got, want) {
 		t.Errorf("ports = %v, want %v", got, want)
@@ -126,6 +126,12 @@ func azureUDPDenyPlan() *plan.Plan {
 	deny := azureNSGRule("deny-udp", 100, "Deny", "Udp")
 	deny["destination_port_range"] = "0-65535"
 
+	return azureNICPlan(deny, azureNSGRule("allow-tcp", 200, "Allow", "Tcp"))
+}
+
+// azureNICPlan is an Azure plan with an app NIC and a database NIC in two subnets of one virtual network, and an NSG
+// with the rules on the database NIC.
+func azureNICPlan(rules ...any) *plan.Plan {
 	subnet := func(address, id, prefix string) plan.Resource {
 		return planned(address, map[string]any{
 			"id": id, "name": id, "resource_group_name": "rg", "virtual_network_name": "vnet", "address_prefixes": []any{prefix},
@@ -147,7 +153,7 @@ func azureUDPDenyPlan() *plan.Plan {
 			}),
 			planned("azurerm_network_security_group.db", map[string]any{
 				"id": "nsg-db", "name": "db", "resource_group_name": "rg",
-				"security_rule": []any{deny, azureNSGRule("allow-tcp", 200, "Allow", "Tcp")},
+				"security_rule": rules,
 			}),
 			subnet("azurerm_subnet.app", "sub-app", "10.0.1.0/24"),
 			subnet("azurerm_subnet.db", "sub-db", "10.0.2.0/24"),
@@ -160,8 +166,23 @@ func azureUDPDenyPlan() *plan.Plan {
 func TestCloudFirewallQueriesEveryProtocolInUse(t *testing.T) {
 	t.Parallel()
 
+	got, run := azurePortlessOutcome(t, azureUDPDenyPlan())
+	if got.Verdict != VerdictViolation {
+		t.Errorf("outcome = %s %q %q, want a violation through TCP", got.Verdict, got.Reason, got.Detail)
+	}
+
+	if !hasAllowedTCPFromAppToDB(run.report.Evaluations) {
+		t.Errorf("no allowed TCP evaluation from the app to the database: %+v", run.report.Evaluations)
+	}
+}
+
+// azurePortlessOutcome evaluates a rule `expect: denied` without ports from the app NIC to the database NIC of an Azure
+// plan, with the completeness assumption declared.
+func azurePortlessOutcome(t *testing.T, p *plan.Plan) (ExternalOutcome, *assuranceRun) {
+	t.Helper()
+
 	declared := evidence.Plan{
-		Plan: azureUDPDenyPlan(), Coverage: assurance.CoverageComplete,
+		Plan: p, Coverage: assurance.CoverageComplete,
 		Declared: workspace.AssurancePlan{Environment: cloudEnvironment, Tool: "terraform", File: cloudPlanFile},
 	}
 
@@ -177,12 +198,52 @@ func TestCloudFirewallQueriesEveryProtocolInUse(t *testing.T) {
 		}},
 	}
 
-	if got := onlyOutcome(t, run, rule); got.Verdict != VerdictViolation {
-		t.Errorf("outcome = %s %q %q, want a violation through TCP", got.Verdict, got.Reason, got.Detail)
+	return onlyOutcome(t, run, rule), run
+}
+
+// The Azure default rule AllowVnetInBound allows every protocol inside one virtual network, and it is not in the plan.
+// An NSG that denies only TCP leaves UDP open, so a rule `expect: denied` without ports must query UDP and is violated.
+func TestCloudFirewallQueriesUDPForAzureDefaultRules(t *testing.T) {
+	t.Parallel()
+
+	vnet := azureNICPlan(azureNSGRule("deny-tcp", 100, "Deny", "Tcp"))
+	for i := range vnet.Resources {
+		vnet.Resources[i].ProviderConfig = "azurerm"
 	}
 
-	if !hasAllowedTCPFromAppToDB(run.report.Evaluations) {
-		t.Errorf("no allowed TCP evaluation from the app to the database: %+v", run.report.Evaluations)
+	got, run := azurePortlessOutcome(t, vnet)
+	if got.Verdict != VerdictViolation {
+		t.Errorf("outcome = %s %q %q, want a violation through UDP", got.Verdict, got.Reason, got.Detail)
+	}
+
+	if !slices.ContainsFunc(run.report.Evaluations, func(e EvaluationEntry) bool { return strings.HasPrefix(e.Query, "udp/") }) {
+		t.Errorf("no UDP evaluation: %+v", run.report.Evaluations)
+	}
+}
+
+// The inline rules of an `aws_default_security_group`, which the evaluator reads, name ports to query.
+func TestPlanPortsReadDefaultSecurityGroups(t *testing.T) {
+	t.Parallel()
+
+	resources := []plan.Resource{{Type: "aws_default_security_group", Values: map[string]any{
+		"ingress": []any{map[string]any{"protocol": "tcp", "from_port": float64(5432), "to_port": float64(5432)}},
+	}}}
+
+	if got := portTexts(planPorts(resources)); !slices.Contains(got, "tcp/5432") {
+		t.Errorf("ports %v do not hold tcp/5432", got)
+	}
+}
+
+// A port range with spaces around the dash, which the evaluator reads, gives the same queries as one without.
+func TestPlanPortsReadRangesWithSpaces(t *testing.T) {
+	t.Parallel()
+
+	rule := func(ports string) []plan.Resource {
+		return []plan.Resource{{Type: "azurerm_network_security_rule", Values: map[string]any{"protocol": "Tcp", "destination_port_range": ports}}}
+	}
+
+	if spaced, plain := portTexts(planPorts(rule("8000 - 8100"))), portTexts(planPorts(rule("8000-8100"))); !slices.Equal(spaced, plain) {
+		t.Errorf("ports of `8000 - 8100` = %v, want those of `8000-8100`: %v", spaced, plain)
 	}
 }
 

@@ -29,13 +29,24 @@ const (
 	awsAttachmentRule = "attachment"
 )
 
-// awsAttached are the groups that other resources attach to the network interfaces of an endpoint, the network
-// interfaces attached besides the endpoint's own, and a pending rule for each attachment that may concern the
-// endpoint but does not resolve.
+// awsAttached are the groups that other resources attach to the network interfaces of an endpoint, by interface when
+// the attachment names one, the network interfaces attached besides the endpoint's own, and a pending rule for each
+// attachment that may concern the endpoint but does not resolve. nicsOpen is true when an attachment that does not
+// resolve may attach another network interface, whose addresses are then not known.
 type awsAttached struct {
-	groups  []*plan.Resource
-	pending []awsRule
-	nics    []*plan.Resource
+	byNIC    map[*plan.Resource][]*plan.Resource
+	groups   []*plan.Resource
+	pending  []awsRule
+	nics     []*plan.Resource
+	nicsOpen bool
+}
+
+// attach records a group on the network interface; nic is nil when the attachment does not name one interface.
+func (out *awsAttached) attach(nic *plan.Resource, groups ...*plan.Resource) {
+	out.groups = append(out.groups, groups...)
+	if nic != nil {
+		out.byNIC[nic] = append(out.byNIC[nic], groups...)
+	}
 }
 
 // awsLink asks whether an attribute of an attachment names one of the targets: by a configuration reference to a
@@ -50,13 +61,14 @@ type awsLink struct {
 
 // awsAttachments finds what other resources attach to an instance or a network interface endpoint.
 func (e *Evaluator) awsAttachments(endpoint *plan.Resource) *awsAttached {
-	out := &awsAttached{}
+	out := &awsAttached{byNIC: map[*plan.Resource][]*plan.Resource{}}
 	if endpoint.Type != awsInstance && endpoint.Type != awsNetworkInterface {
 		return out
 	}
 
 	interfaces := e.awsInterfaces(endpoint, out)
 	out.nics = interfaces[1:]
+	out.nicsOpen = len(out.pending) > 0
 
 	for _, nic := range out.nics {
 		e.awsInterfaceGroups(nic, endpoint, out)
@@ -234,7 +246,7 @@ func (e *Evaluator) awsInterfaceGroups(nic, endpoint *plan.Resource, out *awsAtt
 		})
 	}
 
-	out.groups = append(out.groups, groups...)
+	out.attach(nic, groups...)
 }
 
 // awsGroupAttachments adds the group of each aws_network_interface_sg_attachment that names a network interface of
@@ -266,7 +278,7 @@ func (e *Evaluator) awsGroupAttachments(endpoint *plan.Resource, interfaces []*p
 			continue
 		}
 
-		out.groups = append(out.groups, group)
+		out.attach(e.awsTargetOf(link, interfaces), group)
 	}
 }
 
@@ -351,8 +363,9 @@ func (e *Evaluator) awsConcerns(link *awsLink, out *awsAttached) bool {
 	return e.awsNamesTarget(link, link.res.References[planPath(link.path)], out)
 }
 
-// awsNamesTarget resolves configuration addresses and reports whether one is a target. Addresses that do not
-// resolve, or no addresses at all, make the attachment pending.
+// awsNamesTarget resolves configuration addresses and reports whether they name a target: only when they resolve,
+// in full, to that one resource. An expression can name several resources and take the value of one of them, so a
+// target among several resources, addresses that do not resolve, or no addresses at all make the attachment pending.
 func (e *Evaluator) awsNamesTarget(link *awsLink, addresses []string, out *awsAttached) bool {
 	check := &side{}
 
@@ -364,16 +377,35 @@ func (e *Evaluator) awsNamesTarget(link *awsLink, addresses []string, out *awsAt
 	}
 
 	found, ok := e.resolveAll(link.res, addresses, check)
-	if slices.ContainsFunc(found, func(res *plan.Resource) bool { return slices.Contains(link.targets, res) }) {
-		return true
-	}
 
-	if !ok {
+	named, pending := link.outcome(sortResources(found), ok, check)
+	if pending {
 		out.pend(link, link.path, check.gaps)
 	}
 
-	return false
+	return named
 }
+
+// outcome says whether the resolved resources name a target for certain, and whether the attachment stays pending:
+// when a reference does not resolve, or when a target is one of several resources.
+func (link *awsLink) outcome(found []*plan.Resource, resolved bool, check *side) (named, pending bool) {
+	switch {
+	case !resolved:
+		return false, true
+	case !slices.ContainsFunc(found, link.isTarget):
+		return false, false
+	case len(found) == 1:
+		return true, false
+	}
+
+	check.gap(evaluate.GapUnresolvedReference,
+		fmt.Sprintf("%s.%s names %d resources", link.res.Address, planPath(link.path), len(found)))
+
+	return false, true
+}
+
+// isTarget reports whether the resource is a target of the link.
+func (link *awsLink) isTarget(res *plan.Resource) bool { return slices.Contains(link.targets, res) }
 
 // pend records an attachment that may add a group to the endpoint but does not resolve: a rule that applies maybe in
 // both directions.

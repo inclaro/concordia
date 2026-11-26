@@ -25,7 +25,7 @@ func (e *Evaluator) awsInlineRulesOf(group *plan.Resource, dir *awsDirection) []
 // or after it, its owner is the group or does not resolve.
 func (e *Evaluator) awsInlineStale(group *plan.Resource, dir *awsDirection) bool {
 	return slices.ContainsFunc(e.changedOfType(awsGroupRule, dir.vpcType), func(res *plan.Resource) bool {
-		return awsChangeInDirection(res, dir) && e.awsMayOwn(res, group)
+		return e.awsMayOwn(res, group, dir)
 	})
 }
 
@@ -41,20 +41,38 @@ func awsChangeInDirection(res *plan.Resource, dir *awsDirection) bool {
 	return !ok || kind == dir.block
 }
 
-// awsMayOwn reports whether the group may be the owner of the rule resource: after the change through its planned
-// `security_group_id`, and, for a resource that the plan deletes or replaces, before the change through the known ID
-// that the plan gives for it. A deleted resource without that ID may belong to any group.
-func (e *Evaluator) awsMayOwn(rule, group *plan.Resource) bool {
-	if rule.Values != nil && e.awsOwnedAfter(rule, group) {
+// awsMayOwn reports whether the group may be the owner of the rule resource in the direction: after the change
+// through its planned `type` and `security_group_id`, and, for a resource that the plan deletes or replaces, before
+// the change through the known ID that the plan gives for it. A deleted resource without that ID may belong to any
+// group. The plan does not give the `type` before the change, and a new `type` replaces the resource, so before the
+// change the rule may have been of either direction.
+func (e *Evaluator) awsMayOwn(rule, group *plan.Resource, dir *awsDirection) bool {
+	if e.awsMayOwnAfter(rule, group, dir) {
 		return true
 	}
 
 	return removesRule(rule) && awsOwnedBefore(rule, group)
 }
 
-// awsOwnedAfter reports whether the group may be the owner of the rule resource after the change: its planned
+// awsMayOwnAfter reports whether the rule resource exists after the change, may be a rule of the direction, and may
+// belong to the group.
+func (e *Evaluator) awsMayOwnAfter(rule, group *plan.Resource, dir *awsDirection) bool {
+	if rule.Values == nil || !awsChangeInDirection(rule, dir) {
+		return false
+	}
+
+	return e.awsOwnedAfter(rule, group)
+}
+
+// awsOwnedAfter reports whether the group may be the owner of the rule resource after the change. When the planned
+// `security_group_id` and the ID of the group are both known, they decide. Otherwise the owner may be the group when
 // `security_group_id` does not resolve, is absent, or names the group.
 func (e *Evaluator) awsOwnedAfter(rule, group *plan.Resource) bool {
+	ownerID, ownerKnown := attrString(rule, "security_group_id")
+	if groupID, groupKnown := attrString(group, attrID); ownerKnown && groupKnown {
+		return ownerID == groupID
+	}
+
 	owner, ok := e.refOfType(rule, "security_group_id", &side{}, awsGroupTypes...)
 
 	return !ok || owner == nil || owner == group

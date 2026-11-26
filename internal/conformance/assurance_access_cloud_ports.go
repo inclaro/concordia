@@ -17,14 +17,19 @@ import (
 // has a query: the first port of each class is a start, a port after an end, or the lowest port that no rule names,
 // and the last port of the class before it is an end or a port before a start. A rule that opens every port of a
 // protocol (`*`, a GCP block without ports, AWS `-1`) names no range, so its protocol still gets the port that no
-// rule names. Each protocol keeps its own ports and ranges: a UDP range never hides a TCP port.
+// rule names. Each protocol keeps its own ports and ranges: a UDP range never hides a TCP port. A plan with Azure
+// resources also queries UDP: the Azure default rules, which are not in the plan, allow every protocol inside a
+// virtual network and out to the internet, and an endpoint without an NSG allows every protocol.
 
 // firewallRuleTypes are the resource types whose values name the ports of firewall rules.
 var firewallRuleTypes = []string{
-	"aws_security_group", "aws_security_group_rule", "aws_vpc_security_group_ingress_rule",
+	"aws_security_group", "aws_default_security_group", "aws_security_group_rule", "aws_vpc_security_group_ingress_rule",
 	"aws_vpc_security_group_egress_rule", "azurerm_network_security_group", "azurerm_network_security_rule",
 	"google_compute_firewall",
 }
+
+// azureTypePrefix is the type prefix of the Azure resources, whose default rules open UDP as well as TCP.
+const azureTypePrefix = "azurerm_"
 
 // Attributes of a rule object that name its protocol.
 const (
@@ -54,6 +59,10 @@ type cloudPortSet struct {
 func planPorts(resources []plan.Resource) []portKey {
 	set := &cloudPortSet{byProtocol: map[string]*portSet{}}
 	set.of(netpol.ProtocolTCP)
+
+	if slices.ContainsFunc(resources, func(r plan.Resource) bool { return strings.HasPrefix(r.Type, azureTypePrefix) }) {
+		set.of(netpol.ProtocolUDP)
+	}
 
 	set.collectResources(resources)
 
@@ -213,11 +222,11 @@ func specTexts(value any) []string {
 	return nil
 }
 
-// parsePortRange reads a port text: `80` or `1000-2000`.
+// parsePortRange reads a port text as the evaluator does: `80`, `1000-2000`, or `1000 - 2000`.
 func parsePortRange(spec string) ([2]int, bool) {
-	low, high, isRange := strings.Cut(strings.TrimSpace(spec), "-")
+	low, high, isRange := strings.Cut(spec, "-")
 
-	from, err := strconv.Atoi(low)
+	from, err := strconv.Atoi(strings.TrimSpace(low))
 	if err != nil {
 		return [2]int{}, false
 	}
@@ -226,7 +235,7 @@ func parsePortRange(spec string) ([2]int, bool) {
 		return [2]int{from, from}, true
 	}
 
-	to, err := strconv.Atoi(high)
+	to, err := strconv.Atoi(strings.TrimSpace(high))
 
 	return [2]int{from, to}, err == nil
 }

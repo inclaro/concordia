@@ -145,7 +145,7 @@ PAY-TLS-001 advisory
 The example fails on unknown verdicts on purpose: the workspace sets `check.unknown: fail`, and `PAY-LEG-001` sets `onUnknown: fail` in its own `evidence` block. The rule setting wins over the workspace setting. On the first day of adoption, the bank cannot index the legacy Kotlin code yet. So the architecture team decides to report unknown verdicts as warnings until it can. You change both settings to `warn`, and you look at the change:
 
 ```bash
-cd /tmp/concordia-docs/brownfield && sed -i 's/^  unknown: fail$/  unknown: warn/' concordia.yaml && sed -i 's/onUnknown: fail/onUnknown: warn/' policies/payments.policy.yaml && git diff --stat && git diff -U0 | grep '^[-+] '
+cd /tmp/concordia-docs/brownfield && sed -i.bak 's/^  unknown: fail$/  unknown: warn/' concordia.yaml && sed -i.bak 's/onUnknown: fail/onUnknown: warn/' policies/payments.policy.yaml && rm concordia.yaml.bak policies/payments.policy.yaml.bak && git diff --stat && git diff -U0 | grep '^[-+] '
 ```
 
 ```output

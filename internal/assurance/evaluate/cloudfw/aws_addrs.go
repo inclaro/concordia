@@ -11,14 +11,19 @@ var awsNICSpec = awsEndpointSpecs[awsNetworkInterface]
 
 // awsEndpointAddrs is the address set of an endpoint: the addresses of its own interface and of every network
 // interface that is attached to it. An instance whose interfaces all come from its `network_interface` blocks has
-// only the addresses of those interfaces.
-func (e *Evaluator) awsEndpointAddrs(res *plan.Resource, spec *awsEndpointSpec, nics []*plan.Resource, viaInterfaces bool) addrSet {
-	sets := make([]addrSet, 0, len(nics)+1)
+// only the addresses of those interfaces. An attachment that does not resolve and may attach another interface
+// leaves the set unknown: that interface's addresses are not known.
+func (e *Evaluator) awsEndpointAddrs(res *plan.Resource, spec *awsEndpointSpec, attached *awsAttached, viaInterfaces bool) addrSet {
+	if attached.nicsOpen {
+		return unknownAddrs
+	}
+
+	sets := make([]addrSet, 0, len(attached.nics)+1)
 	if !viaInterfaces {
 		sets = append(sets, e.awsAddrs(res, spec))
 	}
 
-	for _, nic := range nics {
+	for _, nic := range attached.nics {
 		sets = append(sets, e.awsAddrs(nic, &awsNICSpec))
 	}
 

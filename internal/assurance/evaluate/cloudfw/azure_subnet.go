@@ -136,11 +136,19 @@ func (e *Evaluator) azureVNetOf(subnet *plan.Resource, report *side) string {
 }
 
 // azureVNetKey is the key of the virtual network that a subnet references: its resource group and name, else its
-// address.
+// address. A subnet finds its network by name in its own resource group, so the reference identifies the network
+// only when the plan shows the subnet and the network in one resource group.
 func azureVNetKey(vnet, subnet *plan.Resource, report *side) string {
 	if vnet.Type != azureVNetType {
 		report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s.virtual_network_name names %s, a %s, not a %s",
 			subnet.Address, vnet.Address, vnet.Type, azureVNetType))
+
+		return ""
+	}
+
+	if !azureSameGroup(vnet, subnet) {
+		report.gap(evaluate.GapUnresolvedReference, fmt.Sprintf("%s.virtual_network_name names %s, but the plan does "+
+			"not show that the two are in one resource group", subnet.Address, vnet.Address))
 
 		return ""
 	}
@@ -171,4 +179,12 @@ func (e *Evaluator) azureSameVNet(pair *azurePair, report *side) tri {
 		pair.from.res.Address, pair.to.res.Address))
 
 	return triMaybe
+}
+
+// azureSameGroup reports whether the plan knows the resource group of both resources and it is the same.
+func azureSameGroup(a, b *plan.Resource) bool {
+	groupA, knownA := attrString(a, "resource_group_name")
+	groupB, knownB := attrString(b, "resource_group_name")
+
+	return knownA && knownB && strings.EqualFold(groupA, groupB)
 }

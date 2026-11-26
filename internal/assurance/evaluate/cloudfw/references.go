@@ -136,13 +136,16 @@ func (e *Evaluator) resolveAll(from *plan.Resource, addresses []string, into *si
 
 // resolveConfig resolves a configuration address (without instance keys) that the resource from names to its single
 // instance in the plan of from: the configuration of one plan says nothing about the resources of another. A data
-// source, or an opaque `var.`, `local.`, or `each.value` entry whose value may hold any resource, does not resolve.
+// source, an opaque `var.`, `local.`, `each.key`, or `each.value` entry whose value may hold any resource, or an
+// attribute of a resource that does not identify it, does not resolve.
 func (e *Evaluator) resolveConfig(from *plan.Resource, config string, into *side) (*plan.Resource, bool) {
 	switch inst := e.instances(from, config); {
 	case isDataSource(config):
 		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(dataSourceFormat, config))
 	case plan.IsOpaqueReference(config):
 		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(opaqueFormat, config))
+	case plan.IsAttributeReference(config):
+		into.gap(evaluate.GapUnresolvedReference, fmt.Sprintf(attributeFormat, config))
 	case len(inst) == 1:
 		return inst[0], true
 	case len(inst) == 0:
@@ -157,8 +160,12 @@ func (e *Evaluator) resolveConfig(from *plan.Resource, config string, into *side
 // dataSourceFormat is the gap detail of a reference to a data source.
 const dataSourceFormat = "%s is a data source; its rules are not in the plan"
 
-// opaqueFormat is the gap detail of a reference through a variable, a local value, or `each.value`.
+// opaqueFormat is the gap detail of a reference through a variable, a local value, `each.key`, or `each.value`.
 const opaqueFormat = "%s is a variable or local value; the resource it names is not known from the plan"
+
+// attributeFormat is the gap detail of a reference to an attribute that does not identify its resource.
+const attributeFormat = "%s is an attribute that does not identify its resource; the resource it names is not known " +
+	"from the plan"
 
 // isDataSource reports whether the configuration address names a data source (`data.<type>.<name>`, in any module).
 func isDataSource(config string) bool {
