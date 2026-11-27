@@ -184,9 +184,9 @@ func TestEvaluateRegisterWithoutGovernancePack(t *testing.T) {
 
 	out := w.evaluate()
 
-	if len(out.Rules) != 0 || len(out.Findings) != 0 || out.Summary != nil {
-		t.Errorf("rules %d findings %d summary %v; want none", len(out.Rules), len(out.Findings), out.Summary)
-	}
+	evalWantEqual(t, "rules", len(out.Rules), 0)
+	evalWantEqual(t, "findings", len(out.Findings), 0)
+	evalWantEqual(t, "summary", out.Summary == nil, true)
 
 	evalRequireEqual(t, "diagnostics", len(out.Diagnostics), 1)
 	evalWantEqual(t, "diagnostic code", out.Diagnostics[0].Code, diag.ADR007)
@@ -366,6 +366,41 @@ func wantSatisfiedTrigger(t *testing.T, w *world) {
 	evalWantEqual(t, "satisfied trigger", ruleOf(t, out, adr.RuleScope).Verdict, conformance.VerdictPass)
 	evalRequireEqual(t, "trigger summaries", len(out.Summary.Triggers), 1)
 	evalWantEqual(t, "trigger satisfied by", out.Summary.Triggers[0].SatisfiedBy[0], "ADR-3")
+}
+
+// An unsatisfied trigger that an architecture change raises points at the architecture file, which the change set
+// contains.
+func TestEvaluateArchitectureTriggerLocatesTheArchitectureFile(t *testing.T) {
+	t.Parallel()
+
+	w := a12World(t, "  - id: ADR-0003\n    categories: [data-ownership]\n    governs: [{ref: 'calm:node:orders-db'}]\n")
+	w.git.FilesAt["abc"] = map[string]string{baseSource: `{
+  "nodes": [
+    {"unique-id": "orders", "node-type": "service", "name": "Orders", "description": "Orders"},
+    {"unique-id": "orders-db", "node-type": "database", "name": "Orders DB", "description": "Orders data"}
+  ],
+  "relationships": []
+}`}
+	w.triggers = []workspace.ADRTrigger{{
+		ID: "TRG-DATA", Category: "data-ownership", Architecture: []string{"relationship-added"}, NodeTypes: []string{"database"},
+	}}
+	w.changed = &conformance.RunChanged{Ref: "main", Base: "abc", Files: []string{baseSource}}
+
+	input := w.input()
+	input.Workspace.Architecture.Source = baseSource
+	input.Model.SourceURI = baseSource
+
+	out, err := adr.Evaluate(t.Context(), input)
+	if err != nil {
+		t.Fatalf("Evaluate: %v", err)
+	}
+
+	evalRequireEqual(t, "unsatisfied trigger", ruleOf(t, out, adr.RuleScope).Verdict, conformance.VerdictViolation)
+
+	f := findingsOf(out, adr.RuleScope)[0]
+	evalWantEqual(t, "trigger message", f.Message, "trigger TRG-DATA (data-ownership) is raised by relationship-added:orders-to-db and no such decision changed")
+	evalRequireEqual(t, "trigger location set", f.Location != nil, true)
+	evalWantEqual(t, "trigger location", f.Location.Path, baseSource)
 }
 
 // Scenario: Deterministic order.

@@ -63,7 +63,7 @@
   },
   "schemaVersion": "1.1",
   "toolchain": {
-    "claimsRegistryDigest": "sha256:7fa30d8b38567be2084dafe0e1e2e0717c005137f13a400e0bba29b3169c18fb",
+    "claimsRegistryDigest": "sha256:3962dc21c4125417bfd19dfa14bb36fb68e91c8f77fa48cfe73b5ee77980a281",
     "evaluators": [],
     "renderers": [],
     "trustContractDigest": "sha256:d38f6bef0660414d256368512d220f592dd7c8a05d3cd2ad27e78c54ecbe4a26"

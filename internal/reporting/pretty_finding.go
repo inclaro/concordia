@@ -1,6 +1,7 @@
 package reporting
 
 import (
+	"cmp"
 	"fmt"
 	"path"
 	"slices"
@@ -9,6 +10,7 @@ import (
 	"github.com/inclaro/concordia/internal/conformance"
 	"github.com/inclaro/concordia/internal/exceptions"
 	"github.com/inclaro/concordia/internal/observation"
+	"github.com/inclaro/concordia/internal/policy"
 )
 
 // shortName is the name of an observed node as a reader knows it: a file for a file or module node, else the qualified
@@ -237,6 +239,9 @@ type findingGroup struct {
 	findings []*conformance.Finding
 }
 
+// groupFindings groups the findings of a rule by their two ends and their next action. The groups are sorted by their
+// ends then their next action, and the findings of a group by location then message, so the order depends only on
+// what the output shows: not on the fingerprints, which change with the provider's project names.
 func groupFindings(rule *conformance.RuleResult, findings []*conformance.Finding) []findingGroup {
 	var groups []findingGroup
 
@@ -256,17 +261,59 @@ func groupFindings(rule *conformance.RuleResult, findings []*conformance.Finding
 		groups[i].findings = append(groups[i].findings, finding)
 	}
 
+	for i := range groups {
+		slices.SortStableFunc(groups[i].findings, compareShownFindings)
+	}
+
+	slices.SortStableFunc(groups, func(a, b findingGroup) int {
+		return cmp.Or(strings.Compare(a.ends, b.ends), strings.Compare(a.next, b.next))
+	})
+
 	return groups
 }
 
-// findingLines are the lines of one finding inside its group: the location and what the code does, aligned on the
-// width of the longest location of the group, then the lines that a finding of another kind carries (a view, a
-// decision), and with --verbose the fingerprint and the full evidence.
-func findingLines(run *conformance.Run, finding *conformance.Finding, width int, verbose bool) []string {
-	lines := locationLines(run, finding, width)
-	lines = append(lines, kindLines(finding)...)
+// compareShownFindings orders the findings of one group: located findings by path then line, those without a location
+// last, then by message, and by fingerprint when they would print the same.
+func compareShownFindings(a, b *conformance.Finding) int {
+	return cmp.Or(compareLocations(a.Location, b.Location), strings.Compare(a.Message, b.Message),
+		strings.Compare(a.Fingerprint, b.Fingerprint))
+}
 
-	if verbose {
+// compareLocations orders locations by path then line; a missing location comes last.
+func compareLocations(a, b *conformance.Location) int {
+	switch {
+	case a == nil || b == nil:
+		return cmp.Compare(boolRank(a == nil), boolRank(b == nil))
+	default:
+		return cmp.Or(strings.Compare(a.Path, b.Path), cmp.Compare(a.Line, b.Line))
+	}
+}
+
+// boolRank is 1 for true and 0 for false.
+func boolRank(v bool) int {
+	if v {
+		return 1
+	}
+
+	return 0
+}
+
+// findingLayout is how the findings of one group are shown: the family of their rule, the width of the longest
+// location of the group, and whether the output is --verbose.
+type findingLayout struct {
+	family  policy.PredicateFamily
+	width   int
+	verbose bool
+}
+
+// findingLines are the lines of one finding inside its group: the location and what the code does, aligned on the
+// width of the longest location of the group, then the lines that a finding of another kind carries (an effective
+// access, a view, a decision), and with --verbose the fingerprint and the full evidence.
+func findingLines(run *conformance.Run, finding *conformance.Finding, layout findingLayout) []string {
+	lines := locationLines(run, finding, layout.width)
+	lines = append(lines, kindLines(finding, layout.family)...)
+
+	if layout.verbose {
 		lines = append(lines, verboseLines(finding)...)
 	}
 
@@ -292,9 +339,15 @@ func locationLines(run *conformance.Run, finding *conformance.Finding, width int
 	return lines
 }
 
-// kindLines are the lines that a finding of another kind carries: the view of a diagram finding, the decision of a
-// governance finding.
-func kindLines(finding *conformance.Finding) []string {
+// kindLines are the lines that a finding of another kind carries: what the evaluator observed for an effective access
+// finding, the view of a diagram finding, the decision of a governance finding.
+func kindLines(finding *conformance.Finding, family policy.PredicateFamily) []string {
+	if family == policy.FamilyEffectiveAccess {
+		// The observed text states the access without the pair that the heading of the group already names:
+		// `open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (... rule)`.
+		return []string{"      " + finding.Observed}
+	}
+
 	if id := viewIDOf(finding); id != "" {
 		return []string{"      view " + id}
 	}

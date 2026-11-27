@@ -78,52 +78,71 @@ func (o *occurrenceEvidence) entry() LineageEntry {
 //     each environment (complete coverage; `resolved-selections` also needs every selector to be of supported syntax).
 //   - `exact-lineage`, `deployed-digest`, `deployment-succeeded`, `runtime-drift`: from the provenance evaluators.
 //
-// The other registered claims (`planned-resources`, `network-isolation`, `rbac-grants`, `check-outcome`,
-// `quality-scenario-verdict`) have their own evaluators and rule families, with their own outcome per subject; a
-// `require.claim` rule that names one of them has no evaluation here and returns false, so the family default
-// applies: `unknown`, never a pass.
+// The other registered claims (`planned-resources`, `network-isolation`, `cloud-network-isolation`, `rbac-grants`,
+// `check-outcome`, `quality-scenario-verdict`) have their own evaluators and rule families, with their own outcome
+// per subject; a `require.claim` rule that names one of them has no evaluation here and returns false, so the family
+// default applies: `unknown`, never a pass.
 func (c *checker) claimOutcomes(plan *policy.RulePlan) ([]ExternalOutcome, bool) {
 	claim := plan.Predicate.AssuranceClaim
-	if c.assurance == nil || c.assurance.ev == nil || claim == nil {
+	if !c.hasAssuranceEvidence() || claim == nil {
 		return nil, false
 	}
 
-	environments := c.claimEnvironments(claim)
+	id, environments := claims.ID(claim.ID), c.claimEnvironments(claim)
 
-	switch claims.ID(claim.ID) {
-	case claims.CompleteResourceSet, claims.ContainerOccurrenceVersions, claims.ResolvedSelections:
-		return renderedOutcomes(c.assurance.ev, claims.ID(claim.ID), environments), true
-	case claims.ExactLineage:
-		return c.occurrenceOutcomes(environments, lineageOutcome), true
-	case claims.DeployedDigest:
-		return c.occurrenceOutcomes(environments, deployedDigestOutcome), true
-	case claims.DeploymentSucceeded:
-		return c.occurrenceOutcomes(environments, deploymentSucceededOutcome), true
-	case claims.RuntimeDrift:
-		return c.occurrenceOutcomes(environments, runtimeDriftOutcome), true
-	case claims.PlannedResources, claims.NetworkIsolation, claims.RBACGrants, claims.CheckOutcome, claims.QualityScenarioVerdict:
-		return nil, false
+	if slices.Contains(renderedClaimIDs, id) {
+		return renderedOutcomes(c.assurance.ev, id, environments), true
+	}
+
+	if outcome, ok := occurrenceClaims[id]; ok {
+		return c.occurrenceOutcomes(environments, outcome), true
 	}
 
 	return nil, false
+}
+
+// hasAssuranceEvidence says whether the run loaded assurance evidence.
+func (c *checker) hasAssuranceEvidence() bool {
+	return c.assurance != nil && c.assurance.ev != nil
+}
+
+// renderedClaimIDs are the claims that the rendered documents give.
+var renderedClaimIDs = []claims.ID{claims.CompleteResourceSet, claims.ContainerOccurrenceVersions, claims.ResolvedSelections}
+
+// occurrenceClaims are the claims that the provenance evaluators give for each container occurrence, with the outcome
+// of one occurrence.
+var occurrenceClaims = map[claims.ID]func(*occurrenceEvidence) ExternalOutcome{
+	claims.ExactLineage:        lineageOutcome,
+	claims.DeployedDigest:      deployedDigestOutcome,
+	claims.DeploymentSucceeded: deploymentSucceededOutcome,
+	claims.RuntimeDrift:        runtimeDriftOutcome,
 }
 
 // claimEnvironments gives the environments that a claim rule is evaluated for: the environment that the rule names, or
 // else the environments of the run. A run with no declared environment evaluates the environments that the rendered
 // sources name; with none of those it has one unnamed environment, which the rendered claims report as missing.
 func (c *checker) claimEnvironments(claim *policy.ClaimRequirement) []string {
-	if claim.Environment != "" {
-		if slices.Contains(c.environments.Excluded, claim.Environment) {
-			return nil
-		}
-
-		return []string{claim.Environment}
-	}
-
-	if len(c.environments.Selected) > 0 {
+	switch {
+	case claim.Environment != "":
+		return c.namedClaimEnvironment(claim)
+	case len(c.environments.Selected) > 0:
 		return slices.Clone(c.environments.Selected)
 	}
 
+	return c.renderedEnvironments()
+}
+
+// namedClaimEnvironment gives the environment that the claim names, none when the run excludes it.
+func (c *checker) namedClaimEnvironment(claim *policy.ClaimRequirement) []string {
+	if slices.Contains(c.environments.Excluded, claim.Environment) {
+		return nil
+	}
+
+	return []string{claim.Environment}
+}
+
+// renderedEnvironments gives the environments that the rendered sources name, sorted, or one unnamed environment.
+func (c *checker) renderedEnvironments() []string {
 	var out []string
 
 	for _, result := range c.assurance.ev.Renders {
@@ -272,45 +291,67 @@ func renderedOutcomes(ev *evidence.Evidence, id claims.ID, environments []string
 // with `rendered-evidence-missing`: its occurrences cannot all be known, so the claim never passes for the
 // environment as a whole.
 func (c *checker) occurrenceOutcomes(environments []string, outcome func(*occurrenceEvidence) ExternalOutcome) []ExternalOutcome {
+	return append(c.occurrenceGaps(environments), c.occurrenceResults(environments, outcome)...)
+}
+
+// occurrenceGaps gives the `unknown` outcome of each environment whose occurrences are not all known.
+func (c *checker) occurrenceGaps(environments []string) []ExternalOutcome {
 	var out []ExternalOutcome
 
 	for _, environment := range environments {
-		sources := sourcesOf(c.assurance.ev, environment)
-
-		if len(sources) == 0 {
-			out = append(out, renderedEnvironment(claims.CompleteResourceSet, environment, sources))
-
-			continue
-		}
-
-		if detail, path := incompleteSources(sources); detail != "" {
-			out = append(out, ExternalOutcome{
-				Environment: environment, Verdict: VerdictUnknown, Reason: ReasonRenderedEvidenceMissing, Location: &Location{Path: path},
-				Detail: "the occurrences of " + environmentName(environment) + " are not all known: " + detail,
-			})
+		if gap, found := c.occurrenceGap(environment); found {
+			out = append(out, gap)
 		}
 	}
+
+	return out
+}
+
+// occurrenceResults gives the outcome of each rendered container occurrence of the environments.
+func (c *checker) occurrenceResults(environments []string, outcome func(*occurrenceEvidence) ExternalOutcome) []ExternalOutcome {
+	var out []ExternalOutcome
 
 	claim := c.assurance.claimEvidence()
 
 	for i := range claim.occurrences {
-		occ := &claim.occurrences[i]
-		if !slices.Contains(environments, occ.occ.Workload.Environment) {
-			continue
+		if occ := &claim.occurrences[i]; slices.Contains(environments, occ.occ.Workload.Environment) {
+			out = append(out, occurrenceResult(occ, outcome))
 		}
-
-		result := outcome(occ)
-		result.Environment = occ.occ.Workload.Environment
-		result.Subject, result.Occurrence = workloadSubject(&occ.occ.Workload), occurrenceName(occ.occ)
-
-		if occ.location != "" {
-			result.Location = &Location{Path: occ.location}
-		}
-
-		out = append(out, result)
 	}
 
 	return out
+}
+
+// occurrenceGap gives the `unknown` outcome of an environment whose occurrences are not all known: it has no rendered
+// source, or a source that is not complete.
+func (c *checker) occurrenceGap(environment string) (ExternalOutcome, bool) {
+	sources := sourcesOf(c.assurance.ev, environment)
+	if len(sources) == 0 {
+		return renderedEnvironment(claims.CompleteResourceSet, environment, sources), true
+	}
+
+	detail, path := incompleteSources(sources)
+	if detail == "" {
+		return ExternalOutcome{}, false
+	}
+
+	return ExternalOutcome{
+		Environment: environment, Verdict: VerdictUnknown, Reason: ReasonRenderedEvidenceMissing, Location: &Location{Path: path},
+		Detail: "the occurrences of " + environmentName(environment) + " are not all known: " + detail,
+	}, true
+}
+
+// occurrenceResult gives the outcome of one occurrence, named by its workload and container.
+func occurrenceResult(occ *occurrenceEvidence, outcome func(*occurrenceEvidence) ExternalOutcome) ExternalOutcome {
+	result := outcome(occ)
+	result.Environment = occ.occ.Workload.Environment
+	result.Subject, result.Occurrence = workloadSubject(&occ.occ.Workload), occurrenceName(occ.occ)
+
+	if occ.location != "" {
+		result.Location = &Location{Path: occ.location}
+	}
+
+	return result
 }
 
 // workloadSubject names the workload of an occurrence: its kind, namespace, and name.

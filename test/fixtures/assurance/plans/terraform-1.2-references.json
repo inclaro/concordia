@@ -1,0 +1,193 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.17.0",
+  "complete": true,
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "aws_security_group.gateway",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "gateway",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": { "name": "gateway", "egress": [], "ingress": [] },
+        "after_unknown": { "id": true, "vpc_id": true, "egress": [], "ingress": [] },
+        "after_sensitive": { "egress": [], "ingress": [] }
+      }
+    },
+    {
+      "address": "aws_security_group.db",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "db",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "db",
+          "ingress": [
+            { "from_port": 5432, "to_port": 5432, "protocol": "tcp", "description": "hunter2-config-secret", "cidr_blocks": [] }
+          ]
+        },
+        "after_unknown": { "id": true, "vpc_id": true, "ingress": [ { "security_groups": true, "cidr_blocks": [] } ] },
+        "after_sensitive": { "ingress": [ { "description": true, "cidr_blocks": [] } ] }
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.x",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "x",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": { "ip_protocol": "tcp", "from_port": 5432, "to_port": 5432 },
+        "after_unknown": { "id": true, "security_group_id": true, "referenced_security_group_id": true },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.net.aws_vpc.this[0]",
+      "module_address": "module.net",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "this",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": { "cidr_block": "10.20.0.0/16" },
+        "after_unknown": { "id": true },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.net.aws_security_group.web[0]",
+      "module_address": "module.net",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "index": 0,
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": { "name": "web-0" },
+        "after_unknown": { "id": true, "vpc_id": true },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "module.net.aws_security_group.web[1]",
+      "module_address": "module.net",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "web",
+      "index": 1,
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": ["create"],
+        "after": { "name": "web-1" },
+        "after_unknown": { "id": true, "vpc_id": true },
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": { "name": "aws", "full_name": "registry.terraform.io/hashicorp/aws" }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_security_group.gateway",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "gateway",
+          "expressions": {
+            "name": { "constant_value": "gateway" },
+            "vpc_id": { "references": ["var.vpc_id"] }
+          }
+        },
+        {
+          "address": "aws_security_group.db",
+          "mode": "managed",
+          "type": "aws_security_group",
+          "name": "db",
+          "expressions": {
+            "name": { "constant_value": "db" },
+            "vpc_id": { "references": ["data.aws_vpc.main.id", "data.aws_vpc.main"] },
+            "ingress": [
+              {
+                "from_port": { "constant_value": 5432 },
+                "to_port": { "constant_value": 5432 },
+                "protocol": { "constant_value": "tcp" },
+                "description": { "constant_value": "hunter2-config-secret" },
+                "security_groups": {
+                  "references": ["aws_security_group.gateway.id", "aws_security_group.gateway", "local.extra_groups"]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "aws_vpc_security_group_ingress_rule.x",
+          "mode": "managed",
+          "type": "aws_vpc_security_group_ingress_rule",
+          "name": "x",
+          "expressions": {
+            "ip_protocol": { "constant_value": "tcp" },
+            "from_port": { "constant_value": 5432 },
+            "to_port": { "constant_value": 5432 },
+            "security_group_id": { "references": ["aws_security_group.db.id", "aws_security_group.db"] },
+            "referenced_security_group_id": {
+              "references": ["aws_security_group.gateway.id", "aws_security_group.gateway"]
+            }
+          }
+        },
+        {
+          "address": "data.aws_vpc.main",
+          "mode": "data",
+          "type": "aws_vpc",
+          "name": "main",
+          "expressions": {
+            "default": { "constant_value": true }
+          }
+        }
+      ],
+      "module_calls": {
+        "net": {
+          "source": "./modules/net",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_vpc.this",
+                "mode": "managed",
+                "type": "aws_vpc",
+                "name": "this",
+                "expressions": {
+                  "cidr_block": { "constant_value": "10.20.0.0/16" }
+                },
+                "count_expression": { "constant_value": 1 }
+              },
+              {
+                "address": "aws_security_group.web",
+                "mode": "managed",
+                "type": "aws_security_group",
+                "name": "web",
+                "expressions": {
+                  "name": { "references": ["count.index"] },
+                  "vpc_id": { "references": ["aws_vpc.this[0].id", "aws_vpc.this[0]", "aws_vpc.this"] }
+                },
+                "count_expression": { "constant_value": 2 }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

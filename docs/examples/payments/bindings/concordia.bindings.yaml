@@ -1,0 +1,76 @@
+apiVersion: concordia.io/v1alpha1
+kind: BindingSet
+bindings:
+  # The load balancer and the fraud cache have no code. Only the plan and the manifests show them, and
+  # `bind validate` reads only the code graph, so these two bindings are not required to match there.
+  - id: bind-public-load-balancer
+    architectureRef: calm:node:public-load-balancer
+    exclusive: true
+    required: false
+    match:
+      any:
+        - {kind: infraResource, environment: production, address: aws_lb.public}
+  - id: bind-channels-api
+    architectureRef: calm:node:channels-api
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/channels-api/**
+        - {kind: workload, environment: production, resourceKind: Deployment, namespace: channels, name: channels-api}
+  - id: bind-payments-service
+    architectureRef: calm:node:payments-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/payments-service/**
+        - {kind: workload, environment: production, resourceKind: Deployment, namespace: payments, name: payments-service}
+  - id: bind-fraud-service
+    architectureRef: calm:node:fraud-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/fraud-service/**
+  - id: bind-notifications-service
+    architectureRef: calm:node:notifications-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/notifications-service/**
+  - id: bind-ledger-service
+    architectureRef: calm:node:ledger-service
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/ledger-service/**
+  - id: bind-ledger-db
+    architectureRef: calm:node:ledger-db
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/ledger-service/src/db/**
+        - {kind: infraResource, environment: production, address: aws_db_instance.ledger}
+  - id: bind-customer-profile
+    architectureRef: calm:node:customer-profile
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/customer-profile/**
+  - id: bind-reporting-job
+    architectureRef: calm:node:reporting-job
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: jobs/reporting/**
+  - id: bind-legacy-core-banking
+    architectureRef: calm:node:legacy-core-banking
+    exclusive: true
+    match:
+      any:
+        - sourceRoot: services/legacy-core-banking/**
+  - id: bind-fraud-cache
+    architectureRef: calm:node:fraud-cache
+    exclusive: true
+    required: false
+    match:
+      any:
+        - {kind: workload, environment: production, resourceKind: Deployment, namespace: fraud, name: fraud-cache}

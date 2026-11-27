@@ -360,8 +360,8 @@ A `cosign-key` producer with `issuer` or `identity`, or a `cosign-keyless` produ
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `environment` | string | required | An environment id. One entry for each environment. |
-| `kinds` | `network-policy`, `rbac` | required, at least one | The evaluators that run for the environment. |
-| `assumes` | `network-policy-enforced`, `rbac-authorizer-enabled` | `[]` | The enforcement assumptions that you declare. An evaluator result that needs an assumption that is not declared is `unknown` with the reason `enforcement-not-declared`. |
+| `kinds` | `network-policy`, `rbac`, `cloud-firewall` | required, at least one | The evaluators that run for the environment. `cloud-firewall` evaluates network rules against the plans in [`assurance.plans`](#assuranceplans); see [cloud-firewall](assurance.md#cloud-firewall). |
+| `assumes` | `network-policy-enforced`, `rbac-authorizer-enabled`, `firewall-rules-complete-in-plan` | `[]` | The enforcement assumptions that you declare. An evaluator result that needs an assumption that is not declared is `unknown` with the reason `enforcement-not-declared`. `firewall-rules-complete-in-plan` states that no firewall rule for the queried resources exists outside the plans. |
 
 ### assurance.verification
 
@@ -482,8 +482,8 @@ The workspace `test/fixtures/views/concordia.yaml` in the repository holds this 
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `minimumCoverage` | number 0..1 | `0.95` | Required file coverage. `--minimum-coverage` overrides it. |
-| `unknown` | `fail`, `warn`, `ignore` | `fail` | What an unknown rule verdict does. `--unknown` overrides it. |
+| `minimumCoverage` | number 0..1 | `0.95` | Required file coverage of a rule that sets no `minimumCoverage` and has no CALM control that sets it. `--minimum-coverage` overrides it, and also the value of every rule and control. |
+| `unknown` | `fail`, `warn`, `ignore` | `fail` | What an unknown rule verdict does, for a rule that sets no `onUnknown` and has no CALM control that sets it. `--unknown` overrides it, and also the value of every rule and control. See [the `evidence` block](policies.md#the-evidence-block). |
 | `failOn` | `error`, `warning`, `info` | `error` | Minimum active severity that yields failure. `--fail-on` overrides it. |
 | `enforcement` | list | none | The enforcement mode by rule family, pack, or rule, and environment. See [check.enforcement](#checkenforcement). |
 | `rollback` | object | none | Runs the typed, decision-governance, and review rules as `shadow` until a date. See [check.rollback](#checkrollback). |
@@ -641,31 +641,77 @@ Rules for the lock:
 
 ## Example
 
-The complete workspace of the commerce example (`docs/examples/commerce/concordia.yaml`):
+The complete workspace of the payments example (`docs/examples/payments/concordia.yaml`):
 
 ```yaml
 apiVersion: concordia.io/v1alpha1
 kind: Workspace
 metadata:
-  name: commerce-platform
+  name: payments-platform
 architecture:
-  source: architecture/commerce.calm.json
+  source: architecture/payments.calm.json
   urlMapping: architecture/url-mapping.json
 observation:
   provider: codebase-memory-mcp
   projects:
-    - name: commerce-example
+    - name: payments-example
       root: .
-      include: [services/**, packages/**]
-      exclude: [services/legacy/**]
-  indexMode: fast
+      include: [services/**, jobs/**]
+      exclude: [services/legacy-core-banking/**]
+  indexMode: full
+environments:
+  - id: production
+    sources: [deploy/production/**]
 bindings:
   files: [bindings/concordia.bindings.yaml]
 policies:
   files: [policies/**/*.policy.yaml]
+  packs:
+    - use: builtin:core
+    - use: builtin:adr-governance
+      rules:
+        GOV-ADR-006: { severity: error }
+    - use: builtin:review-currency
+    - use: builtin:assurance
 exceptions:
   baseline: exceptions/concordia.baseline.json
   waivers: exceptions/waivers.yaml
+trust:
+  dimensions: []
+  classifications: [public, internal, restricted]
+adr:
+  files: [governance/decisions.yaml]
+  triggers:
+    - id: TRG-DATA-OWNERSHIP
+      category: data-ownership
+      architecture: [relationship-added]
+      nodeTypes: [database]
+assessments:
+  paths: [assessments]
+  trustAnchor: { ref: main }
+  authorities:
+    - id: security-review
+      role: reviewer
+      mechanism: protected-review
+      reviewers: [alice@example.com]
+      paths: [assessments/approvals/**]
+  required:
+    - id: ledger-threat-model
+      assessment: ASM-LEDGER
+      type: security
+      scope: { calmNodes: [ledger-service, ledger-db] }
+      environment: production
+      authority: security-review
+assurance:
+  rendering:
+    sources:
+      - { environment: production, tool: plain, path: deploy/production }
+  plans:
+    - { environment: production, tool: terraform, file: infra/plans/production.json }
+  evaluators:
+    - environment: production
+      kinds: [network-policy, rbac, cloud-firewall]
+      assumes: [network-policy-enforced, rbac-authorizer-enabled, firewall-rules-complete-in-plan]
 check:
   minimumCoverage: 0.9
   unknown: fail

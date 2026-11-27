@@ -2,9 +2,12 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -62,8 +65,8 @@ func addConfined(app *Context, wsp *workspace.Workspace, rel, what string, byPat
 	return nil
 }
 
-// addInputs adds the inputs of the run and the locked cache files as `inputs/<path>` entries. A
-// path that leaves the workspace root is refused (CO-REP-006) and left out.
+// addInputs adds the inputs of the run, the URL mapping of the architecture with its mapped files, and the locked
+// cache files as `inputs/<path>` entries. A path that leaves the workspace root is refused (CO-REP-006) and left out.
 func addInputs(app *Context, wsp *workspace.Workspace, run *conformance.Run, byPath map[string][]byte) error {
 	for _, ref := range inputRefsOf(&run.Inputs) {
 		if err := addConfined(app, wsp, ref.Path, "input", byPath); err != nil {
@@ -71,7 +74,73 @@ func addInputs(app *Context, wsp *workspace.Workspace, run *conformance.Run, byP
 		}
 	}
 
+	if err := addURLMapping(app, wsp, byPath); err != nil {
+		return err
+	}
+
 	return addLockedResources(app, wsp, byPath)
+}
+
+// addURLMapping adds the URL mapping file (architecture.urlMapping) and each file that it maps inside the workspace as
+// `inputs/<path>`, so that `diff` loads the architecture of the bundle with the same mapping. An entry resolves
+// against the directory of the mapping file, as intent.LoadURLMapping does. An absolute entry, an entry that leaves
+// the workspace, and a mapped file that does not exist are left out.
+func addURLMapping(app *Context, wsp *workspace.Workspace, byPath map[string][]byte) error {
+	name := wsp.Architecture.URLMapping
+	if name == "" {
+		return nil
+	}
+
+	name = path.Clean(filepath.ToSlash(name))
+
+	data, ok, err := readConfined(app, wsp, name, "url mapping")
+	if err != nil || !ok {
+		return err
+	}
+
+	byPath["inputs/"+name] = data
+
+	var entries map[string]string
+	if err := json.Unmarshal(data, &entries); err != nil {
+		return fmt.Errorf("parse url mapping %s: %w", name, err)
+	}
+
+	for _, entry := range entries {
+		rel, ok := mappedPath(path.Dir(name), entry)
+		if !ok {
+			continue
+		}
+
+		if err := addMappedFile(app, wsp, rel, byPath); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// mappedPath gives the workspace-relative path of a mapping entry, resolved against the directory of the mapping
+// file. An absolute entry (checked before the join, which would make it relative) or one that leaves the workspace
+// gives false.
+func mappedPath(dir, entry string) (string, bool) {
+	slashed := filepath.ToSlash(entry)
+	if filepath.IsAbs(entry) || path.IsAbs(slashed) {
+		return "", false
+	}
+
+	rel := path.Join(dir, slashed)
+
+	return rel, filepath.IsLocal(filepath.FromSlash(rel))
+}
+
+// addMappedFile adds one mapped file of the URL mapping; a file that does not exist is left out.
+func addMappedFile(app *Context, wsp *workspace.Workspace, rel string, byPath map[string][]byte) error {
+	err := addConfined(app, wsp, rel, "mapped file", byPath)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+
+	return err
 }
 
 // addLockedResources adds the cache files that the lock lists as `inputs/<path>` entries.
@@ -106,14 +175,16 @@ type bundleFiles struct {
 	byPath map[string][]byte
 }
 
-func bundleEntries(ctx context.Context, app *Context, wsp *workspace.Workspace, run *conformance.Run, opts *exportBundleOptions) ([]bundle.Entry, []redact.Record, []bundle.View, error) {
-	files := &bundleFiles{app: app, wsp: wsp, run: run, byPath: map[string][]byte{}}
+// bundleEntries gives the files of the bundle of the job, the records of the values that were removed from them, and
+// the views of the bundle.
+func bundleEntries(ctx context.Context, job *exportJob) ([]bundle.Entry, []redact.Record, []bundle.View, error) {
+	files := &bundleFiles{app: job.app, wsp: job.wsp, run: job.run, byPath: map[string][]byte{}}
 
 	if err := files.addResultFiles(); err != nil {
 		return nil, nil, nil, err
 	}
 
-	viewEntries, err := addViews(ctx, app, wsp, run, files.byPath)
+	viewEntries, err := addViews(ctx, job.app, job.wsp, job.run, files.byPath)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -124,7 +195,7 @@ func bundleEntries(ctx context.Context, app *Context, wsp *workspace.Workspace, 
 		return nil, nil, nil, err
 	}
 
-	optional, err := files.addOptionalFiles(opts)
+	optional, err := files.addOptionalFiles(job.opts)
 	if err != nil {
 		return nil, nil, nil, err
 	}

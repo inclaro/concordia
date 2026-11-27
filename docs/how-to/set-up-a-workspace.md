@@ -17,7 +17,7 @@ This guide shows you how to create a Concordia workspace in an existing reposito
    concordia init --preset services --ci github
    ```
 
-   To start from an existing CALM file, add `--calm <path>`, for example `--calm architecture/commerce.calm.json`.
+   To start from an existing CALM file, add `--calm <path>`, for example `--calm architecture/payments.calm.json`.
 
    | Option | Values | Effect |
    |---|---|---|

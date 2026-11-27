@@ -218,8 +218,8 @@ concordia check [options]
 | `--changed` | git ref | `HEAD` | Limit reporting to findings that touch files changed since the merge base of the ref and `HEAD`. Without a value, the working-tree changes. One positional ref is allowed with `--changed` (`check --changed origin/main`). Rules that cannot be reduced are reported in full (`CO-CON-027`). An invalid ref gives `CO-WRK-015`. |
 | `--use-baseline` | path | `exceptions.baseline` | Baseline file. |
 | `--waivers` | path | `exceptions.waivers` | Waiver register. |
-| `--minimum-coverage` | ratio 0..1 | `check.minimumCoverage` (`0.95`) | Required file coverage. |
-| `--unknown` | `fail`, `warn`, `ignore` | `check.unknown` (`fail`) | What an unknown rule verdict does. |
+| `--minimum-coverage` | ratio 0..1 | `check.minimumCoverage` (`0.95`) | Required file coverage. Replaces the value of every rule, also a rule or control that sets its own; see [the `evidence` block](policies.md#the-evidence-block). |
+| `--unknown` | `fail`, `warn`, `ignore` | `check.unknown` (`fail`) | What an unknown rule verdict does. Replaces the `onUnknown` of every rule, also a rule or control that sets its own, while `check.unknown` applies only to a rule that sets none. A rule that is not `onUnknown: fail` is not mandatory for [ADR governance](adr-governance.md#mandatory-rules). |
 | `--evidence-dir` | dir | none | Write one evidence file for each finding. |
 | `--rollout-report` | path (`--rollout-report=<path>`) | `build/concordia/rollout-report.json` | Write the [rollout report](#rollout-report) as canonical JSON and print a text summary on stderr. Without a value, the default path. A path must be given as `--rollout-report=<path>`. The path is relative to the working directory. The flag changes no result and no exit code. |
 | `--incremental` | none | off | Reuse the review evaluation of an earlier run from the derived cache `.concordia/cache/impact/`, and write it. The result equals the result of a full evaluation; see [incremental evaluation](../explanation/review-currency.md#incremental-evaluation). A damaged cache or a cache of another key is not used: Concordia evaluates in full and reports the note `CO-ASM-010`. Without the flag, `check` reads and writes nothing in the cache directory. |
@@ -708,6 +708,8 @@ concordia diff [--from <side>] [--to <side>] [--kind <kind>]
 
 `--format` accepts `pretty` (default) and `json`. Any other value gives `CO-WRK-010`. The `findings` kind includes the coverage and waiver sections.
 
+A bundle side reads the architecture, the workspace, and the bindings from `inputs/` of the bundle. When the bundle holds the URL mapping file (`architecture.urlMapping`), the architecture loads with that mapping and the mapped files of the bundle. A mapping entry whose file is outside the bundle (an absolute path, a `..` path, or a symbolic link that leaves the bundle) is ignored, so its URL stays unmapped. A bundle without the file, for example one written by an earlier release, loads with an empty mapping: a mapped URL in its architecture does not resolve.
+
 Exit codes: 0; 2.
 
 ## export bundle
@@ -726,6 +728,8 @@ concordia export bundle [--include-graph] [--include-source-snippets none|violat
 | `--sign-key` | ref | keyless signing | Cosign key reference. Signing with `--offline` gives `CO-WRK-016`, with or without a key: cosign 3 records every signature in the public transparency log. |
 
 Output: `--output`, else `build/concordia/conformance.tar.gz`. Prints the path and `sha256:<hex>`.
+
+The inputs are the files of the run (`inputs/<path>`, each workspace-relative): the workspace, the architecture, the patterns and decorators, the policies, the bindings, the deployment traces, the decision registers, the exception registers, the lock and its cached resources, and the URL mapping file (`architecture.urlMapping`) with each file that it maps. A mapping entry that is absolute or leaves the workspace, or a mapped file that does not exist, is left out. `diff` reads these files when a side is a bundle. The manifest `schemaVersion` stays `1.0`: the mapping files are listed in `integrity.files` like any other file.
 
 The manifest records the source revisions and dirty state, the CALM release and digest, policy versions and digests, graph snapshot identifiers, the workspace profile, the selected environments, exception registers, evaluators, the build digest, and timestamps under `provenance`. It also has `integrity` (`algorithm`, a digest for each file in `files`, `manifestDigest`, `level`), `references` (for each content-addressed input: `kind`, `digest`, `availability` `included` or `unavailable`, and `reason` `not-included`, `missing`, or `not-reproducible`), `reproduction` (`available` is false when a reference is unavailable, for example the graph without `--include-graph`), `redactions` (one entry for each place where a value was removed: `path`, `file`, `line`, `property`, `class`, `count`; empty when nothing was redacted), and `redactionRules` (the version of the redaction rule set). `export bundle` prints a `CO-REP-005` notice with the count for each file that has redactions. See [Redaction](redaction.md).
 

@@ -138,18 +138,20 @@ type AssuranceRecords struct {
 const (
 	EvaluatorNetworkPolicy = "network-policy"
 	EvaluatorRBAC          = "rbac"
+	EvaluatorCloudFirewall = "cloud-firewall"
 )
 
 // Enforcement assumptions that an evaluator result may rely on.
 const (
 	AssumeNetworkPolicyEnforced = "network-policy-enforced"
+	AssumeFirewallRulesInPlan   = "firewall-rules-complete-in-plan"
 	AssumeRBACAuthorizerEnabled = "rbac-authorizer-enabled"
 )
 
 // AssuranceEvaluator enables effective-policy evaluators for one environment.
 type AssuranceEvaluator struct {
 	Environment string `json:"environment"`
-	// Kinds are `network-policy` and `rbac`.
+	// Kinds are `network-policy`, `rbac`, and `cloud-firewall`.
 	Kinds []string `json:"kinds"`
 	// Assumes are the declared enforcement assumptions, for example `network-policy-enforced`.
 	Assumes []string `json:"assumes,omitempty"`
@@ -254,14 +256,14 @@ func (a *Assurance) UsesRenderer(tool string) bool {
 	return false
 }
 
-// hasRootedPrefix says whether a path starts at a root: "/" after the slashes are unified, an absolute path of the
-// OS, or a volume name.
-func hasRootedPrefix(p, unified string) bool {
+// hasRootedPrefix says whether a path, with its slashes unified to "/", starts at a root: "/", an absolute path of
+// the OS, or a volume name.
+func hasRootedPrefix(unified string) bool {
 	if strings.HasPrefix(unified, "/") {
 		return true
 	}
 
-	return filepath.IsAbs(filepath.FromSlash(p)) || filepath.VolumeName(p) != ""
+	return filepath.IsAbs(filepath.FromSlash(unified)) || filepath.VolumeName(unified) != ""
 }
 
 // pathEscapesRoot says whether a workspace-relative path or glob leaves the workspace root by its text: an
@@ -270,7 +272,7 @@ func hasRootedPrefix(p, unified string) bool {
 func pathEscapesRoot(p string) bool {
 	unified := strings.ReplaceAll(p, `\`, "/")
 
-	return hasRootedPrefix(p, unified) || slices.Contains(strings.Split(unified, "/"), "..")
+	return hasRootedPrefix(unified) || slices.Contains(strings.Split(unified, "/"), "..")
 }
 
 // pathCollector collects the declared paths of the `assurance` key with the JSON Pointer of each place.
@@ -278,20 +280,20 @@ type pathCollector struct {
 	paths []pointedPath
 }
 
-func (c *pathCollector) add(pointer, value string) {
-	c.paths = append(c.paths, pointedPath{pointer: pointer, value: value})
+func (c *pathCollector) add(declared pointedPath) {
+	c.paths = append(c.paths, declared)
 }
 
 // addIfSet adds the path unless it is empty.
-func (c *pathCollector) addIfSet(pointer, value string) {
-	if value != "" {
-		c.add(pointer, value)
+func (c *pathCollector) addIfSet(declared pointedPath) {
+	if declared.value != "" {
+		c.add(declared)
 	}
 }
 
 func (c *pathCollector) addAll(pointer string, values []string) {
 	for i, value := range values {
-		c.add(fmt.Sprintf("%s/%d", pointer, i), value)
+		c.add(pointedPath{pointer: fmt.Sprintf("%s/%d", pointer, i), value: value})
 	}
 }
 
@@ -302,7 +304,7 @@ func (c *pathCollector) addRendering(r *AssuranceRendering) {
 
 	for i := range r.Sources {
 		base := fmt.Sprintf("/assurance/rendering/sources/%d", i)
-		c.add(base+"/path", r.Sources[i].Path)
+		c.add(pointedPath{pointer: base + "/path", value: r.Sources[i].Path})
 		c.addAll(base+"/valuesFiles", r.Sources[i].ValuesFiles)
 	}
 }
@@ -310,8 +312,8 @@ func (c *pathCollector) addRendering(r *AssuranceRendering) {
 func (c *pathCollector) addPlans(plans []AssurancePlan) {
 	for i := range plans {
 		base := fmt.Sprintf("/assurance/plans/%d", i)
-		c.add(base+"/file", plans[i].File)
-		c.addIfSet(base+"/statement", plans[i].Statement)
+		c.add(pointedPath{pointer: base + "/file", value: plans[i].File})
+		c.addIfSet(pointedPath{pointer: base + "/statement", value: plans[i].Statement})
 	}
 }
 
@@ -320,7 +322,7 @@ func (c *pathCollector) addPlans(plans []AssurancePlan) {
 func (c *pathCollector) addProducerKeys(producers []Producer) {
 	for i := range producers {
 		if key := producers[i].Authentication.Key; !strings.Contains(key, "://") {
-			c.addIfSet(fmt.Sprintf("/assurance/producers/%d/authentication/key", i), key)
+			c.addIfSet(pointedPath{pointer: fmt.Sprintf("/assurance/producers/%d/authentication/key", i), value: key})
 		}
 	}
 }
@@ -337,7 +339,7 @@ func (c *pathCollector) addEvidence(cfg *Assurance) {
 
 	if v := cfg.Verification; v != nil {
 		c.addAll("/assurance/verification/results", v.Results)
-		c.addIfSet("/assurance/verification/trustedRoot", v.TrustedRoot)
+		c.addIfSet(pointedPath{pointer: "/assurance/verification/trustedRoot", value: v.TrustedRoot})
 	}
 
 	if q := cfg.Quality; q != nil {
@@ -367,23 +369,42 @@ type pointedPath struct {
 // checkAssurance rejects what the schema cannot: an environment that `environments` does not declare
 // (CO-WRK-017), a path outside the root (CO-PRV-002), and a duplicate declaration (CO-PRV-001). All have exit 2.
 func checkAssurance(space *Workspace, path string) *diag.Error {
-	cfg := space.Assurance
-	if cfg == nil {
+	if space.Assurance == nil {
 		return nil
 	}
 
-	if err := checkAssuranceEnvironments(space, cfg, path); err != nil {
-		return err
-	}
+	check := &assuranceCheck{space: space, cfg: space.Assurance, file: path}
 
-	for _, declared := range assurancePaths(cfg) {
-		if pathEscapesRoot(declared.value) {
-			return diag.Fail(diag.PRV002, diag.Params{"path": declared.value},
-				diag.WithSource(diag.Source{URI: path, Pointer: declared.pointer}))
+	for _, step := range []func() *diag.Error{check.environments, check.paths, check.duplicates} {
+		if err := step(); err != nil {
+			return err
 		}
 	}
 
-	return checkAssuranceDuplicates(cfg, path)
+	return nil
+}
+
+// assuranceCheck is the `assurance` key of a workspace and the file that declares it.
+type assuranceCheck struct {
+	space *Workspace
+	cfg   *Assurance
+	file  string
+}
+
+// source is the diagnostic source of a place in the workspace file.
+func (a *assuranceCheck) source(pointer string) diag.Option {
+	return diag.WithSource(diag.Source{URI: a.file, Pointer: pointer})
+}
+
+// paths rejects a declared path or glob that leaves the workspace root.
+func (a *assuranceCheck) paths() *diag.Error {
+	for _, declared := range assurancePaths(a.cfg) {
+		if pathEscapesRoot(declared.value) {
+			return diag.Fail(diag.PRV002, diag.Params{"path": declared.value}, a.source(declared.pointer))
+		}
+	}
+
+	return nil
 }
 
 // renderSources gives the rendering sources, or nil when no source is rendered.
@@ -415,16 +436,17 @@ func assuranceEnvironmentRefs(cfg *Assurance) []pointedPath {
 	return append(refs, pointedValues(cfg.Evaluators, "/assurance/evaluators/%d/environment", func(e *AssuranceEvaluator) string { return e.Environment })...)
 }
 
-func checkAssuranceEnvironments(space *Workspace, cfg *Assurance, path string) *diag.Error {
-	declared := make(map[string]struct{}, len(space.Environments))
-	for _, e := range space.Environments {
+// environments rejects an environment that `environments` does not declare.
+func (a *assuranceCheck) environments() *diag.Error {
+	declared := make(map[string]struct{}, len(a.space.Environments))
+	for _, e := range a.space.Environments {
 		declared[e.ID] = struct{}{}
 	}
 
-	for _, ref := range assuranceEnvironmentRefs(cfg) {
+	for _, ref := range assuranceEnvironmentRefs(a.cfg) {
 		if _, ok := declared[ref.value]; !ok {
 			return diag.Fail(diag.WRK017, diag.Detail(fmt.Sprintf("'%s' (declared in assurance: %s)", ref.value, strings.TrimPrefix(ref.pointer, "/assurance/"))),
-				diag.WithSource(diag.Source{URI: path, Pointer: ref.pointer}))
+				a.source(ref.pointer))
 		}
 	}
 
@@ -503,10 +525,11 @@ func duplicatePlan(cfg *Assurance) *duplicate {
 	}
 }
 
-func checkAssuranceDuplicates(cfg *Assurance, path string) *diag.Error {
+// duplicates rejects a declaration that appears two times.
+func (a *assuranceCheck) duplicates() *diag.Error {
 	for _, find := range []func(*Assurance) *duplicate{duplicateProducer, duplicateEvaluator, duplicateRenderSource, duplicatePlan} {
-		if found := find(cfg); found != nil {
-			return diag.Fail(diag.PRV001, diag.Detail(found.detail), diag.WithSource(diag.Source{URI: path, Pointer: found.pointer}))
+		if found := find(a.cfg); found != nil {
+			return diag.Fail(diag.PRV001, diag.Detail(found.detail), a.source(found.pointer))
 		}
 	}
 

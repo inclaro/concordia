@@ -1,11 +1,11 @@
 # A tour of Concordia
 
-*2026-11-02T22:04:14Z by Showboat 0.6.1*
-<!-- showboat-id: 24da9e4c-8f6a-4017-b4f5-301fe43c0b22 -->
+*2026-11-23T17:46:43Z by Showboat 0.6.1*
+<!-- showboat-id: 58cc8ee9-5dca-47f6-8abe-a6f36749ec5a -->
 
-Acme Shop sells online. Billing issues an invoice for every order, and fulfillment ships it. Last quarter, the fulfillment team refactored how it stores shipments, and month-end invoicing broke in production. Every pull request had been reviewed. Nobody saw that billing reached into fulfillment's internals.
+A retail bank runs its payments on a set of services. The payments service authorizes each card payment, and it asks the fraud service for a risk score first. Last quarter, the fraud team refactored its risk model, and payment authorization stopped in production. Every pull request had a review. Nobody saw that the payments service used a class inside the fraud service.
 
-In this tutorial, we run Concordia on a copy of Acme's code and ask the questions that incident raised. Would Concordia have caught it? What actually ships to production? Which decision says billing must not do this, and is it enforced? And when billing's code changes, does the security review still hold?
+In this tutorial, you run Concordia on a copy of the bank's code and ask the questions that the incident raised. Would Concordia have caught it? What else is waiting to break? Can the public load balancer reach the ledger database? Is the decision about the ledger enforced? And when the ledger code changes, does the threat model still hold?
 
 You need `concordia`, Codebase Memory 0.12.1 (`codebase-memory-mcp`), `git`, and `jq` on your `PATH`. Run every command from the root of a Concordia checkout. The tour takes about ten minutes.
 
@@ -20,149 +20,116 @@ cbm-adapter concordia-cbm/v2
 cbm 0.12.1
 ```
 
-## 1. Copy Acme's code
+## 1. Copy the bank's code
 
-The example holds Acme's architecture as a CALM model (billing, fulfillment, a ledger, and the legacy monolith), bindings that map each service to its code, and Acme's architecture rules. We copy it to a scratch directory.
+The example at `docs/examples/payments` holds the bank's code, its architecture as a CALM model, the bindings that map each part of the model to code and infrastructure, the Kubernetes manifests, a Terraform plan, and the bank's architecture rules. You copy it to a scratch directory.
 
 ```bash
-rm -rf /tmp/concordia-docs/tour && mkdir -p /tmp/concordia-docs/tour && cp -R docs/examples/commerce/. /tmp/concordia-docs/tour && ls /tmp/concordia-docs/tour
+rm -rf /tmp/concordia-docs/tour && mkdir -p /tmp/concordia-docs/tour && cp -R docs/examples/payments/. /tmp/concordia-docs/tour && ls /tmp/concordia-docs/tour
 ```
 
 ```output
 architecture
+assessments
 bindings
 concordia.yaml
+deploy
+docs
 exceptions
-packages
+governance
+infra
+jobs
 policies
 services
 ```
 
-The workspace file, `concordia.yaml`, says where the model, the bindings, and the rules are, and which code Codebase Memory (CBM) indexes. We write our own, so that it already lists the folders that later steps add.
+The workspace file, `concordia.yaml`, names the Codebase Memory (CBM) project that holds the code graph. You give the copy its own project name, so that it does not touch any other copy. The `observation` section also shows which code CBM indexes. The legacy core banking system is Kotlin, and this index does not read it.
 
 ```bash
-cat > /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-apiVersion: concordia.io/v1alpha1
-kind: Workspace
-metadata:
-  name: acme-shop
-architecture:
-  source: architecture/commerce.calm.json
-  urlMapping: architecture/url-mapping.json
+cd /tmp/concordia-docs/tour && sed -i.bak 's/payments-example/payments-tour/' concordia.yaml && rm concordia.yaml.bak && sed -n '/^observation:/,/^environments:/p' concordia.yaml
+```
+
+```output
 observation:
   provider: codebase-memory-mcp
   projects:
-    - name: commerce-tour
+    - name: payments-tour
       root: .
-      include: [services/**, packages/**, k8s/**, docs/adr/**, Makefile]
-      exclude: [services/legacy/**]
+      include: [services/**, jobs/**]
+      exclude: [services/legacy-core-banking/**]
   indexMode: full
-bindings:
-  files: [bindings/concordia.bindings.yaml]
-policies:
-  files: [policies/**/*.policy.yaml]
-exceptions:
-  baseline: exceptions/concordia.baseline.json
-  waivers: exceptions/waivers.yaml
-check:
-  minimumCoverage: 0.9
-  unknown: fail
-  failOn: error
-EOF
+environments:
 ```
 
-```output
-```
-
-Concordia reads committed code, so we make the copy a Git repository.
+Concordia reads committed code, so you make the copy a Git repository. The branch is `main`, because the bank's reviews count only when they are on `main`. Section 6 uses this.
 
 ```bash
-cd /tmp/concordia-docs/tour && git init -q -b main && git config user.name "Concordia Docs" && git config user.email docs@concordia.invalid && git config commit.gpgsign false && git add -A && git commit -q -m "Acme Shop" && git log --format=%s
+cd /tmp/concordia-docs/tour && git init -q -b main && git config user.name "Concordia Docs" && git config user.email docs@concordia.invalid && git config commit.gpgsign false && git add -A && git commit -q -m "Payments platform" && git log --format=%s
 ```
 
 ```output
-Acme Shop
+Payments platform
 ```
 
-## 2. Would Concordia have caught the outage?
-
-`concordia index` builds the code graph. Its output also has a generation ID that changes with every commit; we drop that line with `grep -v` so that this page stays reproducible.
+`concordia index` builds the code graph. Its output also has a generation ID that changes with every commit. You drop that line with `grep -v`, so that this page stays the same on every run.
 
 ```bash
 cd /tmp/concordia-docs/tour && concordia index | grep -v '^generation'
 ```
 
 ```output
-project: commerce-tour
-files: 6/7 covered (85.7%)
+project: payments-tour
+files: 14/15 covered (93.3%)
 excluded: 1, stale: 0, unindexed: 0
 coverage file: build/concordia/coverage.json
 ```
 
-`concordia check` compares the code with the model and the rules:
+CBM covers 14 of the 15 files. The one excluded file is the Kotlin service.
+
+## 2. Would Concordia have caught the outage?
+
+The bank already has a rule for this, `PAY-API-001`: the payments service may use only the published API of the fraud service, the files under `services/fraud-service/src/api`. You run that one rule. Every `check` also reports the other areas of the workspace (the deployment trace and the assessments). You read those later, so `sed` stops the output where they start.
 
 ```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color
+cd /tmp/concordia-docs/tour && concordia check --rule PAY-API-001 --no-color 2>&1 | sed -n '/^Deployment trace/q;p'
 ```
 
 ```output
 warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Conformance: violation (4 violation, 1 unknown, 8 findings)
+Conformance: violation (1 violation, 3 findings)
 
-FAIL CO-BND-001 Billing uses Fulfillment contracts only
-  Why it matters: When fulfillment refactors its internals, invoicing breaks. The fulfillment contract is the part that fulfillment keeps stable for billing.
-  Owner: team-billing
-  billing-service -> fulfillment-service: 3 finding(s)
-    services/billing/src/InvoiceService.ts    imports services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/InvoiceService.ts:7  calls ShipmentStore.reserve in services/fulfillment/src/internal/ShipmentStore.ts
-    services/billing/src/InvoiceService.ts:6  calls ShipmentStore in services/fulfillment/src/internal/ShipmentStore.ts
-  Fix: Import from packages/fulfillment-contract instead.
+FAIL PAY-API-001 Payments uses only the published fraud API
+  Why it matters: When the fraud team refactors its risk model, every caller of its internals breaks. A refactor of the risk model once stopped payment authorization in production. The fraud API is the part that the fraud team keeps stable.
+  Owner: team-payments
+  payments-service -> fraud-service: 3 finding(s)
+    services/payments-service/src/PaymentService.ts    imports services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/PaymentService.ts:6  calls RiskModel in services/fraud-service/src/internal/RiskModel.ts
+    services/payments-service/src/PaymentService.ts:7  calls RiskModel.score in services/fraud-service/src/internal/RiskModel.ts
+  Fix: Call the functions in services/fraud-service/src/api instead of the classes under src/internal.
 
-UNKNOWN CO-COV-001 Legacy must not call Billing
-  Why it matters: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
-  Cannot judge: minimum coverage not met: 0.500 < 0.9 (CO-CON-021)
-  Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
-  Coverage: 50.0% (required 90.0%)
-
-FAIL CO-CYC-001 Services are acyclic
-  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
-  Owner: team-billing
-  Coverage: 85.7% (required 90.0%)
-  cycle through billing-service, fulfillment-service: 1 finding(s)
-    services/billing/src/InvoiceService.ts:6  calls ShipmentStore in services/fulfillment/src/internal/ShipmentStore.ts
-                                              then notifyShipped calls InvoiceService in services/billing/src/InvoiceService.ts
-  Fix: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
-
-FAIL CO-DECL-001 Dependencies are declared
-  Why it matters: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
-  Owner: team-fulfillment
-  Coverage: 85.7% (required 90.0%)
-  fulfillment-service -> billing-service: 3 finding(s)
-    services/fulfillment/src/notify.ts    imports services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:4  calls InvoiceService in services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:5  calls InvoiceService.issue in services/billing/src/InvoiceService.ts
-  Fix: Add the relationship to the CALM model if it is intended, or remove the dependency.
-
-FAIL CO-LYR-001 Billing sits above Fulfillment
-  Why it matters: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
-  Owner: team-fulfillment
-  fulfillment-service -> billing-service: 1 finding(s)
-    services/fulfillment/src/notify.ts  imports services/billing/src/InvoiceService.ts
-  Fix: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
-
-Not configured: Deployment trace, ADR governance, Diagram currency, Assessment currency, Quality evaluation
-No environment declared: the deployment trace and environment-specific assurance need a declared environment.
-
-8 active error(s), 0 baselined, 0 waived, 0 expired waiver(s), 1 unknown
 ```
 
-Yes. `CO-BND-001` is the outage: billing imports and calls `ShipmentStore`, a class inside fulfillment, on lines 6 and 7 of `InvoiceService.ts`. A refactor of that class broke invoicing, exactly as the rule says. With Concordia in CI, the pull request that added the import would have failed.
+Yes, Concordia catches it. `PaymentService.ts` imports `RiskModel`, a class in the `internal` folder of the fraud service, and calls it on lines 6 and 7. A refactor of that class stopped payment authorization, exactly as the rule says. Look at the code:
 
-The other findings are the next outage. Fulfillment calls back into billing when an order ships (`notify.ts`), which makes a cycle (`CO-CYC-001`), breaks the layering (`CO-LYR-001`), and is a data flow the model does not show (`CO-DECL-001`). Today a billing release can stop orders from shipping.
+```bash
+cd /tmp/concordia-docs/tour && sed -n '1,9p' services/payments-service/src/PaymentService.ts
+```
 
-`CO-COV-001` is `unknown`, not a pass. The legacy monolith is Kotlin, which this index does not read, so nobody can say whether retiring it will break invoicing. Concordia says so instead of guessing. The `CO-OBS-016` warning is harmless: CBM reported a Git branch edge that no rule uses.
+```output
+import { RiskModel } from "../../fraud-service/src/internal/RiskModel";
+import { postEntry } from "../../ledger-service/src/api/index";
 
-`results.json` holds the same result for CI. The exit code is 1:
+export class PaymentService {
+  async authorize(paymentId: string, amountCents: number): Promise<boolean> {
+    const model = new RiskModel();
+    if (model.score(paymentId, amountCents) > 0.8) {
+      return false;
+    }
+```
+
+The `warning CO-OBS-016` line is harmless. CBM reported a Git branch edge that no rule uses.
+
+`build/concordia/results.json` holds the same result for CI. The exit code is 1, so a pull request that added the import fails:
 
 ```bash
 cd /tmp/concordia-docs/tour && jq .summary.exitCode build/concordia/results.json
@@ -172,516 +139,277 @@ cd /tmp/concordia-docs/tour && jq .summary.exitCode build/concordia/results.json
 1
 ```
 
-## 3. What actually ships?
+[Integrate through published APIs](../use-cases/integrate-through-published-apis.md) explains this rule in detail.
 
-After the outage, the security team asks which image runs billing in production, and whether anything else runs next to it. We add Acme's production manifest, the billing Dockerfile, and the `Makefile` target that builds the image. The Deployment runs the billing app and an audit sidecar, two containers from one image repository at two tags.
+## 3. What else is waiting to break?
 
-```bash
-mkdir -p /tmp/concordia-docs/tour/k8s/production && cat > /tmp/concordia-docs/tour/k8s/production/billing.yaml <<'EOF'
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: billing
-  namespace: commerce
-spec:
-  selector:
-    matchLabels: {app: billing}
-  template:
-    metadata:
-      labels: {app: billing}
-    spec:
-      containers:
-        - name: app
-          image: registry.example.com/commerce/billing:1.4.0
-        - name: audit
-          image: registry.example.com/commerce/billing:1.3.2
-EOF
-```
-
-```output
-```
+The same kind of mistake can hide in other places. Three more rules of the bank look for the next outage: a critical service must not depend on a non-critical one (`PAY-PATH-001`), every dependency in the code must be in the model (`CORE-DECL-001`), and services must be free of cycles (`PAY-CYC-001`). `check` accepts more than one `--rule`.
 
 ```bash
-cat > /tmp/concordia-docs/tour/services/billing/Dockerfile <<'EOF'
-FROM node:22-alpine
-WORKDIR /app
-COPY src ./src
-CMD ["node", "src/index.js"]
-EOF
-```
-
-```output
-```
-
-```bash
-printf 'billing-image:\n\tdocker build -t registry.example.com/commerce/billing:1.4.0 services/billing\n' > /tmp/concordia-docs/tour/Makefile
-```
-
-```output
-```
-
-Concordia never matches a workload to a service by a similar name. We declare the `production` environment and bind the `billing` Deployment and its image repository to `billing-service`.
-
-```bash
-cat >> /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-environments:
-  - id: production
-    cluster: prod-eu
-    sources: ["k8s/production/**"]
-EOF
-```
-
-```output
-```
-
-```bash
-cat >> /tmp/concordia-docs/tour/bindings/concordia.bindings.yaml <<'EOF'
-  - id: bind-billing-workload
-    architectureRef: calm:node:billing-service
-    match:
-      any:
-        - {kind: workload, environment: production, resourceKind: Deployment, name: billing, namespace: commerce}
-  - id: bind-billing-image
-    architectureRef: calm:node:billing-service
-    match:
-      any:
-        - {kind: image, repository: registry.example.com/commerce/billing}
-EOF
-```
-
-```output
-```
-
-We commit and index. `check` builds the trace; we skip its report here (`> /dev/null`) and read the trace of billing in production:
-
-```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Deploy billing" && concordia index | grep -v '^generation'
-```
-
-```output
-project: commerce-tour
-files: 9/10 covered (90.0%)
-excluded: 1, stale: 0, unindexed: 0
-coverage file: build/concordia/coverage.json
-```
-
-```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color > /dev/null; concordia trace billing-service --no-color
+cd /tmp/concordia-docs/tour && concordia check --no-color --rule PAY-PATH-001 --rule CORE-DECL-001 --rule PAY-CYC-001 | sed -n '/^Deployment trace/q;p'
 ```
 
 ```output
 warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Deployment trace: billing-service in production (cluster prod-eu): partial
-Evidence: declared configuration only. Not traced: deployment execution and runtime.
-Workloads of production: complete
-1. service [declared intent, exact]
-   billing-service
-2. workload [parsed source fact, explicitly bound]
-   Deployment commerce/billing  at k8s/production/billing.yaml:1  (bound by bind-billing-workload)
-   namespace commerce
-3. container image [parsed source fact, exact]
-   container app: registry.example.com/commerce/billing:1.4.0  at k8s/production/billing.yaml:1
-   gap: container audit of Deployment/billing (k8s/production/billing.yaml:1) has no image occurrence: the provider keeps one reference for each workload and repository (merged-occurrences)
-   gap: container app uses registry.example.com/commerce/billing:1.4.0: the tag can point to other content later, and no immutable digest is known (mutable-tag)
-4. build definition [inferred association, inferred]
-   Dockerfile services/billing/Dockerfile, lineage candidate  at services/billing/Dockerfile:1, Makefile:2
-   base image node:22-alpine  at services/billing/Dockerfile:1
-5. source evidence [inferred association, explicitly bound]
-   Dockerfile services/billing/Dockerfile  at services/billing/Dockerfile:1
-   Deployment billing  at k8s/production/billing.yaml:1
-   source services/billing/**  (bound by bind-billing)
-Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Conformance: violation (3 violation, 14 findings)
+
+FAIL CORE-DECL-001 Dependencies between services, databases, and web clients are declared
+  Why it matters: An architecture model is only a source of truth when it shows every dependency that exists in the code. A hidden dependency is a coupling that nobody decided on.
+  channels-api -> customer-profile: 3 finding(s)
+    services/channels-api/src/accounts.ts     imports services/customer-profile/src/internal/ProfileStore.ts
+    services/channels-api/src/accounts.ts:9   calls ProfileStore in services/customer-profile/src/internal/ProfileStore.ts
+    services/channels-api/src/accounts.ts:10  calls ProfileStore.load in services/customer-profile/src/internal/ProfileStore.ts
+  fraud-service -> notifications-service: 2 finding(s)
+    services/fraud-service/src/alerts.ts    imports services/notifications-service/src/api/index.ts
+    services/fraud-service/src/alerts.ts:4  calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
+  ledger-service -> payments-service: 2 finding(s)
+    services/ledger-service/src/settlement.ts    imports services/payments-service/src/api/index.ts
+    services/ledger-service/src/settlement.ts:4  calls services.payments-service.src.api.paymentStatus in services/payments-service/src/api/index.ts
+  payments-service: 1 finding(s)
+    services/payments-service/src/PaymentService.ts:5  http_calls __route__ANY__http://card-network.example.com/authorize
+  reporting-job -> ledger-db: 3 finding(s)
+    jobs/reporting/src/nightly.ts    imports services/ledger-service/src/db/schema.ts
+    jobs/reporting/src/nightly.ts:4  calls LedgerTable in services/ledger-service/src/db/schema.ts
+    jobs/reporting/src/nightly.ts:5  calls LedgerTable.totals in services/ledger-service/src/db/schema.ts
+  Fix: Remove the dependency from the code, or declare it as a relationship in the architecture model. Edges of kind HTTP_CALLS and ASYNC_CALLS are heuristic in the CBM adapter, so lower evidence.minimumConfidence to heuristic with a rule override to check them.
+
+FAIL PAY-CYC-001 Services are free of cycles
+  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other. A cycle between payments and the ledger means that a ledger incident can stop payments.
+  Owner: team-architecture
+  cycle through ledger-service, payments-service: 1 finding(s)
+    services/ledger-service/src/settlement.ts:4  calls services.payments-service.src.api.paymentStatus in services/payments-service/src/api/index.ts
+                                                 then PaymentService.authorize calls services.ledger-service.src.api.postEntry in services/ledger-service/src/api/index.ts
+  Fix: Break the cycle. For example, let payments publish a settled event that the ledger consumes, instead of the ledger calling payments.
+
+FAIL PAY-PATH-001 Critical services do not depend on non-critical services
+  Why it matters: Payment authorization must keep working when a non-critical service such as notifications is down. A path from a critical service to a non-critical one, direct or through other code, lets a minor outage stop payments.
+  Owner: team-architecture
+  fraud-service -> notifications-service: 2 finding(s)
+    services/fraud-service/src/alerts.ts    imports services/notifications-service/src/api/index.ts
+    services/fraud-service/src/alerts.ts:4  calls services.notifications-service.src.api.sendAlert in services/notifications-service/src/api/index.ts
+  Fix: Remove the dependency, or decouple it with a queue so that the critical service does not wait for the non-critical one.
+
 ```
 
-Read it from the top. Production runs Deployment `commerce/billing`, and the trace answers the security question only partly. It says so with two gaps.
+Each finding names the file and the line. Read them from the bottom:
 
-The audit sidecar is missing. CBM keeps one image reference for each workload and repository, so the two containers were merged into one. Concordia noticed the container without an image and reported the gap, instead of showing a trace that looks complete. The app's tag can also move: `1.4.0` is not a digest, so nothing pins what it points to.
+- `PAY-PATH-001`: the fraud service is `critical`, and `alerts.ts` calls the notifications service, which is `non-critical`. When notifications is down, fraud scoring waits, and payments stop again.
+- `PAY-CYC-001`: the ledger calls back into payments in `settlement.ts`, and payments calls the ledger. A ledger incident can then stop payments, and neither service can roll back on its own.
+- `CORE-DECL-001`: five dependencies are in the code but not in the model. A threat model that reads the model does not see them. The `reporting-job -> ledger-db` finding is the same access that `PAY-DB-001` reports in section 5. The `http_calls` finding is a call to a URL that Concordia cannot match to a node of the model.
 
-The Dockerfile is only a candidate. The `Makefile` builds this repository from `services/billing`, which suggests the Dockerfile, but nothing proves that the image in production came from it.
+See [Keep critical paths isolated](../use-cases/keep-critical-paths-isolated.md), [Keep the model in sync with code](../use-cases/keep-the-model-in-sync-with-code.md), and [Keep services free of cycles](../use-cases/keep-services-free-of-cycles.md).
 
-## 4. Recover the sidecar
+## 4. Can the public load balancer reach the ledger database?
 
-Concordia can read the manifests itself instead of relying on the code graph. We declare a rendering source for production (plain YAML here; Helm charts and Kustomize overlays work the same way) and add the built-in `assurance` pack.
+After the outage, the security team asks a second question. The ledger database holds the bank's record of every movement of money. The public load balancer faces the internet. Can it open a connection to the database? Rule `PAY-NET-002` says that the public load balancer must have no network path to the ledger database on port 5432. The rule checks only that one hop. It does not check whether the load balancer forwards internet traffic to port 5432, so a violation does not prove that the internet can reach the database. It shows that one control between them is missing.
+
+Concordia does not answer this from the model. The bindings map the load balancer to `aws_lb.public` and the database to `aws_db_instance.ledger` in a Terraform plan, the output of `terraform show -json`. The plan compares the Terraform code with the estate that is already deployed. Concordia reads the security groups and their rules from that plan.
 
 ```bash
-cat >> /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-assurance:
-  rendering:
-    sources:
-      - {environment: production, tool: plain, path: k8s/production}
-EOF
-```
-
-```output
-```
-
-```bash
-cd /tmp/concordia-docs/tour && concordia policy add builtin:assurance
-```
-
-```output
-added builtin:assurance
-```
-
-```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Render production" && concordia index | grep -v '^generation'
-```
-
-```output
-project: commerce-tour
-files: 9/10 covered (90.0%)
-excluded: 1, stale: 0, unindexed: 0
-coverage file: build/concordia/coverage.json
-```
-
-`concordia assurance validate` loads the new input on its own and says what it found:
-
-```bash
-cd /tmp/concordia-docs/tour && concordia assurance validate --no-color
-```
-
-```output
-rendering production k8s/production
-  integrity: content verified by digest
-  admissible: yes
-  coverage: complete
-
-rendering by environment
-  production: complete (1 source, 1 resource, 2 container occurrences)
-
-1 input, 1 admissible
-```
-
-Two container occurrences, where the code graph had one. We check again, skip the report, and read the trace:
-
-```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color > /dev/null; concordia trace billing-service --no-color
+cd /tmp/concordia-docs/tour && concordia check --rule PAY-NET-002 --no-color 2>&1 | sed -n '/^Deployment trace/q;p'
 ```
 
 ```output
 warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Deployment trace: billing-service in production (cluster prod-eu): partial
-Evidence: declared configuration, and rendered or evaluated from 1 source (below). Not traced: deployment execution and runtime.
-Workloads of production: complete
-1. service [declared intent, exact]
-   billing-service
-2. workload [parsed source fact, explicitly bound]
-   Deployment commerce/billing  at k8s/production/billing.yaml:1  (bound by bind-billing-workload)
-   namespace commerce
-3. container image [parsed source fact, exact]
-   container app: registry.example.com/commerce/billing:1.4.0  at k8s/production/billing.yaml:1
-   gap: container app uses registry.example.com/commerce/billing:1.4.0: the tag can point to other content later, and no immutable digest is known (mutable-tag)
-4. build definition [inferred association, inferred]
-   Dockerfile services/billing/Dockerfile, lineage candidate  at services/billing/Dockerfile:1, Makefile:2
-   base image node:22-alpine  at services/billing/Dockerfile:1
-5. source evidence [inferred association, explicitly bound]
-   Dockerfile services/billing/Dockerfile  at services/billing/Dockerfile:1
-   Deployment billing  at k8s/production/billing.yaml:1
-   source services/billing/**  (bound by bind-billing)
-Rendered or evaluated: evaluated
-   render plain k8s/production: complete
-   Deployment commerce/billing  at k8s/production/billing.yaml
-Limits: declared-level-only, provider-may-merge-occurrences, image-provenance-unverified, source-provenance-unverified (--verbose explains each)
+Conformance: violation (1 violation, 1 findings)
+
+FAIL PAY-NET-002 The public load balancer has no network path to the ledger database (advisory: does not change the exit code)
+  Why it matters: The ledger database must be reachable only from the application tier. An open path from the internet-facing load balancer puts the bank's ledger one misconfiguration away from the internet.
+  Owner: team-platform
+  public-load-balancer -> ledger-db: 1 finding(s)
+    infra/plans/production.json
+      open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_security_group.gateway egress[0], aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
+  Fix: Remove the security group rule that admits the load balancer group to the ledger database.
+
 ```
 
-The `merged-occurrences` gap is gone. `results.json` records why: the container versions are `partial` at the declared level and `complete` at the rendered level, and the gap for the `audit` container is resolved by the rendered evidence.
+The path is open. The finding names the plan file, `infra/plans/production.json`, and the rules that open the path. On the load balancer side, the egress rule `gateway_out` allows all traffic out. It shows twice, because the plan lists the deployed rule both as its own resource and in the `egress` list of the `gateway` security group. On the database side, the ingress rule `ledger_from_gateway` admits the load balancer's security group on 5432.
+
+The plan also shows which change opens the path. Everything else in the estate is already deployed (`no-op`). Only the debug rule is new:
 
 ```bash
-cd /tmp/concordia-docs/tour && jq -r '.coverage.predicates[] | select(.predicate == "container-occurrence-versions" and .levels != null) | (.levels[] | "\(.level): \(.status)"), (.resolved[] | "resolved: \(.id), container \(.gaps[0].container), by \(.resolvedBy)")' build/concordia/results.json
+cd /tmp/concordia-docs/tour && jq -r '.resource_changes[] | "\(.change.actions | join(",")) \(.address)"' infra/plans/production.json
 ```
 
 ```output
-declared: partial
-rendered-or-evaluated: complete
-resolved: merged-occurrences, container audit, by rendered-or-evaluated
+no-op aws_db_instance.ledger
+no-op aws_lb.public
+no-op aws_security_group.gateway
+no-op aws_security_group.ledger_db
+no-op aws_subnet.public
+no-op aws_vpc.main
+no-op aws_vpc_ipv4_cidr_block_association.app
+no-op aws_vpc_security_group_egress_rule.gateway_out
+no-op aws_vpc_security_group_ingress_rule.ledger_from_app
+create aws_vpc_security_group_ingress_rule.ledger_from_gateway
 ```
 
-The `assurance` pack asks whether the stronger evidence is there:
+This is the new rule in the Terraform code:
 
 ```bash
-cd /tmp/concordia-docs/tour && jq -r '.rules[] | select(.ruleId | startswith("ASR-")) | "\(.ruleId) \(.verdict): \(.name)" + (if .reasons[0] then " (" + .reasons[0].code + ")" else "" end)' build/concordia/results.json
+cd /tmp/concordia-docs/tour && grep -n -A7 '"ledger_from_gateway"' infra/terraform/main.tf
 ```
 
 ```output
-ASR-PRV-001 unknown: Each container occurrence has exact lineage from source to deployed image (claim-not-enabled)
-ASR-PRV-002 unknown: The deployed digest of each container occurrence matches the observed digest (claim-not-enabled)
-ASR-REN-001 pass: Each environment has complete rendered evidence
+78:resource "aws_vpc_security_group_ingress_rule" "ledger_from_gateway" {
+79-  security_group_id            = aws_security_group.ledger_db.id
+80-  description                  = "temporary debug access"
+81-  referenced_security_group_id = aws_security_group.gateway.id
+82-  ip_protocol                  = "tcp"
+83-  from_port                    = 5432
+84-  to_port                      = 5432
+85-}
 ```
 
-Production now has complete rendered evidence. The two provenance questions, whether the image came from this source and whether the cluster runs what was deployed, stay `unknown`: they need signed build and deployment records that Acme does not produce yet, and Concordia will not fill them in. All three rules are `advisory`, so they report without failing the build. [Add stronger evidence](../how-to/add-stronger-evidence.md) shows how to supply signed records.
+Somebody added "temporary debug access". No code review of the services could see it. Concordia reports it from the plan, before Terraform applies it.
 
-## 5. Write down the goal behind the rule
-
-The outage was a modifiability failure: a change inside fulfillment should never break billing. A quality scenario states that goal and ties it to the rules that protect it. It is `mandatory`, so it counts in the exit code, and it names the decision behind it, `ADR-0001`, which we write next.
+The rule is `advisory`: it reports, but it does not change the exit code. The contract of the effective-access rules is not yet stable, so they cannot be `mandatory` in this release. The exit code of this run is 0:
 
 ```bash
-mkdir -p /tmp/concordia-docs/tour/quality && cat > /tmp/concordia-docs/tour/quality/scenarios.yaml <<'EOF'
-apiVersion: concordia.io/v1alpha1
-kind: QualityScenarioSet
-scenarios:
-  - id: QS-INVOICE-CHANGE
-    area: modifiability
-    qualityAttribute: modifiability
-    stimulusSource: developer
-    stimulus: the fulfillment team refactors how it stores shipments
-    environment: production
-    expectedResponse: invoicing keeps working without a billing change
-    owner: team-billing
-    scope: [billing-service, fulfillment-service]
-    mode: structural
-    enforcement: mandatory
-    criterion:
-      rules: [CO-BND-001, CO-LYR-001]
-    addressedBy: [ADR-0001]
-EOF
+cd /tmp/concordia-docs/tour && jq .summary.exitCode build/concordia/results.json
 ```
 
 ```output
+0
 ```
 
-The scenario files belong under `assurance`, the last key of the workspace file:
+`concordia explain` shows the rule and the finding again, with the evidence location. The middle of its output is the compiled plan of the rule, which `sed` leaves out here.
 
 ```bash
-cat >> /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-  quality:
-    scenarios: [quality/*.yaml]
-EOF
+cd /tmp/concordia-docs/tour && concordia explain PAY-NET-002 --no-color 2>&1 | sed -n '1,7p;/^Finding/,$p'
 ```
 
 ```output
+PAY-NET-002 The public load balancer has no network path to the ledger database
+Verdict: violation   Severity: error   Family: effective-access   Policy: payments-architecture@1.0.0
+Rationale: The ledger database must be reachable only from the application tier. An open path from the internet-facing load balancer puts the bank's ledger one misconfiguration away from the internet.
+Remediation: Remove the security group rule that admits the load balancer group to the ledger database.
+Rule owner: team-platform
+Subjects: calm:node:public-load-balancer
+Targets: calm:node:ledger-db
+Finding 0375…de4
+  Fingerprint: sha256:03752564dacfb15d175792e9bb0bc88d8766a97460efc2171a5df5c31b1f8de4
+  Kind: obligation-violation
+  Message: effective network access from public-load-balancer to ledger-db (environment production): open: tcp/5432 from aws_lb.public to aws_db_instance.ledger (aws_security_group.gateway egress[0], aws_vpc_security_group_egress_rule.gateway_out rule, aws_vpc_security_group_ingress_rule.ledger_from_gateway rule)
+  Source: calm:node:public-load-balancer
+  Target: calm:node:ledger-db
+  Owner: team-platform
+  Disposition: active
+  Location: infra/plans/production.json
 ```
 
+`results.json` also records how Concordia decided. The evaluation entry keeps the query, the rules that decided it, the SHA-256 digest of the plan that Concordia read, and the integrity of that plan. Nobody signed this plan, so its integrity is `content not verified`.
+
 ```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "State the modifiability goal" && concordia index | grep -v '^generation'
+cd /tmp/concordia-docs/tour && jq '.assurance.evaluations[] | select(.kind == "cloud-firewall") | {query, verdict, policies, inputDigest, integrity}' build/concordia/results.json
 ```
 
 ```output
-project: commerce-tour
-files: 9/10 covered (90.0%)
-excluded: 1, stale: 0, unindexed: 0
-coverage file: build/concordia/coverage.json
+{
+  "query": "tcp/5432 from aws_lb.public to aws_db_instance.ledger",
+  "verdict": "allowed",
+  "policies": [
+    "aws_security_group.gateway egress[0]",
+    "aws_vpc_security_group_egress_rule.gateway_out rule",
+    "aws_vpc_security_group_ingress_rule.ledger_from_gateway rule"
+  ],
+  "inputDigest": "sha256:67b42f88792047e1a066738e50b7cd686ccd191c09500cd3eb28c561fd602bdd",
+  "integrity": "content not verified"
+}
 ```
 
+`verdict: allowed` is the answer of the evaluator: the traffic can flow. The rule expects `denied`, so the rule fails.
+
+The plan is a statement of what Terraform would apply. Concordia trusts that the plan came from this revision, and that no other firewall rule for these resources exists outside the plan. The workspace declares that second assumption as `firewall-rules-complete-in-plan`. [Block network paths in the cloud](../use-cases/block-network-paths-in-the-cloud.md) explains each step and each limit.
+
+## 5. Record the decision, and prove it is enforced
+
+The bank decided that only the ledger service reads and writes the ledger database. An ADR records the decision, but a Markdown file cannot show that anything enforces it. A decision register links the ADR to the rule that does, `PAY-DB-001`.
+
 ```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color | tail -n 18
+cd /tmp/concordia-docs/tour && cat governance/decisions.yaml
 ```
 
 ```output
-warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Quality evaluation: violation (1 violation, 1 findings)
-  QS-INVOICE-CHANGE (structural, mandatory, modifiability): violation
-    QS-INVOICE-CHANGE: decision ADR-1 is unknown (adr-governance-not-available)
-  Areas with a scenario: modifiability violation
-  Areas without a scenario: availability, deployment-safety, operability, performance, security
-
-FAIL quality:QS-INVOICE-CHANGE Quality scenario QS-INVOICE-CHANGE
-  Why it matters: When the fulfillment team refactors how it stores shipments, invoicing keeps working without a billing change.
-  Owner: team-billing
-  scope billing-service, fulfillment-service: 1 finding(s)
-    quality/scenarios.yaml:4
-    Next action: fix implementation
-
-Not configured: ADR governance, Diagram currency, Assessment currency
-
-Unknown area(s): Deployment trace
-Violation area(s): Quality evaluation
-9 active error(s), 2 active info(s), 0 baselined, 0 waived, 0 expired waiver(s), 3 unknown
-```
-
-The goal fails today, because both rules it depends on fail: Acme is still one fulfillment refactor away from the same outage. The last area line shows that Acme has written no scenario for availability, security, or the other quality areas. The link to `ADR-0001` is `unknown` because no decision is registered yet.
-
-## 6. Record the decision, and prove it is enforced
-
-After the outage, Acme decided that billing uses only the fulfillment contract. An ADR records the decision, but a Markdown file cannot show that anything enforces it. A decision register links the ADR to the rule that does.
-
-```bash
-mkdir -p /tmp/concordia-docs/tour/docs/adr && cat > /tmp/concordia-docs/tour/docs/adr/0001-billing-uses-the-fulfillment-contract.md <<'EOF'
-# ADR-0001: Billing uses the fulfillment contract
-
-Status: Accepted
-
-Date: 2026-01-01
-
-Deciders: Team Billing
-
-## Context
-
-Billing reached into fulfillment internals, and a fulfillment refactor broke month-end invoicing.
-
-## Decision
-
-Billing depends only on the published fulfillment contract in `packages/fulfillment-contract`.
-
-## Consequences
-
-The rule CO-BND-001 keeps billing away from fulfillment internals.
-EOF
-```
-
-```output
-```
-
-```bash
-mkdir -p /tmp/concordia-docs/tour/governance && cat > /tmp/concordia-docs/tour/governance/decisions.yaml <<'EOF'
 apiVersion: concordia.io/v1alpha1
 kind: DecisionRegister
 decisions:
   - id: ADR-0001
-    path: docs/adr/0001-billing-uses-the-fulfillment-contract.md
-    categories: [system-boundaries]
+    path: docs/adr/0001-ledger-database-owned-by-ledger-service.md
+    expect: active
+    categories: [data-ownership]
     governs:
-      - ref: calm:node:billing-service
-      - ref: calm:relationship:billing-to-fulfillment
+      - ref: calm:node:ledger-db
+      - ref: calm:relationship:ledger-to-database
     enforcement: required
     enforcedBy:
-      - rule: CO-BND-001
-        pack: {id: commerce-boundaries, version: 1.0.0}
-EOF
+      - rule: PAY-DB-001
+        pack: {id: payments-architecture, version: 1.0.0}
 ```
 
-```output
-```
+`enforcement: required` says that a rule must check this decision on every run. `concordia adr validate` checks the register and the rule link:
 
 ```bash
-cat >> /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-adr:
-  files: [governance/decisions.yaml]
-EOF
-```
-
-```output
-```
-
-```bash
-cd /tmp/concordia-docs/tour && concordia policy add builtin:adr-governance
-```
-
-```output
-added builtin:adr-governance
-```
-
-```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Record ADR-0001" && concordia adr validate
+cd /tmp/concordia-docs/tour && concordia adr validate
 ```
 
 ```output
 adr: 1 decision(s) in 1 register file(s) valid; 1 rule link(s) checked; active statuses: accepted
 ```
 
+Rule `GOV-ADR-004` checks that a decision that requires enforcement links a mandatory rule. You run it and read the ADR governance area of the output. The area lists the decision as `ADR-1`.
+
 ```bash
-cd /tmp/concordia-docs/tour && concordia index | grep -v '^generation'
+cd /tmp/concordia-docs/tour && concordia check --rule GOV-ADR-004 --no-color 2>&1 | sed -n '/^ADR governance/,/^$/p'
 ```
 
 ```output
-project: commerce-tour
-files: 10/11 covered (90.9%)
-excluded: 1, stale: 0, unindexed: 0
-coverage file: build/concordia/coverage.json
+ADR governance: pass (1 pass)
+  ADR-1 accepted (docs/adr/0001-ledger-database-owned-by-ledger-service.md:1)
+    presence committed; applicability active; enforcement enforced (required; rules: PAY-DB-001@payments-architecture/1.0.0)
+
 ```
 
+The decision is committed, active (`accepted`), and enforced by `PAY-DB-001`. Now prove that the check means something. You remove the rule link from the register in the working tree, and run the rule again:
+
 ```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color | tail -n 21
+cd /tmp/concordia-docs/tour && sed -i.bak '/enforcedBy:/,$d' governance/decisions.yaml && rm governance/decisions.yaml.bak && concordia check --rule GOV-ADR-004 --no-color 2>&1 | sed -n '/^ADR governance/,/^Assessment currency/p' | sed '$d'
 ```
 
 ```output
-warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-ADR governance: pass (5 pass, 1 notApplicable)
-  ADR-1 accepted (docs/adr/0001-billing-uses-the-fulfillment-contract.md:1)
-    presence committed; applicability active; enforcement enforced (required; rules: CO-BND-001@commerce-boundaries/1.0.0)
+ADR governance: violation (1 violation, 1 findings)
+  ADR-1 accepted (docs/adr/0001-ledger-database-owned-by-ledger-service.md:1)
+    presence committed; applicability active; enforcement unlinked (required)
 
-Quality evaluation: violation (1 violation, 1 findings)
-  QS-INVOICE-CHANGE (structural, mandatory, modifiability): violation
-  Areas with a scenario: modifiability violation
-  Areas without a scenario: availability, deployment-safety, operability, performance, security
+FAIL GOV-ADR-004 A decision that requires enforcement links a mandatory rule
+  Why it matters: A decision that is marked `enforcement.required` but has no mandatory rule behind it is not checked by any run, so a violation of it passes unnoticed.
+  ADR-1: 1 finding(s)
+    docs/adr/0001-ledger-database-owned-by-ledger-service.md:1
+      Decision: ADR-1 (status: accepted)
+      Governs: calm:node:ledger-db, calm:relationship:ledger-to-database
+  Fix: Add an `enforcedBy` link to a mandatory rule, make the linked rule mandatory, or set the enforcement of the decision to none.
 
-FAIL quality:QS-INVOICE-CHANGE Quality scenario QS-INVOICE-CHANGE
-  Why it matters: When the fulfillment team refactors how it stores shipments, invoicing keeps working without a billing change.
-  Owner: team-billing
-  scope billing-service, fulfillment-service: 1 finding(s)
-    quality/scenarios.yaml:4
-    Next action: fix implementation
-
-Not configured: Diagram currency, Assessment currency
-
-Unknown area(s): Deployment trace
-Violation area(s): Quality evaluation
-9 active error(s), 2 active info(s), 0 baselined, 0 waived, 0 expired waiver(s), 3 unknown
 ```
 
-The decision is committed, active (`accepted`), and enforced by a rule that runs on every check. If someone deletes the ADR, marks it superseded, or drops `CO-BND-001`, this area fails. The scenario's link to the decision is no longer `unknown`.
-
-## 7. Approve the security review
-
-Billing handles money, so Acme's security team reviews its invoicing code. In Concordia, the review is an assessment, and an approval counts only if it is a verified record that binds the exact code that was reviewed. The assessment depends on one file, `InvoiceService.ts`.
+Without the link, `GOV-ADR-004` fails. If somebody deletes the ADR, marks it superseded, or drops the rule, the ADR governance area fails in the same way. You restore the register:
 
 ```bash
-mkdir -p /tmp/concordia-docs/tour/assessments/ASM-BILLING && cat > /tmp/concordia-docs/tour/assessments/ASM-BILLING/v1.yaml <<'EOF'
-apiVersion: concordia.io/v1alpha1
-kind: Assessment
-id: ASM-BILLING
-version: 1
-type: security
-title: Invoice handling in the billing service
-scope:
-  calmNodes: [billing-service]
-environment: production
-subject:
-  summary: The billing source code that issues invoices
-  dependencies:
-    - kind: implementation
-      selector:
-        path: services/billing/src/InvoiceService.ts
-assumptions: []
-evidence: []
-outcome: satisfactory
-state: ready-for-review
-EOF
+cd /tmp/concordia-docs/tour && git checkout -q governance/decisions.yaml && tail -n 3 governance/decisions.yaml
 ```
 
 ```output
+    enforcedBy:
+      - rule: PAY-DB-001
+        pack: {id: payments-architecture, version: 1.0.0}
 ```
 
-Alice from security may approve it. Her approval counts only once it is on the trust anchor, the protected branch: `origin/main` in a real repository, `main` here.
+Enforced does not mean obeyed. `PAY-DB-001` runs on every check, and today it fails: the nightly reporting job reads the ledger tables directly. That is the `reporting-job -> ledger-db` finding of section 3. See [Enforce architecture decisions](../use-cases/enforce-architecture-decisions.md) and [Protect database ownership](../use-cases/protect-database-ownership.md).
 
-```bash
-cat >> /tmp/concordia-docs/tour/concordia.yaml <<'EOF'
-assessments:
-  paths: [assessments]
-  trustAnchor: {ref: main}
-  authorities:
-    - id: security-review
-      role: reviewer
-      mechanism: protected-review
-      reviewers: [alice@example.com]
-      paths: [assessments/approvals/**]
-  required:
-    - {id: billing-security, assessment: ASM-BILLING, type: security, scope: {calmNodes: [billing-service]}, environment: production, authority: security-review}
-EOF
-```
+## 6. Approve the threat model
 
-```output
-```
+The security team keeps a threat model of the ledger. In Concordia, the threat model is an assessment, `ASM-LEDGER`. An approval counts only if it is a verified record that binds the exact subject that the reviewer examined. The subject here is the ledger API file `services/ledger-service/src/api/index.ts` and the trust context of `ledger-db` in the model.
 
-```bash
-cd /tmp/concordia-docs/tour && concordia policy add builtin:review-currency
-```
-
-```output
-added builtin:review-currency
-```
-
-```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Assess billing" && concordia index | grep -v '^generation'
-```
-
-```output
-project: commerce-tour
-files: 10/11 covered (90.9%)
-excluded: 1, stale: 0, unindexed: 0
-coverage file: build/concordia/coverage.json
-```
-
-`concordia assessment status` evaluates the review as `check` does. `--at` fixes the evaluation time so that this page reads the same on any day.
+`concordia assessment status` evaluates the assessment as `check` does. `--at` fixes the evaluation time, so that this page reads the same on any day.
 
 ```bash
 cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-color
@@ -690,95 +418,111 @@ cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-
 ```output
 Assessment currency at 2030-01-01T00:00:00.000Z (digest contract review-digest/1, capability profile cbm-0.12.1)
 
-ASM-BILLING v1: review-required
-  security, production, outcome satisfactory, review state ready-for-review, assessments/ASM-BILLING/v1.yaml:1
+ASM-LEDGER v1: review-required
+  security, production, outcome satisfactory, review state ready-for-review, assessments/ledger-threat-model.yaml:2
   why: no approval
-    no verified approval binds ASM-BILLING@v1; a reviewed flag or a note in the document is not an approval
-  changed: addition of implementation:file:services/billing/src/InvoiceService.ts, class implementation or verification
+    no verified approval binds ASM-LEDGER@v1; a reviewed flag or a note in the document is not an approval
+  changed: addition of implementation:file:services/ledger-service/src/api/index.ts, class implementation or verification
   next action: get review
 
 Required assessments
-  billing-security: ASM-BILLING v1 is review-required (no approval)
+  ledger-threat-model: ASM-LEDGER v1 is review-required (no approval)
 ```
 
-The document says `outcome satisfactory`, but that alone counts for nothing: without a verified approval the review is `review-required`. Alice first asks what exactly she would approve. Concordia prints the subject with a digest of each file, and writes nothing until she confirms that digest. The command also refuses to run when `CI` is `true`: a person records a decision, not a pipeline.
+The document says `outcome satisfactory`, but that alone counts for nothing. Without a verified approval, the assessment is `review-required`.
+
+Alice from security may approve it. The workspace lists her under the authority `security-review`. Her approval counts only when it is on the trust anchor, the protected branch: `origin/main` in a real repository, `main` here. First, she asks what exactly she would approve. Concordia prints the subject with a digest of each part, and writes nothing until she confirms the subject digest. The command also refuses to run when `CI` is `true`: a person records a decision, not a pipeline.
 
 ```bash
-cd /tmp/concordia-docs/tour && concordia assessment approve ASM-BILLING --reviewer alice@example.com --no-color
+cd /tmp/concordia-docs/tour && concordia assessment approve ASM-LEDGER --reviewer alice@example.com --no-color
 ```
 
 ```output
-Assessment ASM-BILLING@v1 (security, environment production, outcome satisfactory)
-Title: Invoice handling in the billing service
-Version digest: sha256:4c2e9643913f5828452e81471318def187b73754089c23b1069e84111cdcb8fc
+Assessment ASM-LEDGER@v1 (security, environment production, outcome satisfactory)
+Title: Ledger threat model
+Version digest: sha256:84bcfd1e0b9726c58b713629dcbdb290c67986edb07d8bf928cd5454f4683d14
 Digest contract: review-digest/1, capability profile: cbm-0.12.1
-Dependencies (1):
-  implementation file:services/billing/src/InvoiceService.ts sha256:125134fece377cc99f3dd9c02c862fd695a8f16a1bdfde288b326427bd3b43b6
+Dependencies (2):
+  implementation file:services/ledger-service/src/api/index.ts sha256:d2cf74efc13b873087d8ed23aebbd3f23e79086d48e961272fba2a94efc40d0a
+  trust-context calm:node:ledger-db#trust sha256:dfa04e62291492287ba56c388f2731e8f1e9864aab1e8fae3135356a32f6c49b
 Assumptions: 0, evidence: 0
-Subject digest: sha256:cc2827c2b962a8e30b99214e373ee31d56b0c0a65208a6b435d713f72097e1b5
-error CO-ASM-005: assessment approve or revoke refused: confirm the subject that you examined with --confirm-subject sha256:cc2827c2b962a8e30b99214e373ee31d56b0c0a65208a6b435d713f72097e1b5
+Subject digest: sha256:3cbb1c2620bea1bb97af54ca7f18527ca7a7a506cf90682b5c32eeac021ee43e
+error CO-ASM-005: assessment approve or revoke refused: confirm the subject that you examined with --confirm-subject sha256:3cbb1c2620bea1bb97af54ca7f18527ca7a7a506cf90682b5c32eeac021ee43e
 ```
 
-She confirms the subject digest, and Concordia writes the approval record. The record digest includes the time of the decision and differs on every run, so we drop that one line.
+She confirms the subject digest, and Concordia writes the approval record. The record digest includes the time of the decision and differs on every run, so you drop that one line.
 
 ```bash
-cd /tmp/concordia-docs/tour && concordia assessment approve ASM-BILLING --reviewer alice@example.com --confirm-subject sha256:cc2827c2b962a8e30b99214e373ee31d56b0c0a65208a6b435d713f72097e1b5 --no-color | grep -v '^Record digest'
+cd /tmp/concordia-docs/tour && concordia assessment approve ASM-LEDGER --reviewer alice@example.com --confirm-subject sha256:3cbb1c2620bea1bb97af54ca7f18527ca7a7a506cf90682b5c32eeac021ee43e --no-color 2>&1 | grep -v '^Record digest'
 ```
 
 ```output
-Assessment ASM-BILLING@v1 (security, environment production, outcome satisfactory)
-Title: Invoice handling in the billing service
-Version digest: sha256:4c2e9643913f5828452e81471318def187b73754089c23b1069e84111cdcb8fc
+Assessment ASM-LEDGER@v1 (security, environment production, outcome satisfactory)
+Title: Ledger threat model
+Version digest: sha256:84bcfd1e0b9726c58b713629dcbdb290c67986edb07d8bf928cd5454f4683d14
 Digest contract: review-digest/1, capability profile: cbm-0.12.1
-Dependencies (1):
-  implementation file:services/billing/src/InvoiceService.ts sha256:125134fece377cc99f3dd9c02c862fd695a8f16a1bdfde288b326427bd3b43b6
+Dependencies (2):
+  implementation file:services/ledger-service/src/api/index.ts sha256:d2cf74efc13b873087d8ed23aebbd3f23e79086d48e961272fba2a94efc40d0a
+  trust-context calm:node:ledger-db#trust sha256:dfa04e62291492287ba56c388f2731e8f1e9864aab1e8fae3135356a32f6c49b
 Assumptions: 0, evidence: 0
-Subject digest: sha256:cc2827c2b962a8e30b99214e373ee31d56b0c0a65208a6b435d713f72097e1b5
-approval written: assessments/approvals/ASM-BILLING-v1-1.yaml
+Subject digest: sha256:3cbb1c2620bea1bb97af54ca7f18527ca7a7a506cf90682b5c32eeac021ee43e
+approval written: assessments/approvals/ASM-LEDGER-v1-1.yaml
 Concordia counts this record only when it is on the trust anchor: merge it into the anchor branch (a change that touches only this file), then rebuild the candidate on the anchor.
 ```
 
-In a real repository, the record goes to the protected branch in a small pull request. Here we commit it to `main`. The status shows the time of the decision, which we replace with a placeholder for the same reason.
+In a real repository, the record goes to the protected branch in a small pull request. Here you commit it to `main`. The status shows the time of the decision, which you replace with a placeholder for the same reason.
 
 ```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Approve ASM-BILLING v1" && concordia index | grep -v '^generation'
+cd /tmp/concordia-docs/tour && git add assessments/approvals && git commit -q -m "Approve ASM-LEDGER v1" && concordia index | grep -v '^generation'
 ```
 
 ```output
-project: commerce-tour
-files: 10/11 covered (90.9%)
+project: payments-tour
+files: 14/15 covered (93.3%)
 excluded: 1, stale: 0, unindexed: 0
 coverage file: build/concordia/coverage.json
 ```
 
 ```bash
-cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-color | sed 's/decided [^;]*;/decided <time of the decision>;/'
+cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-color 2>&1 | sed 's/decided [^;]*;/decided <time of the decision>;/'
 ```
 
 ```output
 Assessment currency at 2030-01-01T00:00:00.000Z (digest contract review-digest/1, capability profile cbm-0.12.1)
 
-ASM-BILLING v1: current
-  security, production, outcome satisfactory, review state approved, assessments/ASM-BILLING/v1.yaml:1
-  approval ASM-BILLING-v1-1 by alice@example.com (security-review, protected-review), decided <time of the decision>; no expiry time
+ASM-LEDGER v1: current
+  security, production, outcome satisfactory, review state approved, assessments/ledger-threat-model.yaml:2
+  approval ASM-LEDGER-v1-1 by alice@example.com (security-review, protected-review), decided <time of the decision>; no expiry time
 
 Required assessments
-  billing-security: ASM-BILLING v1 is current
+  ledger-threat-model: ASM-LEDGER v1 is current
 ```
 
-The review is `current`: a listed reviewer approved it, the record is on the protected branch, and it binds the code as it is now.
+The threat model is `current`. A listed reviewer approved it, the record is on the protected branch, and it binds the subject as it is now.
 
-## 8. Fix the outage's cause, and see who needs to know
+## 7. Fix the cause, and see who must look again
 
-Now the billing team does what `CO-BND-001` asked: `InvoiceService.ts` stops using `ShipmentStore` and relies on the contract only. It is the right fix, and it changes the exact file that Alice reviewed.
+Now the payments team does what `PAY-API-001` asked. `PaymentService.ts` calls `assessPayment`, the published fraud API, instead of the internal risk model:
 
 ```bash
-cat > /tmp/concordia-docs/tour/services/billing/src/InvoiceService.ts <<'EOF'
-import { ShipmentRequest } from "../../../packages/fulfillment-contract/src/index";
+cat > /tmp/concordia-docs/tour/services/payments-service/src/PaymentService.ts <<'EOF'
+import { assessPayment } from "../../fraud-service/src/api/index";
+import { postEntry } from "../../ledger-service/src/api/index";
 
-export class InvoiceService {
-  issue(orderId: string, amountCents: number): ShipmentRequest {
-    return { orderId, total: amountCents };
+export class PaymentService {
+  async authorize(paymentId: string, amountCents: number): Promise<boolean> {
+    if (assessPayment(paymentId, amountCents).blocked) {
+      return false;
+    }
+    const response = await fetch("http://card-network.example.com/authorize", {
+      method: "POST",
+      body: JSON.stringify({ paymentId, amountCents }),
+    });
+    if (!response.ok) {
+      return false;
+    }
+    postEntry(paymentId, amountCents);
+    return true;
   }
 }
 EOF
@@ -787,148 +531,106 @@ EOF
 ```output
 ```
 
+During the outage, the payments service retried failed authorizations, and the ledger posted some payments twice. So the ledger team changes the ledger API in the same release: `postEntry` now ignores a payment that it already posted. The example ledger keeps its rows in memory, so this check is only an illustration. In production, duplicate protection needs a durable uniqueness guarantee on the payment ID, written in the same transaction as the ledger insert, so that a repeated payment fails as a whole. What matters for this tour is that the change touches the exact file that Alice reviewed.
+
 ```bash
-cd /tmp/concordia-docs/tour && git add -A && git commit -q -m "Billing uses only the fulfillment contract" && concordia index | grep -v '^generation'
+cat > /tmp/concordia-docs/tour/services/ledger-service/src/api/index.ts <<'EOF'
+import { LedgerTable } from "../db/schema";
+
+const table = new LedgerTable();
+const posted = new Set<string>();
+
+export function postEntry(paymentId: string, amountCents: number): number {
+  if (posted.has(paymentId)) {
+    return 0;
+  }
+  posted.add(paymentId);
+  return table.insert(paymentId, amountCents);
+}
+EOF
 ```
 
 ```output
-project: commerce-tour
-files: 10/11 covered (90.9%)
+```
+
+```bash
+cd /tmp/concordia-docs/tour && git add services && git commit -q -m "Use the fraud API; ignore repeated ledger entries" && concordia index | grep -v '^generation'
+```
+
+```output
+project: payments-tour
+files: 14/15 covered (93.3%)
 excluded: 1, stale: 0, unindexed: 0
 coverage file: build/concordia/coverage.json
 ```
 
+You run the rule of the outage and the review rule `REV-APR-001` together:
+
 ```bash
-cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-color | sed 's/decided [^;]*;/decided <time of the decision>;/'
+cd /tmp/concordia-docs/tour && concordia check --no-color --rule PAY-API-001 --rule REV-APR-001 | sed -n '1,2p;/^Assessment currency/,/^Not configured/p' | sed '$d'
+```
+
+```output
+warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
+Conformance: pass (1 pass)
+
+Assessment currency: violation (1 violation, 1 findings, 1 assessments, 1 required, 1 reviewRequired)
+  ASM-LEDGER v1 (security): review-required (subject digest mismatch)
+    outcome satisfactory; approval ASM-LEDGER-v1-1 by security-review (protected-review); assessments/ledger-threat-model.yaml:2
+    changed: modification of implementation:file:services/ledger-service/src/api/index.ts, class implementation or verification; next action: get review
+
+FAIL REV-APR-001 A required assessment has a current verified approval (advisory: does not change the exit code)
+  Why it matters: An assessment that nobody with authority approved for the subject as it is now, or whose approval expired, was revoked, or was bound to an earlier subject, is not review evidence for the architecture it covers.
+  required ledger-threat-model, assessment ASM-LEDGER: 1 finding(s)
+    assessments/ledger-threat-model.yaml:2
+  Fix: Get review of the assessment version and record a verified approval, or write a new assessment version for the changed subject. When currency is unknown, supply the missing evidence or fix the analysis configuration.
+
+```
+
+`Conformance: pass (1 pass)` is `PAY-API-001`. The payments service no longer depends on the internals of the fraud service, so the refactor that caused the outage cannot stop payments again. Concordia prints only the rules that do not pass, so the passed rule has no block of its own.
+
+`REV-APR-001` now fails. `assessment status` says why:
+
+```bash
+cd /tmp/concordia-docs/tour && concordia assessment status --at 2030-01-01 --no-color 2>&1 | sed 's/decided [^;]*;/decided <time of the decision>;/'
 ```
 
 ```output
 Assessment currency at 2030-01-01T00:00:00.000Z (digest contract review-digest/1, capability profile cbm-0.12.1)
 
-ASM-BILLING v1: review-required
-  security, production, outcome satisfactory, review state review-required, assessments/ASM-BILLING/v1.yaml:1
-  approval ASM-BILLING-v1-1 by alice@example.com (security-review, protected-review), decided <time of the decision>; no expiry time
+ASM-LEDGER v1: review-required
+  security, production, outcome satisfactory, review state review-required, assessments/ledger-threat-model.yaml:2
+  approval ASM-LEDGER-v1-1 by alice@example.com (security-review, protected-review), decided <time of the decision>; no expiry time
   why: subject digest mismatch
-    1 dependency item(s) differ from the subject that approval ASM-BILLING-v1-1 binds: modified implementation file:services/billing/src/InvoiceService.ts
-  changed: modification of implementation:file:services/billing/src/InvoiceService.ts, class implementation or verification
+    1 dependency item(s) differ from the subject that approval ASM-LEDGER-v1-1 binds: modified implementation file:services/ledger-service/src/api/index.ts
+  changed: modification of implementation:file:services/ledger-service/src/api/index.ts, class implementation or verification
   next action: get review
 
 Required assessments
-  billing-security: ASM-BILLING v1 is review-required (subject digest mismatch)
+  ledger-threat-model: ASM-LEDGER v1 is review-required (subject digest mismatch)
 ```
 
-Alice's approval still exists and still verifies, but it no longer covers the code: the file she reviewed changed. The status names that file and the next action, get a review. Nobody had to remember to ask her.
+Alice's approval still exists and still verifies, but it no longer covers the subject: the ledger API file that she reviewed changed. The status names that file and the next action, `get review`. Nobody had to remember to ask her.
 
-The last check shows where Acme stands:
+`REV-APR-001` is `advisory` in the example, so it shows on every pull request without failing the build. [Keep security reviews current](../use-cases/keep-security-reviews-current.md) shows how to make it `mandatory`.
 
-```bash
-cd /tmp/concordia-docs/tour && concordia check --no-color
-```
-
-```output
-warning CO-OBS-016: native edge kind kept as unsupported evidence: HAS_BRANCH (1 edges)
-Conformance: violation (3 violation, 3 unknown, 2 pass, 7 findings)
-
-UNKNOWN ASR-PRV-001 Each container occurrence has exact lineage from source to deployed image (advisory: does not change the exit code)
-  Why it matters: A tag or a static link from an image to a Dockerfile only suggests where an image came from. Exact lineage needs an admissible chain of statements from the source revision to the digest that runs, or the deployed image cannot be traced to the code that was reviewed.
-  Cannot judge: no loaded contract enables claim "exact-lineage" (claim-not-enabled)
-
-UNKNOWN ASR-PRV-002 The deployed digest of each container occurrence matches the observed digest (advisory: does not change the exit code)
-  Why it matters: When the digest that a cluster runs differs from the digest that the deployment record says was rolled out, the deployed software is not the software that was reviewed and traced.
-  Cannot judge: no loaded contract enables claim "runtime-drift" (claim-not-enabled)
-
-UNKNOWN CO-COV-001 Legacy must not call Billing
-  Why it matters: The legacy monolith is being retired. If it still calls billing, switching it off breaks invoicing.
-  Cannot judge: minimum coverage not met: 0.667 < 0.9 (CO-CON-021)
-  Cannot judge: language coverage not met: .kt 0.000 < 0.9 (CO-CON-026)
-  Coverage: 66.7% (required 90.0%)
-
-FAIL CO-CYC-001 Services are acyclic
-  Why it matters: A cycle ties two services together. Neither can be released or rolled back on its own, and an outage in one spreads to the other.
-  Owner: team-billing
-  Coverage: 87.5% (required 90.0%)
-  cycle through billing-service, fulfillment-service: 1 finding(s)
-    services/billing/src/InvoiceService.ts  imports packages/fulfillment-contract/src/index.ts
-                                            then notifyShipped calls InvoiceService in services/billing/src/InvoiceService.ts
-  Fix: Break the cycle. For example, let fulfillment publish a shipped event that billing consumes, instead of calling billing.
-
-FAIL CO-DECL-001 Dependencies are declared
-  Why it matters: Reviews and threat models read the architecture model. A dependency that the model does not show is a data flow that nobody reviewed.
-  Owner: team-fulfillment
-  Coverage: 87.5% (required 90.0%)
-  fulfillment-service -> billing-service: 3 finding(s)
-    services/fulfillment/src/notify.ts    imports services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:4  calls InvoiceService in services/billing/src/InvoiceService.ts
-    services/fulfillment/src/notify.ts:5  calls InvoiceService.issue in services/billing/src/InvoiceService.ts
-  Fix: Add the relationship to the CALM model if it is intended, or remove the dependency.
-
-FAIL CO-LYR-001 Billing sits above Fulfillment
-  Why it matters: Fulfillment is the lower layer. When it calls up into billing, a billing release can stop orders from shipping.
-  Owner: team-fulfillment
-  fulfillment-service -> billing-service: 1 finding(s)
-    services/fulfillment/src/notify.ts  imports services/billing/src/InvoiceService.ts
-  Fix: Notify billing through the fulfillment contract (an event or a callback) instead of importing billing code.
-
-Deployment trace: unknown (1 partial, 1 subjects)
-  Evidence: declared configuration, and rendered or evaluated in production. Not traced: deployment execution and runtime.
-  Subjects: 1 in 1 environment(s): 0 complete, 1 partial, 0 unresolved, 0 unknown
-  partial: billing-service in production
-
-ADR governance: pass (5 pass, 1 notApplicable)
-  ADR-1 accepted (docs/adr/0001-billing-uses-the-fulfillment-contract.md:1)
-    presence committed; applicability active; enforcement enforced (required; rules: CO-BND-001@commerce-boundaries/1.0.0)
-
-Assessment currency: violation (1 violation, 3 pass, 1 findings, 1 assessments, 1 required, 1 reviewRequired)
-  ASM-BILLING v1 (security): review-required (subject digest mismatch)
-    outcome satisfactory; approval ASM-BILLING-v1-1 by security-review (protected-review); assessments/ASM-BILLING/v1.yaml:1
-    changed: modification of implementation:file:services/billing/src/InvoiceService.ts, class implementation or verification; next action: get review
-
-FAIL REV-APR-001 A required assessment has a current verified approval (advisory: does not change the exit code)
-  Why it matters: An assessment that nobody with authority approved for the subject as it is now, or whose approval expired, was revoked, or was bound to an earlier subject, is not review evidence for the architecture it covers.
-  required billing-security, assessment ASM-BILLING: 1 finding(s)
-    assessments/ASM-BILLING/v1.yaml:1
-  Fix: Get review of the assessment version and record a verified approval, or write a new assessment version for the changed subject. When currency is unknown, supply the missing evidence or fix the analysis configuration.
-
-Quality evaluation: violation (1 violation, 1 findings)
-  QS-INVOICE-CHANGE (structural, mandatory, modifiability): violation
-  Areas with a scenario: modifiability violation
-  Areas without a scenario: availability, deployment-safety, operability, performance, security
-
-FAIL quality:QS-INVOICE-CHANGE Quality scenario QS-INVOICE-CHANGE
-  Why it matters: When the fulfillment team refactors how it stores shipments, invoicing keeps working without a billing change.
-  Owner: team-billing
-  scope billing-service, fulfillment-service: 1 finding(s)
-    quality/scenarios.yaml:4
-    Next action: fix implementation
-
-Not configured: Diagram currency
-
-Unknown area(s): Deployment trace
-Violation area(s): Assessment currency, Quality evaluation
-7 active error(s), 2 active info(s), 0 baselined, 0 waived, 0 expired waiver(s), 3 unknown
-```
-
-`CO-BND-001` is gone: billing no longer depends on fulfillment's internals, so the refactor that caused the outage would not break invoicing today. Three things remain, and each says what is at stake.
-
-- The security review needs Alice again (`REV-APR-001`). It is `advisory`, so it shows on every pull request without failing the build until Acme makes it `mandatory`.
-- Fulfillment still calls back into billing in `notify.ts`. That keeps the cycle (billing now reaches fulfillment through its contract package, which belongs to fulfillment), the layering violation, and the undeclared dependency. Each `Fix:` line says what to change.
-- The modifiability goal still fails, because `CO-LYR-001` still fails. It turns green when `notify.ts` is fixed.
-
-## What we learned
+## 8. What you learned
 
 | Question from the incident | Where Concordia answered it |
 |---|---|
-| Would it have been caught? | `CO-BND-001` points at the two lines that caused the outage. |
-| What else is waiting to break? | The cycle and layering findings in `notify.ts`, and the legacy calls Concordia cannot judge. |
-| What actually ships? | The deployment trace, with the sidecar that the code graph lost and the rendered manifests that recovered it. |
-| Is the decision enforced? | ADR governance: `ADR-0001` is committed, active, and enforced by `CO-BND-001`. |
-| Is the security review still valid? | Assessment currency: it was, until the reviewed file changed. |
+| Would Concordia have caught the outage? | `PAY-API-001` names the import and the two calls into the fraud service's internals. |
+| What else is waiting to break? | `PAY-PATH-001`, `PAY-CYC-001`, and `CORE-DECL-001` name the next dependencies that can stop payments. |
+| Can the public load balancer reach the ledger database? | `PAY-NET-002` reads the Terraform plan and names the security group rule that opens port 5432. |
+| Is the decision about the ledger enforced? | ADR governance: `ADR-0001` is committed, active, and linked to `PAY-DB-001`. `GOV-ADR-004` fails when the link goes. |
+| Does the threat model still hold? | Assessment currency: it did, until the reviewed ledger API changed. |
 
 ## Next steps
 
 - [Getting started](getting-started.md) and [Brownfield adoption](brownfield-adoption.md) cover rules, bindings, and baselines that accept today's findings and fail only on new ones.
-- [Trace a deployment](../how-to/trace-a-deployment.md), [Add stronger evidence](../how-to/add-stronger-evidence.md), [Govern architecture decisions](../how-to/govern-architecture-decisions.md), and [Review and approve assessments](../how-to/review-and-approve-assessments.md) do each step on a real repository.
-- [Keep diagrams current](../how-to/keep-diagrams-current.md) covers diagram currency, the one area this tour leaves out.
+- The [use cases](../README.md#use-cases) show each rule of this tour on the same example: what Concordia reads, how it decides, and what you still declare.
+- [Trace a deployment](../how-to/trace-a-deployment.md) follows a service from its source to the workloads in an environment.
+- [Add stronger evidence](../how-to/add-stronger-evidence.md) adds rendered manifests and signed build and deployment records.
+- [Govern architecture decisions](../how-to/govern-architecture-decisions.md) and [Review and approve assessments](../how-to/review-and-approve-assessments.md) do sections 5 to 7 on a real repository.
 - [Evidence and trust](../explanation/evidence-and-trust.md) explains why Concordia reports `unknown` instead of guessing.
 
 To clean up:
@@ -938,5 +640,5 @@ cd /tmp/concordia-docs/tour && concordia clean --all --yes && cd /tmp && rm -rf 
 ```
 
 ```output
-removed: .concordia/, build/concordia/, CBM project 'commerce-tour'
+removed: .concordia/, build/concordia/, CBM project 'payments-tour'
 ```

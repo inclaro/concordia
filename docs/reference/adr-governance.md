@@ -254,6 +254,8 @@ All six rules have the family `decision-governance`. The pack declares no `enfor
 
 A rule is **mandatory** when its severity is at or above `check.failOn` and its effective `onUnknown` is `fail`. The effective `onUnknown` is the one of the compiled rule, so the rule override, the control, the workspace `check.unknown`, and `--unknown` are already applied. Only the rules of the run are classified: a rule that `--rule` removed has no plan. It stays a valid link, but it is not judged by `GOV-ADR-003`, and `GOV-ADR-004` counts it as mandatory because it cannot show it to be advisory.
 
+`--unknown` and `check.unknown` have different precedence (see [the `evidence` block](policies.md#the-evidence-block)). `--unknown` replaces the `onUnknown` of every rule, also a rule that sets `evidence.onUnknown: fail`. `check.unknown` is only the default for a rule that sets no `onUnknown`. So `check --unknown warn` makes every linked rule advisory: a decision with `enforcement: required` then gives a `GOV-ADR-004` violation of kind `adr-advisory-only`. `check.unknown: warn` in the workspace keeps a rule with `evidence.onUnknown: fail` mandatory, and the decision stays `enforced`.
+
 This is the PRD definition of a mandatory rule (design D6), and it does not read the enforcement mode of the rule (`enforcement` in the pack, or `check.enforcement` in the workspace). An `advisory` or `shadow` rule that meets both conditions is still mandatory here: it counts as enforcing the decision, but it does not block a run. See [gate by environment](../how-to/run-in-ci.md#gate-by-environment).
 
 ### Replacement review (`GOV-ADR-002`)
@@ -327,7 +329,7 @@ The next action is one of the categories of the evaluation reporting contract:
 
 Every governance finding has `area: adrGovernance`, the obligation, the subject (the decision ID or the rule ID), the result, the expected condition, the observed evidence or gap, the related decisions, and a `decision` block: `id`, `title`, `status`, `statusText`, `path`, `line`, `successors`, `predecessors`, `governs` (resolved subjects), `enforcedBy` (rule refs), and `candidateSuccessors`. The kind of a finding is `adr-<reason>`.
 
-The location is the ADR file and the line of the decision when the provider reports it. Otherwise it is the register file and the line of the entry. A rule-justification finding points to the line of the link in the register. A trigger finding points to the changed file that raised it.
+The location is the ADR file and the line of the decision when the provider reports it. Otherwise it is the register file and the line of the entry. A rule-justification finding points to the line of the link in the register. A trigger finding points to the changed file that raised it. When only an architecture change raised it, it points to the architecture file (`architecture.source`), without a line.
 
 The **fingerprint** is the common fingerprint with these inputs and no path, line, or digest.
 

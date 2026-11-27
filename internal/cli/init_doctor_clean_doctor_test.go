@@ -116,13 +116,18 @@ func requireCbmProfile(t *testing.T, cbm map[string]any) map[string]any {
 	}
 
 	profile, _ := cbm["profile"].(map[string]any)
-	profileDigest, _ := profile["digest"].(string)
-
-	if profile["id"] != "cbm-0.12.1" || profile["applies"] != true || !strings.HasPrefix(profileDigest, "sha256:") {
+	if !isAppliedCbmProfile(profile) {
 		t.Fatalf("profile = %v", profile)
 	}
 
 	return profile
+}
+
+// isAppliedCbmProfile says whether the profile object is the applied profile of CBM 0.12.1 with a digest.
+func isAppliedCbmProfile(profile map[string]any) bool {
+	profileDigest, _ := profile["digest"].(string)
+
+	return profile["id"] == "cbm-0.12.1" && profile["applies"] == true && strings.HasPrefix(profileDigest, "sha256:")
 }
 
 // profileLossModes gives the loss modes of each family of the profile, and requires the keys of every family.
@@ -448,22 +453,45 @@ func indexClaimContracts(doc *doctorClaims) claimContractIndex {
 	return idx
 }
 
-// evaluators is the number of contracts of the kind evaluator.
-func (idx claimContractIndex) evaluators() int {
-	count := 0
+// evaluators are the ids of the contracts of the kind evaluator, sorted.
+func (idx claimContractIndex) evaluators() []string {
+	var ids []string
 
-	for _, kind := range idx.kinds {
+	for id, kind := range idx.kinds {
 		if kind == "evaluator" {
-			count++
+			ids = append(ids, id)
 		}
 	}
 
-	return count
+	slices.Sort(ids)
+
+	return ids
 }
 
 // listsEnabledAndNotEnabled reports whether the contract says what it enables and what it does not enable.
 func (idx claimContractIndex) listsEnabledAndNotEnabled(id string) bool {
 	return idx.enabled[id] > 0 && len(idx.notEnabled[id]) > 0
+}
+
+// isAdapter reports whether the contract is an adapter that says what it enables and what it does not enable.
+func (idx claimContractIndex) isAdapter(id string) bool {
+	return idx.kinds[id] == "adapter" && idx.listsEnabledAndNotEnabled(id)
+}
+
+// requireClaimRegistry decodes the `claims` object of `doctor --json` and requires a digest and the thirteen claims.
+func requireClaimRegistry(t *testing.T, stdout string) *doctorClaims {
+	t.Helper()
+
+	var doc doctorClaims
+	if err := json.Unmarshal([]byte(stdout), &doc); err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.HasPrefix(doc.Claims.Digest, "sha256:") || len(doc.Claims.Claims) != 13 {
+		t.Fatalf("registry = %+v", doc.Claims)
+	}
+
+	return &doc
 }
 
 func TestDoctorJSONListsTheClaimContracts(t *testing.T) {
@@ -472,25 +500,16 @@ func TestDoctorJSONListsTheClaimContracts(t *testing.T) {
 	res := doctorRun(t, initialized(t), nil, "--json")
 	requireExit0(t, &res)
 
-	var doc doctorClaims
-	if err := json.Unmarshal([]byte(res.Stdout), &doc); err != nil {
-		t.Fatal(err)
-	}
-
-	if !strings.HasPrefix(doc.Claims.Digest, "sha256:") || len(doc.Claims.Claims) != 12 {
-		t.Fatalf("registry = %+v", doc.Claims)
-	}
-
-	idx := indexClaimContracts(&doc)
+	idx := indexClaimContracts(requireClaimRegistry(t, res.Stdout))
 
 	for _, id := range []string{"rendering", "plan", "provenance", "verification", "quality"} {
-		if idx.kinds[id] != "adapter" || !idx.listsEnabledAndNotEnabled(id) {
+		if !idx.isAdapter(id) {
 			t.Errorf("contract %s: kind %q, %d enabled, not enabled %v", id, idx.kinds[id], idx.enabled[id], idx.notEnabled[id])
 		}
 	}
 
-	if got := idx.evaluators(); got != 2 {
-		t.Errorf("evaluator contracts = %d, want the network and the access evaluator", got)
+	if got, want := idx.evaluators(), []string{"cloud-firewall", "network-policy", "rbac"}; !slices.Equal(got, want) {
+		t.Errorf("evaluator contracts = %v, want %v", got, want)
 	}
 
 	if !slices.Contains(idx.notEnabled["provenance"], "slsa-level") {

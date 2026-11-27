@@ -246,3 +246,200 @@ func TestReadingTwiceGivesTheSameResult(t *testing.T) {
 		t.Errorf("results differ:\n%s\n%s", left, right)
 	}
 }
+
+// terraform-1.2-references.json is a handwritten plan whose group IDs are unknown until apply and whose
+// `configuration` section names the groups that each attribute refers to.
+func TestReferencesResolveAnUnknownGroupIDThroughTheConfiguration(t *testing.T) {
+	t.Parallel()
+
+	p := read(t, "terraform-1.2-references.json")
+	rule := resource(t, p, "aws_vpc_security_group_ingress_rule.x")
+
+	if !slices.Contains(rule.Unknown, "referenced_security_group_id") {
+		t.Fatalf("unknown = %v", rule.Unknown)
+	}
+
+	want := map[string][]string{
+		"referenced_security_group_id": {"aws_security_group.gateway"},
+		"security_group_id":            {"aws_security_group.db"},
+	}
+	if !reflect.DeepEqual(rule.References, want) {
+		t.Errorf("references = %v, want %v", rule.References, want)
+	}
+
+	// A nested block has the path form of Unknown; a local stays as an opaque entry; a data source keeps its address.
+	db := resource(t, p, "aws_security_group.db")
+
+	wantDB := map[string][]string{
+		"ingress[0].security_groups": {"aws_security_group.gateway", "local.extra_groups"},
+		"vpc_id":                     {"data.aws_vpc.main"},
+	}
+	if !reflect.DeepEqual(db.References, wantDB) {
+		t.Errorf("references = %v, want %v", db.References, wantDB)
+	}
+
+	// A variable is kept as an opaque entry, never as its value.
+	gateway := resource(t, p, "aws_security_group.gateway")
+	if want := map[string][]string{"vpc_id": {"var.vpc_id"}}; !reflect.DeepEqual(gateway.References, want) {
+		t.Errorf("references = %v, want %v", gateway.References, want)
+	}
+}
+
+func TestReferencesInAModuleAreAbsoluteAndShared(t *testing.T) {
+	t.Parallel()
+
+	p := read(t, "terraform-1.2-references.json")
+
+	want := map[string][]string{"vpc_id": {"module.net.aws_vpc.this"}}
+	for _, address := range []string{"module.net.aws_security_group.web[0]", "module.net.aws_security_group.web[1]"} {
+		if web := resource(t, p, address); !reflect.DeepEqual(web.References, want) {
+			t.Errorf("%s references = %v, want %v", address, web.References, want)
+		}
+	}
+}
+
+func TestReferencesNeverCarryAConstantValue(t *testing.T) {
+	t.Parallel()
+
+	if !strings.Contains(string(fixture(t, "terraform-1.2-references.json")), `"constant_value": "hunter2-config-secret"`) {
+		t.Fatal("the fixture no longer holds the secret as a constant value")
+	}
+
+	encoded := marshal(t, read(t, "terraform-1.2-references.json"))
+	if strings.Contains(string(encoded), "hunter2") {
+		t.Fatalf("the output holds a constant value: %s", encoded)
+	}
+}
+
+func TestReferencesAreNilWithoutAUsableConfiguration(t *testing.T) {
+	t.Parallel()
+
+	change := `"resource_changes":[{"address":"a_b.c","mode":"managed","type":"a_b","name":"c",
+		"change":{"actions":["create"],"after":{},"after_unknown":{"id":true},"after_sensitive":{}}}]`
+
+	for _, tc := range []struct{ name, configuration string }{
+		{"missing", ""},
+		{"malformed", `,"configuration":{"root_module":{"resources":"not a list"}}`},
+		{"null", `,"configuration":null`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			p := readInline(t, `{"format_version":"1.2",`+change+tc.configuration+`}`)
+			if p.Resources[0].References != nil {
+				t.Errorf("references = %v, want nil", p.Resources[0].References)
+			}
+		})
+	}
+}
+
+// A reference through a variable, a local, `each.key` or `each.value` can carry a resource ID that the plan does not
+// name, so it stays in the list as an opaque entry: a consumer must not take the rest of the list for the whole of it.
+func TestReferencesKeepOpaqueVariableLocalAndEachEntries(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2",
+		"resource_changes":[{"address":"module.net.aws_instance.app[\"a\"]","module_address":"module.net","mode":"managed",
+			"type":"aws_instance","name":"app","change":{"actions":["create"],"after":{},"after_unknown":{"vpc_security_group_ids":true},"after_sensitive":{}}}],
+		"configuration":{"root_module":{"module_calls":{"net":{"module":{"resources":[{"address":"aws_instance.app",
+			"expressions":{
+				"vpc_security_group_ids":{"references":["aws_security_group.this.id","aws_security_group.this",
+					"var.extra_security_group_ids","local.groups[0]","each.value.id","each.value","each.key","count.index",
+					"path.module","self.id","terraform.workspace"]}
+			}}]}}}}}}`)
+
+	want := map[string][]string{"vpc_security_group_ids": {
+		"module.net.aws_security_group.this", "module.net.each.key", "module.net.each.value", "module.net.local.groups",
+		"module.net.var.extra_security_group_ids",
+	}}
+	if got := p.Resources[0].References; !reflect.DeepEqual(got, want) {
+		t.Errorf("references = %v, want %v", got, want)
+	}
+}
+
+// A reference that reads an attribute that does not identify its resource, such as a tag, gives a value that may be
+// the ID of any resource: the reader keeps the attribute in the entry. An identifying attribute (`id`, `name`) is cut.
+func TestReferencesKeepNonIdentityAttributes(t *testing.T) {
+	t.Parallel()
+
+	p := readInline(t, `{"format_version":"1.2",
+		"resource_changes":[{"address":"aws_instance.app","mode":"managed","type":"aws_instance","name":"app",
+			"change":{"actions":["create"],"after":{},"after_unknown":{"vpc_security_group_ids":true},"after_sensitive":{}}}],
+		"configuration":{"root_module":{"resources":[{"address":"aws_instance.app","expressions":{
+			"vpc_security_group_ids":{"references":["aws_security_group.a.tags[\"peer_id\"]","aws_security_group.a.tags",
+				"aws_security_group.a","aws_security_group.b.id","aws_security_group.b","var.x.id","local.y.z"]}
+		}}]}}}`)
+
+	want := map[string][]string{"vpc_security_group_ids": {
+		"aws_security_group.a", "aws_security_group.a.tags", "aws_security_group.b", "local.y", "var.x",
+	}}
+	if got := p.Resources[0].References; !reflect.DeepEqual(got, want) {
+		t.Errorf("references = %v, want %v", got, want)
+	}
+}
+
+func TestReferencesNameAttributeEntries(t *testing.T) {
+	t.Parallel()
+
+	for address, want := range map[string]bool{
+		"aws_security_group.a.tags":            true,
+		"module.net.aws_security_group.a.tags": true,
+		"aws_security_group.a":                 false,
+		"data.aws_vpc.main.tags":               false,
+		"var.extra":                            false,
+		"each.key":                             false,
+		"module.net":                           false,
+	} {
+		if got := plan.IsAttributeReference(address); got != want {
+			t.Errorf("IsAttributeReference(%q) = %v, want %v", address, got, want)
+		}
+	}
+}
+
+func TestReferencesNameOpaqueEntries(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		address string
+		want    bool
+	}{
+		{"var.extra", true},
+		{"local.groups", true},
+		{"each.value", true},
+		{"each.key", true},
+		{"module.net.var.extra", true},
+		{"module.a.module.b.local.groups", true},
+		{"module.net.each.value", true},
+		{"aws_security_group.this", false},
+		{"module.net.aws_security_group.this", false},
+		{"data.aws_vpc.main", false},
+		{"module.var", false},
+		{"module.net", false},
+	} {
+		t.Run(tc.address, func(t *testing.T) {
+			t.Parallel()
+
+			if got := plan.IsOpaqueReference(tc.address); got != tc.want {
+				t.Errorf("IsOpaqueReference(%q) = %v, want %v", tc.address, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestConfigAddressRemovesInstanceKeys(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct{ name, address, want string }{
+		{"no key", "aws_security_group.db", "aws_security_group.db"},
+		{"count index", "aws_security_group.web[1]", "aws_security_group.web"},
+		{"module and string key", `module.net["a"].aws_instance.app["x.y]"]`, "module.net.aws_instance.app"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			if got := plan.ConfigAddress(tc.address); got != tc.want {
+				t.Errorf("ConfigAddress(%q) = %q, want %q", tc.address, got, tc.want)
+			}
+		})
+	}
+}

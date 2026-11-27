@@ -1,0 +1,14 @@
+apiVersion: concordia.io/v1alpha1
+kind: DecisionRegister
+decisions:
+  - id: ADR-0001
+    path: docs/adr/0001-ledger-database-owned-by-ledger-service.md
+    expect: active
+    categories: [data-ownership]
+    governs:
+      - ref: calm:node:ledger-db
+      - ref: calm:relationship:ledger-to-database
+    enforcement: required
+    enforcedBy:
+      - rule: PAY-DB-001
+        pack: {id: payments-architecture, version: 1.0.0}

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: channels-api
+  namespace: channels
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: channels-api
+  namespace: channels
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: channels-api
+  template:
+    metadata:
+      labels:
+        app: channels-api
+    spec:
+      serviceAccountName: channels-api
+      containers:
+        - name: channels-api
+          image: registry.example.com/bank/channels-api:2.4.0
+          ports:
+            - containerPort: 8443

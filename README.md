@@ -1,15 +1,27 @@
 # Concordia
 
-Concordia is a command-line tool that checks a codebase against its architecture and the evidence around it. It compares a CALM 1.2 or 1.3 architecture model with the code graph that Codebase Memory (CBM) builds, and evaluates policy rules over the result. You can adopt it on existing code by accepting today's violations and failing only on new ones.
+Concordia is a command-line tool that keeps your systems in line with the architecture that you approved. It compares a CALM 1.2 or 1.3 architecture model with the code graph that Codebase Memory (CBM) builds, with the Kubernetes manifests and Terraform plans of each environment, and with your decisions and security reviews. It fails the build when a change breaks a rule, and it reports `unknown` when it cannot prove a result. You can adopt it on existing code by accepting today's violations and failing only on new ones.
 
-Today Concordia tells you whether:
+## What Concordia catches
 
-- the code conforms to the architecture: which dependencies break it ([bind code to architecture](docs/how-to/bind-code-to-architecture.md));
-- each deployed service traces to its workloads, images, build definitions, and source ([trace a deployment](docs/how-to/trace-a-deployment.md));
-- the architecture diagrams in the repository are present, fresh, and still match the model ([keep diagrams current](docs/how-to/keep-diagrams-current.md));
-- architecture decisions are recorded, applicable, and enforced by rules ([govern architecture decisions](docs/how-to/govern-architecture-decisions.md));
-- security and quality assessments are still current, or need a new review after a change ([review and approve assessments](docs/how-to/review-and-approve-assessments.md));
-- stronger evidence backs a claim: rendered manifests, signed provenance, and policy evaluators ([add stronger evidence](docs/how-to/add-stronger-evidence.md)).
+Each use case runs on a bank payments example (`docs/examples/payments/`).
+
+|Problem|Use case|
+|---|---|
+|A service imports the internal code of another service, and a refactor there breaks payments.|[Integrate through published APIs](docs/use-cases/integrate-through-published-apis.md)|
+|Two services depend on each other, so you cannot deploy or roll back one alone.|[Keep services free of cycles](docs/use-cases/keep-services-free-of-cycles.md)|
+|A critical service depends on a non-critical one, so a minor outage stops payments.|[Keep critical paths isolated](docs/use-cases/keep-critical-paths-isolated.md)|
+|An internet-facing service reaches into a service that holds restricted data.|[Enforce trust boundaries in code](docs/use-cases/enforce-trust-boundaries-in-code.md)|
+|Code outside the owning service reads or writes the ledger database.|[Protect database ownership](docs/use-cases/protect-database-ownership.md)|
+|A NetworkPolicy opens a port between workloads that must stay apart (advisory).|[Block network paths in Kubernetes](docs/use-cases/block-network-paths-in-kubernetes.md)|
+|A security group rule in a Terraform plan opens the database to a public load balancer (advisory).|[Block network paths in the cloud](docs/use-cases/block-network-paths-in-the-cloud.md)|
+|A RoleBinding lets one workload change another (advisory).|[Limit Kubernetes permissions](docs/use-cases/limit-kubernetes-permissions.md)|
+|A service calls another service in production without HTTPS. The example shows an `unknown` result and the evidence that is missing.|[Require encrypted connections](docs/use-cases/require-encrypted-connections.md)|
+|A deployed image has no verified lineage from a trusted build. The example shows an `unknown` result and the evidence to add.|[Trace images to trusted builds](docs/use-cases/trace-images-to-trusted-builds.md)|
+|The code has dependencies that the architecture model does not declare.|[Keep the model in sync with code](docs/use-cases/keep-the-model-in-sync-with-code.md)|
+|A change adds a significant relationship without an architecture decision.|[Require a decision for significant changes](docs/use-cases/require-a-decision-for-significant-changes.md)|
+|An accepted decision is missing, no longer in force, or not enforced by a rule.|[Enforce architecture decisions](docs/use-cases/enforce-architecture-decisions.md)|
+|A security review still counts after the code it approved has changed.|[Keep security reviews current](docs/use-cases/keep-security-reviews-current.md)|
 
 ## Quickstart
 

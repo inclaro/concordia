@@ -392,7 +392,7 @@ An entry holds digests, counts, names, and reasons, never a rendered value, a se
 Three shared values:
 
 - `coverage` is `complete`, `partial`, or `failed`. A source over a limit is `partial` or `failed`; Concordia never cuts the output to fit.
-- `integrity` is `content-not-verified`, `content-verified-by-digest`, or `producer-authenticated`, in this order. See [Statements](assurance.md#statements).
+- `integrity` in `plans`, `statements`, `lineage`, and `checkResults` is `content-not-verified`, `content-verified-by-digest`, or `producer-authenticated`, in this order. See [Statements](assurance.md#statements). The `integrity` of an entry in [`evaluations`](#evaluations) uses the same levels as text with spaces: `content not verified`, `content verified by digest`, or `producer authenticated`.
 - A gap is `{kind, detail}` with an optional `path`. It says what the evidence lacks, for example an unknown value after apply.
 
 ### `rendered`
@@ -447,12 +447,13 @@ No SLSA level is derived or shown.
 
 | Field | Description |
 |---|---|
-| `environment`, `kind`, `query` | The environment, `network-policy` or `rbac`, and the query as text. |
+| `environment`, `kind`, `query` | The environment, `network-policy`, `rbac`, or `cloud-firewall`, and the query as text. A `cloud-firewall` query has the form `<protocol>/<port> from <source address> to <destination address>`, with plan addresses, for example `tcp/5432 from aws_lb.public to aws_db_instance.ledger`. The protocol is `tcp` for a rule with `ports`; a rule without `ports` can also give `udp/<port>` queries. |
 | `verdict`, `reason` | `allowed`, `denied`, `granted`, `not-granted`, or `unknown`, and the reason of an `unknown`. |
-| `policies` | The policies, bindings, and roles that decided the answer. |
+| `policies` | The policies, bindings, and roles that decided the answer. For `cloud-firewall`, each entry is `<address> <rule>`, where `<rule>` names the rule in the resource: `rule` for a standalone AWS rule resource, `ingress[i]` or `egress[i]` for an inline rule of an AWS security group, and the forms in [cloud-firewall](assurance.md#cloud-firewall) for Azure and GCP. For example, the open path of the payments example lists `aws_security_group.gateway egress[0]`, `aws_vpc_security_group_egress_rule.gateway_out rule`, and `aws_vpc_security_group_ingress_rule.ledger_from_gateway rule`. |
 | `assumptions`, `declaredAssumptions` | The enforcement assumptions that the answer relies on, and those that the workspace declares. |
 | `limits`, `gaps` | The limits of the evaluator and the gaps of its input. |
-| `evaluator`, `evaluatorVersion`, `inputDigest` | The evaluator that answered and the digest of its input. The same rendered input gives the same answer and digest. |
+| `evaluator`, `evaluatorVersion`, `inputDigest` | The evaluator that answered and the digest of its input. The same rendered input gives the same answer and digest. For `cloud-firewall`, `inputDigest` is the SHA-256 of the plan bytes, or the digest of the sorted plan digests when the environment has more plans. |
+| `integrity` | Optional. The integrity of the evidence that the evaluator read: `content not verified`, `content verified by digest`, or `producer authenticated`. A `cloud-firewall` entry always has it: `content not verified` for a plan without a statement, `producer authenticated` for a plan that a verified statement binds, and the lowest level when the environment has more plans. |
 
 ### `checkResults`
 
@@ -688,7 +689,7 @@ FAIL <ruleId> <name>[ (advisory: does not change the exit code)]
 
 - The status word is `FAIL`, `UNKNOWN`, or `ERROR`; color is never the only signal.
 - `Why it matters` and `Fix` are the `rationale` and `remediation` of the rule, shown when the policy sets them. `Owner` is the owner of the rule, else the one owner that all shown findings share.
-- Findings are grouped by their two ends: `<source> -> <target>` (CALM element IDs), `cycle through <a>, <b>` for a cycle, `required <id>, assessment <id>` for a review finding, or `scope <ids>` for a quality scenario. Each finding is one line with its location and what the code does there: the edge kind in lower case (`imports`, `calls`) and the target by its short name. A longer evidence path adds one `then` line for each further edge. A finding that is not active (an expired waiver, or with `--verbose` a baselined or waived finding) ends with its disposition in brackets.
+- Findings are grouped by their two ends: `<source> -> <target>` (CALM element IDs), `<source>` alone when the finding has no target, `cycle through <a>, <b>` for a cycle, `required <id>, assessment <id>` for a review finding, or `scope <ids>` for a quality scenario. The groups are sorted by this text, then by next action. In a group, findings are sorted by path, then line, then message; a finding without a location comes last. The order depends only on what the block shows, so two copies of a workspace with different project names print the same block. `results.json` keeps its own order (rule ID, then fingerprint). Each finding is one line with its location and what the code does there: the edge kind in lower case (`imports`, `calls`) and the target by its short name. A longer evidence path adds one `then` line for each further edge. A finding that is not active (an expired waiver, or with `--verbose` a baselined or waived finding) ends with its disposition in brackets.
 - `Next action` closes a group when the rule has no remediation. The coverage line shows when coverage is below the required ratio.
 - An `unknown` block shows `Why it matters`, one `Cannot judge: <message> (<code>)` line for each reason, and the coverage line. With `onUnknown` `warn`, it adds `On unknown: warn`. An `error` block uses `Error:`.
 - `--verbose` adds, under each finding, its full fingerprint and each edge of its evidence with the native kind and confidence, shows baselined and waived findings, and always shows the coverage line. Otherwise a line states how many accepted findings are not shown. `concordia explain` and `results.json` always have every detail.

@@ -1,0 +1,1049 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.17.0",
+  "complete": true,
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "google_compute_network.vpc",
+      "mode": "managed",
+      "type": "google_compute_network",
+      "name": "vpc",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "vpc",
+          "auto_create_subnetworks": false
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_network.other",
+      "mode": "managed",
+      "type": "google_compute_network",
+      "name": "other",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "other",
+          "auto_create_subnetworks": false
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_subnetwork.app",
+      "mode": "managed",
+      "type": "google_compute_subnetwork",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "app",
+          "ip_cidr_range": "10.10.0.0/24",
+          "region": "europe-west1",
+          "stack_type": "IPV4_ONLY"
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_subnetwork.data",
+      "mode": "managed",
+      "type": "google_compute_subnetwork",
+      "name": "data",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "data",
+          "ip_cidr_range": "10.20.0.0/24",
+          "region": "europe-west1",
+          "stack_type": "IPV4_ONLY"
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance.web",
+      "mode": "managed",
+      "type": "google_compute_instance",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "web",
+          "tags": [
+            "web"
+          ],
+          "network_interface": [
+            {
+              "stack_type": "IPV4_ONLY"
+            }
+          ],
+          "service_account": [
+            {
+              "email": "web@bank-payments.iam.gserviceaccount.com",
+              "scopes": [
+                "cloud-platform"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network_interface": [
+            {
+              "network": true,
+              "subnetwork": true,
+              "network_ip": true
+            }
+          ],
+          "service_account": [
+            {
+              "scopes": [
+                false
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance.db",
+      "mode": "managed",
+      "type": "google_compute_instance",
+      "name": "db",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "db",
+          "tags": [
+            "db"
+          ],
+          "network_interface": [
+            {
+              "network_ip": "10.20.0.5",
+              "stack_type": "IPV4_ONLY"
+            }
+          ],
+          "service_account": [
+            {
+              "email": "db@bank-payments.iam.gserviceaccount.com",
+              "scopes": [
+                "cloud-platform"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network_interface": [
+            {
+              "network": true,
+              "subnetwork": true
+            }
+          ],
+          "service_account": [
+            {
+              "scopes": [
+                false
+              ]
+            }
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance.peer",
+      "mode": "managed",
+      "type": "google_compute_instance",
+      "name": "peer",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "peer",
+          "tags": [],
+          "network_interface": [
+            {
+              "network": "other",
+              "subnetwork": "other-sub",
+              "network_ip": "10.30.0.5",
+              "stack_type": "IPV4_ONLY"
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network_interface": [
+            {}
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance_template.batch",
+      "mode": "managed",
+      "type": "google_compute_instance_template",
+      "name": "batch",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "batch",
+          "tags": [
+            "batch"
+          ],
+          "network_interface": [
+            {
+              "stack_type": "IPV4_ONLY"
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network_interface": [
+            {
+              "network": true,
+              "subnetwork": true
+            }
+          ]
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_web_to_db",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_web_to_db",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-web-to-db",
+          "direction": "INGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "5432"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [],
+          "source_tags": [
+            "web"
+          ],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.deny_web_redis",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_web_redis",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "deny-web-redis",
+          "direction": "INGRESS",
+          "priority": 900,
+          "disabled": false,
+          "allow": [],
+          "deny": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "6379"
+              ]
+            }
+          ],
+          "source_ranges": [],
+          "source_tags": [
+            "web"
+          ],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_web_redis",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_web_redis",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-web-redis",
+          "direction": "INGRESS",
+          "priority": 900,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "6379"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [],
+          "source_tags": [
+            "web"
+          ],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_app_range",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_app_range",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-app-range",
+          "direction": "INGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "8080"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [
+            "10.10.0.0/25"
+          ],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_metrics_accounts",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_metrics_accounts",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-metrics-accounts",
+          "direction": "INGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "9000-9100"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [],
+          "source_tags": [],
+          "source_service_accounts": [
+            "web@bank-payments.iam.gserviceaccount.com"
+          ],
+          "destination_ranges": [],
+          "target_tags": [],
+          "target_service_accounts": [
+            "db@bank-payments.iam.gserviceaccount.com"
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.deny_web_mysql_out",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_web_mysql_out",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "deny-web-mysql-out",
+          "direction": "EGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [],
+          "deny": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "3306"
+              ]
+            }
+          ],
+          "source_ranges": [],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [
+            "10.20.0.0/24"
+          ],
+          "target_tags": [
+            "web"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_web_mysql",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_web_mysql",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-web-mysql",
+          "direction": "INGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "3306"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [],
+          "source_tags": [
+            "web"
+          ],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_all_disabled",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_all_disabled",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-all-disabled",
+          "direction": "INGRESS",
+          "priority": 500,
+          "disabled": true,
+          "allow": [
+            {
+              "protocol": "all",
+              "ports": []
+            }
+          ],
+          "deny": [],
+          "source_ranges": [
+            "0.0.0.0/0"
+          ],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.other_allow_all",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "other_allow_all",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "other-allow-all",
+          "direction": "INGRESS",
+          "priority": 100,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "all",
+              "ports": []
+            }
+          ],
+          "deny": [],
+          "source_ranges": [
+            "0.0.0.0/0"
+          ],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.allow_batch_dns",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "allow_batch_dns",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "name": "allow-batch-dns",
+          "direction": "INGRESS",
+          "priority": 1000,
+          "disabled": false,
+          "allow": [
+            {
+              "protocol": "udp",
+              "ports": [
+                "53"
+              ]
+            }
+          ],
+          "deny": [],
+          "source_ranges": [],
+          "source_tags": [
+            "batch"
+          ],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [
+            "db"
+          ],
+          "target_service_accounts": []
+        },
+        "after_unknown": {
+          "id": true,
+          "self_link": true,
+          "network": true,
+          "creation_timestamp": true
+        },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.deny_other_host",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_other_host",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "deny-other-host",
+          "direction": "INGRESS",
+          "priority": 100,
+          "disabled": false,
+          "allow": [],
+          "deny": [{ "protocol": "tcp", "ports": ["9060"] }],
+          "source_ranges": [],
+          "source_tags": ["web"],
+          "source_service_accounts": [],
+          "destination_ranges": ["10.20.0.9/32"],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": { "id": true, "self_link": true, "network": true, "creation_timestamp": true },
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.deny_other_source_out",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "deny_other_source_out",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "name": "deny-other-source-out",
+          "direction": "EGRESS",
+          "priority": 100,
+          "disabled": false,
+          "allow": [],
+          "deny": [{ "protocol": "tcp", "ports": ["9070"] }],
+          "source_ranges": ["10.99.0.0/24"],
+          "source_tags": [],
+          "source_service_accounts": [],
+          "destination_ranges": [],
+          "target_tags": [],
+          "target_service_accounts": []
+        },
+        "after_unknown": { "id": true, "self_link": true, "network": true, "creation_timestamp": true },
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "google": {
+        "name": "google",
+        "full_name": "registry.terraform.io/hashicorp/google"
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "google_compute_network.vpc",
+          "mode": "managed",
+          "type": "google_compute_network",
+          "name": "vpc",
+          "expressions": {
+            "name": {
+              "constant_value": "vpc"
+            }
+          }
+        },
+        {
+          "address": "google_compute_network.other",
+          "mode": "managed",
+          "type": "google_compute_network",
+          "name": "other",
+          "expressions": {
+            "name": {
+              "constant_value": "other"
+            }
+          }
+        },
+        {
+          "address": "google_compute_subnetwork.app",
+          "mode": "managed",
+          "type": "google_compute_subnetwork",
+          "name": "app",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.id",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_subnetwork.data",
+          "mode": "managed",
+          "type": "google_compute_subnetwork",
+          "name": "data",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.id",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_instance.web",
+          "mode": "managed",
+          "type": "google_compute_instance",
+          "name": "web",
+          "expressions": {
+            "network_interface": [
+              {
+                "network": {
+                  "references": [
+                    "google_compute_network.vpc.id",
+                    "google_compute_network.vpc"
+                  ]
+                },
+                "subnetwork": {
+                  "references": [
+                    "google_compute_subnetwork.app.id",
+                    "google_compute_subnetwork.app"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "google_compute_instance.db",
+          "mode": "managed",
+          "type": "google_compute_instance",
+          "name": "db",
+          "expressions": {
+            "network_interface": [
+              {
+                "network": {
+                  "references": [
+                    "google_compute_network.vpc.id",
+                    "google_compute_network.vpc"
+                  ]
+                },
+                "subnetwork": {
+                  "references": [
+                    "google_compute_subnetwork.data.id",
+                    "google_compute_subnetwork.data"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "google_compute_instance.peer",
+          "mode": "managed",
+          "type": "google_compute_instance",
+          "name": "peer",
+          "expressions": {}
+        },
+        {
+          "address": "google_compute_instance_template.batch",
+          "mode": "managed",
+          "type": "google_compute_instance_template",
+          "name": "batch",
+          "expressions": {
+            "network_interface": [
+              {
+                "network": {
+                  "references": [
+                    "google_compute_network.vpc.self_link",
+                    "google_compute_network.vpc"
+                  ]
+                },
+                "subnetwork": {
+                  "references": [
+                    "google_compute_subnetwork.app.self_link",
+                    "google_compute_subnetwork.app"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_web_to_db",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_web_to_db",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_web_redis",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_web_redis",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_web_redis",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_web_redis",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_app_range",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_app_range",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_metrics_accounts",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_metrics_accounts",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_web_mysql_out",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_web_mysql_out",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_web_mysql",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_web_mysql",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_all_disabled",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_all_disabled",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.other_allow_all",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "other_allow_all",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.other.name",
+                "google_compute_network.other"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.allow_batch_dns",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "allow_batch_dns",
+          "expressions": {
+            "network": {
+              "references": [
+                "google_compute_network.vpc.name",
+                "google_compute_network.vpc"
+              ]
+            }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_other_host",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_other_host",
+          "expressions": {
+            "network": { "references": ["google_compute_network.vpc.name", "google_compute_network.vpc"] }
+          }
+        },
+        {
+          "address": "google_compute_firewall.deny_other_source_out",
+          "mode": "managed",
+          "type": "google_compute_firewall",
+          "name": "deny_other_source_out",
+          "expressions": {
+            "network": { "references": ["google_compute_network.vpc.name", "google_compute_network.vpc"] }
+          }
+        }
+      ]
+    }
+  }
+}
