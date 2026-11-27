@@ -11,15 +11,19 @@ import (
 
 // awsTargetOf is the one network interface of the endpoint that an attachment which concerns the endpoint names: by
 // its known ID, or by the one resource that its configuration references resolve to. It is nil when the attachment
-// names no single interface.
+// names no single interface. A known ID names an attached network interface before the endpoint (interfaces[0]):
+// the `primary_network_interface_id` of an instance is also the ID of the network interface of its primary
+// `network_interface` block, and that interface, not the instance, has a view when the blocks give the groups.
 func (e *Evaluator) awsTargetOf(link *awsLink, interfaces []*plan.Resource) *plan.Resource {
 	if value, ok := attrString(link.res, link.path); ok {
-		at := slices.IndexFunc(interfaces, func(nic *plan.Resource) bool { return slices.Contains(awsIDs(nic), value) })
+		ordered := append(slices.Clone(interfaces[1:]), interfaces[0])
+		at := slices.IndexFunc(ordered, func(nic *plan.Resource) bool { return slices.Contains(awsIDs(nic), value) })
+
 		if at < 0 {
 			return nil
 		}
 
-		return interfaces[at]
+		return ordered[at]
 	}
 
 	found, _ := e.resolveAll(link.res, link.res.References[planPath(link.path)], &side{})

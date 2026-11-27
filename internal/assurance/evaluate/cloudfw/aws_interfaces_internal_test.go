@@ -265,3 +265,45 @@ func TestSeveralInterfacesNeedOnePair(t *testing.T) {
 		},
 	})
 }
+
+// TestGroupAttachmentToThePrimaryInterfaceBlock: an instance whose interfaces come from its `network_interface`
+// blocks has no view of its own, so a group attachment that names its primary interface by the known
+// `primary_network_interface_id` attaches the group to the view of that interface.
+func TestGroupAttachmentToThePrimaryInterfaceBlock(t *testing.T) {
+	t.Parallel()
+
+	const primaryNIC = "aws_network_interface.primary"
+
+	nic := func(address, id, ip string) plan.Resource {
+		res := resourceOf(address, awsNetworkInterface, map[string]any{
+			"id": id, "security_groups": []any{idApp}, "private_ip": ip,
+		})
+		res.Configured = []string{awsAttrSubnetID}
+
+		return res
+	}
+
+	web := resourceOf(awsWebInstance, awsInstance, map[string]any{
+		"id": "i-web", "primary_network_interface_id": "eni-primary", "vpc_security_group_ids": []any{},
+		"network_interface": []any{
+			map[string]any{"device_index": "0", awsAttrNICID: "eni-primary"},
+			map[string]any{"device_index": "1", awsAttrNICID: "eni-extra"},
+		},
+	})
+	web.Configured = []string{"network_interface", "network_interface[0].device_index",
+		"network_interface[0].network_interface_id", "network_interface[1].device_index",
+		"network_interface[1].network_interface_id"}
+
+	runQueryCases(t, []queryCase{{
+		name: "group attachment by the primary interface ID", from: awsWebInstance, to: awsDBGroup, want: VerdictAllowed,
+		resources: []plan.Resource{
+			web, nic(primaryNIC, "eni-primary", "10.0.1.10"), nic(awsExtraNIC, "eni-extra", "10.0.1.11"),
+			group(awsAppGroup, idApp, []any{}, []any{}),
+			group(awsExtraGroup, idExtra, []any{}, []any{allTraffic()}),
+			group(awsDBGroup, idDB, []any{postgresFrom(map[string]any{"security_groups": []any{idExtra}})}, []any{}),
+			resourceOf("aws_network_interface_sg_attachment.primary", awsSGAttachment, map[string]any{
+				awsAttrNICID: "eni-primary", "security_group_id": idExtra,
+			}),
+		},
+	}})
+}
